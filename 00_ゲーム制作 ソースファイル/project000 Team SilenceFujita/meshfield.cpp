@@ -1,0 +1,366 @@
+//======================================================================================================================
+//
+//	メッシュフィールド処理 [meshfield.cpp]
+//	Author：藤田勇一
+//
+//======================================================================================================================
+//**********************************************************************************************************************
+//	インクルードファイル
+//**********************************************************************************************************************
+#include "main.h"
+#include "meshfield.h"
+
+//**********************************************************************************************************************
+//	マクロ定義
+//**********************************************************************************************************************
+#define MAX_MESHFIELD		(4)			// 使用するポリゴン数 (メッシュフィールドの最大数)
+
+//**********************************************************************************************************************
+//	コンスト定義
+//**********************************************************************************************************************
+const char *apTextureMeshField[] =		// テクスチャの相対パス
+{
+	"data\\TEXTURE\\field000.png",		// メッシュフィールドのテクスチャの相対パス
+};
+
+//**********************************************************************************************************************
+//	列挙型定義 (TEXTURE_MESHFIELD)
+//**********************************************************************************************************************
+typedef enum
+{
+	TEXTURE_MESHFIELD_NORMAL = 0,		// メッシュフィールド (通常)
+	TEXTURE_MESHFIELD_MAX,				// この列挙型の総数
+} TEXTURE_MESHFIELD;
+
+//**********************************************************************************************************************
+//	構造体定義 (MeshField)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3 pos;					// 位置
+	D3DXVECTOR3 rot;					// 向き
+	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
+	float       fWidth;					// 横幅
+	float       fHeight;				// 縦幅
+	int         nPartWidth;				// 横の分割数
+	int         nPartHeight;			// 縦の分割数
+	int         nNumVtx;				// 必要頂点数
+	int         nNumIdx;				// 必要インデックス数
+	bool        bUse;					// 使用状況
+} MeshField;
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight);	// メッシュフィールドの設定処理
+
+//**********************************************************************************************************************
+//	グローバル変数
+//**********************************************************************************************************************
+LPDIRECT3DTEXTURE9      g_apTextureMeshField[TEXTURE_MESHFIELD_MAX] = {};	// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffMeshField = NULL;							// 頂点バッファへのポインタ
+LPDIRECT3DINDEXBUFFER9  g_pIdxBuffMeshField = NULL;							// インデックスバッファへのポインタ
+
+MeshField g_aMeshField[MAX_MESHFIELD];			// メッシュフィールドの情報
+int       g_nNeedVtxField;						// 必要頂点数
+int       g_nNeedIdxField;						// 必要インデックス数
+
+//======================================================================================================================
+//	メッシュフィールドの初期化処理
+//======================================================================================================================
+void InitMeshField(void)
+{
+	// 変数を宣言
+	int nNumVtx = 0;							// 頂点数の計測用
+
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	VERTEX_3D *pVtx;							// 頂点情報へのポインタ
+	WORD      *pIdx;							// インデックス情報へのポインタ
+
+	// グローバル変数の初期化
+	g_nNeedVtxField = 0;						// 必要頂点の総数
+	g_nNeedIdxField = 0;						// 必要インデックスの総数
+
+	// メッシュフィールドの情報の初期化
+	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
+	{ // メッシュフィールドの最大表示数分繰り返す
+
+		g_aMeshField[nCntMeshField].pos         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aMeshField[nCntMeshField].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aMeshField[nCntMeshField].fWidth      = 0.0f;								// 横幅
+		g_aMeshField[nCntMeshField].fHeight     = 0.0f;								// 縦幅
+		g_aMeshField[nCntMeshField].nPartWidth  = 0;								// 横の分割数
+		g_aMeshField[nCntMeshField].nPartHeight = 0;								// 縦の分割数
+		g_aMeshField[nCntMeshField].nNumVtx     = 0;								// 必要頂点数
+		g_aMeshField[nCntMeshField].nNumIdx     = 0;								// 必要インデックス数
+		g_aMeshField[nCntMeshField].bUse        = false;							// 使用状況
+	}
+
+	// テクスチャの読み込み
+	for (int nCntMeshField = 0; nCntMeshField < TEXTURE_MESHFIELD_MAX; nCntMeshField++)
+	{ // 使用するテクスチャ数分繰り返す
+
+		D3DXCreateTextureFromFile(pDevice, apTextureMeshField[nCntMeshField], &g_apTextureMeshField[nCntMeshField]);
+	}
+
+	// メッシュフィールドの設定
+	SetMeshField(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 1600.0f, 1600.0f, 8, 8);
+
+	// 頂点バッファの生成
+	pDevice->CreateVertexBuffer
+	( // 引数
+		sizeof(VERTEX_3D) * g_nNeedVtxField,	// 必要頂点数
+		D3DUSAGE_WRITEONLY,						// 使用方法
+		FVF_VERTEX_3D,							// 頂点フォーマット
+		D3DPOOL_MANAGED,						// メモリの指定
+		&g_pVtxBuffMeshField,					// 頂点バッファへのポインタ
+		NULL
+	);
+
+	// インデックスバッファの生成
+	pDevice->CreateIndexBuffer
+	( // 引数
+		sizeof(WORD) * g_nNeedIdxField,			// 必要インデックス数
+		D3DUSAGE_WRITEONLY,						// 使用方法
+		D3DFMT_INDEX16,							// インデックスバッファのフォーマット
+		D3DPOOL_MANAGED,						// メモリの指定
+		&g_pIdxBuffMeshField,					// インデックスバッファへのポインタ
+		NULL
+	);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	頂点情報の初期化
+	//------------------------------------------------------------------------------------------------------------------
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	g_pVtxBuffMeshField->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
+	{ // メッシュフィールドの最大表示数分繰り返す
+
+		if (g_aMeshField[nCntMeshField].bUse == true)
+		{ // メッシュフィールドが使用されている場合
+
+			for (int nCntHeight = 0; nCntHeight < g_aMeshField[nCntMeshField].nPartHeight + 1; nCntHeight++)
+			{ // 縦の分割数 +1回繰り返す
+
+				for (int nCntWidth = 0; nCntWidth < g_aMeshField[nCntMeshField].nPartWidth + 1; nCntWidth++)
+				{ // 横の分割数 +1回繰り返す
+
+					// 頂点座標の設定
+					pVtx[0].pos = D3DXVECTOR3
+					( // 引数
+						nCntWidth * (g_aMeshField[nCntMeshField].fWidth / (float)g_aMeshField[nCntMeshField].nPartWidth) - (g_aMeshField[nCntMeshField].fWidth * 0.5f),			// x
+						0.0f,																																					// y
+						-(nCntHeight * (g_aMeshField[nCntMeshField].fHeight / (float)g_aMeshField[nCntMeshField].nPartHeight) - (g_aMeshField[nCntMeshField].fHeight * 0.5f))	// z
+					);
+
+					// 法線ベクトルの設定
+					pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+
+					// 頂点カラーの設定
+					pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+					//// テクスチャ座標の設定
+					//pVtx[0].tex = D3DXVECTOR2
+					//( // 引数
+					//	nCntWidth * (1.0f / (float)g_aMeshField[nCntMeshField].nPartWidth) - (1.0f * 0.5f),		// u
+					//	nCntHeight * (1.0f / (float)g_aMeshField[nCntMeshField].nPartHeight) - (1.0f * 0.5f)	// v
+					//);
+
+					// テクスチャ座標の設定
+					pVtx[0].tex = D3DXVECTOR2(1.0f * (nCntWidth % 2), 1.0f * nCntHeight);
+
+					// 頂点データのポインタを 1つ分進める
+					pVtx += 1;
+				}
+			}
+		}
+	}
+
+	// 頂点バッファをアンロックする
+	g_pVtxBuffMeshField->Unlock();
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	インデックス情報の初期化
+	//------------------------------------------------------------------------------------------------------------------
+	// インデックスバッファをロックし、頂点番号データへのポインタを取得
+	g_pIdxBuffMeshField->Lock(0, 0, (void**)&pIdx, 0);
+
+	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
+	{ // メッシュフィールドの最大表示数分繰り返す
+
+		if (g_aMeshField[nCntMeshField].bUse == true)
+		{ // メッシュフィールドが使用されている場合
+
+			for (int nCntHeight = 0, nCntWidth = 0; nCntHeight < g_aMeshField[nCntMeshField].nPartHeight; nCntHeight++)
+			{ // 縦の分割数 +1回繰り返す
+
+				for (nCntWidth = 0; nCntWidth < g_aMeshField[nCntMeshField].nPartWidth + 1; nCntWidth++)
+				{ // 横の分割数 +1回繰り返す
+
+					pIdx[0] = nNumVtx + ((g_aMeshField[nCntMeshField].nPartWidth + 1) * (nCntHeight + 1) + nCntWidth);
+					pIdx[1] = nNumVtx + ((g_aMeshField[nCntMeshField].nPartWidth + 1) * nCntHeight + nCntWidth);
+
+					// インデックスデータのポインタを 2つ分進める
+					pIdx += 2;
+				}
+
+				if (nCntHeight != g_aMeshField[nCntMeshField].nPartHeight - 1)
+				{ // 一番手前の分割場所ではない場合
+
+					pIdx[0] = nNumVtx + ((g_aMeshField[nCntMeshField].nPartWidth + 1) * nCntHeight + nCntWidth - 1);
+					pIdx[1] = nNumVtx + ((g_aMeshField[nCntMeshField].nPartWidth + 1) * (nCntHeight + 2));
+
+					// インデックスデータのポインタを 2つ分進める
+					pIdx += 2;
+				}
+			}
+
+			// 頂点バッファの開始地点を必要数分ずらす
+			nNumVtx += g_aMeshField[nCntMeshField].nNumVtx;
+		}
+	}
+
+	// インデックスバッファをアンロックする
+	g_pIdxBuffMeshField->Unlock();
+}
+
+//======================================================================================================================
+//	メッシュフィールドの終了処理
+//======================================================================================================================
+void UninitMeshField(void)
+{
+	// テクスチャの破棄
+	for (int nCntMeshField = 0; nCntMeshField < TEXTURE_MESHFIELD_MAX; nCntMeshField++)
+	{ // 使用するテクスチャ数分繰り返す
+
+		if (g_apTextureMeshField[nCntMeshField] != NULL)
+		{ // 変数 (g_apTextureMeshField) がNULLではない場合
+
+			g_apTextureMeshField[nCntMeshField]->Release();
+			g_apTextureMeshField[nCntMeshField] = NULL;
+		}
+	}
+
+	// 頂点バッファの破棄
+	if (g_pVtxBuffMeshField != NULL)
+	{ // 変数 (g_pVtxBuffMeshField) がNULLではない場合
+
+		g_pVtxBuffMeshField->Release();
+		g_pVtxBuffMeshField = NULL;
+	}
+
+	// インデックスバッファの破棄
+	if (g_pIdxBuffMeshField != NULL)
+	{ // 変数 (g_pIdxBuffMeshField) がNULLではない場合
+
+		g_pIdxBuffMeshField->Release();
+		g_pIdxBuffMeshField = NULL;
+	}
+}
+
+//======================================================================================================================
+//	メッシュフィールドの更新処理
+//======================================================================================================================
+void UpdateMeshField(void)
+{
+
+}
+
+//======================================================================================================================
+//	メッシュフィールドの描画処理
+//======================================================================================================================
+void DrawMeshField(void)
+{
+	// 変数を宣言
+	int        nNumIdx = 0;						// インデックス数の計測用
+	D3DXMATRIX mtxRot, mtxTrans;				// 計算用マトリックス
+
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+
+	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
+	{ // メッシュフィールドの最大表示数分繰り返す
+
+		if (g_aMeshField[nCntMeshField].bUse == true)
+		{ // メッシュフィールドが使用されている場合
+
+			// ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&g_aMeshField[nCntMeshField].mtxWorld);
+
+			// 向きを反映
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aMeshField[nCntMeshField].rot.y, g_aMeshField[nCntMeshField].rot.x, g_aMeshField[nCntMeshField].rot.z);
+			D3DXMatrixMultiply(&g_aMeshField[nCntMeshField].mtxWorld, &g_aMeshField[nCntMeshField].mtxWorld, &mtxRot);
+
+			// 位置を反映
+			D3DXMatrixTranslation(&mtxTrans, g_aMeshField[nCntMeshField].pos.x, g_aMeshField[nCntMeshField].pos.y, g_aMeshField[nCntMeshField].pos.z);
+			D3DXMatrixMultiply(&g_aMeshField[nCntMeshField].mtxWorld, &g_aMeshField[nCntMeshField].mtxWorld, &mtxTrans);
+
+			// ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &g_aMeshField[nCntMeshField].mtxWorld);
+
+			// 頂点バッファをデータストリームに設定
+			pDevice->SetStreamSource(0, g_pVtxBuffMeshField, 0, sizeof(VERTEX_3D));
+
+			// インデックスバッファをデータストリームに設定
+			pDevice->SetIndices(g_pIdxBuffMeshField);
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_3D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureMeshField[TEXTURE_MESHFIELD_NORMAL]);
+
+			// ポリゴンの描画
+			pDevice->DrawIndexedPrimitive
+			( // 引数
+				D3DPT_TRIANGLESTRIP,					// プリミティブの種類
+				0,
+				0,
+				g_aMeshField[nCntMeshField].nNumVtx,	// 使用する頂点数
+				nNumIdx,								// インデックスバッファの開始地点
+				g_aMeshField[nCntMeshField].nNumIdx - 2	// プリミティブ (ポリゴン) 数
+			);
+
+			// インデックスバッファの開始地点を必要数分ずらす
+			nNumIdx += g_aMeshField[nCntMeshField].nNumIdx;
+		}
+	}
+}
+
+//======================================================================================================================
+//	メッシュフィールドの設定処理
+//======================================================================================================================
+void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight)
+{
+	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
+	{ // メッシュフィールドの最大表示数分繰り返す
+
+		if (g_aMeshField[nCntMeshField].bUse == false)
+		{ // メッシュフィールドが使用されていない場合
+
+			// 引数を代入
+			g_aMeshField[nCntMeshField].pos         = pos;			// 位置
+			g_aMeshField[nCntMeshField].rot         = rot;			// 向き
+			g_aMeshField[nCntMeshField].fWidth      = fWidth;		// 横幅
+			g_aMeshField[nCntMeshField].fHeight     = fHeight;		// 縦幅
+			g_aMeshField[nCntMeshField].nPartWidth  = nPartWidth;	// 横の分割数
+			g_aMeshField[nCntMeshField].nPartHeight = nPartHeight;	// 縦の分割数
+
+			// 使用している状態にする
+			g_aMeshField[nCntMeshField].bUse = true;
+
+			// 頂点バッファとインデックスバッファの必要数を設定
+			g_aMeshField[nCntMeshField].nNumVtx = (nPartWidth + 1) * (nPartHeight + 1);
+			g_aMeshField[nCntMeshField].nNumIdx = (nPartWidth + 1) * (((nPartHeight + 1) * 2) - 2) + (nPartHeight * 2) - 2;
+
+			// 頂点バッファとインデックスバッファの総数を加算
+			g_nNeedVtxField += g_aMeshField[nCntMeshField].nNumVtx;
+			g_nNeedIdxField += g_aMeshField[nCntMeshField].nNumIdx;
+
+			// 処理を抜ける
+			break;
+		}
+	}
+}
