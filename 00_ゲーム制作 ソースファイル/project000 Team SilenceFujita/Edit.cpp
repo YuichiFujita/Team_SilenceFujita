@@ -9,6 +9,7 @@
 #include "Edit.h"
 #include "input.h"
 #include "camera.h"
+#include "object.h"
 #include "Shadow.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
@@ -32,16 +33,16 @@ EditMaterial g_EditMaterial[MODELTYPE_MAX];				//マテリアルの情報
 int g_nStyleObject;										//スタイルの変数
 int g_nSoundDJ;											//現在流れているサウンド
 
-//Xファイル名
-const char *c_apModelnameEditObject[OBJECTTYPE_MAX] =
-{
-	"data/MODEL/Tree.x",								//木
-	"data/MODEL/Rock.x",								//岩
-	"data/MODEL/Forest.x",								//森
-	"data/MODEL/BigTree.x",								//大木
-	"data/MODEL/YellowTree.x",							//黄色い木
-	"data/MODEL/Grass.x"								//草
-};
+////Xファイル名
+//const char *c_apModelnameEditObject[OBJECTTYPE_MAX] =
+//{
+//	"data/MODEL/Tree.x",								//木
+//	"data/MODEL/Rock.x",								//岩
+//	"data/MODEL/Forest.x",								//森
+//	"data/MODEL/BigTree.x",								//大木
+//	"data/MODEL/YellowTree.x",							//黄色い木
+//	"data/MODEL/Grass.x"								//草
+//};
 
 //==========================================
 //モデルの初期化処理
@@ -68,7 +69,7 @@ void InitEditObject(void)
 		g_EditObject.bUse = false;
 
 		//エディットオブジェクトの種類を初期化する
-		g_EditObject.nType = OBJECTTYPE_TREE;
+		g_EditObject.nType = MODELTYPE_OBJECT_TREE;
 
 		for (int nCntEdit = 0; nCntEdit < MAX_TEXTURE; nCntEdit++)
 		{
@@ -98,7 +99,7 @@ void InitEditObject(void)
 	//サウンドを初期化する
 	g_nSoundDJ = FUJITA_DJ_LABEL_ONE;
 
-	for (int nCntDoll = 0; nCntDoll < OBJECTTYPE_MAX; nCntDoll++)
+	for (int nCntDoll = 0; nCntDoll < MODELTYPE_OBJECT_MAX; nCntDoll++)
 	{//モデルの初期化
 		for (int nCnt = 0; nCnt < MAX_TEXTURE; nCnt++)
 		{
@@ -116,7 +117,7 @@ void InitEditObject(void)
 		g_DollEditObject[nCntDoll].g_pMesh = NULL;
 	}
 
-	for (int nCntModel = 0; nCntModel < OBJECTTYPE_MAX; nCntModel++)
+	for (int nCntModel = 0; nCntModel < MODELTYPE_OBJECT_MAX; nCntModel++)
 	{//モデルの読み込み
 		//Xファイルの読み込み
 		D3DXLoadMeshFromX(c_apModelnameEditObject[nCntModel],
@@ -155,32 +156,7 @@ void InitEditObject(void)
 //========================================
 void UninitEditObject(void)
 {
-	for (int nCntDoll = 0; nCntDoll < OBJECTTYPE_MAX; nCntDoll++)
-	{
-		for (int nCntMat = 0; nCntMat < MAX_TEXTURE; nCntMat++)
-		{
-			//テクスチャの破棄
-			if (g_DollEditObject[nCntDoll].apTexture[nCntMat] != NULL)
-			{
-				g_DollEditObject[nCntDoll].apTexture[nCntMat]->Release();
-				g_DollEditObject[nCntDoll].apTexture[nCntMat] = NULL;
-			}
-		}
 
-		//メッシュの破棄
-		if (g_DollEditObject[nCntDoll].g_pMesh != NULL)
-		{
-			g_DollEditObject[nCntDoll].g_pMesh->Release();
-			g_DollEditObject[nCntDoll].g_pMesh = NULL;
-		}
-
-		//マテリアルの破棄
-		if (g_DollEditObject[nCntDoll].g_pBuffMat != NULL)
-		{
-			g_DollEditObject[nCntDoll].g_pBuffMat->Release();
-			g_DollEditObject[nCntDoll].g_pBuffMat = NULL;
-		}
-	}
 }
 
 //========================================
@@ -337,10 +313,10 @@ void DrawEditObject(void)
 			pDevice->SetMaterial(&g_EditMaterial[g_EditObject.nType].EditMaterial[nCntMat].MatD3D);
 
 			//テクスチャの設定
-			pDevice->SetTexture(0, g_EditObject.pDollData.apTexture[nCntMat]);
+			pDevice->SetTexture(0, g_EditObject.pModelData.pTexture[nCntMat]);
 
 			//モデル(パーツ)の描画
-			g_EditObject.pDollData.g_pMesh->DrawSubset(nCntMat);
+			g_EditObject.pModelData.pMesh->DrawSubset(nCntMat);
 		}
 		//保存していたマテリアルを戻す
 		pDevice->SetMaterial(&matDef);
@@ -378,8 +354,6 @@ void DeleteEditObject(void)
 
 				if (GetKeyboardTrigger(DIK_9) == true)
 				{//9キーを押した場合
-					//影のリセット処理
-					ResetShadow(&pObject->nShadow);
 
 					//使用していない
 					pObject->bUse = false;

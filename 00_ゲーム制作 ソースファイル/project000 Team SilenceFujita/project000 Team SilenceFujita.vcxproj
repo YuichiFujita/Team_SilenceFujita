@@ -165,6 +165,7 @@
     <ClCompile Include="meshfield.cpp" />
     <ClCompile Include="meshwall.cpp" />
     <ClCompile Include="model.cpp" />
+    <ClCompile Include="object.cpp" />
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="shadow.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="meshfield.h" />
     <ClInclude Include="meshwall.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="pause.h" />
     <ClInclude Include="shadow.h" />

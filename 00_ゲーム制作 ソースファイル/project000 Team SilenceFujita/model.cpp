@@ -21,22 +21,12 @@
 //************************************************************
 const char *apModelData[] =		// モデルの相対パス
 {
-	"data\\MODEL_PLAYER\\body.x",		// 体のモデル相対パス
-	"data\\MODEL_PLAYER\\head.x",		// 頭のモデル相対パス
-	"data\\MODEL_PLAYER\\sleeve_l.x",	// 左腕のモデル相対パス
-	"data\\MODEL_PLAYER\\sleeve_r.x",	// 右腕のモデル相対パス
-	"data\\MODEL_PLAYER\\wrist_l.x",	// 左手首のモデル相対パス
-	"data\\MODEL_PLAYER\\wrist_r.x",	// 右手首のモデル相対パス
-	"data\\MODEL_PLAYER\\hand_l.x",		// 左手のモデル相対パス
-	"data\\MODEL_PLAYER\\hand_r.x",		// 右手のモデル相対パス
-	"data\\MODEL_PLAYER\\pants_l.x",	// 左足のモデル相対パス
-	"data\\MODEL_PLAYER\\pants_r.x",	// 右足のモデル相対パス
-	"data\\MODEL_PLAYER\\leg_l.x",		// 左腿のモデル相対パス
-	"data\\MODEL_PLAYER\\leg_r.x",		// 右腿のモデル相対パス
-	"data\\MODEL_PLAYER\\shoes_l.x",	// 左靴のモデル相対パス
-	"data\\MODEL_PLAYER\\shoes_r.x",	// 右靴のモデル相対パス
-	"data\\MODEL_PLAYER\\knife.x",		// 武器 (ナイフ) のモデル相対パス
-	"data\\MODEL_PLAYER\\gun.x",		// 武器 (銃) のモデル相対パス
+	"data\\MODEL_OBJECT\\Tree.x",		// 木
+	"data\\MODEL_OBJECT\\Rock.x",		// 岩
+	"data\\MODEL_OBJECT\\Forest.x",		// 森
+	"data\\MODEL_OBJECT\\BigTree.x",	// 大木
+	"data\\MODEL_OBJECT\\YellowTree.x",	// 黄色い木
+	"data\\MODEL_OBJECT\\Grass.x"		// 草
 };
 
 //************************************************************
