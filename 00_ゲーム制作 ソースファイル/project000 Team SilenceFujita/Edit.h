@@ -20,7 +20,7 @@ typedef struct
 	int nSetNumber;										//オブジェクトの番号
 	int nType;											//種類
 	D3DXMATRIX mtx;										//ワールドマトリックス
-	Doll pDollData;										//モデルの基本情報
+	Model pModelData;									//モデルの基本情報
 	int nCntMaterial;									//マテリアルの番号
 	int nColorCount;									//色を変えるときのカウント
 }EditObject;

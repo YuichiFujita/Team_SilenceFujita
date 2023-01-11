@@ -179,7 +179,8 @@ void UninitEditBillboard(void)
 void UpdateEditBillboard(void)
 {
 	Billboard *pBillboard = GetBillboard();			//ビルボードの情報を取得する
-	D3DXVECTOR3 Camerarot = GetCamera().rot;		//カメラの情報を取得する
+	Camera *pCamera = GetCamera();					//カメラの情報を取得する
+
 	g_nStyleBillboard = GetStyle();					//スタイルを取得する
 
 	if (g_nStyleBillboard == EDITSTYLE_BILLBOARD)
@@ -207,13 +208,13 @@ void UpdateEditBillboard(void)
 	TypeChangeEditBillboard();
 
 	//移動処理
-	MoveEditBillboard(Camerarot.y);
+	MoveEditBillboard(pCamera->rot.y);
 
 	//ビルボードの削除処理
 	DeleteEditBillboard();
 
 	//ビルボードの設定処理
-	SetEditBillboard(Camerarot);
+	SetEditBillboard(pCamera->rot);
 
 	//ビルボードの拡大縮小処理(X軸)
 	ScaleBillboardX();
@@ -336,8 +337,6 @@ void DeleteEditBillboard(void)
 
 				if (GetKeyboardTrigger(DIK_9) == true)
 				{//9キーを押した場合
-					//影のリセット処理
-					ResetShadow(&Billboard->nShadow);
 
 					//使用していない
 					Billboard->bUse = false;
