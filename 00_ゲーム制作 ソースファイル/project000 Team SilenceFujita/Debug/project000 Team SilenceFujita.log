@@ -1,2 +1,37 @@
-﻿  project000 Team SilenceFujita.vcxproj -> C:\Users\student\Desktop\Team SilenceFujita\00_ゲーム制作 ソースファイル\project000 Team SilenceFujita\Debug\project000 Team SilenceFujita.exe
-  project000 Team SilenceFujita.vcxproj -> C:\Users\student\Desktop\Team SilenceFujita\00_ゲーム制作 ソースファイル\project000 Team SilenceFujita\Debug\project000 Team SilenceFujita.pdb (Full PDB)
+﻿  billboard.cpp
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(241): error C2660: 'SetPositionShadow': 関数に 3 個の引数を指定できません。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(244): error C2065: 'MESH_RADIUS': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(244): error C3861: 'CollisionOuterProduct': 識別子が見つかりませんでした
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(245): error C2065: 'MESH_RADIUS': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(245): error C3861: 'CollisionOuterProduct': 識別子が見つかりませんでした
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(246): error C2065: 'MESH_RADIUS': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(246): error C3861: 'CollisionOuterProduct': 識別子が見つかりませんでした
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(247): error C2065: 'MESH_RADIUS': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(247): error C3861: 'CollisionOuterProduct': 識別子が見つかりませんでした
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(420): error C2660: 'SetShadow': 関数に 2 個の引数を指定できません。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\billboard.cpp(451): error C3861: 'ResetShadow': 識別子が見つかりませんでした
+  EditBillboard.cpp
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\edit.h(23): error C3646: 'pDollData': 不明なオーバーライド指定子です
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\edit.h(23): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\edit.h(31): error C2065: 'MAX_MATERIAL': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(45): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(182): error C2228: '.rot' の左側はクラス、構造体、共用体でなければなりません
+  c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(182): note: 型は 'Camera *' です。
+  c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(182): note: 代わりに '->' を使用しますか?
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(183): error C3861: 'GetStyle': 識別子が見つかりませんでした
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(185): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(340): error C3861: 'ResetShadow': 識別子が見つかりませんでした
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(360): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(375): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(412): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(437): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(472): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(507): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(544): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\editbillboard.cpp(583): error C2065: 'EDITSTYLE_BILLBOARD': 定義されていない識別子です。
+  Edit.cpp
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\edit.h(23): error C3646: 'pDollData': 不明なオーバーライド指定子です
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\edit.h(23): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\edit.h(31): error C2065: 'MAX_MATERIAL': 定義されていない識別子です。
+c:\users\student\desktop\team silencefujita\00_ゲーム制作 ソースファイル\project000 team silencefujita\edit.cpp(14): fatal error C1083: include ファイルを開けません。'SoundDJ.h':No such file or directory
+  コードを生成中...

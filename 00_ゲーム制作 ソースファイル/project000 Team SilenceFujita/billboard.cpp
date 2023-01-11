@@ -8,7 +8,7 @@
 #include "game.h"
 #include "billboard.h"
 #include "input.h"
-#include "Shadow.h"
+#include "shadow.h"
 #include "meshfield.h"
 
 //プロトタイプ宣言
@@ -120,10 +120,10 @@ void InitBillboard(void)
 		pVtx[3].pos = D3DXVECTOR3(+g_aBillboard[nCnt].Radius.x, -g_aBillboard[nCnt].Radius.y, 0.0f);
 
 		//法線ベクトルの設定
-		pVtx[0].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[1].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[2].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[3].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 		//頂点カラーの設定
 		pVtx[0].col = g_aBillboard[nCnt].col;

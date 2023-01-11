@@ -5,7 +5,7 @@
 //
 //===========================================
 #include "main.h"
-#include "Object.h"
+#include "model.h"
 #include "Edit.h"
 #include "input.h"
 #include "camera.h"
@@ -28,8 +28,7 @@ void EditMaterialCustom(void);							//マテリアルのエディット処理
 
 //グローバル変数
 EditObject g_EditObject;								//オブジェクトの情報
-Doll g_DollEditObject[OBJECTTYPE_MAX];					//モデルの基本情報
-EditMaterial g_EditMaterial[OBJECTTYPE_MAX];			//マテリアルの情報
+EditMaterial g_EditMaterial[MODELTYPE_MAX];				//マテリアルの情報
 int g_nStyleObject;										//スタイルの変数
 int g_nSoundDJ;											//現在流れているサウンド
 

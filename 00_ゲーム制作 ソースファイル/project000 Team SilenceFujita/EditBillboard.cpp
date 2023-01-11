@@ -129,10 +129,10 @@ void InitEditBillboard(void)
 	pVtx[3].pos = D3DXVECTOR3(+g_EditBillboard.Radius.x, -g_EditBillboard.Radius.y, 0.0f);
 
 	//法線ベクトルの設定
-	pVtx[0].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[1].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[2].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[3].hor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 	//頂点カラーの設定
 	pVtx[0].col = g_EditBillboard.col;
