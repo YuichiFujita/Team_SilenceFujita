@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "input.h"
+#include "model.h"
 
 #include "object.h"
 #include "particle.h"
@@ -18,77 +19,23 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define OBJ_LIFE			(50)		// オブジェクトの体力
+#define OBJ_LIFE	(50)		// オブジェクトの体力
 
-#define DAMAGE_TIME_OBJ		(PLAY_SLASH_LIFE)		// ダメージ状態を保つ時間
-#define UNR_TIME_OBJ		(PLAY_SLASH_LIFE - 10)	// 無敵状態に変更する時間
-
-//**********************************************************************************************************************
-//	コンスト定義
-//**********************************************************************************************************************
-const char *apModelObject[] =			// モデルの相対パス
-{
-	"data\\MODEL_STAGE\\wood000.x",		// 木のモデル相対パス
-	"data\\MODEL_STAGE\\wood001.x",		// 木のモデル相対パス
-	"data\\MODEL_STAGE\\wood002.x",		// 木のモデル相対パス
-	"data\\MODEL_STAGE\\stone000.x",	// 石のモデル相対パス
-	"data\\MODEL_STAGE\\stone001.x",	// 石のモデル相対パス
-	"data\\MODEL_STAGE\\stone002.x",	// 石のモデル相対パス
-	"data\\MODEL_STAGE\\box000.x",		// 箱のモデル相対パス
-	"data\\MODEL_STAGE\\box001.x",		// 箱のモデル相対パス
-};
-
-//**********************************************************************************************************************
-//	列挙型定義 (OBJECTTYPE)
-//**********************************************************************************************************************
-typedef enum
-{
-	OBJECTTYPE_WOOD_S = 0,				// 木 (小)
-	OBJECTTYPE_WOOD_M,					// 木 (中)
-	OBJECTTYPE_WOOD_L,					// 木 (大)
-	OBJECTTYPE_STONE_S,					// 石 (小)
-	OBJECTTYPE_STONE_M,					// 石 (中)
-	OBJECTTYPE_STONE_L,					// 石 (大)
-	OBJECTTYPE_BOX_S,					// 箱 (小)
-	OBJECTTYPE_BOX_L,					// 箱 (大)
-	OBJECTTYPE_MAX,						// この列挙型の総数
-} OBJECTTYPE;
+#define DAMAGE_TIME_OBJ		(20)					// ダメージ状態を保つ時間
+#define UNR_TIME_OBJ		(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Model  g_aModelObject[OBJECTTYPE_MAX];	// オブジェクトのモデル情報
-Object g_aObject[MAX_OBJECT];			// オブジェクトの情報
+Object g_aObject[MAX_OBJECT];	// オブジェクトの情報
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
 //======================================================================================================================
 void InitObject(void)
 {
-	// 変数を宣言
-	int         nNumVtx;		// モデルの頂点数
-	DWORD       dwSizeFVF;		// モデルの頂点フォーマットのサイズ
-	BYTE        *pVtxBuff;		// モデルの頂点バッファへのポインタ
-	D3DXVECTOR3 vtx;			// モデルの頂点座標
-	D3DXVECTOR3 size;			// モデルの大きさ
-
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
-	D3DXMATERIAL      *pMat;					// マテリアルへのポインタ
-
-	// オブジェクトのモデル情報の初期化
-	for (int nCntObject = 0; nCntObject < OBJECTTYPE_MAX; nCntObject++)
-	{ // オブジェクトの種類分繰り返す
-
-		g_aModelObject[nCntObject].apTexture[MAX_MODEL_TEXTURE] = {};						// テクスチャへのポインタ
-		g_aModelObject[nCntObject].pMesh    = NULL;											// メッシュ (頂点情報) へのポインタ
-		g_aModelObject[nCntObject].pBuffMat = NULL;											// マテリアルへのポインタ
-		g_aModelObject[nCntObject].dwNumMat = 0;											// マテリアルの数
-		g_aModelObject[nCntObject].vtxMin   = D3DXVECTOR3( 9999.0f,  9999.0f,  9999.0f);	// 最小の頂点座標
-		g_aModelObject[nCntObject].vtxMax   = D3DXVECTOR3(-9999.0f, -9999.0f, -9999.0f);	// 最大の頂点座標
-		g_aModelObject[nCntObject].fHeight  = 0.0f;											// 縦幅
-		g_aModelObject[nCntObject].fRadius  = 0.0f;											// 半径
-	}
 
 	// オブジェクトの情報の初期化
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
@@ -96,6 +43,7 @@ void InitObject(void)
 
 		g_aObject[nCntObject].pos           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
 		g_aObject[nCntObject].rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
+		g_aObject[nCntObject].scale         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
 		g_aObject[nCntObject].pModelData    = NULL;									// モデル情報
 		g_aObject[nCntObject].state         = ACTIONSTATE_NONE;						// 状態
 		g_aObject[nCntObject].nLife         = 0;									// 体力
@@ -105,120 +53,6 @@ void InitObject(void)
 		g_aObject[nCntObject].nShadowID     = NONE_SHADOW;							// 影のインデックス
 		g_aObject[nCntObject].bUse          = false;								// 使用状況
 	}
-
-	// xファイルの読み込み
-	for (int nCntObject = 0; nCntObject < OBJECTTYPE_MAX; nCntObject++)
-	{ // オブジェクトの種類分繰り返す
-
-		D3DXLoadMeshFromX
-		( // 引数
-			apModelObject[nCntObject],				// モデルの相対パス
-			D3DXMESH_SYSTEMMEM,
-			pDevice,								// デバイスへのポインタ
-			NULL,
-			&g_aModelObject[nCntObject].pBuffMat,	// マテリアルへのポインタ
-			NULL,
-			&g_aModelObject[nCntObject].dwNumMat,	// マテリアルの数
-			&g_aModelObject[nCntObject].pMesh		// メッシュ (頂点情報) へのポインタ
-		);
-	}
-
-	// 当たり判定の作成
-	for (int nCntObject = 0; nCntObject < OBJECTTYPE_MAX; nCntObject++)
-	{ // オブジェクトの種類分繰り返す
-
-		// モデルの頂点数を取得
-		nNumVtx = g_aModelObject[nCntObject].pMesh->GetNumVertices();
-
-		// モデルの頂点フォーマットのサイズを取得
-		dwSizeFVF = D3DXGetFVFVertexSize(g_aModelObject[nCntObject].pMesh->GetFVF());
-
-		// モデルの頂点バッファをロック
-		g_aModelObject[nCntObject].pMesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
-
-		for (int nCntVtx = 0; nCntVtx < nNumVtx; nCntVtx++)
-		{ // モデルの頂点数分繰り返す
-
-			// モデルの頂点座標を代入
-			vtx = *(D3DXVECTOR3*)pVtxBuff;
-
-			// 頂点座標 (x) の設定
-			if (vtx.x < g_aModelObject[nCntObject].vtxMin.x)
-			{ // 今回の頂点座標 (x) が、現状の頂点座標 (x) よりも小さい場合
-
-				// 今回の頂点情報 (x) を代入
-				g_aModelObject[nCntObject].vtxMin.x = vtx.x;
-			}
-			else if (vtx.x > g_aModelObject[nCntObject].vtxMax.x)
-			{ // 今回の頂点座標 (x) が、現状の頂点座標 (x) よりも大きい場合
-
-				// 今回の頂点情報 (x) を代入
-				g_aModelObject[nCntObject].vtxMax.x = vtx.x;
-			}
-
-			// 頂点座標 (y) の設定
-			if (vtx.y < g_aModelObject[nCntObject].vtxMin.y)
-			{ // 今回の頂点座標 (y) が、現状の頂点座標 (y) よりも小さい場合
-
-				// 今回の頂点情報 (y) を代入
-				g_aModelObject[nCntObject].vtxMin.y = vtx.y;
-			}
-			else if (vtx.y > g_aModelObject[nCntObject].vtxMax.y)
-			{ // 今回の頂点座標 (y) が、現状の頂点座標 (y) よりも大きい場合
-
-				// 今回の頂点情報 (y) を代入
-				g_aModelObject[nCntObject].vtxMax.y = vtx.y;
-			}
-
-			// 頂点座標 (z) の設定
-			if (vtx.z < g_aModelObject[nCntObject].vtxMin.z)
-			{ // 今回の頂点座標 (z) が、現状の頂点座標 (z) よりも小さい場合
-
-				// 今回の頂点情報 (z) を代入
-				g_aModelObject[nCntObject].vtxMin.z = vtx.z;
-			}
-			else if (vtx.z > g_aModelObject[nCntObject].vtxMax.z)
-			{ // 今回の頂点座標 (z) が、現状の頂点座標 (z) よりも大きい場合
-
-				// 今回の頂点情報 (z) を代入
-				g_aModelObject[nCntObject].vtxMax.z = vtx.z;
-			}
-
-			// 頂点フォーマットのサイズ分ポインタを進める
-			pVtxBuff += dwSizeFVF;
-		}
-
-		// モデルの頂点バッファをアンロック
-		g_aModelObject[nCntObject].pMesh->UnlockVertexBuffer();
-
-		// モデルサイズを求める
-		size = g_aModelObject[nCntObject].vtxMax - g_aModelObject[nCntObject].vtxMin;
-
-		// モデルの縦幅を代入
-		g_aModelObject[nCntObject].fHeight = size.y;
-
-		// モデルの円の当たり判定を作成
-		g_aModelObject[nCntObject].fRadius = ((size.x * 0.5f) + (size.z * 0.5f)) * 0.5f;
-	}
-
-	// テクスチャの読み込み
-	for (int nCntObject = 0; nCntObject < OBJECTTYPE_MAX; nCntObject++)
-	{ // オブジェクトの種類分繰り返す
-
-		// マテリアル情報に対するポインタを取得
-		pMat = (D3DXMATERIAL*)g_aModelObject[nCntObject].pBuffMat->GetBufferPointer();
-
-		for (int nCntMat = 0; nCntMat < (int)g_aModelObject[nCntObject].dwNumMat; nCntMat++)
-		{ // マテリアルの数分繰り返す
-
-			if (pMat[nCntMat].pTextureFilename != NULL)
-			{ // テクスチャファイルが存在する場合
-
-				// テクスチャの読み込み
-				D3DXCreateTextureFromFile(pDevice, pMat[nCntMat].pTextureFilename, &g_aModelObject[nCntObject].apTexture[nCntMat]);
-			}
-		}
-	}
 }
 
 //======================================================================================================================
@@ -226,45 +60,7 @@ void InitObject(void)
 //======================================================================================================================
 void UninitObject(void)
 {
-	// テクスチャの破棄
-	for (int nCntObject = 0; nCntObject < OBJECTTYPE_MAX; nCntObject++)
-	{ // オブジェクトの種類分繰り返す
 
-		for (int nCntMat = 0; nCntMat < MAX_MODEL_TEXTURE; nCntMat++)
-		{ // 使用するテクスチャ数分繰り返す
-
-			if (g_aModelObject[nCntObject].apTexture[nCntMat] != NULL)
-			{ // 変数 (g_aModelObject[nCntObject].apTexture) がNULLではない場合
-
-				g_aModelObject[nCntObject].apTexture[nCntMat]->Release();
-				g_aModelObject[nCntObject].apTexture[nCntMat] = NULL;
-			}
-		}
-	}
-
-	// メッシュの破棄
-	for (int nCntObject = 0; nCntObject < OBJECTTYPE_MAX; nCntObject++)
-	{ // オブジェクトの種類分繰り返す
-
-		if (g_aModelObject[nCntObject].pMesh != NULL)
-		{ // 変数 (g_aModelObject[nCntObject].pMesh) がNULLではない場合
-
-			g_aModelObject[nCntObject].pMesh->Release();
-			g_aModelObject[nCntObject].pMesh = NULL;
-		}
-	}
-
-	// マテリアルの破棄
-	for (int nCntObject = 0; nCntObject < OBJECTTYPE_MAX; nCntObject++)
-	{ // オブジェクトの種類分繰り返す
-
-		if (g_aModelObject[nCntObject].pBuffMat != NULL)
-		{ // 変数 (g_aModelObject[nCntObject].pBuffMat) がNULLではない場合
-
-			g_aModelObject[nCntObject].pBuffMat->Release();
-			g_aModelObject[nCntObject].pBuffMat = NULL;
-		}
-	}
 }
 
 //======================================================================================================================
@@ -322,8 +118,8 @@ void UpdateObject(void)
 void DrawObject(void)
 {
 	// 変数を宣言
-	D3DXMATRIX   mtxRot, mtxTrans;	// 計算用マトリックス
-	D3DMATERIAL9 matDef;			// 現在のマテリアル保存用
+	D3DXMATRIX   mtxScale, mtxRot, mtxTrans;	// 計算用マトリックス
+	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -338,6 +134,10 @@ void DrawObject(void)
 
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aObject[nCntObject].mtxWorld);
+
+			//拡大率を反映
+			D3DXMatrixScaling(&mtxScale, g_aObject[nCntObject].scale.x, g_aObject[nCntObject].scale.y, g_aObject[nCntObject].scale.z);
+			D3DXMatrixMultiply(&g_aObject[nCntObject].mtxWorld, &g_aObject[nCntObject].mtxWorld, &mtxScale);
 
 			// 向きを反映
 			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aObject[nCntObject].rot.y, g_aObject[nCntObject].rot.x, g_aObject[nCntObject].rot.z);
@@ -387,7 +187,7 @@ void DrawObject(void)
 				}
 
 				// テクスチャの設定
-				pDevice->SetTexture(0, g_aObject[nCntObject].pModelData->apTexture[nCntMat]);
+				pDevice->SetTexture(0, g_aObject[nCntObject].pModelData->pTexture[nCntMat]);
 
 				// モデルの描画
 				g_aObject[nCntObject].pModelData->pMesh->DrawSubset(nCntMat);
@@ -402,8 +202,11 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nBreakType, int nType)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nBreakType, int nType)
 {
+	// ポインタを宣言
+	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
+
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -413,6 +216,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nBreakType, int nType)
 			// 引数を代入
 			g_aObject[nCntObject].pos        = pos;			// 位置
 			g_aObject[nCntObject].rot        = rot;			// 向き
+			g_aObject[nCntObject].scale      = scale;		// 拡大率
 			g_aObject[nCntObject].nBreakType = nBreakType;	// 壊れ方の種類
 			g_aObject[nCntObject].nType      = nType;		// オブジェクトの種類
 
@@ -425,15 +229,36 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nBreakType, int nType)
 			g_aObject[nCntObject].bUse = true;
 
 			// モデル情報を設定
-			g_aObject[nCntObject].pModelData = &g_aModelObject[nType];	// モデル情報
+			g_aObject[nCntObject].pModelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
+
+			// 最大値を反映する
+			g_aObject[nCntObject].pModelData->vtxMax.x *= g_aObject[nCntObject].scale.x;
+			g_aObject[nCntObject].pModelData->vtxMax.y *= g_aObject[nCntObject].scale.y;
+			g_aObject[nCntObject].pModelData->vtxMax.z *= g_aObject[nCntObject].scale.z;
+
+			// 最小値を反映する
+			g_aObject[nCntObject].pModelData->vtxMin.x *= g_aObject[nCntObject].scale.x;
+			g_aObject[nCntObject].pModelData->vtxMin.y *= g_aObject[nCntObject].scale.y;
+			g_aObject[nCntObject].pModelData->vtxMin.z *= g_aObject[nCntObject].scale.z;
+
+			// マテリアルデータへのポインタを取得
+			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].pModelData->pBuffMat->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].pModelData->dwNumMat; nCntMat++)
+			{ // マテリアルの数分繰り返す
+
+				// 引数の色を代入
+				pMatModel[nCntMat].MatD3D.Ambient = pMat[nCntMat].MatD3D.Ambient;
+				pMatModel[nCntMat].MatD3D.Diffuse = pMat[nCntMat].MatD3D.Diffuse;
+			}
 
 			// 影のインデックスを設定
 			g_aObject[nCntObject].nShadowID = SetShadow
 			( // 引数
-				0.5f,																												// α値
-				fabsf(g_aModelObject[g_aObject[nCntObject].nType].vtxMax.x - g_aModelObject[g_aObject[nCntObject].nType].vtxMin.x),	// 半径
-				&g_aObject[nCntObject].nShadowID,																					// 影の親の影インデックス
-				&g_aObject[nCntObject].bUse																							// 影の親の使用状況
+				0.5f,																																// α値
+				fabsf(g_aObject[g_aObject[nCntObject].nType].pModelData->vtxMax.x - g_aObject[g_aObject[nCntObject].nType].pModelData->vtxMin.x),	// 半径
+				&g_aObject[nCntObject].nShadowID,																									// 影の親の影インデックス
+				&g_aObject[nCntObject].bUse																											// 影の親の使用状況
 			);
 
 			// 影の位置設定
@@ -445,6 +270,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nBreakType, int nType)
 	}
 }
 
+#if 0
 //======================================================================================================================
 //	オブジェクトのダメージ判定
 //======================================================================================================================
@@ -502,6 +328,7 @@ void HitObject(Object *pObject, int nDamage)
 		}
 	}
 }
+#endif
 
 //======================================================================================================================
 //	オブジェクトとの当たり判定

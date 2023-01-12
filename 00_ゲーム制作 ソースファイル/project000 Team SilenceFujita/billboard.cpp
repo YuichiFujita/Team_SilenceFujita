@@ -10,6 +10,7 @@
 #include "input.h"
 #include "shadow.h"
 #include "meshfield.h"
+#include "Editmain.h"
 
 //プロトタイプ宣言
 void CollisionWall(Billboard *Billboard);		//壁の当たり判定
@@ -238,13 +239,13 @@ void UpdateBillboard(void)
 			pVtx[3].col = g_aBillboard[nCntBill].col;
 
 			//影の位置の設定処理
-			SetPositionShadow(g_aBillboard[nCntBill].nShadow, g_aBillboard[nCntBill].pos, g_aBillboard[nCntBill].rot);
+			SetPositionShadow(g_aBillboard[nCntBill].nShadow, g_aBillboard[nCntBill].pos);
 
-			//ビルボードの当たり判定
-			CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(MESH_RADIUS, 0.0f, MESH_RADIUS), D3DXVECTOR3(-MESH_RADIUS, 0.0f, MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
-			CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(MESH_RADIUS, 0.0f, -MESH_RADIUS), D3DXVECTOR3(MESH_RADIUS, 0.0f, MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
-			CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(-MESH_RADIUS, 0.0f, -MESH_RADIUS), D3DXVECTOR3(MESH_RADIUS, 0.0f, -MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
-			CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(-MESH_RADIUS, 0.0f, MESH_RADIUS), D3DXVECTOR3(-MESH_RADIUS, 0.0f, -MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
+			////ビルボードの当たり判定
+			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(MESH_RADIUS, 0.0f, MESH_RADIUS), D3DXVECTOR3(-MESH_RADIUS, 0.0f, MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
+			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(MESH_RADIUS, 0.0f, -MESH_RADIUS), D3DXVECTOR3(MESH_RADIUS, 0.0f, MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
+			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(-MESH_RADIUS, 0.0f, -MESH_RADIUS), D3DXVECTOR3(MESH_RADIUS, 0.0f, -MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
+			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(-MESH_RADIUS, 0.0f, MESH_RADIUS), D3DXVECTOR3(-MESH_RADIUS, 0.0f, -MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
 		}
 		pVtx += 4;					//頂点データを4つ分進める
 	}
@@ -417,7 +418,7 @@ void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radiu
 			if (g_aBillboard[nCntBill].Type != BILLBOARD_EXPL)
 			{//爆発のビルボード以外だった場合
 				//影を設定する
-				g_aBillboard[nCntBill].nShadow = SetShadow(D3DXVECTOR3(5.0f, 0.0f, 5.0f), g_aBillboard[nCntBill].pos);
+				g_aBillboard[nCntBill].nShadow = SetShadow(0.5f, 30.0f, &g_aBillboard[nCntBill].nShadow, &g_aBillboard[nCntBill].bUse);
 			}
 
 			//使用する
@@ -446,9 +447,6 @@ void CollisionWall(Billboard *Billboard)
 
 		//使用していない
 		Billboard->bUse = false;
-
-		//影のリセット処理
-		ResetShadow(&Billboard->nShadow);
 	}
 }
 

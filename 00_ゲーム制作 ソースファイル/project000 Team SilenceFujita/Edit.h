@@ -8,7 +8,11 @@
 #define _EDIT_H_
 
 #include "main.h"
+#include "model.h"
 #include "game.h"
+
+//マクロ定義
+#define MAX_MATERIAL	(32)	// マテリアルの最大数
 
 //セットオブジェクトの情報
 typedef struct
@@ -20,16 +24,11 @@ typedef struct
 	int nSetNumber;										//オブジェクトの番号
 	int nType;											//種類
 	D3DXMATRIX mtx;										//ワールドマトリックス
-	Model pModelData;									//モデルの基本情報
+	Model *pModelData;									//モデルの基本情報
 	int nCntMaterial;									//マテリアルの番号
 	int nColorCount;									//色を変えるときのカウント
+	D3DXMATERIAL EditMaterial[MODELTYPE_OBJECT_MAX][MAX_MATERIAL] = {};		//カスタム用のマテリアル情報
 }EditObject;
-
-//エディットマテリアルの情報
-typedef struct
-{
-	D3DXMATERIAL EditMaterial[MAX_MATERIAL] = {};		//カスタム用のマテリアル情報
-}EditMaterial;
 
 //プロトタイプ宣言
 void InitEditObject(void);								//オブジェクトの初期化処理
@@ -37,6 +36,6 @@ void UninitEditObject(void);							//オブジェクトの終了処理
 void UpdateEditObject(void);							//オブジェクトの更新処理
 void DrawEditObject(void);								//オブジェクトの描画処理
 EditObject *GetEditObject(void);						//エディットオブジェクトの取得処理
-EditMaterial GetCustomMaterial(void);					//マテリアルの情報取得処理
+//EditMaterial GetCustomMaterial(void);					//マテリアルの情報取得処理
 
 #endif

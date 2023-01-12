@@ -11,6 +11,7 @@
 #include "Shadow.h"
 #include "billboard.h"
 #include "Edit.h"
+#include "Editmain.h"
 
 //プロトタイプ宣言
 void TypeChangeEditBillboard(void);						//種類変更処理

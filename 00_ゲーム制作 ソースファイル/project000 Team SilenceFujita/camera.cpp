@@ -132,128 +132,6 @@ void SetCamera(void)
 void MoveCamera(void)
 {
 	//------------------------------------------------------------------------------------------------------------------
-	//	前後左右の更新
-	//------------------------------------------------------------------------------------------------------------------
-	if (GetKeyboardPress(DIK_W) == true)
-	{ // [W] が押された場合
-
-		if (GetKeyboardPress(DIK_A) == true)
-		{ // [A] も押された場合
-
-			// 視点を移動
-			g_camera.posV.x += sinf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-			g_camera.posV.z += cosf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-
-			// 注視点を移動
-			g_camera.posR.x += sinf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-			g_camera.posR.z += cosf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-		}
-		else if (GetKeyboardPress(DIK_D) == true)
-		{ // [D] も押された場合
-
-			// 視点を移動
-			g_camera.posV.x -= sinf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-			g_camera.posV.z -= cosf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-
-			// 注視点を移動
-			g_camera.posR.x -= sinf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-			g_camera.posR.z -= cosf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-		}
-		else
-		{ // [W] だけが押された場合
-
-			// 視点を移動
-			g_camera.posV.x += sinf(g_camera.rot.y) * MOVE_CAMERA;
-			g_camera.posV.z += cosf(g_camera.rot.y) * MOVE_CAMERA;
-
-			// 注視点を移動
-			g_camera.posR.x += sinf(g_camera.rot.y) * MOVE_CAMERA;
-			g_camera.posR.z += cosf(g_camera.rot.y) * MOVE_CAMERA;
-		}
-	}
-	else if (GetKeyboardPress(DIK_S) == true)
-	{ // [S] が押された場合
-
-		if (GetKeyboardPress(DIK_A) == true)
-		{ // [A] も押された場合
-
-			// 視点を移動
-			g_camera.posV.x += sinf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-			g_camera.posV.z += cosf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-
-			// 注視点を移動
-			g_camera.posR.x += sinf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-			g_camera.posR.z += cosf(g_camera.rot.y - (D3DX_PI * 0.75f)) * MOVE_CAMERA;
-		}
-		else if (GetKeyboardPress(DIK_D) == true)
-		{ // [D] も押された場合
-
-			// 視点を移動
-			g_camera.posV.x -= sinf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-			g_camera.posV.z -= cosf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-
-			// 注視点を移動
-			g_camera.posR.x -= sinf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-			g_camera.posR.z -= cosf(g_camera.rot.y - (D3DX_PI * 0.25f)) * MOVE_CAMERA;
-		}
-		else
-		{ // [W] だけが押された場合
-
-			// 視点を移動
-			g_camera.posV.x -= sinf(g_camera.rot.y) * MOVE_CAMERA;
-			g_camera.posV.z -= cosf(g_camera.rot.y) * MOVE_CAMERA;
-
-			// 注視点を移動
-			g_camera.posR.x -= sinf(g_camera.rot.y) * MOVE_CAMERA;
-			g_camera.posR.z -= cosf(g_camera.rot.y) * MOVE_CAMERA;
-		}
-	}
-	else if (GetKeyboardPress(DIK_A) == true)
-	{ // [A] が押された場合
-
-		// 視点を移動
-		g_camera.posV.x += sinf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-		g_camera.posV.z += cosf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-
-		// 注視点を移動
-		g_camera.posR.x += sinf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-		g_camera.posR.z += cosf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-	}
-	else if (GetKeyboardPress(DIK_D) == true)
-	{ // [D] が押された場合
-
-		// 視点を移動
-		g_camera.posV.x -= sinf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-		g_camera.posV.z -= cosf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-
-		// 注視点を移動
-		g_camera.posR.x -= sinf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-		g_camera.posR.z -= cosf(g_camera.rot.y - (D3DX_PI * 0.5f)) * MOVE_CAMERA;
-	}
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	上下の更新
-	//------------------------------------------------------------------------------------------------------------------
-	else if (GetKeyboardPress(DIK_R) == true)
-	{ // [R] が押された場合
-
-		// 視点を移動
-		g_camera.posV.y += MOVE_CAMERA;
-
-		// 注視点を移動
-		g_camera.posR.y += MOVE_CAMERA;
-	}
-	else if (GetKeyboardPress(DIK_V) == true)
-	{ // [V] が押された場合
-
-		// 視点を移動
-		g_camera.posV.y -= MOVE_CAMERA;
-
-		// 注視点を移動
-		g_camera.posR.y -= MOVE_CAMERA;
-	}
-
-	//------------------------------------------------------------------------------------------------------------------
 	//	マウス操作の更新
 	//------------------------------------------------------------------------------------------------------------------
 	if (GetMousePress(MOUKEY_LEFT) == true && GetMousePress(MOUKEY_RIGHT) == true)
@@ -281,23 +159,6 @@ void MoveCamera(void)
 void DisCamera(void)
 {
 	//------------------------------------------------------------------------------------------------------------------
-	//	距離の更新
-	//------------------------------------------------------------------------------------------------------------------
-	// 距離の変更
-	if (GetKeyboardPress(DIK_U) == true)
-	{ // [U] が押された場合
-
-		// 視点を移動
-		g_camera.fDis -= MOVE_DIS;
-	}
-	else if (GetKeyboardPress(DIK_M) == true)
-	{ // [M] が押された場合
-
-		// 視点を移動
-		g_camera.fDis += MOVE_DIS;
-	}
-
-	//------------------------------------------------------------------------------------------------------------------
 	//	マウス操作の更新
 	//------------------------------------------------------------------------------------------------------------------
 	if (GetMouseMove().z != 0.0f)
@@ -323,38 +184,6 @@ void DisCamera(void)
 //======================================================================================================================
 void RotCamera(void)
 {
-	//------------------------------------------------------------------------------------------------------------------
-	//	視点の向きの更新 (x)
-	//------------------------------------------------------------------------------------------------------------------
-	if (GetKeyboardPress(DIK_Y) == true)
-	{ // [Y] が押された場合
-
-		// 上に回転
-		g_camera.rot.x += MOVE_ROT_X;
-	}
-	else if (GetKeyboardPress(DIK_N) == true)
-	{ // [N] が押された場合
-
-		// 下に回転
-		g_camera.rot.x -= MOVE_ROT_X;
-	}
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	視点の向きの更新 (y)
-	//------------------------------------------------------------------------------------------------------------------
-	if (GetKeyboardPress(DIK_Z) == true)
-	{ // [Z] が押された場合
-
-		// 左に回転
-		g_camera.rot.y += MOVE_ROT_Y;
-	}
-	else if (GetKeyboardPress(DIK_C) == true)
-	{ // [C] が押された場合
-
-		// 右に回転
-		g_camera.rot.y -= MOVE_ROT_Y;
-	}
-
 	//------------------------------------------------------------------------------------------------------------------
 	//	マウス操作の更新
 	//------------------------------------------------------------------------------------------------------------------
@@ -383,38 +212,6 @@ void RotCamera(void)
 	g_camera.posV.x = g_camera.posR.x + ((g_camera.fDis * sinf(g_camera.rot.x)) * sinf(g_camera.rot.y));
 	g_camera.posV.y = g_camera.posR.y + ((g_camera.fDis * cosf(g_camera.rot.x)));
 	g_camera.posV.z = g_camera.posR.z + ((g_camera.fDis * sinf(g_camera.rot.x)) * cosf(g_camera.rot.y));
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	注視点の向きの更新 (x)
-	//------------------------------------------------------------------------------------------------------------------
-	if (GetKeyboardPress(DIK_T) == true)
-	{ // [T] が押された場合
-
-		// 上に回転
-		g_camera.rot.x -= MOVE_ROT_X;
-	}
-	else if (GetKeyboardPress(DIK_B) == true)
-	{ // [B] が押された場合
-
-		// 下に回転
-		g_camera.rot.x += MOVE_ROT_X;
-	}
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	注視点の向きの更新 (y)
-	//------------------------------------------------------------------------------------------------------------------
-	if (GetKeyboardPress(DIK_Q) == true)
-	{ // [Q] が押された場合
-
-		// 左に回転
-		g_camera.rot.y -= MOVE_ROT_Y;
-	}
-	else if (GetKeyboardPress(DIK_E) == true)
-	{ // [E] が押された場合
-
-		// 右に回転
-		g_camera.rot.y += MOVE_ROT_Y;
-	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	マウス操作の更新
