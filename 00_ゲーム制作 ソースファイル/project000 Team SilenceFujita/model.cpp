@@ -21,12 +21,16 @@
 //************************************************************
 const char *apModelData[] =		// モデルの相対パス
 {
+	// オブジェクトモデル
 	"data\\MODEL_OBJECT\\Tree.x",		// 木
 	"data\\MODEL_OBJECT\\Rock.x",		// 岩
 	"data\\MODEL_OBJECT\\Forest.x",		// 森
 	"data\\MODEL_OBJECT\\BigTree.x",	// 大木
 	"data\\MODEL_OBJECT\\YellowTree.x",	// 黄色い木
-	"data\\MODEL_OBJECT\\Grass.x"		// 草
+	"data\\MODEL_OBJECT\\Grass.x",		// 草
+
+	// プレイヤーモデル
+	"data\\MODEL_PLAYER\\head.x",		// 頭
 };
 
 //************************************************************

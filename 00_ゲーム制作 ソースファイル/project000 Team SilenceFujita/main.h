@@ -35,17 +35,11 @@
 #define FVF_VERTEX_2D		(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)				// 頂点フォーマット [2D]
 #define FVF_VERTEX_3D		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 頂点フォーマット [3D]
 
+#define STAGE_SETUP_TXT		"data\\TXT\\stage.txt"
+
 #define SCREEN_WIDTH		(1280)			// ウインドウの幅
 #define SCREEN_HEIGHT		(720)			// ウインドウの高さ
-
-#define MAX_MODEL_TEXTURE	(10)			// テクスチャの最大数
 #define MAX_STRING			(128)			// セットアップ時のテキスト読み込み文字列の最長
-
-#define STAGE_LIMIT_NEAR	(800.0f)		// 移動制限の位置 (手前)
-#define STAGE_LIMIT_FAR		(-800.0f)		// 移動制限の位置 (奥)
-#define STAGE_LIMIT_RIGHT	(800.0f)		// 移動制限の位置 (右)
-#define STAGE_LIMIT_LEFT	(-800.0f)		// 移動制限の位置 (左)
-#define STAGE_LIMIT_FIELD	(0.0f)			// 移動制限の位置 (地面)
 
 //**********************************************************************************************************************
 //	列挙型定義 (MODE)
@@ -78,15 +72,31 @@ typedef enum
 } ALPHASTATE;
 
 //**********************************************************************************************************************
-//	列挙型定義 (DAMAGESTATE)
+//	列挙型定義 (ACTIONSTATE)
 //**********************************************************************************************************************
 typedef enum
 {
-	DAMAGESTATE_NONE = 0,	// 何もしない状態
-	DAMAGESTATE_NORMAL,		// 通常状態
-	DAMAGESTATE_DAMAGE,		// ダメージ状態
-	DAMAGESTATE_MAX,		// この列挙型の総数
-} DAMAGESTATE;
+	ACTIONSTATE_NONE = 0,	// 何もしない状態
+	ACTIONSTATE_SPAWN,		// 出現状態
+	ACTIONSTATE_NORMAL,		// 通常状態
+	ACTIONSTATE_ATTACK,		// 攻撃状態
+	ACTIONSTATE_DAMAGE,		// ダメージ状態
+	ACTIONSTATE_UNRIVALED,	// 無敵状態
+	ACTIONSTATE_GROW,		// 成長状態
+	ACTIONSTATE_MAX,		// この列挙型の総数
+} ACTIONSTATE;
+
+//**********************************************************************************************************************
+//	構造体定義 (StageLimit)
+//**********************************************************************************************************************
+typedef struct
+{
+	float fNear;			// 移動の制限位置 (手前)
+	float fFar;				// 移動の制限位置 (奥)
+	float fRight;			// 移動の制限位置 (右)
+	float fLeft;			// 移動の制限位置 (左)
+	float fField;			// 移動の制限位置 (地面)
+}StageLimit;
 
 //**********************************************************************************************************************
 //	構造体定義 ( 頂点情報 [2D] )
@@ -113,7 +123,11 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void SetMode(MODE mode);					// モードの設定処理
-LPDIRECT3DDEVICE9 GetDevice(void);			// デバイスの取得処理
+void TxtSetStage(void);					// ステージのセットアップ処理
+void SetMode(MODE mode);				// モードの設定処理
+MODE GetMode(void);						// モードの取得処理
+void SetLimitStage(StageLimit limit);	// ステージの移動範囲の設定処理
+StageLimit GetLimitStage(void);			// ステージの移動範囲の取得処理
+LPDIRECT3DDEVICE9 GetDevice(void);		// デバイスの取得処理
 
 #endif

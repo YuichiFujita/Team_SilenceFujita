@@ -12,21 +12,24 @@
 //************************************************************
 typedef enum
 {
-	MODELTYPE_OBJECT_TREE = 0,					// 木
-	MODELTYPE_OBJECT_ROCK,						// 岩
-	MODELTYPE_OBJECT_FOREST,					// 森
-	MODELTYPE_OBJECT_BIGTREE,					// 大木
-	MODELTYPE_OBJECT_YELLOWTREE,				// 黄色い木
-	MODELTYPE_OBJECT_GRASS,						// 草
-	MODELTYPE_OBJECT_MAX,						// オブジェクトのモデルの総数
-	MODELTYPE_PLAYER_ = MODELTYPE_OBJECT_MAX,	// (プレイヤー)
-	MODELTYPE_MAX,								// 全モデルの総数
+	// オブジェクトモデル
+	MODELTYPE_OBJECT_TREE = 0,		// 木
+	MODELTYPE_OBJECT_ROCK,			// 岩
+	MODELTYPE_OBJECT_FOREST,		// 森
+	MODELTYPE_OBJECT_BIGTREE,		// 大木
+	MODELTYPE_OBJECT_YELLOWTREE,	// 黄色い木
+	MODELTYPE_OBJECT_GRASS,			// 草
+
+	// プレイヤーモデル
+	MODELTYPE_PLAYER_HEAD,			// 頭
+	MODELTYPE_MAX,					// 全モデルの総数
 } MODELTYPE;
 
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define FROM_OBJECT	(MODELTYPE_OBJECT_TREE)		// オブジェクトのモデル列挙の開始地点
+#define FROM_OBJECT				(MODELTYPE_OBJECT_TREE)		// オブジェクトのモデル列挙の開始地点
+#define MODELTYPE_OBJECT_MAX	(MODELTYPE_OBJECT_GRASS)	// オブジェクトのモデルの総数
 
 //************************************************************
 //	構造体定義 (Model)

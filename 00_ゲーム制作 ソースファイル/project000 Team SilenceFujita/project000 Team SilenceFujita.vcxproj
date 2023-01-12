@@ -156,6 +156,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Edit.cpp" />
     <ClCompile Include="EditBillboard.cpp" />
+    <ClCompile Include="Editmain.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="SoundDJ.cpp" />
     <ClCompile Include="title.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +179,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="Edit.h" />
     <ClInclude Include="EditBillboard.h" />
+    <ClInclude Include="Editmain.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />
@@ -191,6 +194,7 @@
     <ClInclude Include="pause.h" />
     <ClInclude Include="shadow.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="SoundDJ.h" />
     <ClInclude Include="title.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
