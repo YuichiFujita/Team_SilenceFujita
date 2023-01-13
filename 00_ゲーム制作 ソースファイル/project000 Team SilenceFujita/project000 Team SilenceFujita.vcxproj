@@ -156,7 +156,9 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Edit.cpp" />
     <ClCompile Include="EditBillboard.cpp" />
+    <ClCompile Include="EditEffect.cpp" />
     <ClCompile Include="Editmain.cpp" />
+    <ClCompile Include="EditParticle.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
@@ -179,7 +181,9 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="Edit.h" />
     <ClInclude Include="EditBillboard.h" />
+    <ClInclude Include="EditEffect.h" />
     <ClInclude Include="Editmain.h" />
+    <ClInclude Include="EditParticle.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />

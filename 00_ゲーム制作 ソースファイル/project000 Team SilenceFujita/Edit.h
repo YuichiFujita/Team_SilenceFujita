@@ -11,9 +11,6 @@
 #include "model.h"
 #include "game.h"
 
-//マクロ定義
-#define MAX_MATERIAL	(32)	// マテリアルの最大数
-
 //セットオブジェクトの情報
 typedef struct
 {
@@ -24,10 +21,11 @@ typedef struct
 	int nSetNumber;										//オブジェクトの番号
 	int nType;											//種類
 	D3DXMATRIX mtx;										//ワールドマトリックス
-	Model *pModelData;									//モデルの基本情報
+	Model modelData;									//モデルの基本情報
 	int nCntMaterial;									//マテリアルの番号
 	int nColorCount;									//色を変えるときのカウント
-	D3DXMATERIAL EditMaterial[MODELTYPE_OBJECT_MAX][MAX_MATERIAL] = {};		//カスタム用のマテリアル情報
+	D3DXMATERIAL MatCopy[MODELTYPE_OBJECT_MAX][MAX_MATERIAL];			//マテリアルのコピー
+	D3DXMATERIAL EditMaterial[MODELTYPE_OBJECT_MAX][MAX_MATERIAL];		//カスタム用のマテリアル情報
 }EditObject;
 
 //プロトタイプ宣言

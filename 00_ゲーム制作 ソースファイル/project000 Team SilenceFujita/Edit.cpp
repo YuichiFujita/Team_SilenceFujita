@@ -61,7 +61,7 @@ void InitEditObject(void)
 		g_EditObject.nType = MODELTYPE_OBJECT_TREE;
 
 		//モデルの基本情報
-		g_EditObject.pModelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
+		g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
 
 		//選択中のマテリアルの番号を初期化する
 		g_EditObject.nCntMaterial = 0;
@@ -76,17 +76,16 @@ void InitEditObject(void)
 	//サウンドを初期化する
 	g_nSoundDJ = FUJITA_DJ_LABEL_ONE;
 
-	// 
-	D3DXMATERIAL *pMat = (D3DXMATERIAL*)GetModelData(FROM_OBJECT)->pBuffMat->GetBufferPointer();
-
 	//カスタム用のマテリアル情報
 	for (int nCntModel = 0; nCntModel < MODELTYPE_OBJECT_MAX; nCntModel++)
 	{ // モデルの初期化
+		//マテリアルの色を取得する
+		D3DXMATERIAL *pMat = (D3DXMATERIAL*)GetModelData(nCntModel + FROM_OBJECT).pBuffMat->GetBufferPointer();
 
-		for (int nCntMat = 0; nCntMat < (int)g_EditObject.pModelData->dwNumMat; nCntMat++)
+		for (int nCntMat = 0; nCntMat < (int)GetModelData(nCntModel + FROM_OBJECT).dwNumMat; nCntMat++)
 		{
-
 			//マテリアルをコピーする
+			g_EditObject.MatCopy[nCntModel][nCntMat] = pMat[nCntMat];
 			g_EditObject.EditMaterial[nCntModel][nCntMat] = pMat[nCntMat];
 		}
 	}
@@ -123,7 +122,7 @@ void UpdateEditObject(void)
 				g_EditObject.nSetNumber = nCntObject;
 
 				//モデル情報を読み込む
-				g_EditObject.pModelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
+				g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
 
 				break;							//抜け出す
 			}
@@ -205,7 +204,6 @@ void DrawEditObject(void)
 
 	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		//計算用マトリックス
 	D3DMATERIAL9 matDef;						//現在のマテリアル保存用
-	D3DXMATERIAL *pMat;							//マテリアルデータへのポインタ
 	D3DXMATERIAL *pEditMat;						//エディットマテリアルのデータ
 
 	if (g_EditObject.bUse == true)
@@ -231,10 +229,7 @@ void DrawEditObject(void)
 		//現在のマテリアルを取得
 		pDevice->GetMaterial(&matDef);
 
-		//マテリアルデータへのポインタを取得
-		pMat = (D3DXMATERIAL*)g_EditObject.pModelData->pBuffMat->GetBufferPointer();
-
-		for (int nCntMat = 0; nCntMat < (int)g_EditObject.pModelData->dwNumMat; nCntMat++)
+		for (int nCntMat = 0; nCntMat < (int)g_EditObject.modelData.dwNumMat; nCntMat++)
 		{
 			pEditMat = &g_EditObject.EditMaterial[g_EditObject.nType][nCntMat];
 
@@ -255,10 +250,10 @@ void DrawEditObject(void)
 			pDevice->SetMaterial(&g_EditObject.EditMaterial[g_EditObject.nType][nCntMat].MatD3D);
 
 			//テクスチャの設定
-			pDevice->SetTexture(0, g_EditObject.pModelData->pTexture[nCntMat]);
+			pDevice->SetTexture(0, g_EditObject.modelData.pTexture[nCntMat]);
 
 			//モデル(パーツ)の描画
-			g_EditObject.pModelData->pMesh->DrawSubset(nCntMat);
+			g_EditObject.modelData.pMesh->DrawSubset(nCntMat);
 		}
 		//保存していたマテリアルを戻す
 		pDevice->SetMaterial(&matDef);
@@ -323,7 +318,7 @@ void TypeChangeEdit(void)
 			g_EditObject.nType = (g_EditObject.nType + 1) % MODELTYPE_OBJECT_MAX;
 
 			//設定する
-			g_EditObject.pModelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
+			g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
 		}
 	}
 }
@@ -524,10 +519,10 @@ void EditMaterialCustom(void)
 		if (GetKeyboardTrigger(DIK_SPACE) == true)
 		{//SPACEキーを押した場合
 			//マテリアルを変更する
-			g_EditObject.nCntMaterial = (g_EditObject.nCntMaterial + 1) % (int)(g_EditObject.pModelData->dwNumMat);
+			g_EditObject.nCntMaterial = (g_EditObject.nCntMaterial + 1) % (int)(g_EditObject.modelData.dwNumMat);
 		}
 
-		for (int nCntMat = 0; nCntMat < (int)g_EditObject.pModelData->dwNumMat; nCntMat++)
+		for (int nCntMat = 0; nCntMat < (int)g_EditObject.modelData.dwNumMat; nCntMat++)
 		{
 			//マテリアルデータへのポインタを取得
 			pMatEdit = &g_EditObject.EditMaterial[g_EditObject.nType][nCntMat].MatD3D;
@@ -693,7 +688,7 @@ void EditMaterialCustom(void)
 					}
 
 					//アドレスを入れる
-					D3DMATERIAL9 *pMatOriginal = &g_EditObject.EditMaterial[g_EditObject.nType][nCntMat].MatD3D;
+					D3DMATERIAL9 *pMatOriginal = &g_EditObject.MatCopy[g_EditObject.nType][nCntMat].MatD3D;
 
 					if (GetKeyboardPress(DIK_V) == true)
 					{//Vキーを押した場合
