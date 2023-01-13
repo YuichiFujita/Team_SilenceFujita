@@ -11,12 +11,15 @@
 #include "Editmain.h"
 #include "SoundDJ.h"
 #include "input.h"
+#include "EditParticle.h"
+#include "EditEffect.h"
 
 //プロトタイプ宣言
 void DrawDebugEditObject(void);			//エディットオブジェクトモードのデバッグ表示
 void DrawDebugEditBillboard(void);		//エディットビルボードモードのデバッグ表示
 void DrawDebugControlObject(void);		//エディットオブジェクト操作説明
 void DrawDebugControlBillboard(void);	//エディットビルボード操作説明
+void DrawDebugEditParticle(void);		//エディットパーティクルのデバッグ表示
 
 //グローバル変数
 int g_EditStyle;						//スタイル
@@ -32,6 +35,12 @@ void InitEditmain()
 	//エディットビルボードの初期化処理
 	InitEditBillboard();
 
+	//エディットパーティクルの初期化処理
+	InitEditParticle();
+
+	//エディットエフェクトの初期化処理
+	InitEditEffect();
+
 	//エディットオブジェクトスタイルにする
 	g_EditStyle = EDITSTYLE_OBJECT;
 }
@@ -46,6 +55,12 @@ void UninitEditmain(void)
 
 	//エディットビルボードの終了処理
 	UninitEditBillboard();
+
+	//エディットエフェクトの終了処理
+	UninitEditEffect();
+
+	//エディットパーティクルの終了処理
+	UninitEditParticle();
 }
 
 //==========================
@@ -66,6 +81,17 @@ void UpdateEditmain(void)
 		//エディットビルボードの更新処理
 		UpdateEditBillboard();
 	}
+	else if (g_EditStyle == EDITSTYLE_PARTICLE)
+	{//パーティクルエディットモードの場合
+		//エディットエフェクトの更新処理
+		UpdateEditEffect();
+
+		//エディットパーティクルの更新処理
+		UpdateEditParticle();
+	}
+
+	// エディットパーティクルの更新処理
+	UpdateEditParticle();
 }
 
 //============================
@@ -83,6 +109,14 @@ void DrawEditmain(void)
 		//エディットビルボードの描画処理
 		DrawEditBillboard();
 	}
+	else if (g_EditStyle == EDITSTYLE_PARTICLE)
+	{//パーティクルエディットモードの場合
+		//エディットエフェクトの描画処理
+		DrawEditEffect();
+
+		//エディットパーティクルの描画処理
+		DrawEditParticle();
+	}
 }
 
 //=======================================
@@ -92,6 +126,7 @@ void StyleChange(void)
 {
 	D3DXVECTOR3 *pEditBillpos = &GetEditBillboard()->pos;		//エディットビルボードの情報を取得する
 	D3DXVECTOR3 *pEditObjepos = &GetEditObject()->pos;			//エディットオブジェクトの情報を取得する
+	D3DXVECTOR3 *pEditPartpos = &GetEditParticle()->pos;		//エディットパーティクルの情報を取得する
 
 	if (GetKeyboardTrigger(DIK_6) == true)
 	{//6キーを押した場合
@@ -106,7 +141,12 @@ void StyleChange(void)
 		else if (g_EditStyle == EDITSTYLE_OBJECT)
 		{//オブジェクトモードだった場合
 			//ビルボードがあった位置を代入する
-			*pEditObjepos = *pEditBillpos;
+			*pEditPartpos = *pEditBillpos;
+		}
+		else if (g_EditStyle == EDITSTYLE_PARTICLE)
+		{//パーティクルモードだった場合
+			//パーティクルが合った場所を代入する
+			*pEditObjepos = *pEditPartpos;
 		}
 	}
 }

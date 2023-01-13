@@ -22,6 +22,8 @@
 #include "meshwall.h"
 #include "particle.h"
 #include "pause.h"
+#include "shadow.h"
+#include "object.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -52,6 +54,12 @@ void InitGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
 	//------------------------------------------------------------------------------------------------------------------
+	// 影の初期化
+	InitShadow();
+
+	// オブジェクトの初期化
+	InitObject();
+
 	// カメラの初期化
 	InitCamera();
 
@@ -87,6 +95,12 @@ void InitGame(void)
 //======================================================================================================================
 void UninitGame(void)
 {
+	// 影の終了
+	UninitShadow();
+
+	// オブジェクトの終了
+	UninitObject();
+
 	// カメラの終了
 	UninitCamera();
 
@@ -176,6 +190,9 @@ void UpdateGame(void)
 
 			// メッシュウォールの更新
 			UpdateMeshWall();
+
+			// オブジェクトの更新
+			UpdateObject();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -193,6 +210,9 @@ void UpdateGame(void)
 
 	// パーティクルの更新
 	UpdateParticle();
+
+	// 影の更新
+	UpdateShadow();
 
 	if (GetKeyboardTrigger(DIK_F2) == true)
 	{ // [F2] が押された場合
@@ -224,6 +244,9 @@ void UpdateGame(void)
 		// メッシュウォールの更新
 		UpdateMeshWall();
 
+		// オブジェクトの更新
+		UpdateObject();
+
 		// ビルボードの更新
 		UpdateBillboard();
 
@@ -232,6 +255,9 @@ void UpdateGame(void)
 
 		// パーティクルの更新
 		UpdateParticle();
+
+		// 影の更新
+		UpdateShadow();
 	}
 	else
 	{ // ポーズ状態の場合
@@ -256,6 +282,12 @@ void DrawGame(void)
 
 	// メッシュウォールの描画
 	DrawMeshWall();
+
+	// 影の描画
+	DrawShadow();
+
+	// オブジェクトの描画
+	DrawObject();
 
 	// ビルボードの描画
 	DrawBillboard();

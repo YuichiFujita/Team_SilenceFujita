@@ -24,6 +24,7 @@
 #include "Edit.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
+#include "EditParticle.h"
 #endif
 
 //************************************************************
@@ -804,6 +805,24 @@ void DrawDebugEditBillboard(void)
 }
 
 //==============================================
+//エディットパーティクルのデバッグ表示
+//==============================================
+void DrawDebugEditParticle(void)
+{
+	RECT rect = { 0,108,SCREEN_WIDTH,SCREEN_HEIGHT };
+	char aStr[512];
+	EditParticle *pParticle = GetEditParticle();			//エディットパーティクルの情報を取得する
+
+	//文字列に代入
+	sprintf(&aStr[0], "====================================================\nエディットパーティクルの位置[%.4f,%.4f,%.4f]\n"
+		"エディットパーティクルの角度のランダム:[%.4f]\nエディットパーティクルの速度のランダム:[%d,%d,%d]\n"
+		, pParticle->pos.x, pParticle->pos.y, pParticle->pos.z, pParticle->nRandom, pParticle->SpeedRandomX, pParticle->SpeedRandomY, pParticle->SpeedRandomZ);
+
+	//テキストの描画
+	g_pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+
+//==============================================
 //エディットオブジェクト操作説明
 //==============================================
 void DrawDebugControlObject(void)
@@ -989,6 +1008,12 @@ void DrawDebug(void)
 
 				// エディットモードのデバッグ表示
 				DrawDebugEditBillboard();
+			}
+			else if (GetStyle() == EDITSTYLE_PARTICLE)
+			{ // パーティクルスタイルだった場合
+
+				//パーティクルモードのデバッグ表示
+				DrawDebugEditParticle();
 			}
 		}
 	}

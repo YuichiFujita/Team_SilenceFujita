@@ -23,6 +23,7 @@ typedef enum
 {
 	EDITSTYLE_OBJECT = 0,		//オブジェクト
 	EDITSTYLE_BILLBOARD,		//ビルボード
+	EDITSTYLE_PARTICLE,			//パーティクル
 	EDITSTYLE_MAX
 }EDITSTYLE;
 

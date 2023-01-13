@@ -44,7 +44,6 @@ void InitObject(void)
 		g_aObject[nCntObject].pos           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
 		g_aObject[nCntObject].rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
 		g_aObject[nCntObject].scale         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
-		g_aObject[nCntObject].pModelData    = NULL;									// モデル情報
 		g_aObject[nCntObject].state         = ACTIONSTATE_NONE;						// 状態
 		g_aObject[nCntObject].nLife         = 0;									// 体力
 		g_aObject[nCntObject].nBreakType    = BREAKTYPE_NONE;						// 壊れ方の種類
@@ -52,6 +51,17 @@ void InitObject(void)
 		g_aObject[nCntObject].nCounterState = 0; 									// 状態管理カウンター
 		g_aObject[nCntObject].nShadowID     = NONE_SHADOW;							// 影のインデックス
 		g_aObject[nCntObject].bUse          = false;								// 使用状況
+
+		//モデル状況の初期化
+		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
+		g_aObject[nCntObject].modelData.pTexture = NULL;							// テクスチャへのポインタ
+		g_aObject[nCntObject].modelData.pMesh    = NULL;							// メッシュ (頂点情報) へのポインタ
+		g_aObject[nCntObject].modelData.pBuffMat = NULL;							// マテリアルへのポインタ
+		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
+		g_aObject[nCntObject].modelData.vtxMin   = INIT_VTX_MIN;					// 最小の頂点座標
+		g_aObject[nCntObject].modelData.vtxMax   = INIT_VTX_MAX;					// 最大の頂点座標
+		g_aObject[nCntObject].modelData.fHeight  = 0.0f;							// 縦幅
+		g_aObject[nCntObject].modelData.fRadius  = 0.0f;							// 半径
 	}
 }
 
@@ -125,6 +135,7 @@ void DrawObject(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
 	D3DXMATERIAL      blackMat;					// マテリアルデータ (黄＋黒)
+	D3DXMATERIAL	  DeleteMat;				// 削除マテリアルデータ(赤)
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -154,9 +165,9 @@ void DrawObject(void)
 			pDevice->GetMaterial(&matDef);
 
 			// マテリアルデータへのポインタを取得
-			pMat = (D3DXMATERIAL*)g_aObject[nCntObject].pModelData->pBuffMat->GetBufferPointer();
+			pMat = &g_aObject[nCntObject].MatCopy[0];
 
-			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].pModelData->dwNumMat; nCntMat++)
+			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
 				switch (g_aObject[nCntObject].state)
@@ -186,11 +197,33 @@ void DrawObject(void)
 					break;
 				}
 
+				switch (g_aObject[nCntObject].editState)
+				{
+				case OBJECTSTATE_DELETETARGET:	//削除対象
+
+					//拡散光・環境光・自己発光を赤にする
+					DeleteMat.MatD3D.Diffuse  = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+					DeleteMat.MatD3D.Ambient  = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+					DeleteMat.MatD3D.Emissive = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&DeleteMat.MatD3D);			// 黄＋黒
+
+					break;					//抜け出す
+
+				default:					//それ以外の状態
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+
+					break;					//抜け出す
+				}
+
 				// テクスチャの設定
-				pDevice->SetTexture(0, g_aObject[nCntObject].pModelData->pTexture[nCntMat]);
+				pDevice->SetTexture(0, g_aObject[nCntObject].modelData.pTexture[nCntMat]);
 
 				// モデルの描画
-				g_aObject[nCntObject].pModelData->pMesh->DrawSubset(nCntMat);
+				g_aObject[nCntObject].modelData.pMesh->DrawSubset(nCntMat);
 			}
 
 			// 保存していたマテリアルを戻す
@@ -229,34 +262,38 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].bUse = true;
 
 			// モデル情報を設定
-			g_aObject[nCntObject].pModelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
+			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
+
+			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].modelData.pBuffMat->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].modelData.dwNumMat; nCntMat++, pMatModel++)
+			{
+				g_aObject[nCntObject].MatCopy[nCntMat] = *pMatModel;
+			}
 
 			// 最大値を反映する
-			g_aObject[nCntObject].pModelData->vtxMax.x *= g_aObject[nCntObject].scale.x;
-			g_aObject[nCntObject].pModelData->vtxMax.y *= g_aObject[nCntObject].scale.y;
-			g_aObject[nCntObject].pModelData->vtxMax.z *= g_aObject[nCntObject].scale.z;
+			g_aObject[nCntObject].modelData.vtxMax.x *= g_aObject[nCntObject].scale.x;
+			g_aObject[nCntObject].modelData.vtxMax.y *= g_aObject[nCntObject].scale.y;
+			g_aObject[nCntObject].modelData.vtxMax.z *= g_aObject[nCntObject].scale.z;
 
 			// 最小値を反映する
-			g_aObject[nCntObject].pModelData->vtxMin.x *= g_aObject[nCntObject].scale.x;
-			g_aObject[nCntObject].pModelData->vtxMin.y *= g_aObject[nCntObject].scale.y;
-			g_aObject[nCntObject].pModelData->vtxMin.z *= g_aObject[nCntObject].scale.z;
+			g_aObject[nCntObject].modelData.vtxMin.x *= g_aObject[nCntObject].scale.x;
+			g_aObject[nCntObject].modelData.vtxMin.y *= g_aObject[nCntObject].scale.y;
+			g_aObject[nCntObject].modelData.vtxMin.z *= g_aObject[nCntObject].scale.z;
 
-			// マテリアルデータへのポインタを取得
-			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].pModelData->pBuffMat->GetBufferPointer();
-
-			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].pModelData->dwNumMat; nCntMat++)
+			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
 				// 引数の色を代入
-				pMatModel[nCntMat].MatD3D.Ambient = pMat[nCntMat].MatD3D.Ambient;
-				pMatModel[nCntMat].MatD3D.Diffuse = pMat[nCntMat].MatD3D.Diffuse;
+				g_aObject[nCntObject].MatCopy[nCntMat].MatD3D.Ambient = pMat[nCntMat].MatD3D.Ambient;
+				g_aObject[nCntObject].MatCopy[nCntMat].MatD3D.Diffuse = pMat[nCntMat].MatD3D.Diffuse;
 			}
 
 			// 影のインデックスを設定
 			g_aObject[nCntObject].nShadowID = SetShadow
 			( // 引数
 				0.5f,																																// α値
-				fabsf(g_aObject[g_aObject[nCntObject].nType].pModelData->vtxMax.x - g_aObject[g_aObject[nCntObject].nType].pModelData->vtxMin.x),	// 半径
+				fabsf(g_aObject[g_aObject[nCntObject].nType].modelData.vtxMax.x - g_aObject[g_aObject[nCntObject].nType].modelData.vtxMin.x),		// 半径
 				&g_aObject[nCntObject].nShadowID,																									// 影の親の影インデックス
 				&g_aObject[nCntObject].bUse																											// 影の親の使用状況
 			);
@@ -342,44 +379,44 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, floa
 		{ // オブジェクトが使用されている場合
 
 			// 前後の当たり判定
-			if (pPos->x + fWidth > g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMin.x
-			&&  pPos->x - fWidth < g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMax.x)
+			if (pPos->x + fWidth > g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
+			&&  pPos->x - fWidth < g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
 			{ // ブロックの左右の範囲内の場合
 
-				if (pPos->z    + fDepth >  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMin.z
-				&&  pOldPos->z + fDepth <= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMin.z)
+				if (pPos->z    + fDepth >  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z
+					&&  pOldPos->z + fDepth <= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z)
 				{ // 前からの当たり判定
 
 					// 位置を補正
-					pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMin.z - fDepth - 0.01f;
+					pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z - fDepth - 0.01f;
 				}
-				else if (pPos->z    - fDepth <  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMax.z
-				     &&  pOldPos->z - fDepth >= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMax.z)
+				else if (pPos->z    - fDepth <  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z
+				     &&  pOldPos->z - fDepth >= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
 				{ // 後ろからの当たり判定
 
 					// 位置を補正
-					pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMax.z + fDepth + 0.01f;
+					pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z + fDepth + 0.01f;
 				}
 			}
 
 			// 左右の当たり判定
-			if (pPos->z + fDepth > g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMin.z
-			&&  pPos->z - fDepth < g_aObject[nCntObject].pos.z + g_aObject[nCntObject].pModelData->vtxMax.z)
+			if (pPos->z + fDepth > g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z
+			&&  pPos->z - fDepth < g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
 			{ // ブロックの前後の範囲内の場合
 
-				if (pPos->x    + fWidth >  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMin.x
-				&&  pOldPos->x + fWidth <= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMin.x)
+				if (pPos->x    + fWidth >  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
+				&&  pOldPos->x + fWidth <= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x)
 				{ // 左からの当たり判定
 
 					// 位置を補正
-					pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMin.x - fWidth - 0.01f;
+					pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x - fWidth - 0.01f;
 				}
-				else if (pPos->x    - fWidth <  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMax.x
-				     &&  pOldPos->x - fWidth >= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMax.x)
+				else if (pPos->x    - fWidth <  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x
+				     &&  pOldPos->x - fWidth >= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
 				{ // 右からの当たり判定
 					
 					// 位置を補正
-					pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].pModelData->vtxMax.x + fWidth + 0.01f;
+					pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x + fWidth + 0.01f;
 				}
 			}
 		}
