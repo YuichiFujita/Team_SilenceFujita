@@ -1,0 +1,71 @@
+#==============================================================================
+#
+#	敵のパラメーター設定 [enemy.txt]
+#	Author : you
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+# 敵のパラメーター情報
+#------------------------------------------------------------------------------
+STATUS_ENEMYSET
+
+	ENEMYSET
+		TYPE = 0					# 種類
+		LIFE = 75					# 体力
+		SCORE = 800					# スコア加算量
+		ATTACK_CNT = 80				# 攻撃頻度
+		FORWARD_MOVE = 3.0			# 前進の移動量
+		BACKWARD_MOVE = 0.0			# 後退の移動量
+		LOOK_REV = 0.05				# 振り向き補正係数
+		FIND_RADIUS = 280.0			# 検知範囲
+		ATTACK_RADIUS = 50.0		# 攻撃範囲
+		BACKWARD_RADIUS = 0.0		# 後退範囲
+		BACWARD_ENABLE = 1			# 後退の ON / OFF (0：ON, 1：OFF)
+		
+		WEED_CNTSPAWN = 180			# 雑草の出現頻度
+		WEED_MINSPAWN = 0			# 雑草の最低出減数
+		WEED_MAXSPAWN = 3			# 雑草の最高出現数
+		WEED_RANDSPAWN = 150		# 雑草の出現位置のブレの半径
+	END_ENEMYSET
+	
+	ENEMYSET
+		TYPE = 1					# 種類
+		LIFE = 50					# 体力
+		SCORE = 600					# スコア加算量
+		ATTACK_CNT = 60				# 攻撃頻度
+		FORWARD_MOVE = 2.0			# 前進の移動量
+		BACKWARD_MOVE = 1.0			# 後退の移動量
+		LOOK_REV = 0.05				# 振り向き補正係数
+		FIND_RADIUS = 300.0			# 検知範囲
+		ATTACK_RADIUS = 160.0		# 攻撃範囲
+		BACKWARD_RADIUS = 100.0		# 後退範囲
+		BACWARD_ENABLE = 0			# 後退の ON / OFF (0：ON, 1：OFF)
+		
+		WEED_CNTSPAWN = 380			# 雑草の出現頻度
+		WEED_MINSPAWN = 1			# 雑草の最低出減数
+		WEED_MAXSPAWN = 3			# 雑草の最高出現数
+		WEED_RANDSPAWN = 200		# 雑草の出現位置のブレの半径
+	END_ENEMYSET
+
+END_STATUS_ENEMYSET
+
+#------------------------------------------------------------------------------
+# 敵のスポーン情報
+#------------------------------------------------------------------------------
+SPAWN_ENEMYSET
+
+	MINSPAWN = 6		# 最低出減数
+	MAXSPAWN = 16		# 最高出現数
+	RANDSPAWN = 240		# 出現位置のブレの半径
+
+	# 出現の中心位置
+	POS = -500 -80 -500	# 左奥
+	POS = 0 -80 -500	# 奥
+	POS = 500 -80 -500	# 右奥
+	POS = -500 -80 0	# 左
+	POS = 500 -80 0		# 右
+	POS = -500 -80 500	# 左手前
+	POS = 0 -80 500		# 手前
+	POS = 500 -80 500	# 右手前
+
+END_SPAWN_ENEMYSET
