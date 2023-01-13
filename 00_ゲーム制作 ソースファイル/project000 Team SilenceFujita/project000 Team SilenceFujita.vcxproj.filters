@@ -57,9 +57,6 @@
     <ClCompile Include="particle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Edit.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="EditBillboard.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -78,10 +75,7 @@
     <ClCompile Include="SoundDJ.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="EditParticle.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="EditEffect.cpp">
+    <ClCompile Include="EditObject.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -128,9 +122,6 @@
     <ClInclude Include="particle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Edit.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="EditBillboard.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -149,10 +140,7 @@
     <ClInclude Include="SoundDJ.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="EditParticle.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="EditEffect.h">
+    <ClInclude Include="EditObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

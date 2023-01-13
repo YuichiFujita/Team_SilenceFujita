@@ -1,0 +1,196 @@
+#===========================================================
+#
+#	エディットの保存ステージ
+#	Author：小原 立暉 & 藤田 勇一 & you
+#
+#===========================================================
+#===========================================================
+#	オブジェクトの設定
+#===========================================================
+#-----------------------------------------------------------
+#	BREAKTYPE：0  壊れない
+#	         ：1  壊れる
+#-----------------------------------------------------------
+SETSTAGE_OBJECT
+
+	SET_OBJECT
+		POS        = -280.0 0.0 95.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+
+		NUMMAT     = 2
+		00_MAT_DIF = 0.80 0.80 0.80 1.00
+		00_MAT_AMB = 0.00 0.00 0.00 1.00
+		01_MAT_DIF = 0.06 0.41 0.00 1.00
+		01_MAT_AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = -130.0 0.0 95.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+
+		NUMMAT     = 2
+		00_MAT_DIF = 0.80 0.80 0.80 1.00
+		00_MAT_AMB = 0.00 0.00 0.00 1.00
+		01_MAT_DIF = 0.06 0.41 0.00 1.00
+		01_MAT_AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = 30.0 0.0 95.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+
+		NUMMAT     = 2
+		00_MAT_DIF = 0.80 0.80 0.80 1.00
+		00_MAT_AMB = 0.00 0.00 0.00 1.00
+		01_MAT_DIF = 0.06 0.41 0.00 1.00
+		01_MAT_AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = 190.0 0.0 95.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+
+		NUMMAT     = 2
+		00_MAT_DIF = 0.80 0.80 0.80 1.00
+		00_MAT_AMB = 0.00 0.00 0.00 1.00
+		01_MAT_DIF = 0.06 0.41 0.00 1.00
+		01_MAT_AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = -105.0 0.0 -75.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 1
+		BREAKTYPE  = 0
+
+		NUMMAT     = 2
+		00_MAT_DIF = 0.80 0.80 0.80 1.00
+		00_MAT_AMB = 0.00 0.00 0.00 1.00
+		01_MAT_DIF = 1.00 1.00 1.00 1.00
+		01_MAT_AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = 60.0 0.0 -75.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 1
+		BREAKTYPE  = 0
+
+		NUMMAT     = 2
+		00_MAT_DIF = 0.80 0.80 0.80 1.00
+		00_MAT_AMB = 0.00 0.00 0.00 1.00
+		01_MAT_DIF = 1.00 1.00 1.00 1.00
+		01_MAT_AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+END_SETSTAGE_OBJECT
+
+#===========================================================
+#	ビルボードの設定
+#===========================================================
+#-----------------------------------------------------------
+#	ANIMATION：0  アニメーション OFF
+#	         ：1  アニメーション ON
+#-----------------------------------------------------------
+SETSTAGE_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -315.0 0.0 8363.0
+		ROT    = 2.3 0.0 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 1
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -335.0 0.0 6497.0
+		ROT    = 2.3 0.0 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 1
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -335.0 0.0 -340.0
+		ROT    = 2.3 0.0 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -145.0 0.0 -340.0
+		ROT    = 2.3 0.0 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -45.0 0.0 -245.0
+		ROT    = 2.3 0.0 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 1
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 50.0 0.0 -245.0
+		ROT    = 2.3 0.0 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 5
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 135.0 0.0 -245.0
+		ROT    = 2.3 0.0 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 10
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+END_SETSTAGE_BILLBOARD
+
