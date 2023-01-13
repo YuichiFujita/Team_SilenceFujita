@@ -28,8 +28,10 @@ typedef enum
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define FROM_OBJECT				(MODELTYPE_OBJECT_TREE)		// オブジェクトのモデル列挙の開始地点
-#define MODELTYPE_OBJECT_MAX	(MODELTYPE_OBJECT_GRASS)	// オブジェクトのモデルの総数
+#define INIT_VTX_MIN	(D3DXVECTOR3( 9999.0f,  9999.0f,  9999.0f))		// モデルの最小の頂点座標の初期値
+#define INIT_VTX_MAX	(D3DXVECTOR3(-9999.0f, -9999.0f, -9999.0f))		// モデルの最大の頂点座標の初期値
+#define FROM_OBJECT				(0)		// オブジェクトのモデル列挙の開始地点
+#define MODELTYPE_OBJECT_MAX	(6)		// オブジェクトのモデルの総数
 
 //************************************************************
 //	構造体定義 (Model)
@@ -51,6 +53,6 @@ typedef struct
 //************************************************************
 HRESULT InitModel(void);			// モデルの初期化処理
 void UninitModel(void);				// モデルの終了処理
-Model *GetModelData(int nID);		// モデル情報の取得処理
+Model GetModelData(int nID);		// モデル情報の取得処理
 
 #endif

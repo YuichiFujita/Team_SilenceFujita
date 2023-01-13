@@ -36,20 +36,21 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 pos;					// 位置
-	D3DXVECTOR3 rot;					// 向き
-	D3DXVECTOR3 scale;					// 拡大率
-	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
-	Model      *pModelData;				// モデル情報
-	ACTIONSTATE state;					// 状態
-	OBJECTSTATE editState;				// エディット時の状態
-	int         nLife;					// 体力
-	int         nBreakType;				// 壊れ方の種類
-	int         nType;					// オブジェクトの種類
-	float       fPosBlur;				// オブジェクトの位置のブレ
-	int         nCounterState;			// 状態管理カウンター
-	int         nShadowID;				// 影のインデックス
-	bool        bUse;					// 使用状況
+	D3DXVECTOR3  pos;					// 位置
+	D3DXVECTOR3  rot;					// 向き
+	D3DXVECTOR3  scale;					// 拡大率
+	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
+	Model        modelData;				// モデル情報
+	ACTIONSTATE  state;					// 状態
+	OBJECTSTATE  editState;				// エディット時の状態
+	int          nLife;					// 体力
+	int          nBreakType;			// 壊れ方の種類
+	int          nType;					// オブジェクトの種類
+	float        fPosBlur;				// オブジェクトの位置のブレ
+	int          nCounterState;			// 状態管理カウンター
+	int          nShadowID;				// 影のインデックス
+	bool         bUse;					// 使用状況
+	D3DXMATERIAL MatCopy[MAX_MATERIAL];	//マテリアルのコピー
 }Object;
 
 //**********************************************************************************************************************
