@@ -1,3 +1,4 @@
+#ifdef _DEBUG	// デバッグ処理
 //===================================
 //
 //エディットメイン画面ヘッダー[Editmain.h]
@@ -34,5 +35,7 @@ void UpdateEditmain(void);		//エディットメイン画面の更新処理
 void DrawEditmain(void);		//エディットメイン画面の描画処理
 int  GetStyle(void);			//スタイルの取得処理
 void StyleChange(void);			//スタイル変更処理
+
+#endif
 
 #endif

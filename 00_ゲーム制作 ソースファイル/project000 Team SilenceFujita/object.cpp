@@ -16,6 +16,10 @@
 #include "shadow.h"
 #include "sound.h"
 
+#ifdef _DEBUG	// デバッグ処理
+#include "game.h"
+#endif
+
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
@@ -52,7 +56,7 @@ void InitObject(void)
 		g_aObject[nCntObject].nShadowID     = NONE_SHADOW;							// 影のインデックス
 		g_aObject[nCntObject].bUse          = false;								// 使用状況
 
-		//モデル状況の初期化
+		// モデル情報の初期化
 		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
 		g_aObject[nCntObject].modelData.pTexture = NULL;							// テクスチャへのポインタ
 		g_aObject[nCntObject].modelData.pMesh    = NULL;							// メッシュ (頂点情報) へのポインタ
@@ -62,6 +66,14 @@ void InitObject(void)
 		g_aObject[nCntObject].modelData.vtxMax   = INIT_VTX_MAX;					// 最大の頂点座標
 		g_aObject[nCntObject].modelData.fHeight  = 0.0f;							// 縦幅
 		g_aObject[nCntObject].modelData.fRadius  = 0.0f;							// 半径
+
+		// マテリアルのコピーを初期化
+		g_aObject[nCntObject].matCopy[MAX_MATERIAL] = {};
+
+#ifdef _DEBUG	// デバッグ処理
+		// エディット時の状態
+		g_aObject[nCntObject].editState = OBJECTSTATE_NONE;
+#endif
 	}
 }
 
@@ -135,7 +147,10 @@ void DrawObject(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
 	D3DXMATERIAL      blackMat;					// マテリアルデータ (黄＋黒)
-	D3DXMATERIAL	  DeleteMat;				// 削除マテリアルデータ(赤)
+
+#ifdef _DEBUG	// デバッグ処理
+	D3DXMATERIAL      deleteMat;				// 削除マテリアルデータ (赤)
+#endif
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -146,7 +161,7 @@ void DrawObject(void)
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aObject[nCntObject].mtxWorld);
 
-			//拡大率を反映
+			// 拡大率を反映
 			D3DXMatrixScaling(&mtxScale, g_aObject[nCntObject].scale.x, g_aObject[nCntObject].scale.y, g_aObject[nCntObject].scale.z);
 			D3DXMatrixMultiply(&g_aObject[nCntObject].mtxWorld, &g_aObject[nCntObject].mtxWorld, &mtxScale);
 
@@ -165,7 +180,7 @@ void DrawObject(void)
 			pDevice->GetMaterial(&matDef);
 
 			// マテリアルデータへのポインタを取得
-			pMat = &g_aObject[nCntObject].MatCopy[0];
+			pMat = &g_aObject[nCntObject].matCopy[0];
 
 			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
@@ -197,27 +212,35 @@ void DrawObject(void)
 					break;
 				}
 
-				switch (g_aObject[nCntObject].editState)
-				{
-				case OBJECTSTATE_DELETETARGET:	//削除対象
+#ifdef _DEBUG	// デバッグ処理
+				if (GetGameMode() == GAMEMODE_EDIT)
+				{ // エディットモードの場合
 
-					//拡散光・環境光・自己発光を赤にする
-					DeleteMat.MatD3D.Diffuse  = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-					DeleteMat.MatD3D.Ambient  = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-					DeleteMat.MatD3D.Emissive = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+					switch (g_aObject[nCntObject].editState)
+					{ // 状態ごとの処理
+					case OBJECTSTATE_DELETETARGET:	// 削除対象
 
-					// マテリアルの設定
-					pDevice->SetMaterial(&DeleteMat.MatD3D);			// 黄＋黒
+						// 拡散光・環境光・自己発光を赤にする
+						deleteMat.MatD3D.Diffuse  = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+						deleteMat.MatD3D.Ambient  = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+						deleteMat.MatD3D.Emissive = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 
-					break;					//抜け出す
+						// マテリアルの設定
+						pDevice->SetMaterial(&deleteMat.MatD3D);		// 赤
 
-				default:					//それ以外の状態
+						// 処理を抜ける
+						break;
 
-					// マテリアルの設定
-					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+					default:						// それ以外の状態
 
-					break;					//抜け出す
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+
+						// 処理を抜ける
+						break;
+					}
 				}
+#endif
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aObject[nCntObject].modelData.pTexture[nCntMat]);
@@ -264,11 +287,14 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			// モデル情報を設定
 			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
 
+			// マテリアルデータへのポインタを取得
 			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].modelData.pBuffMat->GetBufferPointer();
 
 			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].modelData.dwNumMat; nCntMat++, pMatModel++)
-			{
-				g_aObject[nCntObject].MatCopy[nCntMat] = *pMatModel;
+			{ // マテリアルの数分繰り返す
+
+				// マテリアルをコピーする
+				g_aObject[nCntObject].matCopy[nCntMat] = *pMatModel;
 			}
 
 			// 最大値を反映する
@@ -285,17 +311,17 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			{ // マテリアルの数分繰り返す
 
 				// 引数の色を代入
-				g_aObject[nCntObject].MatCopy[nCntMat].MatD3D.Ambient = pMat[nCntMat].MatD3D.Ambient;
-				g_aObject[nCntObject].MatCopy[nCntMat].MatD3D.Diffuse = pMat[nCntMat].MatD3D.Diffuse;
+				g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Ambient = pMat[nCntMat].MatD3D.Ambient;
+				g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse = pMat[nCntMat].MatD3D.Diffuse;
 			}
 
 			// 影のインデックスを設定
 			g_aObject[nCntObject].nShadowID = SetShadow
 			( // 引数
-				0.5f,																																// α値
-				fabsf(g_aObject[g_aObject[nCntObject].nType].modelData.vtxMax.x - g_aObject[g_aObject[nCntObject].nType].modelData.vtxMin.x),		// 半径
-				&g_aObject[nCntObject].nShadowID,																									// 影の親の影インデックス
-				&g_aObject[nCntObject].bUse																											// 影の親の使用状況
+				0.5f,																						// α値
+				fabsf(g_aObject[nCntObject].modelData.vtxMax.x - g_aObject[nCntObject].modelData.vtxMin.x),	// 半径
+				&g_aObject[nCntObject].nShadowID,															// 影の親の影インデックス
+				&g_aObject[nCntObject].bUse																	// 影の親の使用状況
 			);
 
 			// 影の位置設定

@@ -1,3 +1,4 @@
+#ifdef _DEBUG	// デバッグ処理
 //========================================
 //
 //エディットメインのメイン処理[Editmain.cpp]
@@ -159,3 +160,4 @@ int GetStyle(void)
 	//エディットスタイルを返す
 	return g_EditStyle;
 }
+#endif

@@ -1,3 +1,4 @@
+#ifdef _DEBUG	// デバッグ処理
 //===========================================
 //
 //オブジェクトのメイン処理[Object.cpp]
@@ -158,10 +159,10 @@ void UpdateEditObject(void)
 	DeleteEditObject();
 
 	//オブジェクトの設定処理
-	SetEdit();										
+	SetEdit();
 
 	//オブジェクトの拡大縮小処理(X軸)
-	ScaleObjectX();								
+	ScaleObjectX();	
 
 	//オブジェクトの拡大縮小処理(Y軸)
 	ScaleObjectY();
@@ -715,12 +716,4 @@ void EditMaterialCustom(void)
 		}
 	}
 }
-
-////=======================================
-////マテリアルの情報取得処理
-////=======================================
-//EditMaterial GetCustomMaterial(void)
-//{
-//	//マテリアルの情報を返す
-//	return g_EditMaterial[g_EditObject.nType];
-//}
+#endif

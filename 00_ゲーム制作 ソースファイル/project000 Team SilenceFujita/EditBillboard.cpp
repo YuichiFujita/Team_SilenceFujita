@@ -1,3 +1,4 @@
+#ifdef _DEBUG	// デバッグ処理
 //===========================================
 //
 //オブジェクトのメイン処理[Object.cpp]
@@ -828,3 +829,4 @@ void ReplayBillboard(void)
 	//頂点バッファをアンロックする
 	g_EditBillboard.VtxBuff->Unlock();
 }
+#endif
