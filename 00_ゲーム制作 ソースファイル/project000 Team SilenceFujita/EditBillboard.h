@@ -1,3 +1,4 @@
+#ifdef _DEBUG	// デバッグ処理
 //===================================
 //
 //エディットヘッダー[Edit.h]
@@ -34,5 +35,7 @@ void UninitEditBillboard(void);							//ビルボードの終了処理
 void UpdateEditBillboard(void);							//ビルボードの更新処理
 void DrawEditBillboard(void);							//ビルボードの描画処理
 EditBillboard *GetEditBillboard(void);					//エディットビルボードの取得処理
+
+#endif
 
 #endif

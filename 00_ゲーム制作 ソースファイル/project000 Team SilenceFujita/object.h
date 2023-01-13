@@ -41,8 +41,8 @@ typedef struct
 	D3DXVECTOR3  scale;					// 拡大率
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報
+	D3DXMATERIAL matCopy[MAX_MATERIAL];	// マテリアルのコピー
 	ACTIONSTATE  state;					// 状態
-	OBJECTSTATE  editState;				// エディット時の状態
 	int          nLife;					// 体力
 	int          nBreakType;			// 壊れ方の種類
 	int          nType;					// オブジェクトの種類
@@ -50,7 +50,10 @@ typedef struct
 	int          nCounterState;			// 状態管理カウンター
 	int          nShadowID;				// 影のインデックス
 	bool         bUse;					// 使用状況
-	D3DXMATERIAL MatCopy[MAX_MATERIAL];	//マテリアルのコピー
+
+#ifdef _DEBUG	// デバッグ処理
+	OBJECTSTATE  editState;				// エディット時の状態
+#endif
 }Object;
 
 //**********************************************************************************************************************

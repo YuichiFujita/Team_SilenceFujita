@@ -1,3 +1,4 @@
+#ifdef _DEBUG	// デバッグ処理
 //===================================
 //
 //エディットヘッダー[Edit.h]
@@ -34,6 +35,7 @@ void UninitEditObject(void);							//オブジェクトの終了処理
 void UpdateEditObject(void);							//オブジェクトの更新処理
 void DrawEditObject(void);								//オブジェクトの描画処理
 EditObject *GetEditObject(void);						//エディットオブジェクトの取得処理
-//EditMaterial GetCustomMaterial(void);					//マテリアルの情報取得処理
+
+#endif
 
 #endif

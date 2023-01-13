@@ -49,7 +49,7 @@ void InitGame(void)
 	g_gameState         = GAMESTATE_NORMAL;		// ゲームの状態
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
-	g_nGameMode = GAMEMODE_PLAY;		// エディットの ON / OFF
+	g_nGameMode         = GAMEMODE_PLAY;		// エディットの ON / OFF
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
@@ -143,6 +143,21 @@ void UpdateGame(void)
 		if (GetFade() == FADE_NONE)
 		{ // フェードしていない場合
 
+#ifdef _DEBUG	// デバッグ処理
+			if (g_nGameMode == GAMEMODE_PLAY)
+			{ // ゲームモードだった場合
+
+				if (GetKeyboardTrigger(DIK_P) == true || GetJoyKeyTrigger(JOYKEY_START, 0) == true)
+				{ // ポーズの操作が行われた場合
+
+					// ポーズの選択項目の再設定
+					ResetPauseSelect();
+
+					// ポーズの開始、解除
+					g_bPause = (g_bPause == false) ? true : false;
+				}
+			}
+#else
 			if (GetKeyboardTrigger(DIK_P) == true || GetJoyKeyTrigger(JOYKEY_START, 0) == true)
 			{ // ポーズの操作が行われた場合
 
@@ -152,6 +167,7 @@ void UpdateGame(void)
 				// ポーズの開始、解除
 				g_bPause = (g_bPause == false) ? true : false;
 			}
+#endif
 		}
 
 		// 処理を抜ける
@@ -166,7 +182,6 @@ void UpdateGame(void)
 	}
 
 #ifdef _DEBUG	// デバッグ処理
-
 	// ライトの更新
 	UpdateLight();
 
@@ -226,9 +241,7 @@ void UpdateGame(void)
 		// オブジェクトのセーブ処理
 		//SaveObject();
 	}
-
 #else
-
 	if (g_bPause == false)
 	{ // ポーズ状態ではない場合
 
@@ -265,7 +278,6 @@ void UpdateGame(void)
 		// ポーズの更新
 		UpdatePause();
 	}
-
 #endif
 }
 
