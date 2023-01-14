@@ -26,6 +26,7 @@ typedef struct
 	int         nPartHeight;	// 縦の分割数
 	int         nNumVtx;		// 必要頂点数
 	int         nNumIdx;		// 必要インデックス数
+	int         nType;			// 種類
 	bool        bUse;			// 使用状況
 } MeshWall;
 

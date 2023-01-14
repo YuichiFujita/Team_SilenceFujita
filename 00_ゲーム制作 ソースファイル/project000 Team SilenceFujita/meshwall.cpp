@@ -30,8 +30,8 @@ typedef enum
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void SetMeshWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight);	// メッシュウォールの設定処理
-void TxtSetMeshWall(void);																							// メッシュウォールのセットアップ処理
+void SetMeshWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight, int nType);	// メッシュウォールの設定処理
+void TxtSetMeshWall(void);																										// メッシュウォールのセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -73,6 +73,7 @@ void InitMeshWall(void)
 		g_aMeshWall[nCntMeshWall].nPartHeight = 0;								// 縦の分割数
 		g_aMeshWall[nCntMeshWall].nNumVtx     = 0;								// 必要頂点数
 		g_aMeshWall[nCntMeshWall].nNumIdx     = 0;								// 必要インデックス数
+		g_aMeshWall[nCntMeshWall].nType       = TEXTURE_MESHWALL_NORMAL;		// 種類
 		g_aMeshWall[nCntMeshWall].bUse        = false;							// 使用状況
 	}
 
@@ -282,7 +283,7 @@ void DrawMeshWall(void)
 			pDevice->SetFVF(FVF_VERTEX_3D);
 
 			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureMeshWall[TEXTURE_MESHWALL_NORMAL]);
+			pDevice->SetTexture(0, g_apTextureMeshWall[g_aMeshWall[nCntMeshWall].nType]);
 
 			// ポリゴンの描画
 			pDevice->DrawIndexedPrimitive
@@ -304,7 +305,7 @@ void DrawMeshWall(void)
 //======================================================================================================================
 //	メッシュウォールの設定処理
 //======================================================================================================================
-void SetMeshWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight)
+void SetMeshWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight, int nType)
 {
 	for (int nCntMeshWall = 0; nCntMeshWall < MAX_MESHWALL; nCntMeshWall++)
 	{ // メッシュウォールの最大表示数分繰り返す
@@ -319,6 +320,7 @@ void SetMeshWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, 
 			g_aMeshWall[nCntMeshWall].fHeight     = fHeight;		// 縦幅
 			g_aMeshWall[nCntMeshWall].nPartWidth  = nPartWidth;		// 横の分割数
 			g_aMeshWall[nCntMeshWall].nPartHeight = nPartHeight;	// 縦の分割数
+			g_aMeshWall[nCntMeshWall].nType       = nType;			// 種類
 
 			// 使用している状態にする
 			g_aMeshWall[nCntMeshWall].bUse = true;
@@ -349,6 +351,7 @@ void TxtSetMeshWall(void)
 	float       fHeight;		// 縦幅の代入用
 	int         nPartWidth;		// 横の分割数の代入用
 	int         nPartHeight;	// 縦の分割数の代入用
+	int         nType;			// 種類の代入用
 	int         nEnd;			// テキスト読み込み終了の確認用
 
 	// 変数配列を宣言
@@ -421,11 +424,16 @@ void TxtSetMeshWall(void)
 								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
 								fscanf(pFile, "%d", &nPartHeight);	// 縦の分割数を読み込む
 							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// 種類を読み込む
+							}
 
 						} while (strcmp(&aString[0], "END_MESHWALLSET") != 0);	// 読み込んだ文字列が END_MESHWALLSET ではない場合ループ
 
 						// メッシュウォールの設定
-						SetMeshWall(pos, D3DXToRadian(rot), fWidth, fHeight, nPartWidth, nPartHeight);
+						SetMeshWall(pos, D3DXToRadian(rot), fWidth, fHeight, nPartWidth, nPartHeight, nType);
 					}
 				} while (strcmp(&aString[0], "END_STAGE_MESHWALLSET") != 0);	// 読み込んだ文字列が END_STAGE_MESHWALLSET ではない場合ループ
 			}

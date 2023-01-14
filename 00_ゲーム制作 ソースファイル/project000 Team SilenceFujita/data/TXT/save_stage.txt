@@ -1,6 +1,6 @@
 #===========================================================
 #
-#	エディットの保存ステージ
+#	エディットの保存ステージ [save_stage.txt]
 #	Author：小原 立暉 & 藤田 勇一 & you
 #
 #===========================================================
@@ -395,6 +395,174 @@ SETSTAGE_BILLBOARD
 		ROT    = 2.2 0.0 0.0
 		COL    = 1.0 0.8 0.1 1.0
 		RADIUS = 47.0 57.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 4
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -329.5 0.0 646.5
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -219.9 0.0 636.8
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -100.3 0.0 626.2
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 24.2 0.0 615.3
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 148.7 0.0 604.3
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 298.1 0.0 591.1
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 492.3 0.0 573.9
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 0
+		ANIMCNT   = 1
+		ANIMPAT   = 1
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 368.3 0.0 419.3
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 1
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 149.1 0.0 438.6
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 1
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -60.1 0.0 457.0
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 1
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -289.2 0.0 477.3
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 4
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = -97.9 0.0 540.7
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 4
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 71.5 0.0 525.7
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
+		TYPE   = 0
+
+		ANIMATION = 1
+		ANIMCNT   = 4
+		ANIMPAT   = 8
+	END_SET_BILLBOARD
+
+	SET_BILLBOARD
+		POS    = 230.9 0.0 511.7
+		ROT    = 2.8 0.1 0.0
+		COL    = 1.0 1.0 1.0 1.0
+		RADIUS = 30.0 30.0
 		TYPE   = 0
 
 		ANIMATION = 1

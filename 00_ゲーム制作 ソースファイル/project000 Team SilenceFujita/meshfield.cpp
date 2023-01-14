@@ -46,14 +46,15 @@ typedef struct
 	int         nPartHeight;			// 縦の分割数
 	int         nNumVtx;				// 必要頂点数
 	int         nNumIdx;				// 必要インデックス数
+	int         nType;					// 種類
 	bool        bUse;					// 使用状況
 } MeshField;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight);	// メッシュフィールドの設定処理
-void TxtSetMeshField(void);																							// メッシュフィールドのセットアップ処理
+void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight, int nType);	// メッシュフィールドの設定処理
+void TxtSetMeshField(void);																										// メッシュフィールドのセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -95,6 +96,7 @@ void InitMeshField(void)
 		g_aMeshField[nCntMeshField].nPartHeight = 0;								// 縦の分割数
 		g_aMeshField[nCntMeshField].nNumVtx     = 0;								// 必要頂点数
 		g_aMeshField[nCntMeshField].nNumIdx     = 0;								// 必要インデックス数
+		g_aMeshField[nCntMeshField].nType       = TEXTURE_MESHFIELD_NORMAL;			// 種類
 		g_aMeshField[nCntMeshField].bUse        = false;							// 使用状況
 	}
 
@@ -304,7 +306,7 @@ void DrawMeshField(void)
 			pDevice->SetFVF(FVF_VERTEX_3D);
 
 			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureMeshField[TEXTURE_MESHFIELD_NORMAL]);
+			pDevice->SetTexture(0, g_apTextureMeshField[g_aMeshField[nCntMeshField].nType]);
 
 			// ポリゴンの描画
 			pDevice->DrawIndexedPrimitive
@@ -326,7 +328,7 @@ void DrawMeshField(void)
 //======================================================================================================================
 //	メッシュフィールドの設定処理
 //======================================================================================================================
-void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight)
+void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight, int nType)
 {
 	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
 	{ // メッシュフィールドの最大表示数分繰り返す
@@ -341,6 +343,7 @@ void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight,
 			g_aMeshField[nCntMeshField].fHeight     = fHeight;		// 縦幅
 			g_aMeshField[nCntMeshField].nPartWidth  = nPartWidth;	// 横の分割数
 			g_aMeshField[nCntMeshField].nPartHeight = nPartHeight;	// 縦の分割数
+			g_aMeshField[nCntMeshField].nType       = nType;		// 種類
 
 			// 使用している状態にする
 			g_aMeshField[nCntMeshField].bUse = true;
@@ -371,6 +374,7 @@ void TxtSetMeshField(void)
 	float       fHeight;		// 縦幅の代入用
 	int         nPartWidth;		// 横の分割数の代入用
 	int         nPartHeight;	// 縦の分割数の代入用
+	int         nType;			// 種類の代入用
 	int         nEnd;			// テキスト読み込み終了の確認用
 
 	// 変数配列を宣言
@@ -443,11 +447,16 @@ void TxtSetMeshField(void)
 								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
 								fscanf(pFile, "%d", &nPartHeight);	// 縦の分割数を読み込む
 							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// 種類を読み込む
+							}
 
 						} while (strcmp(&aString[0], "END_MESHFIELDSET") != 0);	// 読み込んだ文字列が END_MESHFIELDSET ではない場合ループ
 
 						// メッシュフィールドの設定
-						SetMeshField(pos, D3DXToRadian(rot), fWidth, fHeight, nPartWidth, nPartHeight);
+						SetMeshField(pos, D3DXToRadian(rot), fWidth, fHeight, nPartWidth, nPartHeight, nType);
 					}
 				} while (strcmp(&aString[0], "END_STAGE_MESHFIELDSET") != 0);	// 読み込んだ文字列が END_STAGE_MESHFIELDSET ではない場合ループ
 			}
