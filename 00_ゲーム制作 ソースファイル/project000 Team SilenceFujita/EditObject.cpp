@@ -395,7 +395,7 @@ void SetEdit(void)
 			}
 
 			//オブジェクトの設定処理
-			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], BREAKTYPE_NONE, g_EditObject.nType);
+			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], g_EditObject.nType, BREAKTYPE_NONE);
 
 			//エディットオブジェクトの番号を初期化する
 			g_EditObject.nSetNumber = -1;

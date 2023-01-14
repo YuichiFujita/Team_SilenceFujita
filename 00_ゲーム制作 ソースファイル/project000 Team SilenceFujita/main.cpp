@@ -16,6 +16,9 @@
 #include "title.h"
 #include "game.h"
 
+#include "billboard.h"
+#include "object.h"
+
 #ifdef _DEBUG	// デバッグ処理
 #include "camera.h"
 #include "effect.h"
@@ -685,14 +688,27 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 void TxtSetStage(void)
 {
 	// 変数を宣言
-	StageLimit  stageLimit;		// ステージの移動範囲の代入用
-	int         nEnd;			// テキスト読み込み終了の確認用
+	int         nEnd;		// テキスト読み込み終了の確認用
+	StageLimit  stageLimit;	// ステージの移動範囲の代入用
+	D3DXVECTOR3 pos;		// 位置の代入用
+	D3DXVECTOR3 rot;		// 向きの代入用
+	D3DXVECTOR3 scale;		// 拡大率の代入用
+	D3DXCOLOR   col;		// 色の代入用
+	D3DXVECTOR2 radius;		// 半径の代入用
+	int         nType;		// 種類の代入用
+	int         nBreakType;	// 壊れ方の種類の代入用
+	int         nNumMat;	// マテリアル数の代入用
+	int         nAnimCnt;	// 再生カウントの代入用
+	int         nAnimPat;	// 再生パターンの代入用
+	int         nAnim;		// アニメーションの ON / OFF の設定用
+	bool        bAnim;		// アニメーションの ON / OFF の代入用
 
 	// 変数配列を宣言
-	char aString[MAX_STRING];	// テキストの文字列の代入用
+	char         aString[MAX_STRING];	// テキストの文字列の代入用
+	D3DXMATERIAL aMat[MAX_MATERIAL];	// マテリアルの情報の代入用
 
 	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
+	FILE *pFile;			// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
 	pFile = fopen(STAGE_SETUP_TXT, "r");
@@ -748,7 +764,165 @@ void TxtSetStage(void)
 				// ステージの移動範囲の設定
 				SetLimitStage(stageLimit);
 			}
-		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
+
+			//------------------------------------------------
+			//	オブジェクトの設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_OBJECT") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_OBJECT の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_OBJECT") == 0)
+					{ // 読み込んだ文字列が SET_OBJECT の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);		// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);		// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "SCALE") == 0)
+							{ // 読み込んだ文字列が SCALE の場合
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &scale.x, &scale.y, &scale.z);	// 拡大率を読み込む
+							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// オブジェクトの種類を読み込む
+							}
+							else if (strcmp(&aString[0], "BREAKTYPE") == 0)
+							{ // 読み込んだ文字列が BREAKTYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nBreakType);	// 壊れ方の種類を読み込む
+							}
+							else if (strcmp(&aString[0], "NUMMAT") == 0)
+							{ // 読み込んだ文字列が NUMMAT の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nNumMat);		// マテリアル数を読み込む
+
+								for (int nCntMat = 0; nCntMat < nNumMat; nCntMat++)
+								{ // マテリアル数分繰り返す
+
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの番号を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+
+									// 拡散光を読み込む
+									fscanf(pFile, "%f%f%f%f",
+									&aMat[nCntMat].MatD3D.Diffuse.r,
+									&aMat[nCntMat].MatD3D.Diffuse.g,
+									&aMat[nCntMat].MatD3D.Diffuse.b,
+									&aMat[nCntMat].MatD3D.Diffuse.a);
+
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの番号を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+
+									// 環境光を読み込む
+									fscanf(pFile, "%f%f%f%f",
+									&aMat[nCntMat].MatD3D.Ambient.r,
+									&aMat[nCntMat].MatD3D.Ambient.g,
+									&aMat[nCntMat].MatD3D.Ambient.b,
+									&aMat[nCntMat].MatD3D.Ambient.a);
+								}
+							}
+
+						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
+
+						// オブジェクトの設定
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
+			}
+
+			//------------------------------------------------
+			//	ビルボードの設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_BILLBOARD") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_BILLBOARD の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_BILLBOARD") == 0)
+					{ // 読み込んだ文字列が SET_BILLBOARD の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_BILLBOARD ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);			// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "COL") == 0)
+							{ // 読み込んだ文字列が COL の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f%f", &col.r, &col.g, &col.b, &col.a);	// 色を読み込む
+							}
+							else if (strcmp(&aString[0], "RADIUS") == 0)
+							{ // 読み込んだ文字列が RADIUS の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f", &radius.x, &radius.y);				// 半径を読み込む
+							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);			// 種類を読み込む
+							}
+							else if (strcmp(&aString[0], "ANIMATION") == 0)
+							{ // 読み込んだ文字列が ANIMATION の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nAnim);			// アニメーションの ON / OFF を読み込む
+
+								// アニメーションの ON / OFF を設定
+								bAnim = (nAnim == 0) ? false : true;
+							}
+							else if (strcmp(&aString[0], "ANIMCNT") == 0)
+							{ // 読み込んだ文字列が ANIMCNT の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nAnimCnt);			// 再生カウントを読み込む
+							}
+							else if (strcmp(&aString[0], "ANIMPAT") == 0)
+							{ // 読み込んだ文字列が ANIMPAT の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nAnimPat);			// 再生パターンを読み込む
+							}
+						} while (strcmp(&aString[0], "END_SET_BILLBOARD") != 0);	// 読み込んだ文字列が END_SET_BILLBOARD ではない場合ループ
+
+						// ビルボードの設定
+						SetBillboard(rot, pos, nType, radius, col, nAnimCnt, nAnimPat, bAnim);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_BILLBOARD") != 0);			// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
+			}
+		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
 		
 		// ファイルを閉じる
 		fclose(pFile);

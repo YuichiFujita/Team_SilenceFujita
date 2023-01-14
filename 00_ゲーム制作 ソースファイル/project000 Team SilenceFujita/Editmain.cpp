@@ -144,7 +144,7 @@ void TxtSaveStage(void)
 		// 見出し
 		fprintf(pFile, "#===========================================================\n");
 		fprintf(pFile, "#\n");
-		fprintf(pFile, "#	エディットの保存ステージ\n");
+		fprintf(pFile, "#	エディットの保存ステージ [save_stage.txt]\n");
 		fprintf(pFile, "#	Author：小原 立暉 & 藤田 勇一 & you\n");
 		fprintf(pFile, "#\n");
 		fprintf(pFile, "#===========================================================\n");
@@ -185,12 +185,12 @@ void TxtSaveStage(void)
 				{ // マテリアルの数分繰り返す
 
 					// 拡散光の書き出し
-					fprintf(pFile, "		%02d_MAT_DIF = %.2f %.2f %.2f %.2f\n", nCntMat,
+					fprintf(pFile, "		%02d_MAT DIF = %.2f %.2f %.2f %.2f\n", nCntMat,
 							pObject->matCopy[nCntMat].MatD3D.Diffuse.r, pObject->matCopy[nCntMat].MatD3D.Diffuse.g,
 							pObject->matCopy[nCntMat].MatD3D.Diffuse.b, pObject->matCopy[nCntMat].MatD3D.Diffuse.a);
 
 					// 環境光の書き出し
-					fprintf(pFile, "		%02d_MAT_AMB = %.2f %.2f %.2f %.2f\n", nCntMat,
+					fprintf(pFile, "		%02d_MAT AMB = %.2f %.2f %.2f %.2f\n", nCntMat,
 							pObject->matCopy[nCntMat].MatD3D.Ambient.r, pObject->matCopy[nCntMat].MatD3D.Ambient.g,
 							pObject->matCopy[nCntMat].MatD3D.Ambient.b, pObject->matCopy[nCntMat].MatD3D.Ambient.a);
 				}

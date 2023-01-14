@@ -258,7 +258,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nBreakType, int nType)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
@@ -273,8 +273,8 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].pos        = pos;			// 位置
 			g_aObject[nCntObject].rot        = rot;			// 向き
 			g_aObject[nCntObject].scale      = scale;		// 拡大率
-			g_aObject[nCntObject].nBreakType = nBreakType;	// 壊れ方の種類
 			g_aObject[nCntObject].nType      = nType;		// オブジェクトの種類
+			g_aObject[nCntObject].nBreakType = nBreakType;	// 壊れ方の種類
 
 			// オブジェクトの情報を初期化
 			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態

@@ -13,7 +13,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_MESHFIELD		(4)			// 使用するポリゴン数 (メッシュフィールドの最大数)
+#define MAX_MESHFIELD		(128)		// メッシュフィールドの最大数
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -53,6 +53,7 @@ typedef struct
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight);	// メッシュフィールドの設定処理
+void TxtSetMeshField(void);																							// メッシュフィールドのセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -104,8 +105,8 @@ void InitMeshField(void)
 		D3DXCreateTextureFromFile(pDevice, apTextureMeshField[nCntMeshField], &g_apTextureMeshField[nCntMeshField]);
 	}
 
-	// メッシュフィールドの設定
-	SetMeshField(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 1600.0f, 1600.0f, 8, 8);
+	// メッシュフィールドのセットアップ
+	TxtSetMeshField();
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
@@ -160,13 +161,6 @@ void InitMeshField(void)
 
 					// 頂点カラーの設定
 					pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-					//// テクスチャ座標の設定
-					//pVtx[0].tex = D3DXVECTOR2
-					//( // 引数
-					//	nCntWidth * (1.0f / (float)g_aMeshField[nCntMeshField].nPartWidth) - (1.0f * 0.5f),		// u
-					//	nCntHeight * (1.0f / (float)g_aMeshField[nCntMeshField].nPartHeight) - (1.0f * 0.5f)	// v
-					//);
 
 					// テクスチャ座標の設定
 					pVtx[0].tex = D3DXVECTOR2(1.0f * (nCntWidth % 2), 1.0f * nCntHeight);
@@ -362,5 +356,110 @@ void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight,
 			// 処理を抜ける
 			break;
 		}
+	}
+}
+
+//======================================================================================================================
+//	メッシュフィールドのセットアップ処理
+//======================================================================================================================
+void TxtSetMeshField(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos;			// 位置の代入用
+	D3DXVECTOR3 rot;			// 向きの代入用
+	float       fWidth;			// 横幅の代入用
+	float       fHeight;		// 縦幅の代入用
+	int         nPartWidth;		// 横の分割数の代入用
+	int         nPartHeight;	// 縦の分割数の代入用
+	int         nEnd;			// テキスト読み込み終了の確認用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE *pFile;				// ファイルポインタ
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(STAGE_SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
+
+			if (strcmp(&aString[0], "STAGE_MESHFIELDSET") == 0)
+			{ // 読み込んだ文字列が STAGE_MESHFIELDSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_STAGE_MESHFIELDSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "MESHFIELDSET") == 0)
+					{ // 読み込んだ文字列が MESHFIELDSET の場合
+
+						do
+						{ // 読み込んだ文字列が END_MESHFIELDSET ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%f", &pos.x);		// X座標を読み込む
+								fscanf(pFile, "%f", &pos.y);		// Y座標を読み込む
+								fscanf(pFile, "%f", &pos.z);		// Z座標を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%f", &rot.x);		// X向きを読み込む
+								fscanf(pFile, "%f", &rot.y);		// Y向きを読み込む
+								fscanf(pFile, "%f", &rot.z);		// Z向きを読み込む
+							}
+							else if (strcmp(&aString[0], "WIDTH") == 0)
+							{ // 読み込んだ文字列が WIDTH の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%f", &fWidth);		// 横幅を読み込む
+							}
+							else if (strcmp(&aString[0], "HEIGHT") == 0)
+							{ // 読み込んだ文字列が HEIGHT の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%f", &fHeight);		// 縦幅を読み込む
+							}
+							else if (strcmp(&aString[0], "PARTWIDTH") == 0)
+							{ // 読み込んだ文字列が PARTWIDTH の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nPartWidth);	// 横の分割数を読み込む
+							}
+							else if (strcmp(&aString[0], "PARTHEIGHT") == 0)
+							{ // 読み込んだ文字列が PARTHEIGHT の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nPartHeight);	// 縦の分割数を読み込む
+							}
+
+						} while (strcmp(&aString[0], "END_MESHFIELDSET") != 0);	// 読み込んだ文字列が END_MESHFIELDSET ではない場合ループ
+
+						// メッシュフィールドの設定
+						SetMeshField(pos, D3DXToRadian(rot), fWidth, fHeight, nPartWidth, nPartHeight);
+					}
+				} while (strcmp(&aString[0], "END_STAGE_MESHFIELDSET") != 0);	// 読み込んだ文字列が END_STAGE_MESHFIELDSET ではない場合ループ
+			}
+		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "ステージファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
 }
