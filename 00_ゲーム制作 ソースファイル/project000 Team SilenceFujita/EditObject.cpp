@@ -180,17 +180,19 @@ void UpdateEditObject(void)
 	EditMaterialCustom();
 
 	if (GetKeyboardTrigger(DIK_F5) == true)
-	{//F11キーを押した場合
-		//サウンドの停止
+	{ // [F5] が押された場合
+
+		// サウンドの停止
 		StopSoundDJ();
 
-		//サウンドを流す
+		// サウンドを流す
 		PlaySound(g_nSoundDJ, true);
 	}
 
 	if (GetKeyboardTrigger(DIK_F4) == true)
-	{//F10キーを押した場合
-		//サウンドを変える
+	{ // [F4] が押された場合
+
+		// サウンドを変える
 		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
 	}
 }

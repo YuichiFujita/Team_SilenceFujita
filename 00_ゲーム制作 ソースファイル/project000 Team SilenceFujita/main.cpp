@@ -1066,15 +1066,15 @@ void UpdateDebug(void)
 		g_bDispDebug = (g_bDispDebug == false) ? true : false;
 	}
 
-	if (GetKeyboardTrigger(DIK_F4) == true)
-	{ // [F4] が押された場合
+	if (GetKeyboardTrigger(DIK_F7) == true)
+	{ // [F7] が押された場合
 
 		// 真偽を反転させる
 		g_bLeftBG = (g_bLeftBG == false) ? true : false;
 	}
 
-	if (GetKeyboardTrigger(DIK_F5) == true)
-	{ // [F5] が押された場合
+	if (GetKeyboardTrigger(DIK_F8) == true)
+	{ // [F8] が押された場合
 
 		// 真偽を反転させる
 		g_bRightBG = (g_bRightBG == false) ? true : false;
@@ -1116,8 +1116,11 @@ void DrawDebug(void)
 		"　 [F1] デバッグ表示 ON / OFF\n"
 		"　 [F2] モードの切り替え\n"
 		"　 [F3] ステージのセーブ\n"
-		"　 [F4] 左背景の ON / OFF\n"
-		"　 [F5] 右背景の ON / OFF\n"
+		"　 [F4] 曲の変更\n"
+		"　 [F5] 曲の再生\n"
+		"　 [F6] 曲の停止\n"
+		"　 [F7] 左背景の ON / OFF\n"
+		"　 [F8] 右背景の ON / OFF\n"
 		"　 ---------------------------------------------　\n"
 		"　 [FPS] %d\n"
 		"　 [ カメラ視点 ] %.1f, %.1f, %.1f\n"
@@ -1242,7 +1245,7 @@ void DrawDebugEditObject(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n\n\n\n\n\n\n\n\n\n\n\n"
+		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 		"\n　 ---------------------------------------------"
 		"\n　 位置　 [%.4f, %.4f, %.4f]"
 		"\n　 拡大率 [%.4f, %.4f, %.4f]"
@@ -1285,7 +1288,7 @@ void DrawDebugEditBillboard(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n\n\n\n\n\n\n\n\n\n\n\n"
+		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 		"\n　 ---------------------------------------------"
 		"\n　 位置　 [%.4f, %.4f, %.4f]"
 		"\n　 拡大率 [%.4f, %.4f]"

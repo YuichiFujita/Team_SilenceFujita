@@ -27,7 +27,6 @@ typedef struct
 typedef struct
 {
 	D3DXVECTOR3 pos;								//位置
-	D3DXVECTOR3 posOld;								//前回の位置
 	D3DXVECTOR3 rot;								//方向(発射の方向設定に必要)
 	D3DXCOLOR col;									//色
 	D3DXCOLOR colCopy;								//色のコピー
