@@ -1,9 +1,9 @@
-//=======================================================================================================
+//============================================================
 //
 //	影処理 [shadow.cpp]
 //	Author：藤田勇一
 //
-//=======================================================================================================
+//============================================================
 //************************************************************
 //	インクルードファイル
 //************************************************************
@@ -30,16 +30,6 @@ typedef enum
 	TEXTURE_SHADOW_NORMAL = 0,		// 影 (通常)
 	TEXTURE_SHADOW_MAX,				// この列挙型の総数
 } TEXTURE_SHADOW;
-
-//************************************************************
-//	列挙型定義 (SHADOWTYPE)
-//************************************************************
-typedef enum
-{
-	SHADOWTYPE_CIRCLE = 0,			// 丸影
-	SHADOWTYPE_MODEL,				// モデル影
-	SHADOWTYPE_MAX,					// この列挙型の総数
-} SHADOWTYPE;
 
 //************************************************************
 //	構造体定義 (Shadow)
@@ -98,7 +88,7 @@ void InitShadow(void)
 
 		g_aShadow[nCntShadow].pos             = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_aShadow[nCntShadow].rot             = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aShadow[nCntShadow].type            = SHADOWTYPE_CIRCLE;				// 種類
+		g_aShadow[nCntShadow].type            = SHADOWTYPE_NONE;				// 種類
 		g_aShadow[nCntShadow].pShadowIDParent = NULL;							// 影の親の影インデックス
 		g_aShadow[nCntShadow].pUseParent      = NULL;							// 影の親の使用状況
 		g_aShadow[nCntShadow].bUse            = false;							// 使用状況
