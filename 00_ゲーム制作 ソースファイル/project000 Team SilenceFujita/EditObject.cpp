@@ -29,6 +29,7 @@ void ScaleObject(void);									//オブジェクトの拡大縮小処理
 void ResetEdit(void);									//オブジェクトの情報リセット処理
 void EditMaterialCustom(void);							//マテリアルのエディット処理
 
+
 //グローバル変数
 EditObject g_EditObject;								//オブジェクトの情報
 int g_nStyleObject;										//スタイルの変数
