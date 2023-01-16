@@ -16,15 +16,17 @@
 #include "title.h"
 #include "game.h"
 
+#include "billboard.h"
+#include "object.h"
+
 #ifdef _DEBUG	// デバッグ処理
 #include "camera.h"
 #include "effect.h"
 #include "particle.h"
 #include "Editmain.h"
-#include "Edit.h"
+#include "EditObject.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
-#include "EditParticle.h"
 #endif
 
 //************************************************************
@@ -34,7 +36,11 @@
 #define WINDOW_NAME		"None"				// ウインドウの名前 (キャプションに表示)
 
 #ifdef _DEBUG	// デバッグ処理
-#define DEBUG_PRINT		(1280)				// デバッグ表示の文字列の最長
+#define DEBUG_PRINT		(1280)		// デバッグ表示の文字列の最長
+
+#define MAX_DEBUG		(2)			// 使用するポリゴン数
+#define DEBUG_WIDTH		(405.0f)	// デバッグ背景の横幅
+#define DEBUG_SPACE		(470.0f)	// デバッグ背景の空白
 #endif
 
 //************************************************************
@@ -51,21 +57,29 @@ void InitDebug(void);	// デバッグの初期化処理
 void UninitDebug(void);	// デバッグの終了処理
 void UpdateDebug(void);	// デバッグの更新処理
 void DrawDebug(void);	// デバッグの描画処理
+
+void DrawDebugEditObject(void);			// エディットオブジェクトモードのデバッグ表示
+void DrawDebugEditBillboard(void);		// エディットビルボードモードのデバッグ表示
+void DrawDebugControlObject(void);		// エディットオブジェクト操作説明
+void DrawDebugControlBillboard(void);	// エディットビルボード操作説明
 #endif
 
 //************************************************************
 //	グローバル変数
 //************************************************************
-LPDIRECT3D9       g_pD3D = NULL;			// Direct3D オブジェクトへのポインタ
-LPDIRECT3DDEVICE9 g_pD3DDevice = NULL;		// Direct3D デバイスへのポインタ
+LPDIRECT3D9       g_pD3D = NULL;		// Direct3D オブジェクトへのポインタ
+LPDIRECT3DDEVICE9 g_pD3DDevice = NULL;	// Direct3D デバイスへのポインタ
 
-MODE g_mode;					// モード切り替え用
-StageLimit g_stageLimit;		// ステージの移動範囲
+MODE       g_mode;			// モード切り替え用
+StageLimit g_stageLimit;	// ステージの移動範囲
 
 #ifdef _DEBUG	// デバッグ処理
-LPD3DXFONT g_pFont;		// フォントへのポインタ
-int  g_nCountFPS;		// FPS カウンタ
-bool g_bDispDebug;		// デバッグ表記の ON / OFF
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffDebug = NULL;	// 頂点バッファへのポインタ
+LPD3DXFONT g_pFont;			// フォントへのポインタ
+int        g_nCountFPS;		// FPSカウンタ
+bool       g_bDispDebug;	// デバッグ表記の ON / OFF
+bool       g_bLeftBG;		// 左背景表示の ON / OFF
+bool       g_bRightBG;		// 右背景表示の ON / OFF
 #endif
 
 //============================================================
@@ -148,10 +162,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 #ifdef _DEBUG	// デバッグ処理
 	dwFrameCount  = 0;
 	dwFPSLastTime = timeGetTime();	// 現在時刻を取得 (保存)
-
-	g_pFont      = NULL;			// フォントへのポインタを初期化
-	g_nCountFPS  = 0;				// FPS カウンタを初期化
-	g_bDispDebug = true;			// デバッグ表記をしない状態にする
 #endif
 
 	// ウインドウの表示
@@ -686,14 +696,27 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 void TxtSetStage(void)
 {
 	// 変数を宣言
-	StageLimit  stageLimit;		// ステージの移動範囲の代入用
-	int         nEnd;			// テキスト読み込み終了の確認用
+	int         nEnd;		// テキスト読み込み終了の確認用
+	StageLimit  stageLimit;	// ステージの移動範囲の代入用
+	D3DXVECTOR3 pos;		// 位置の代入用
+	D3DXVECTOR3 rot;		// 向きの代入用
+	D3DXVECTOR3 scale;		// 拡大率の代入用
+	D3DXCOLOR   col;		// 色の代入用
+	D3DXVECTOR2 radius;		// 半径の代入用
+	int         nType;		// 種類の代入用
+	int         nBreakType;	// 壊れ方の種類の代入用
+	int         nNumMat;	// マテリアル数の代入用
+	int         nAnimCnt;	// 再生カウントの代入用
+	int         nAnimPat;	// 再生パターンの代入用
+	int         nAnim;		// アニメーションの ON / OFF の設定用
+	bool        bAnim;		// アニメーションの ON / OFF の代入用
 
 	// 変数配列を宣言
-	char aString[MAX_STRING];	// テキストの文字列の代入用
+	char         aString[MAX_STRING];	// テキストの文字列の代入用
+	D3DXMATERIAL aMat[MAX_MATERIAL];	// マテリアルの情報の代入用
 
 	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
+	FILE *pFile;			// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
 	pFile = fopen(STAGE_SETUP_TXT, "r");
@@ -749,7 +772,165 @@ void TxtSetStage(void)
 				// ステージの移動範囲の設定
 				SetLimitStage(stageLimit);
 			}
-		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
+
+			//------------------------------------------------
+			//	オブジェクトの設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_OBJECT") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_OBJECT の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_OBJECT") == 0)
+					{ // 読み込んだ文字列が SET_OBJECT の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);		// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);		// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "SCALE") == 0)
+							{ // 読み込んだ文字列が SCALE の場合
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &scale.x, &scale.y, &scale.z);	// 拡大率を読み込む
+							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// オブジェクトの種類を読み込む
+							}
+							else if (strcmp(&aString[0], "BREAKTYPE") == 0)
+							{ // 読み込んだ文字列が BREAKTYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nBreakType);	// 壊れ方の種類を読み込む
+							}
+							else if (strcmp(&aString[0], "NUMMAT") == 0)
+							{ // 読み込んだ文字列が NUMMAT の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nNumMat);		// マテリアル数を読み込む
+
+								for (int nCntMat = 0; nCntMat < nNumMat; nCntMat++)
+								{ // マテリアル数分繰り返す
+
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの番号を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+
+									// 拡散光を読み込む
+									fscanf(pFile, "%f%f%f%f",
+									&aMat[nCntMat].MatD3D.Diffuse.r,
+									&aMat[nCntMat].MatD3D.Diffuse.g,
+									&aMat[nCntMat].MatD3D.Diffuse.b,
+									&aMat[nCntMat].MatD3D.Diffuse.a);
+
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの番号を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// マテリアルの要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+
+									// 環境光を読み込む
+									fscanf(pFile, "%f%f%f%f",
+									&aMat[nCntMat].MatD3D.Ambient.r,
+									&aMat[nCntMat].MatD3D.Ambient.g,
+									&aMat[nCntMat].MatD3D.Ambient.b,
+									&aMat[nCntMat].MatD3D.Ambient.a);
+								}
+							}
+
+						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
+
+						// オブジェクトの設定
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
+			}
+
+			//------------------------------------------------
+			//	ビルボードの設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_BILLBOARD") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_BILLBOARD の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_BILLBOARD") == 0)
+					{ // 読み込んだ文字列が SET_BILLBOARD の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_BILLBOARD ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);			// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "COL") == 0)
+							{ // 読み込んだ文字列が COL の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f%f", &col.r, &col.g, &col.b, &col.a);	// 色を読み込む
+							}
+							else if (strcmp(&aString[0], "RADIUS") == 0)
+							{ // 読み込んだ文字列が RADIUS の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f", &radius.x, &radius.y);				// 半径を読み込む
+							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);			// 種類を読み込む
+							}
+							else if (strcmp(&aString[0], "ANIMATION") == 0)
+							{ // 読み込んだ文字列が ANIMATION の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nAnim);			// アニメーションの ON / OFF を読み込む
+
+								// アニメーションの ON / OFF を設定
+								bAnim = (nAnim == 0) ? false : true;
+							}
+							else if (strcmp(&aString[0], "ANIMCNT") == 0)
+							{ // 読み込んだ文字列が ANIMCNT の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nAnimCnt);			// 再生カウントを読み込む
+							}
+							else if (strcmp(&aString[0], "ANIMPAT") == 0)
+							{ // 読み込んだ文字列が ANIMPAT の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nAnimPat);			// 再生パターンを読み込む
+							}
+						} while (strcmp(&aString[0], "END_SET_BILLBOARD") != 0);	// 読み込んだ文字列が END_SET_BILLBOARD ではない場合ループ
+
+						// ビルボードの設定
+						SetBillboard(rot, pos, nType, radius, col, nAnimCnt, nAnimPat, bAnim);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_BILLBOARD") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
+			}
+		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
 		
 		// ファイルを閉じる
 		fclose(pFile);
@@ -763,111 +944,33 @@ void TxtSetStage(void)
 }
 
 #ifdef _DEBUG	// デバッグ処理
-//==============================================
-//エディットオブジェクトモードのデバッグ表示
-//==============================================
-void DrawDebugEditObject(void)
-{
-	RECT rect = { 0,108,SCREEN_WIDTH,SCREEN_HEIGHT };
-	char aStr[512];
-	EditObject *edit = GetEditObject();				//エディットオブジェクトの情報を取得する
-
-	//文字列に代入
-	sprintf(&aStr[0], "====================================================\nエディットオブジェクトの位置[%.4f,%.4f,%.4f]"
-		"\nエディットオブジェクトの向き[%.4f]\nエディットオブジェクトの種類:%d"
-		"\nマテリアルの色:[%.2f, %.2f, %.2f]\nオブジェクトの拡大率[%.4f,%.4f,%.4f]"
-		, edit->pos.x, edit->pos.y, edit->pos.z, edit->rot.y, edit->nType
-		, edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.r, edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.g, edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b
-		, edit->scale.x, edit->scale.y, edit->scale.z);
-
-	//テキストの描画
-	g_pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
-}
-
-//==============================================
-//エディットビルボードモードのデバッグ表示
-//==============================================
-void DrawDebugEditBillboard(void)
-{
-	RECT rect = { 0,108,SCREEN_WIDTH,SCREEN_HEIGHT };
-	char aStr[512];
-	EditBillboard *Editbillboard = GetEditBillboard();					//エディットビルボードの情報を取得する
-
-	//文字列に代入
-	sprintf(&aStr[0], "====================================================\nエディットオブジェクトの位置[%.4f,%.4f,%.4f]\n"
-		"エディットオブジェクトの種類:%d\nアニメーション:%d　(0=No,1=Yes)\nアニメーションプレイ:%d　(0=Stop,1=Replay)"
-		"\nアニメーションパターン数:%d\nアニメーションカウンター:%d\n色:[%.2f,%.2f,%.2f]\nビルボードの拡大率:[%.4f,%.4f]"
-		, Editbillboard->pos.x, Editbillboard->pos.y, Editbillboard->pos.z, Editbillboard->nType, Editbillboard->EditAnim.bAnim, Editbillboard->bAnimReplay, Editbillboard->EditAnim.nAnimPattern, Editbillboard->EditAnim.nAnimCounter, Editbillboard->col.r,
-		Editbillboard->col.g, Editbillboard->col.b, Editbillboard->Radius.x, Editbillboard->Radius.y);
-
-	//テキストの描画
-	g_pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
-}
-
-//==============================================
-//エディットパーティクルのデバッグ表示
-//==============================================
-void DrawDebugEditParticle(void)
-{
-	RECT rect = { 0,108,SCREEN_WIDTH,SCREEN_HEIGHT };
-	char aStr[512];
-	EditParticle *pParticle = GetEditParticle();			//エディットパーティクルの情報を取得する
-
-	//文字列に代入
-	sprintf(&aStr[0], "====================================================\nエディットパーティクルの位置[%.4f,%.4f,%.4f]\n"
-		"エディットパーティクルの角度のランダム:[%.4f]\nエディットパーティクルの速度のランダム:[%d,%d,%d]\n"
-		, pParticle->pos.x, pParticle->pos.y, pParticle->pos.z, pParticle->nRandom, pParticle->SpeedRandomX, pParticle->SpeedRandomY, pParticle->SpeedRandomZ);
-
-	//テキストの描画
-	g_pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
-}
-
-//==============================================
-//エディットオブジェクト操作説明
-//==============================================
-void DrawDebugControlObject(void)
-{
-	RECT rect = { 950,0,SCREEN_WIDTH,SCREEN_HEIGHT };
-	char aStr[600];
-
-	//文字列に代入
-	sprintf(&aStr[0], "オブジェクトの種類変更:1\n向きのリセット:2\n拡大率のリセット:3\n全体の拡大:4\n全体の縮小:5\n設置するスタイルの変更:6\n"
-		"オブジェクトの削除:9\nオブジェクトの設置:0\n"
-		"オブジェクトの移動:W/A/S/D\nオブジェクトの向き変更:Q/E\nオブジェクトのX軸の拡大縮小:U/J\nオブジェクトのY軸の拡大縮小:I/K\nオブジェクトのZ軸の拡大縮小:O/L\n"
-		"マテリアルのR値の変更:LSHIFT+R/F\nマテリアルのG値の変更:LSHIFT+T/G\nマテリアルのB値の変更:LSHIFT+Y/H\n"
-		"マテリアルのリセットR値:LSHIFT+V\nマテリアルのリセットG値:LSHIFT+B\nマテリアルのリセットB値:LSHIFT+N\n"
-		"マテリアルの変更:SPACE\nモード切り替え:F2\nセーブ:F3");
-
-	//テキストの描画
-	g_pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
-}
-
-//==============================================
-//エディットビルボード操作説明
-//==============================================
-void DrawDebugControlBillboard(void)
-{
-	RECT rect = { 950,0,SCREEN_WIDTH,SCREEN_HEIGHT };
-	char aStr[700];
-
-	//文字列に代入
-	sprintf(&aStr[0], "ビルボードの種類変更:1\n拡大率のリセット:3\n全体の拡大:4\n全体の縮小:5\n設置するスタイルの変更:6\n"
-		"ビルボードのアニメーション化:7\nビルボードのアニメーション再生:8\nオブジェクトの削除:9\nオブジェクトの設置:0"
-		"\nオブジェクトの移動:W/A/S/D\nオブジェクトのX軸の拡大縮小:U/J\nオブジェクトのY軸の拡大縮小:I/K"
-		"\n色のR値の変更:LSHIFT+R/F\n色のG値の変更:LSHIFT+T/G\n色のB値の変更:LSHIFT+Y/H\n"
-		"色のリセットR値:LSHIFT+V\n色のリセットG値:LSHIFT+B\n色のリセットB値:LSHIFT+N\n"
-		"ビルボードのアニメーションの\nパターン数の設定:LSHIFT+↑/↓\nビルボードのアニメーションの\n間隔の設定:LSHIFT+←/→"
-		"\nモード切り替え:F2\nセーブ:F3");
-
-	//テキストの描画
-	g_pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
-}
-
 //============================================================
 //	デバッグの初期化処理
 //============================================================
 void InitDebug(void)
 {
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	VERTEX_2D         *pVtx;					// 頂点情報へのポインタ
+
+	// グローバル変数の初期化
+	g_pFont      = NULL;	// フォントへのポインタ
+	g_nCountFPS  = 0;		// FPSカウンタ
+	g_bDispDebug = true;	// デバッグ表記の ON / OFF
+	g_bLeftBG    = true;	// 左背景表示の ON / OFF
+	g_bRightBG   = false;	// 右背景表示の ON / OFF
+
+	// 頂点バッファの生成
+	pDevice->CreateVertexBuffer
+	( // 引数
+		sizeof(VERTEX_2D) * 4 * MAX_DEBUG,		// 必要頂点数
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_2D,							// 頂点フォーマット
+		D3DPOOL_MANAGED,
+		&g_pVtxBuffDebug,
+		NULL
+	);
+
 	// デバッグ表示用フォントの生成
 	D3DXCreateFont
 	( // 引数
@@ -884,6 +987,46 @@ void InitDebug(void)
 		"Terminal",
 		&g_pFont				// フォントポインタ
 	);
+
+	//--------------------------------------------------------
+	//	頂点情報の初期化
+	//--------------------------------------------------------
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	g_pVtxBuffDebug->Lock(0, 0, (void**)&pVtx, 0);
+
+	//--------------------------------------------------------
+	//	背景の初期化
+	//--------------------------------------------------------
+	for (int nCntDebug = 0; nCntDebug < MAX_DEBUG; nCntDebug++)
+	{ // 使用するポリゴン数分繰り返す
+
+		// 頂点座標を設定
+		pVtx[0].pos = D3DXVECTOR3(0.0f        + (nCntDebug * (DEBUG_WIDTH + DEBUG_SPACE)), 0.0f,          0.0f);
+		pVtx[1].pos = D3DXVECTOR3(DEBUG_WIDTH + (nCntDebug * (DEBUG_WIDTH + DEBUG_SPACE)), 0.0f,          0.0f);
+		pVtx[2].pos = D3DXVECTOR3(0.0f        + (nCntDebug * (DEBUG_WIDTH + DEBUG_SPACE)), SCREEN_HEIGHT, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(DEBUG_WIDTH + (nCntDebug * (DEBUG_WIDTH + DEBUG_SPACE)), SCREEN_HEIGHT, 0.0f);
+
+		// rhw の設定
+		pVtx[0].rhw = 1.0f;
+		pVtx[1].rhw = 1.0f;
+		pVtx[2].rhw = 1.0f;
+		pVtx[3].rhw = 1.0f;
+
+		// 頂点カラーの設定
+		pVtx[0].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
+		pVtx[1].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
+		pVtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
+		pVtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
+
+		// テクスチャ座標の設定
+		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+		// 頂点データのポインタを 4つ分進める
+		pVtx += 4;
+	}
 }
 
 //============================================================
@@ -891,6 +1034,14 @@ void InitDebug(void)
 //============================================================
 void UninitDebug(void)
 {
+	// 頂点バッファの破棄
+	if (g_pVtxBuffDebug != NULL)
+	{ // 変数 (g_pVtxBuffDebug) がNULLではない場合
+
+		g_pVtxBuffDebug->Release();
+		g_pVtxBuffDebug = NULL;
+	}
+
 	// デバッグ表示用フォントの破棄
 	if (g_pFont != NULL)
 	{ // フォントのポインタが NULL ではない場合
@@ -911,8 +1062,22 @@ void UpdateDebug(void)
 	if (GetKeyboardTrigger(DIK_F1) == true)
 	{ // [F1] が押された場合
 
-		// 変数 (g_bDispDebug) 真偽を代入する (三項演算子)		// 条件式が真なら true 、偽なら false を代入
-		g_bDispDebug = (g_bDispDebug == false) ? true : false;	// ※ 条件式：() の中
+		// 真偽を反転させる
+		g_bDispDebug = (g_bDispDebug == false) ? true : false;
+	}
+
+	if (GetKeyboardTrigger(DIK_F7) == true)
+	{ // [F7] が押された場合
+
+		// 真偽を反転させる
+		g_bLeftBG = (g_bLeftBG == false) ? true : false;
+	}
+
+	if (GetKeyboardTrigger(DIK_F8) == true)
+	{ // [F8] が押された場合
+
+		// 真偽を反転させる
+		g_bRightBG = (g_bRightBG == false) ? true : false;
 	}
 }
 
@@ -940,15 +1105,23 @@ void DrawDebug(void)
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
 
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+
 	// 文字列に代入
 	sprintf
 	( // 引数
 		&aDeb[0],			// 代入する文字列
 		"　 \n"
 		"　 [F1] デバッグ表示 ON / OFF\n"
-		"　 [F2] カメラの位置リセット\n"
-		"　 [F3] レベルの変更\n"
-		"　 ------------------------------------\n"
+		"　 [F2] モードの切り替え\n"
+		"　 [F3] ステージのセーブ\n"
+		"　 [F4] 曲の変更\n"
+		"　 [F5] 曲の再生\n"
+		"　 [F6] 曲の停止\n"
+		"　 [F7] 左背景の ON / OFF\n"
+		"　 [F8] 右背景の ON / OFF\n"
+		"　 ---------------------------------------------　\n"
 		"　 [FPS] %d\n"
 		"　 [ カメラ視点 ] %.1f, %.1f, %.1f\n"
 		"　 [カメラ注視点] %.1f, %.1f, %.1f\n"
@@ -970,6 +1143,38 @@ void DrawDebug(void)
 		nNumParticle		// パーティクルの総数
 	);
 
+	//--------------------------------------------------------
+	//	背景の描画
+	//--------------------------------------------------------
+	// 頂点バッファをデータストリームに設定
+	pDevice->SetStreamSource(0, g_pVtxBuffDebug, 0, sizeof(VERTEX_2D));
+
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_2D);
+
+	if (g_bLeftBG == true)
+	{ // 左の背景表示が ON の場合
+
+		// テクスチャの設定
+		pDevice->SetTexture(0, NULL);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	}
+
+	if (g_bRightBG == true)
+	{ // 右の背景表示が ON の場合
+
+		// テクスチャの設定
+		pDevice->SetTexture(0, NULL);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+	}
+
+	//--------------------------------------------------------
+	//	デバッグ表示の描画
+	//--------------------------------------------------------
 	if (g_bDispDebug == true)
 	{ // デバッグの表示が ON の場合
 
@@ -985,6 +1190,9 @@ void DrawDebug(void)
 		);
 	}
 
+	//--------------------------------------------------------
+	//	エディット表示の描画
+	//--------------------------------------------------------
 	if (g_mode == MODE_GAME)
 	{ // ゲームモードの場合
 
@@ -1009,13 +1217,199 @@ void DrawDebug(void)
 				// エディットモードのデバッグ表示
 				DrawDebugEditBillboard();
 			}
-			else if (GetStyle() == EDITSTYLE_PARTICLE)
-			{ // パーティクルスタイルだった場合
-
-				//パーティクルモードのデバッグ表示
-				DrawDebugEditParticle();
-			}
 		}
 	}
+}
+
+//==============================================
+//	エディットオブジェクトモードのデバッグ表示
+//==============================================
+void DrawDebugEditObject(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	// ポインタを宣言
+	EditObject *edit = GetEditObject();		// エディットオブジェクトの情報を取得する
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		"\n　 ---------------------------------------------"
+		"\n　 位置　 [%.4f, %.4f, %.4f]"
+		"\n　 拡大率 [%.4f, %.4f, %.4f]"
+		"\n　 向き　 [%.4f]"
+		"\n　 種類　 [%d]"
+		"\n　 色　　 [%.2f, %.2f, %.2f]",
+		edit->pos.x, edit->pos.y, edit->pos.z,
+		edit->scale.x, edit->scale.y, edit->scale.z,
+		edit->rot.y, edit->nType,
+		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.r,
+		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.g,
+		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+
+//==============================================
+//	エディットビルボードモードのデバッグ表示
+//==============================================
+void DrawDebugEditBillboard(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	// ポインタを宣言
+	EditBillboard *Editbillboard = GetEditBillboard();	//エディットビルボードの情報を取得する
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		"\n　 ---------------------------------------------"
+		"\n　 位置　 [%.4f, %.4f, %.4f]"
+		"\n　 拡大率 [%.4f, %.4f]"
+		"\n　 種類　 [%d]"
+		"\n　 色　　 [%.2f,%.2f,%.2f]"
+		"\n　 ---------------------------------------------"
+		"\n　 アニメーション　　　：%d　(0：OFF,  1：ON)"
+		"\n　 アニメーションプレイ：%d　(0：STOP, 1：PLAY)"
+		"\n　 ---------------------------------------------"
+		"\n　 アニメーションパターン：%d"
+		"\n　 アニメーションカウンタ：%d",
+		Editbillboard->pos.x, Editbillboard->pos.y, Editbillboard->pos.z,
+		Editbillboard->Radius.x, Editbillboard->Radius.y,
+		Editbillboard->nType,
+		Editbillboard->col.r, Editbillboard->col.g, Editbillboard->col.b,
+		Editbillboard->EditAnim.bAnim,
+		Editbillboard->bAnimReplay,
+		Editbillboard->EditAnim.nAnimPattern,
+		Editbillboard->EditAnim.nAnimCounter
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+
+//==============================================
+//	エディットオブジェクト操作説明
+//==============================================
+void DrawDebugControlObject(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n種類の変更：[1] 　"
+		"\n向きのリセット：[2] 　"
+		"\n拡大率のリセット：[3] 　"
+		"\n全体の拡大：[4] 　"
+		"\n全体の縮小：[5] 　"
+		"\n設置スタイルの変更：[6] 　"
+		"\nオブジェクトの削除：[9] 　"
+		"\nオブジェクトの設置：[0] 　"
+		"\nマテリアルの変更：[SPACE] 　"
+		"\n--------------------------------------------- 　"
+		"\nオブジェクトの移動：[W/A/S/D] 　"
+		"\nオブジェクトの向き変更：[Q/E] 　"
+		"\nオブジェクトのX軸の拡大縮小：[U/J] 　"
+		"\nオブジェクトのY軸の拡大縮小：[I/K] 　"
+		"\nオブジェクトのZ軸の拡大縮小：[O/L] 　"
+		"\n--------------------------------------------- 　"
+		"\nマテリアルのR値の変更：[LSHIFT+R/F] 　"
+		"\nマテリアルのG値の変更：[LSHIFT+T/G] 　"
+		"\nマテリアルのB値の変更：[LSHIFT+Y/H] 　"
+		"\nマテリアルのリセットR値：[LSHIFT+V] 　"
+		"\nマテリアルのリセットG値：[LSHIFT+B] 　"
+		"\nマテリアルのリセットB値：[LSHIFT+N] 　"
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+
+//==============================================
+//	エディットビルボード操作説明
+//==============================================
+void DrawDebugControlBillboard(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n種類変更：[1] 　"
+		"\n拡大率のリセット：[3] 　"
+		"\n全体の拡大：[4] 　"
+		"\n全体の縮小：[5] 　"
+		"\n設置スタイルの変更：[6] 　"
+		"\nビルボードのアニメーション化：[7] 　"
+		"\nビルボードのアニメーション再生：[8] 　"
+		"\nビルボードの削除：[9] 　"
+		"\nビルボードの設置：[0] 　"
+		"\n--------------------------------------------- 　"
+		"\nビルボードの移動：[W/A/S/D] 　"
+		"\nビルボードのX軸の拡大縮小：[U/J] 　"
+		"\nビルボードのY軸の拡大縮小：[I/K] 　"
+		"\n--------------------------------------------- 　"
+		"\n色のR値の変更：[LSHIFT+R/F] 　"
+		"\n色のG値の変更：[LSHIFT+T/G] 　"
+		"\n色のB値の変更：[LSHIFT+Y/H] 　"
+		"\n色のリセットR値：[LSHIFT+V] 　"
+		"\n色のリセットG値：[LSHIFT+B] 　"
+		"\n色のリセットB値：[LSHIFT+N] 　"
+		"\n--------------------------------------------- 　"
+		"\nアニメーションのカウンタ：[LSHIFT+←/→] 　"
+		"\nアニメーションのパターン：[LSHIFT+↑/↓] 　"
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
 #endif

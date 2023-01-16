@@ -24,7 +24,6 @@ typedef enum
 {
 	EDITSTYLE_OBJECT = 0,		//オブジェクト
 	EDITSTYLE_BILLBOARD,		//ビルボード
-	EDITSTYLE_PARTICLE,			//パーティクル
 	EDITSTYLE_MAX
 }EDITSTYLE;
 
@@ -35,6 +34,7 @@ void UpdateEditmain(void);		//エディットメイン画面の更新処理
 void DrawEditmain(void);		//エディットメイン画面の描画処理
 int  GetStyle(void);			//スタイルの取得処理
 void StyleChange(void);			//スタイル変更処理
+void TxtSaveStage(void);		//ステージの保存処理
 
 #endif
 

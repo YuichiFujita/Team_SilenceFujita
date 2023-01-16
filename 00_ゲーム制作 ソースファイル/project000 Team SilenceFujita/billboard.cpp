@@ -49,9 +49,6 @@ void InitBillboard(void)
 		//位置の初期化
 		g_aBillboard[nCntSet].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-		//前回の位置を記録する
-		g_aBillboard[nCntSet].posOld = g_aBillboard[nCntSet].pos;
-
 		//向きの初期化
 		g_aBillboard[nCntSet].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
@@ -183,20 +180,6 @@ void UpdateBillboard(void)
 	{
 		if (g_aBillboard[nCntBill].bUse == true)
 		{//使用されていた場合
-			//前回の位置を記録する
-			g_aBillboard[nCntBill].posOld = g_aBillboard[nCntBill].pos;
-
-			switch (g_aBillboard[nCntBill].Type)
-			{
-			case BILLBOARD_BULLET:			//弾の場合
-
-				//加速する
-				g_aBillboard[nCntBill].pos.x += sinf(g_aBillboard[nCntBill].rot.y) * 4.0f;
-				g_aBillboard[nCntBill].pos.z += cosf(g_aBillboard[nCntBill].rot.y) * 4.0f;
-
-				break;						//抜け出す
-			}
-
 			switch (g_aBillboard[nCntBill].State)
 			{
 			case BILLBOARDSTATE_DELETETARGET:			//削除対象の場合
@@ -240,12 +223,6 @@ void UpdateBillboard(void)
 
 			//影の位置の設定処理
 			SetPositionShadow(g_aBillboard[nCntBill].nShadow, g_aBillboard[nCntBill].pos);
-
-			////ビルボードの当たり判定
-			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(MESH_RADIUS, 0.0f, MESH_RADIUS), D3DXVECTOR3(-MESH_RADIUS, 0.0f, MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
-			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(MESH_RADIUS, 0.0f, -MESH_RADIUS), D3DXVECTOR3(MESH_RADIUS, 0.0f, MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
-			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(-MESH_RADIUS, 0.0f, -MESH_RADIUS), D3DXVECTOR3(MESH_RADIUS, 0.0f, -MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
-			//CollisionOuterProduct(&g_aBillboard[nCntBill].pos, &g_aBillboard[nCntBill].posOld, D3DXVECTOR3(-MESH_RADIUS, 0.0f, MESH_RADIUS), D3DXVECTOR3(-MESH_RADIUS, 0.0f, -MESH_RADIUS), &g_aBillboard[nCntBill].bUse, &g_aBillboard[nCntBill].nShadow);
 		}
 		pVtx += 4;					//頂点データを4つ分進める
 	}
@@ -351,9 +328,6 @@ void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radiu
 		{//使用されていなかった場合
 			//位置を設定する
 			g_aBillboard[nCntBill].pos = pos;
-
-			//前回の位置を記録する
-			g_aBillboard[nCntBill].posOld = g_aBillboard[nCntBill].pos;
 
 			//向きを設定する
 			g_aBillboard[nCntBill].rot = rot;

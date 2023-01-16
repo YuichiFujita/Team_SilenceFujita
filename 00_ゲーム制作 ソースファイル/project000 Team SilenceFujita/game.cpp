@@ -84,6 +84,9 @@ void InitGame(void)
 	// ポーズの初期化
 	InitPause();
 
+	// ステージのセットアップ
+	TxtSetStage();
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
 	InitEditmain();
@@ -238,8 +241,8 @@ void UpdateGame(void)
 	if (GetKeyboardTrigger(DIK_F3) == true)
 	{ // [F3] が押された場合
 
-		// オブジェクトのセーブ処理
-		//SaveObject();
+		// ステージの保存
+		TxtSaveStage();
 	}
 #else
 	if (g_bPause == false)

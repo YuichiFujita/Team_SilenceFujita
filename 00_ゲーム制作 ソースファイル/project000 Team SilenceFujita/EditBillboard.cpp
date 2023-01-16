@@ -11,7 +11,7 @@
 #include "camera.h"
 #include "Shadow.h"
 #include "billboard.h"
-#include "Edit.h"
+#include "EditObject.h"
 #include "Editmain.h"
 
 //プロトタイプ宣言

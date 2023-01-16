@@ -64,7 +64,7 @@ void UninitObject(void);				// オブジェクトの終了処理
 void UpdateObject(void);				// オブジェクトの更新処理
 void DrawObject(void);					// オブジェクトの描画処理
 
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nBreakType, int nType);	// オブジェクトの設定処理
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType);	// オブジェクトの設定処理
 
 void HitObject(Object *pObject, int nDamage);												// オブジェクトのダメージ判定
 void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth);	// オブジェクトとの当たり判定
