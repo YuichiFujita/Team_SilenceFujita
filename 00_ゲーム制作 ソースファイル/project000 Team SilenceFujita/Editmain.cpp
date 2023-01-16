@@ -148,6 +148,8 @@ void TxtSaveStage(void)
 		fprintf(pFile, "#	Author：小原 立暉 & 藤田 勇一 & you\n");
 		fprintf(pFile, "#\n");
 		fprintf(pFile, "#===========================================================\n");
+		fprintf(pFile, "<>****<> ここから下をコピーし [stage.txt]に張り付け <>****<>\n");
+		fprintf(pFile, "\n");
 
 		// オブジェクトの書き出し
 		fprintf(pFile, "#===========================================================\n");
