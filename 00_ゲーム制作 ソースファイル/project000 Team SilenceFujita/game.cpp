@@ -27,6 +27,7 @@
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
+#include "SoundDJ.h"
 #endif
 
 //**********************************************************************************************************************
@@ -36,6 +37,7 @@ GAMESTATE g_gameState;			// ゲームの状態
 int       g_nCounterGameState;	// 状態管理カウンター
 bool      g_bPause;				// ポーズ状態の ON / OFF
 int       g_nGameMode;			// エディットの ON / OFF
+int		  g_nSoundDJ;			//現在流れているサウンド
 
 //======================================================================================================================
 //	ゲーム画面の初期化処理
@@ -50,6 +52,9 @@ void InitGame(void)
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
 	g_nGameMode         = GAMEMODE_PLAY;		// エディットの ON / OFF
+#ifdef _DEBUG	// デバッグ処理
+	g_nSoundDJ			= FUJITA_DJ_LABEL_ONE;	//サウンドを初期化する
+#endif
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
@@ -218,6 +223,30 @@ void UpdateGame(void)
 			// ポーズの更新
 			UpdatePause();
 		}
+	}
+
+	if (GetKeyboardTrigger(DIK_F5) == true)
+	{ // [F5] が押された場合
+
+		// サウンドの停止
+		StopSoundDJ();
+
+		// サウンドを流す
+		PlaySound(g_nSoundDJ, true);
+	}
+
+	if (GetKeyboardTrigger(DIK_F4) == true)
+	{ // [F4] が押された場合
+
+		// サウンドを変える
+		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
+	}
+
+	if (GetKeyboardTrigger(DIK_F6) == true)
+	{ // [F6]が押された場合
+
+		// サウンドの停止
+		StopSoundDJ((SOUND_DJ_LABEL)g_nSoundDJ);
 	}
 
 	// ビルボードの更新

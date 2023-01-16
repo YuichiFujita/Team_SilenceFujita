@@ -26,6 +26,8 @@ void ResetEditBillboard(void);							//ビルボードの情報リセット処理
 void CustomBillboardColor(void);						//ビルボードの色のエディット処理
 void CustomBillboardAnim(void);							//ビルボードのアニメーションカスタム処理
 void ReplayBillboard(void);								//ビルボードのアニメーション再生処理
+void UpDownEditBillboard(void);							//ビルボードの上下移動処理
+void CustomShadowBillboard(void);						//影のカスタム処理
 
 //グローバル変数
 EditBillboard g_EditBillboard;							//ビルボードの情報
@@ -92,6 +94,9 @@ void InitEditBillboard(void)
 		//テクスチャパターンを初期化する
 		g_EditBillboard.EditAnim.TexPattern = 1.0f;
 
+		//影を付ける
+		g_EditBillboard.bShadow = true;
+
 		//バッファをNULLにする
 		g_EditBillboard.VtxBuff = NULL;
 
@@ -104,7 +109,7 @@ void InitEditBillboard(void)
 
 	for (int nCntTexture = 0; nCntTexture < BILLBOARD_MAX; nCntTexture++)
 	{//テクスチャの設定
-	 //下地のテクスチャの読み込み
+		//下地のテクスチャの読み込み
 		D3DXCreateTextureFromFile(pDevice,
 			c_apTexturenameEditBillboard[nCntTexture],
 			&g_EditBillboard.Texture[nCntTexture]);
@@ -238,6 +243,9 @@ void UpdateEditBillboard(void)
 
 	//ビルボードの情報リセット処理
 	ResetEditBillboard();
+
+	//影のカスタム処理
+	CustomShadowBillboard();						
 }
 
 //=====================================
@@ -416,7 +424,7 @@ void SetEditBillboard(D3DXVECTOR3 rot)
 		{//0キーを押した場合
 			//ビルボードの設定処理
 			SetBillboard(rot, g_EditBillboard.pos, g_EditBillboard.nType, g_EditBillboard.Radius, g_EditBillboard.col
-				, g_EditBillboard.EditAnim.nAnimCounter, g_EditBillboard.EditAnim.nAnimPattern, g_EditBillboard.EditAnim.bAnim);
+				, g_EditBillboard.EditAnim.nAnimCounter, g_EditBillboard.EditAnim.nAnimPattern, g_EditBillboard.EditAnim.bAnim, g_EditBillboard.bShadow);
 
 			//番号を初期化する
 			g_EditBillboard.nSetNumber = -1;
@@ -828,5 +836,44 @@ void ReplayBillboard(void)
 
 	//頂点バッファをアンロックする
 	g_EditBillboard.VtxBuff->Unlock();
+}
+
+//=======================================
+//ビルボードの上下移動処理
+//=======================================
+void UpDownEditBillboard(void)
+{
+	if (GetKeyboardPress(DIK_LSHIFT) == true)
+	{//左SHIFTキーを押している場合
+		if (GetKeyboardPress(DIK_W) == true)
+		{//Wキーを押している場合
+			//位置を奥に進める
+			g_EditBillboard.pos.y += 1.0f;
+		}
+
+		if (GetKeyboardPress(DIK_S) == true)
+		{//Sキーを押している場合
+			//位置を手前に進める
+			g_EditBillboard.pos.y -= 1.0f;
+		}
+
+		if (GetKeyboardTrigger(DIK_A) == true || GetKeyboardTrigger(DIK_D) == true)
+		{//AキーかDキーを押した場合
+			//地面に戻す
+			g_EditBillboard.pos.y = 0.0f;
+		}
+	}
+}
+
+//=======================================
+//影のカスタム処理
+//=======================================
+void CustomShadowBillboard(void)
+{
+	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
+	{//BackSpaceキーを押した場合
+		//影を切り替える
+		g_EditBillboard.bShadow = g_EditBillboard.bShadow ? false : true;
+	}
 }
 #endif

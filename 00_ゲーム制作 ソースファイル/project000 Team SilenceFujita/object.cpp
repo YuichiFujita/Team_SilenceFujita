@@ -258,7 +258,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
@@ -315,14 +315,31 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse = pMat[nCntMat].MatD3D.Diffuse;
 			}
 
-			// 影のインデックスを設定
-			g_aObject[nCntObject].nShadowID = SetCircleShadow
-			( // 引数
-				0.5f,																						// α値
-				fabsf(g_aObject[nCntObject].modelData.vtxMax.x - g_aObject[nCntObject].modelData.vtxMin.x),	// 半径
-				&g_aObject[nCntObject].nShadowID,															// 影の親の影インデックス
-				&g_aObject[nCntObject].bUse																	// 影の親の使用状況
-			);
+			if (nShadowType == SHADOWTYPE_CIRCLE)
+			{//丸影の場合
+				// 影のインデックスを設定
+				g_aObject[nCntObject].nShadowID = SetCircleShadow
+				( // 引数
+					0.5f,																						// α値
+					fabsf(g_aObject[nCntObject].modelData.vtxMax.x - g_aObject[nCntObject].modelData.vtxMin.x),	// 半径
+					&g_aObject[nCntObject].nShadowID,															// 影の親の影インデックス
+					&g_aObject[nCntObject].bUse																	// 影の親の使用状況
+				);
+			}
+			else if (nShadowType == SHADOWTYPE_MODEL)
+			{//モデル影の場合
+				g_aObject[nCntObject].nShadowID = SetModelShadow
+				( // 引数
+					g_aObject[nCntObject].modelData,
+					&g_aObject[nCntObject].nShadowID,
+					&g_aObject[nCntObject].bUse
+				);
+			}
+			else
+			{//影無しの場合
+				//影を設定しない
+				g_aObject[nCntObject].nShadowID = -1;
+			}
 
 			// 影の位置設定
 			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);

@@ -854,7 +854,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, 0);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
@@ -926,7 +926,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_BILLBOARD") != 0);	// 読み込んだ文字列が END_SET_BILLBOARD ではない場合ループ
 
 						// ビルボードの設定
-						SetBillboard(rot, pos, nType, radius, col, nAnimCnt, nAnimPat, bAnim);
+						SetBillboard(rot, pos, nType, radius, col, nAnimCnt, nAnimPat, bAnim, true);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_BILLBOARD") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
@@ -1251,13 +1251,17 @@ void DrawDebugEditObject(void)
 		"\n　 拡大率 [%.4f, %.4f, %.4f]"
 		"\n　 向き　 [%.4f]"
 		"\n　 種類　 [%d]"
-		"\n　 色　　 [%.2f, %.2f, %.2f]",
+		"\n　 色　　 [%.2f, %.2f, %.2f]"
+		"\n   影     [%s]"
+		"\n   壊れ方 [%s]",
 		edit->pos.x, edit->pos.y, edit->pos.z,
 		edit->scale.x, edit->scale.y, edit->scale.z,
 		edit->rot.y, edit->nType,
 		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.r,
 		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.g,
-		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b
+		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b,
+		edit->Shadowtype.pShadowMode[edit->Shadowtype.Shadowtype],
+		edit->Break.pBreakMode[edit->Break.Breaktype]
 	);
 
 	// テキストの描画
@@ -1294,8 +1298,9 @@ void DrawDebugEditBillboard(void)
 		"\n　 拡大率 [%.4f, %.4f]"
 		"\n　 種類　 [%d]"
 		"\n　 色　　 [%.2f,%.2f,%.2f]"
+		"\n   影     [%d]  (0:OFF,1:ON)"
 		"\n　 ---------------------------------------------"
-		"\n　 アニメーション　　　：%d　(0：OFF,  1：ON)"
+		"\n　 アニメーション　　　：%d  (0：OFF,  1：ON)"
 		"\n　 アニメーションプレイ：%d　(0：STOP, 1：PLAY)"
 		"\n　 ---------------------------------------------"
 		"\n　 アニメーションパターン：%d"
@@ -1304,6 +1309,7 @@ void DrawDebugEditBillboard(void)
 		Editbillboard->Radius.x, Editbillboard->Radius.y,
 		Editbillboard->nType,
 		Editbillboard->col.r, Editbillboard->col.g, Editbillboard->col.b,
+		Editbillboard->bShadow,
 		Editbillboard->EditAnim.bAnim,
 		Editbillboard->bAnimReplay,
 		Editbillboard->EditAnim.nAnimPattern,
@@ -1341,6 +1347,8 @@ void DrawDebugControlObject(void)
 		"\n全体の拡大：[4] 　"
 		"\n全体の縮小：[5] 　"
 		"\n設置スタイルの変更：[6] 　"
+		"\nオブジェクトの破壊のON / OFF：[7] 　"
+		"\nオブジェクトの影の種類の変更：[8] 　"
 		"\nオブジェクトの削除：[9] 　"
 		"\nオブジェクトの設置：[0] 　"
 		"\nマテリアルの変更：[SPACE] 　"
@@ -1357,6 +1365,8 @@ void DrawDebugControlObject(void)
 		"\nマテリアルのリセットR値：[LSHIFT+V] 　"
 		"\nマテリアルのリセットG値：[LSHIFT+B] 　"
 		"\nマテリアルのリセットB値：[LSHIFT+N] 　"
+		"\nオブジェクトの縦の移動：[LSHIFT+W/S] 　"
+		"\nオブジェクトの縦の位置の初期化：[LSHIFT+A/D] 　"
 	);
 
 	// テキストの描画
@@ -1393,6 +1403,7 @@ void DrawDebugControlBillboard(void)
 		"\nビルボードのアニメーション再生：[8] 　"
 		"\nビルボードの削除：[9] 　"
 		"\nビルボードの設置：[0] 　"
+		"\nビルボードの影のON/OFF：[BackSpace] 　"
 		"\n--------------------------------------------- 　"
 		"\nビルボードの移動：[W/A/S/D] 　"
 		"\nビルボードのX軸の拡大縮小：[U/J] 　"
@@ -1407,6 +1418,8 @@ void DrawDebugControlBillboard(void)
 		"\n--------------------------------------------- 　"
 		"\nアニメーションのカウンタ：[LSHIFT+←/→] 　"
 		"\nアニメーションのパターン：[LSHIFT+↑/↓] 　"
+		"\nビルボードの縦の移動：[LSHIFT+W/S] 　"
+		"\nビルボードの縦の位置の初期化：[LSHIFT+A/D] 　"
 	);
 
 	// テキストの描画

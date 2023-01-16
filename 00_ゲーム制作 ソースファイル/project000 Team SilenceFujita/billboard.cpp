@@ -314,7 +314,7 @@ void DrawBillboard(void)
 //======================================
 //ビルボードの設定処理
 //======================================
-void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radius, D3DXCOLOR col, int AnimCnt, int AnimPtrn, bool bAnim)
+void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radius, D3DXCOLOR col, int AnimCnt, int AnimPtrn, bool bAnim, bool bShadow)
 {
 	//頂点情報へのポインタ
 	VERTEX_3D *pVtx;
@@ -389,10 +389,15 @@ void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radiu
 			//ビルボードの状態を設定する
 			g_aBillboard[nCntBill].State = BILLBOARDSTATE_USE;
 
-			if (g_aBillboard[nCntBill].Type != BILLBOARD_EXPL)
-			{//爆発のビルボード以外だった場合
+			if (bShadow == true)
+			{//影を入れる
 				//影を設定する
 				g_aBillboard[nCntBill].nShadow = SetCircleShadow(0.5f, 30.0f, &g_aBillboard[nCntBill].nShadow, &g_aBillboard[nCntBill].bUse);
+			}
+			else
+			{//影を入れない
+				//影を-1に設定する
+				g_aBillboard[nCntBill].nShadow = -1;
 			}
 
 			//使用する
@@ -417,7 +422,7 @@ void CollisionWall(Billboard *Billboard)
 		Billboard->pos.z <= -300.0f)
 	{//弾がステージの外に出た場合
 		//爆発のビルボードを設定
-		SetBillboard(Billboard->rot, Billboard->pos, BILLBOARD_EXPL, D3DXVECTOR2(10.0f, 10.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 4, 8, true);
+		SetBillboard(Billboard->rot, Billboard->pos, BILLBOARD_EXPL, D3DXVECTOR2(10.0f, 10.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 4, 8, true, false);
 
 		//使用していない
 		Billboard->bUse = false;
