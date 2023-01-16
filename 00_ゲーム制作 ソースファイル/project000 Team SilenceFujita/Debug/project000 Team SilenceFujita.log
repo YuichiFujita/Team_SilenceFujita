@@ -1,4 +1,3 @@
-﻿  main.cpp
-cl : コマンド ライン warning D9028: 簡易リビルド時のエラーです、通常のビルドに戻します
+﻿  object.cpp
   project000 Team SilenceFujita.vcxproj -> C:\Users\student\Desktop\Team SilenceFujita\00_ゲーム制作 ソースファイル\project000 Team SilenceFujita\Debug\project000 Team SilenceFujita.exe
   project000 Team SilenceFujita.vcxproj -> C:\Users\student\Desktop\Team SilenceFujita\00_ゲーム制作 ソースファイル\project000 Team SilenceFujita\Debug\project000 Team SilenceFujita.pdb (Full PDB)

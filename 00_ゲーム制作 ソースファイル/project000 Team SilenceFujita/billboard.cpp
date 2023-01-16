@@ -222,7 +222,7 @@ void UpdateBillboard(void)
 			pVtx[3].col = g_aBillboard[nCntBill].col;
 
 			//影の位置の設定処理
-			SetPositionShadow(g_aBillboard[nCntBill].nShadow, g_aBillboard[nCntBill].pos);
+			SetPositionShadow(g_aBillboard[nCntBill].nShadow, g_aBillboard[nCntBill].pos, NONE_ROT, NONE_SCALE);
 		}
 		pVtx += 4;					//頂点データを4つ分進める
 	}
@@ -392,7 +392,7 @@ void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radiu
 			if (g_aBillboard[nCntBill].Type != BILLBOARD_EXPL)
 			{//爆発のビルボード以外だった場合
 				//影を設定する
-				g_aBillboard[nCntBill].nShadow = SetShadow(0.5f, 30.0f, &g_aBillboard[nCntBill].nShadow, &g_aBillboard[nCntBill].bUse);
+				g_aBillboard[nCntBill].nShadow = SetCircleShadow(0.5f, 30.0f, &g_aBillboard[nCntBill].nShadow, &g_aBillboard[nCntBill].bUse);
 			}
 
 			//使用する
