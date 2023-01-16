@@ -8,17 +8,26 @@
 #	オブジェクトの設定
 #===========================================================
 #-----------------------------------------------------------
-#	BREAKTYPE：0  壊れない
-#	         ：1  壊れる
+#	 BREAKTYPE：0  壊れない
+#	          ：1  壊れる
+#-----------------------------------------------------------
+#	SHADOWTYPE：0  影無し
+#	          ：1  丸影
+#	          ：2  モデル影
+#-----------------------------------------------------------
+#	  COLLTYPE：0  当たらない
+#	          ：1  当たる
 #-----------------------------------------------------------
 SETSTAGE_OBJECT
 
 	SET_OBJECT
-		POS        = -221.9 0.0 130.4
+		POS        = 480.0 0.0 -180.0
 		ROT        = 0.0 0.0 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 0
 		BREAKTYPE  = 0
+		SHADOWTYPE = 0
+		COLLTYPE   = 1
 
 		NUMMAT     = 2
 		00_MAT DIF = 0.80 0.80 0.80 1.00
@@ -28,11 +37,13 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 13.0 0.0 124.7
+		POS        = 685.0 0.0 -180.0
 		ROT        = 0.0 0.0 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 0
 		BREAKTYPE  = 0
+		SHADOWTYPE = 1
+		COLLTYPE   = 1
 
 		NUMMAT     = 2
 		00_MAT DIF = 0.80 0.80 0.80 1.00
@@ -42,209 +53,67 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 232.9 0.0 119.4
+		POS        = 895.0 0.0 -180.0
 		ROT        = 0.0 0.0 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 0
 		BREAKTYPE  = 0
+		SHADOWTYPE = 2
+		COLLTYPE   = 1
 
 		NUMMAT     = 2
 		00_MAT DIF = 0.80 0.80 0.80 1.00
 		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.06 0.41 0.47 1.00
-		01_MAT AMB = 0.00 0.00 0.47 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = -190.0 0.0 -45.0
+		POS        = 485.0 0.0 -675.0
 		ROT        = 0.0 0.0 0.0
 		SCALE      = 1.0 1.0 1.0
-		TYPE       = 1
+		TYPE       = 0
 		BREAKTYPE  = 0
+		SHADOWTYPE = 0
+		COLLTYPE   = 0
 
 		NUMMAT     = 2
 		00_MAT DIF = 0.80 0.80 0.80 1.00
 		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 1.00 1.00 1.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
 		01_MAT AMB = 0.00 0.00 0.00 1.00
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 85.0 0.0 -230.0
+		POS        = 685.0 0.0 -675.0
 		ROT        = 0.0 0.0 0.0
 		SCALE      = 1.0 1.0 1.0
-		TYPE       = 1
+		TYPE       = 0
 		BREAKTYPE  = 0
-
-		NUMMAT     = 2
-		00_MAT DIF = 0.80 0.80 0.09 1.00
-		00_MAT AMB = 0.00 0.00 0.30 1.00
-		01_MAT DIF = 1.00 1.00 1.00 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = 330.0 0.0 -175.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 1.0 1.0
-		TYPE       = 2
-		BREAKTYPE  = 0
+		SHADOWTYPE = 1
+		COLLTYPE   = 0
 
 		NUMMAT     = 2
 		00_MAT DIF = 0.80 0.80 0.80 1.00
 		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.06 0.11 0.00 1.00
-		01_MAT AMB = 0.00 0.71 0.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = -575.0 0.0 -90.0
+		POS        = 900.0 0.0 -675.0
 		ROT        = 0.0 0.0 0.0
 		SCALE      = 1.0 1.0 1.0
-		TYPE       = 3
+		TYPE       = 0
 		BREAKTYPE  = 0
+		SHADOWTYPE = 2
+		COLLTYPE   = 0
 
 		NUMMAT     = 2
-		00_MAT DIF = 0.08 0.56 0.08 1.00
+		00_MAT DIF = 0.80 0.80 0.80 1.00
 		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.80 0.80 0.80 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
 		01_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -495.0 0.0 -90.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 1.0 1.0
-		TYPE       = 3
-		BREAKTYPE  = 0
-
-		NUMMAT     = 2
-		00_MAT DIF = 0.08 0.56 0.08 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.80 0.80 0.80 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -395.0 0.0 -90.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 1.0 1.0
-		TYPE       = 3
-		BREAKTYPE  = 0
-
-		NUMMAT     = 2
-		00_MAT DIF = 0.08 0.56 0.08 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.80 0.80 0.80 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -185.0 0.0 -370.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 0.2 1.0
-		TYPE       = 4
-		BREAKTYPE  = 0
-
-		NUMMAT     = 2
-		00_MAT DIF = 0.59 0.39 0.04 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.80 0.80 0.80 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -60.0 0.0 -370.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 0.2 1.0
-		TYPE       = 4
-		BREAKTYPE  = 0
-
-		NUMMAT     = 2
-		00_MAT DIF = 0.59 0.39 0.04 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.80 0.80 0.80 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -30.0 0.0 -180.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 3.2 1.0
-		TYPE       = 5
-		BREAKTYPE  = 0
-
-		NUMMAT     = 3
-		00_MAT DIF = 0.04 0.71 0.00 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.09 0.49 0.07 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-		02_MAT DIF = 0.42 0.61 0.00 1.00
-		02_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -230.0 0.0 -265.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 1.8 1.0
-		TYPE       = 5
-		BREAKTYPE  = 0
-
-		NUMMAT     = 3
-		00_MAT DIF = 0.04 0.71 0.00 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.09 0.49 0.07 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-		02_MAT DIF = 0.42 0.61 0.00 1.00
-		02_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -460.0 0.0 -415.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 1.2 1.0
-		TYPE       = 5
-		BREAKTYPE  = 0
-
-		NUMMAT     = 3
-		00_MAT DIF = 0.04 0.71 0.00 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.09 0.49 0.07 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-		02_MAT DIF = 0.42 0.61 0.00 1.00
-		02_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -360.0 0.0 -220.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 1.0 1.0
-		TYPE       = 5
-		BREAKTYPE  = 0
-
-		NUMMAT     = 3
-		00_MAT DIF = 0.04 0.71 0.00 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.09 0.49 0.07 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-		02_MAT DIF = 0.42 0.61 0.00 1.00
-		02_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -100.0 0.0 -220.0
-		ROT        = 0.0 0.0 0.0
-		SCALE      = 1.0 1.0 1.0
-		TYPE       = 5
-		BREAKTYPE  = 0
-
-		NUMMAT     = 3
-		00_MAT DIF = 0.04 0.71 0.00 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.09 0.49 0.07 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-		02_MAT DIF = 0.42 0.61 0.00 1.00
-		02_MAT AMB = 0.00 0.00 0.00 1.00
 	END_SET_OBJECT
 
 END_SETSTAGE_OBJECT
@@ -253,321 +122,77 @@ END_SETSTAGE_OBJECT
 #	ビルボードの設定
 #===========================================================
 #-----------------------------------------------------------
-#	ANIMATION：0  アニメーション OFF
-#	         ：1  アニメーション ON
+#	 ANIMATION：0  アニメーション OFF
+#	          ：1  アニメーション ON
+#-----------------------------------------------------------
+#	SHADOWTYPE：0  丸影
+#	          ：1  影無し
 #-----------------------------------------------------------
 SETSTAGE_BILLBOARD
 
 	SET_BILLBOARD
-		POS    = 242.4 0.0 -477.2
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
+		POS        = -289.7 0.0 95.6
+		ROT        = 2.2 0.0 0.0
+		COL        = 1.0 1.0 1.0 1.0
+		RADIUS     = 88.0 88.0
+		TYPE       = 0
+		SHADOWTYPE = 1
 
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
+		ANIMATION  = 0
+		ANIMCNT    = 1
+		ANIMPAT    = 1
 	END_SET_BILLBOARD
 
 	SET_BILLBOARD
-		POS    = 311.9 0.0 -385.4
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
+		POS        = -504.7 0.0 99.0
+		ROT        = 2.2 0.0 0.0
+		COL        = 1.0 1.0 1.0 1.0
+		RADIUS     = 88.0 88.0
+		TYPE       = 0
+		SHADOWTYPE = 0
 
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
+		ANIMATION  = 0
+		ANIMCNT    = 1
+		ANIMPAT    = 1
 	END_SET_BILLBOARD
 
 	SET_BILLBOARD
-		POS    = 142.5 0.0 -472.4
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 85.0 30.0
-		TYPE   = 0
+		POS        = -286.0 0.0 -174.9
+		ROT        = 2.4 0.1 0.0
+		COL        = 0.1 1.0 1.0 1.0
+		RADIUS     = 199.0 199.0
+		TYPE       = 0
+		SHADOWTYPE = 1
 
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
+		ANIMATION  = 1
+		ANIMCNT    = 8
+		ANIMPAT    = 8
 	END_SET_BILLBOARD
 
 	SET_BILLBOARD
-		POS    = 436.4 0.0 -501.5
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 85.0 75.0
-		TYPE   = 0
+		POS        = -570.6 0.0 -159.0
+		ROT        = 2.4 0.1 0.0
+		COL        = 0.1 0.0 1.0 1.0
+		RADIUS     = 120.0 120.0
+		TYPE       = 0
+		SHADOWTYPE = 0
 
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
+		ANIMATION  = 1
+		ANIMCNT    = 8
+		ANIMPAT    = 8
 	END_SET_BILLBOARD
 
 	SET_BILLBOARD
-		POS    = -272.3 0.0 -457.5
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 85.0 75.0
-		TYPE   = 0
+		POS        = -403.8 0.0 -488.8
+		ROT        = 2.4 0.1 0.0
+		COL        = 0.1 0.0 1.0 1.0
+		RADIUS     = 120.0 120.0
+		TYPE       = 1
+		SHADOWTYPE = 0
 
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -126.0 0.0 -539.6
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 1.0 0.1 1.0
-		RADIUS = 85.0 75.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -47.0 0.0 -458.3
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 0.8 0.1 1.0
-		RADIUS = 47.0 57.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -411.4 0.0 -540.9
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 0.8 0.1 1.0
-		RADIUS = 47.0 57.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -341.5 0.0 -544.2
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 0.8 0.1 1.0
-		RADIUS = 47.0 57.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -266.6 0.0 -547.8
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 0.8 0.1 1.0
-		RADIUS = 47.0 57.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -206.7 0.0 -550.7
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 0.8 0.1 1.0
-		RADIUS = 47.0 57.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -121.8 0.0 -554.8
-		ROT    = 2.2 0.0 0.0
-		COL    = 1.0 0.8 0.1 1.0
-		RADIUS = 47.0 57.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -329.5 0.0 646.5
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -219.9 0.0 636.8
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -100.3 0.0 626.2
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 24.2 0.0 615.3
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 148.7 0.0 604.3
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 298.1 0.0 591.1
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 492.3 0.0 573.9
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 0
-		ANIMCNT   = 1
-		ANIMPAT   = 1
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 368.3 0.0 419.3
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 1
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 149.1 0.0 438.6
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 1
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -60.1 0.0 457.0
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 1
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -289.2 0.0 477.3
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = -97.9 0.0 540.7
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 71.5 0.0 525.7
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
-	END_SET_BILLBOARD
-
-	SET_BILLBOARD
-		POS    = 230.9 0.0 511.7
-		ROT    = 2.8 0.1 0.0
-		COL    = 1.0 1.0 1.0 1.0
-		RADIUS = 30.0 30.0
-		TYPE   = 0
-
-		ANIMATION = 1
-		ANIMCNT   = 4
-		ANIMPAT   = 8
+		ANIMATION  = 0
+		ANIMCNT    = 8
+		ANIMPAT    = 8
 	END_SET_BILLBOARD
 
 END_SETSTAGE_BILLBOARD

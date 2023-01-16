@@ -245,7 +245,10 @@ void UpdateEditBillboard(void)
 	ResetEditBillboard();
 
 	//影のカスタム処理
-	CustomShadowBillboard();						
+	CustomShadowBillboard();
+
+	//ビルボードの上下移動処理
+	UpDownEditBillboard();
 }
 
 //=====================================
@@ -381,6 +384,12 @@ void TypeChangeEditBillboard(void)
 //=======================================
 void MoveEditBillboard(float Camerarot)
 {
+	if (GetKeyboardPress(DIK_LSHIFT) == true)
+	{//左シフトキーが押されていた場合
+		//処理を抜ける
+		return;
+	}
+
 	if (g_nStyleBillboard == EDITSTYLE_BILLBOARD)
 	{//ビルボード設置モードだった場合
 		if (GetKeyboardPress(DIK_W) == true)
@@ -870,10 +879,11 @@ void UpDownEditBillboard(void)
 //=======================================
 void CustomShadowBillboard(void)
 {
-	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
-	{//BackSpaceキーを押した場合
+	if (GetKeyboardTrigger(DIK_2) == true)
+	{//2キーを押した場合
 		//影を切り替える
 		g_EditBillboard.bShadow = g_EditBillboard.bShadow ? false : true;
 	}
 }
+
 #endif

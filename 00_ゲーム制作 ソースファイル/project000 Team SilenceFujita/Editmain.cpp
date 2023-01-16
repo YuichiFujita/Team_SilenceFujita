@@ -154,8 +154,15 @@ void TxtSaveStage(void)
 		fprintf(pFile, "#	オブジェクトの設定\n");
 		fprintf(pFile, "#===========================================================\n");
 		fprintf(pFile, "#-----------------------------------------------------------\n");
-		fprintf(pFile, "#	BREAKTYPE：0  壊れない\n");
-		fprintf(pFile, "#	         ：1  壊れる\n");
+		fprintf(pFile, "#	 BREAKTYPE：0  壊れない\n");
+		fprintf(pFile, "#	          ：1  壊れる\n");
+		fprintf(pFile, "#-----------------------------------------------------------\n");
+		fprintf(pFile, "#	SHADOWTYPE：0  影無し\n");
+		fprintf(pFile, "#	          ：1  丸影\n");
+		fprintf(pFile, "#	          ：2  モデル影\n");
+		fprintf(pFile, "#-----------------------------------------------------------\n");
+		fprintf(pFile, "#	  COLLTYPE：0  当たらない\n");
+		fprintf(pFile, "#	          ：1  当たる\n");
 		fprintf(pFile, "#-----------------------------------------------------------\n");
 
 		// オブジェクトの設定の開始地点をテキストに書き出し
@@ -174,8 +181,10 @@ void TxtSaveStage(void)
 				fprintf(pFile, "		POS        = %.1f %.1f %.1f\n", pObject->pos.x,   pObject->pos.y,   pObject->pos.z);	// 位置
 				fprintf(pFile, "		ROT        = %.1f %.1f %.1f\n", pObject->rot.x,   pObject->rot.y,   pObject->rot.z);	// 向き
 				fprintf(pFile, "		SCALE      = %.1f %.1f %.1f\n", pObject->scale.x, pObject->scale.y, pObject->scale.z);	// 拡大率
-				fprintf(pFile, "		TYPE       = %d\n",   pObject->nType);													// オブジェクトの種類
-				fprintf(pFile, "		BREAKTYPE  = %d\n\n", pObject->nBreakType);												// 壊れ方の種類
+				fprintf(pFile, "		TYPE       = %d\n",   pObject->nType);			// オブジェクトの種類
+				fprintf(pFile, "		BREAKTYPE  = %d\n",   pObject->nBreakType);		// 壊れ方の種類
+				fprintf(pFile, "		SHADOWTYPE = %d\n",   pObject->nShadowType);	// 影の種類
+				fprintf(pFile, "		COLLTYPE   = %d\n\n", pObject->nCollisionType);	// 当たり判定の種類
 
 				// マテリアル数の書き出し
 				fprintf(pFile, "		NUMMAT     = %d\n", pObject->modelData.dwNumMat);
@@ -208,8 +217,11 @@ void TxtSaveStage(void)
 		fprintf(pFile, "#	ビルボードの設定\n");
 		fprintf(pFile, "#===========================================================\n");
 		fprintf(pFile, "#-----------------------------------------------------------\n");
-		fprintf(pFile, "#	ANIMATION：0  アニメーション OFF\n");
-		fprintf(pFile, "#	         ：1  アニメーション ON\n");
+		fprintf(pFile, "#	 ANIMATION：0  アニメーション OFF\n");
+		fprintf(pFile, "#	          ：1  アニメーション ON\n");
+		fprintf(pFile, "#-----------------------------------------------------------\n");
+		fprintf(pFile, "#	SHADOWTYPE：0  丸影\n");
+		fprintf(pFile, "#	          ：1  影無し\n");
 		fprintf(pFile, "#-----------------------------------------------------------\n");
 
 		// ビルボードの設定の開始地点をテキストに書き出し
@@ -225,16 +237,17 @@ void TxtSaveStage(void)
 				fprintf(pFile, "	SET_BILLBOARD\n");
 
 				// 基本情報の書き出し
-				fprintf(pFile, "		POS    = %.1f %.1f %.1f\n",      pBillboard->pos.x, pBillboard->pos.y, pBillboard->pos.z);						// 位置
-				fprintf(pFile, "		ROT    = %.1f %.1f %.1f\n",      pBillboard->rot.x, pBillboard->rot.y, pBillboard->rot.z);						// 向き
-				fprintf(pFile, "		COL    = %.1f %.1f %.1f %.1f\n", pBillboard->col.r, pBillboard->col.g, pBillboard->col.b, pBillboard->col.a);	// 色
-				fprintf(pFile, "		RADIUS = %.1f %.1f\n",           pBillboard->Radius.x, pBillboard->Radius.y);	// 半径
-				fprintf(pFile, "		TYPE   = %d\n\n",                pBillboard->Type);								// 種類
+				fprintf(pFile, "		POS        = %.1f %.1f %.1f\n",      pBillboard->pos.x, pBillboard->pos.y, pBillboard->pos.z);						// 位置
+				fprintf(pFile, "		ROT        = %.1f %.1f %.1f\n",      pBillboard->rot.x, pBillboard->rot.y, pBillboard->rot.z);						// 向き
+				fprintf(pFile, "		COL        = %.1f %.1f %.1f %.1f\n", pBillboard->col.r, pBillboard->col.g, pBillboard->col.b, pBillboard->col.a);	// 色
+				fprintf(pFile, "		RADIUS     = %.1f %.1f\n",           pBillboard->Radius.x, pBillboard->Radius.y);	// 半径
+				fprintf(pFile, "		TYPE       = %d\n",                  pBillboard->Type);								// 種類
+				fprintf(pFile, "		SHADOWTYPE = %d\n\n",                pBillboard->bShadow);							// 影の種類
 
 				// アニメーション情報の書き出し
-				fprintf(pFile, "		ANIMATION = %d\n", pBillboard->Anim.bAnim);			// アニメーションの ON / OFF
-				fprintf(pFile, "		ANIMCNT   = %d\n", pBillboard->Anim.nAnimCounter);	// 再生カウント
-				fprintf(pFile, "		ANIMPAT   = %d\n", pBillboard->Anim.nAnimPattern);	// 再生パターン
+				fprintf(pFile, "		ANIMATION  = %d\n", pBillboard->Anim.bAnim);		// アニメーションの ON / OFF
+				fprintf(pFile, "		ANIMCNT    = %d\n", pBillboard->Anim.nAnimCounter);	// 再生カウント
+				fprintf(pFile, "		ANIMPAT    = %d\n", pBillboard->Anim.nAnimPattern);	// 再生パターン
 
 				// ビルボードの情報の終了地点テキストに書き出し
 				fprintf(pFile, "	END_SET_BILLBOARD\n\n");

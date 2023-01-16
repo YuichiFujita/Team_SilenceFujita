@@ -38,6 +38,7 @@ typedef struct
 	int nAnimCounter;								//アニメカウンター
 	int nAnimPattern;								//アニメパターンNo.
 	int nShadow;									//影のインデックス(影の番号)
+	bool bShadow;									//影の使用状況
 	bool bUse;										//使用しているかどうか
 	BillboardAnim Anim;								//アニメーション関係
 }Billboard;

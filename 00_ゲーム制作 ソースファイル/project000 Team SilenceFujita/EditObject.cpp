@@ -30,21 +30,29 @@ void ResetEdit(void);									//オブジェクトの情報リセット処理
 void EditMaterialCustom(void);							//マテリアルのエディット処理
 void BreakEdit(void);									//オブジェクトの破壊エディット処理
 void ShadowEdit(void);									//オブジェクトの影のエディット処理
+void CollisionEdit(void);								//オブジェクトの当たり判定のエディット処理
 void UpDownEditObject(void);							//オブジェクトの上下移動処理
 
 //破壊モードの表記
 const char *c_apBreakmodename[BREAKTYPE_MAX] =
 {
-	"破壊されない状態",
-	"1撃破壊状態",
+	"破壊不可",
+	"一撃破壊",
 };
 
 //影モードの表記
 const char *c_apShadowmodename[SHADOWTYPE_MAX] =
 {
-	"影無しモード",
-	"丸影モード",
-	"リアル影モード",
+	"影無し",
+	"丸影",
+	"リアル影",
+};
+
+//影モードの表記
+const char *c_apCollisionmodename[COLLISIONTYPE_MAX] =
+{
+	"当たり判定無し",
+	"当たり判定あり",
 };
 
 //グローバル変数
@@ -92,6 +100,9 @@ void InitEditObject(void)
 
 		//影無し
 		g_EditObject.Shadowtype.Shadowtype = SHADOWTYPE_NONE;
+
+		//当たり判定あり
+		g_EditObject.Collisiontype.Collisiontype = COLLISIONTYPE_ON;
 	}
 
 	for (int nCntBreak = 0; nCntBreak < BREAKTYPE_MAX; nCntBreak++)
@@ -104,6 +115,12 @@ void InitEditObject(void)
 	{
 		//影のデバッグ表記を設定
 		g_EditObject.Shadowtype.pShadowMode[nCntShadow] = (char*)c_apShadowmodename[nCntShadow];
+	}
+
+	for (int nCntCollision = 0; nCntCollision < COLLISIONTYPE_MAX; nCntCollision++)
+	{
+		//影のデバッグ表記を設定
+		g_EditObject.Collisiontype.pCollisionMode[nCntCollision] = (char*)c_apCollisionmodename[nCntCollision];
 	}
 
 	//スタイルを設定する
@@ -216,6 +233,9 @@ void UpdateEditObject(void)
 
 	//オブジェクトの影のエディット処理
 	ShadowEdit();
+
+	//オブジェクトの当たり判定のエディット処理
+	CollisionEdit();
 
 	//オブジェクトの上下移動処理
 	UpDownEditObject();
@@ -427,7 +447,7 @@ void SetEdit(void)
 			}
 
 			//オブジェクトの設定処理
-			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], g_EditObject.nType, g_EditObject.Break.Breaktype, g_EditObject.Shadowtype.Shadowtype);
+			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], g_EditObject.nType, g_EditObject.Break.Breaktype, g_EditObject.Shadowtype.Shadowtype, g_EditObject.Collisiontype.Collisiontype);
 
 			//エディットオブジェクトの番号を初期化する
 			g_EditObject.nSetNumber = -1;
@@ -770,6 +790,18 @@ void ShadowEdit(void)
 	{//8キーを押した場合
 		//影の種類を切り替える
 		g_EditObject.Shadowtype.Shadowtype = (g_EditObject.Shadowtype.Shadowtype + 1) % SHADOWTYPE_MAX;
+	}
+}
+
+//=======================================
+//オブジェクトの当たり判定のエディット処理
+//=======================================
+void CollisionEdit(void)
+{
+	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
+	{//DIK_BACKSPACEキーを押した場合
+		//当たり判定の種類を切り替える
+		g_EditObject.Collisiontype.Collisiontype = (g_EditObject.Collisiontype.Collisiontype + 1) % COLLISIONTYPE_MAX;
 	}
 }
 
