@@ -316,7 +316,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			}
 
 			// 影のインデックスを設定
-			g_aObject[nCntObject].nShadowID = SetShadow
+			g_aObject[nCntObject].nShadowID = SetCircleShadow
 			( // 引数
 				0.5f,																						// α値
 				fabsf(g_aObject[nCntObject].modelData.vtxMax.x - g_aObject[nCntObject].modelData.vtxMin.x),	// 半径
@@ -325,7 +325,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			);
 
 			// 影の位置設定
-			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos);
+			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
 
 			// 処理を抜ける
 			break;
