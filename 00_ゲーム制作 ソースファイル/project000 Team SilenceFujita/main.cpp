@@ -27,6 +27,7 @@
 #include "EditObject.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
+#include "Police.h"
 #endif
 
 //************************************************************
@@ -62,6 +63,7 @@ void DrawDebugEditObject(void);			// エディットオブジェクトモードのデバッグ表示
 void DrawDebugEditBillboard(void);		// エディットビルボードモードのデバッグ表示
 void DrawDebugControlObject(void);		// エディットオブジェクト操作説明
 void DrawDebugControlBillboard(void);	// エディットビルボード操作説明
+void DrawDebugPolice(void);				//警察のデバッグ表記
 #endif
 
 //************************************************************
@@ -1239,6 +1241,9 @@ void DrawDebug(void)
 				DrawDebugEditBillboard();
 			}
 		}
+
+		//警察のデバッグ表記
+		DrawDebugPolice();				
 	}
 }
 
@@ -1443,6 +1448,38 @@ void DrawDebugControlBillboard(void)
 		"\nアニメーションのパターン：[LSHIFT+↑/↓] 　"
 		"\nビルボードの縦の移動：[LSHIFT+W/S] 　"
 		"\nビルボードの縦の位置の初期化：[LSHIFT+A/D] 　"
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+//==============================================
+//警察のデバッグ表記
+//==============================================
+void DrawDebugPolice(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	Police *pPolice = GetPoliceData();	//警察の情報を取得する
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n警察の向き：[%.3f] 　"
+		"\n警察の位置：[%.3f,%.3f,%.3f] 　",
+		pPolice->rot.y,
+		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z
 	);
 
 	// テキストの描画

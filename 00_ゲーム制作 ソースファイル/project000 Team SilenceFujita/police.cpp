@@ -600,7 +600,7 @@ void PatrolPoliceAct(Police *pPolice)
 		pPolice->move.x = 15.0f;
 	}
 
-	if (pPolice->pos.z + cosf(pPolice->rot.y) * 60.0f > GetLimitStage().fNear - (30.0f * 2))
+	if (pPolice->pos.z + cosf(pPolice->rot.y) * 130.0f > GetLimitStage().fNear - (30.0f * 2))
 	{//手前の壁にぶつかりそうになった場合
 		// 向きを更新
 		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
@@ -616,22 +616,40 @@ void PatrolPoliceAct(Police *pPolice)
 		pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
 	}
 
-	if (pPolice->pos.z + cosf(pPolice->rot.y) * 60.0f < GetLimitStage().fFar + (30.0f * 2))
+	if (pPolice->pos.z + cosf(pPolice->rot.y) * 130.0f < GetLimitStage().fFar + (30.0f * 2))
 	{//奥の壁にぶつかりそうになった場合
+		// 向きを更新
+		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
 
+		if (pPolice->move.x >= 15.0f)
+		{ // 移動量が一定値以上の場合
+
+			// 移動量を更新
+			pPolice->move.x -= 0.05f;
+		}
+
+		// 移動量を減速
+		pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
 	}
 
-	if (pPolice->pos.x + sinf(pPolice->rot.y) * 150.0f > GetLimitStage().fRight - (30.0f * 2))
+	if (pPolice->pos.x + sinf(pPolice->rot.y) * 130.0f > GetLimitStage().fRight - (30.0f * 2))
 	{//右の壁にぶつかりそうになった場合
+		// 向きを更新
+		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
 
+		if (pPolice->move.x >= 15.0f)
+		{ // 移動量が一定値以上の場合
+
+			// 移動量を更新
+			pPolice->move.x -= 0.05f;
+		}
+
+		// 移動量を減速
+		pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
 	}
 
-	if (pPolice->pos.x + sinf(pPolice->rot.y) * 150.0f < GetLimitStage().fLeft + (30.0f * 2))
+	if (pPolice->pos.x + sinf(pPolice->rot.y) * 130.0f < GetLimitStage().fLeft + (30.0f * 2))
 	{//左の壁にぶつかりそうになった場合
-
-	}
-
-	{//壁に近づいた場合
 		// 向きを更新
 		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
 
