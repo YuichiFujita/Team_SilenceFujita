@@ -24,6 +24,7 @@
 #include "pause.h"
 #include "shadow.h"
 #include "object.h"
+#include "Police.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -89,6 +90,9 @@ void InitGame(void)
 	// ポーズの初期化
 	InitPause();
 
+	//警察の初期化
+	InitPolice();
+
 	// ステージのセットアップ
 	TxtSetStage();
 
@@ -132,6 +136,9 @@ void UninitGame(void)
 
 	// ポーズの終了
 	UninitPause();
+
+	//警察の終了
+	UninitPolice();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
@@ -216,6 +223,9 @@ void UpdateGame(void)
 
 			// オブジェクトの更新
 			UpdateObject();
+
+			//警察の更新
+			UpdatePolice();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -295,6 +305,9 @@ void UpdateGame(void)
 		// ビルボードの更新
 		UpdateBillboard();
 
+		//警察の更新
+		UpdatePolice();
+
 		// エフェクトの更新
 		UpdateEffect();
 
@@ -335,6 +348,9 @@ void DrawGame(void)
 
 	// ビルボードの描画
 	DrawBillboard();
+
+	//警察の描画
+	DrawPolice();
 
 	// エフェクトの描画
 	DrawEffect();
