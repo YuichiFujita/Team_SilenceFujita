@@ -25,7 +25,7 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\KariPolice.x",	// 仮の警察
 
 	// プレイヤーモデル
-	"data\\MODEL_PLAYER\\head.x",		// 頭
+	"data\\MODEL_PLAYER\\car000.x",		// 車
 };
 
 //************************************************************
