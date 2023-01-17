@@ -32,6 +32,7 @@ void BreakEdit(void);									//オブジェクトの破壊エディット処理
 void ShadowEdit(void);									//オブジェクトの影のエディット処理
 void CollisionEdit(void);								//オブジェクトの当たり判定のエディット処理
 void UpDownEditObject(void);							//オブジェクトの上下移動処理
+void RightAngleEditObject(void);						//オブジェクトの直角処理
 
 //破壊モードの表記
 const char *c_apBreakmodename[BREAKTYPE_MAX] =
@@ -193,15 +194,18 @@ void UpdateEditObject(void)
 	//回転処理
 	RotationEdit();
 
+	//オブジェクトの直角処理
+	RightAngleEditObject();
+
 	if (g_EditObject.rot.y > D3DX_PI)
 	{//3.14fより大きくなった場合
 		//-3.14fに補正する
-		g_EditObject.rot.y = -D3DX_PI;
+		g_EditObject.rot.y -= D3DX_PI * 2;
 	}
 	else if (g_EditObject.rot.y < -D3DX_PI)
 	{//-3.14fより小さくなった場合
 		//3.14fに補正する
-		g_EditObject.rot.y = D3DX_PI;
+		g_EditObject.rot.y += D3DX_PI * 2;
 	}
 
 	//オブジェクトの消去
@@ -418,13 +422,19 @@ void MoveEdit(float Camerarot)
 //=======================================
 void RotationEdit(void)
 {
+	if (GetKeyboardPress(DIK_LSHIFT) == true)
+	{//左SHIFTキーを押している場合
+		//処理を抜ける
+		return;
+	}
+
 	if (GetKeyboardPress(DIK_Q) == true)
-	{//2キーを押した場合
+	{//Qキーを押した場合
 		//向きを変える
 		g_EditObject.rot.y += 0.02f;
 	}
 	else if (GetKeyboardPress(DIK_E) == true)
-	{//3キーを押した場合
+	{//Eキーを押した場合
 		//向きを変える
 		g_EditObject.rot.y -= 0.02f;
 	}
@@ -828,6 +838,26 @@ void UpDownEditObject(void)
 		{//AキーかDキーを押した場合
 			//地面に戻す
 			g_EditObject.pos.y = 0.0f;
+		}
+	}
+}
+
+//=======================================
+//オブジェクトの直角処理
+//=======================================
+void RightAngleEditObject(void)
+{
+	if (GetKeyboardPress(DIK_LSHIFT) == true)
+	{//左SHIFTキーを押している場合
+		if (GetKeyboardTrigger(DIK_Q) == true)
+		{//Qキーを押した場合
+			//向きを変える
+			g_EditObject.rot.y += D3DXToRadian(15);
+		}
+		else if (GetKeyboardTrigger(DIK_E) == true)
+		{//Eキーを押した場合
+			//向きを変える
+			g_EditObject.rot.y -= D3DXToRadian(15);
 		}
 	}
 }
