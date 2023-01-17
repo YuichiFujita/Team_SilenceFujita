@@ -20,7 +20,10 @@
 //**********************************************************************************************************************
 const char *apTextureMeshField[] =		// テクスチャの相対パス
 {
-	"data\\TEXTURE\\field000.png",		// メッシュフィールドのテクスチャの相対パス
+	"data\\TEXTURE\\road000.png",		// 直線のテクスチャの相対パス
+	"data\\TEXTURE\\road001.png",		// 曲がり角度のテクスチャの相対パス
+	"data\\TEXTURE\\road002.png",		// 交差点のテクスチャの相対パス
+	"data\\TEXTURE\\road003.png",		// 丁字路のテクスチャの相対パス
 };
 
 //**********************************************************************************************************************
@@ -28,7 +31,10 @@ const char *apTextureMeshField[] =		// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_MESHFIELD_NORMAL = 0,		// メッシュフィールド (通常)
+	TEXTURE_MESHFIELD_ROAD_LINE = 0,	// (道路) 直線
+	TEXTURE_MESHFIELD_ROAD_TURN,		// (道路) 曲がり角度
+	TEXTURE_MESHFIELD_ROAD_CROSS,		// (道路) 交差点
+	TEXTURE_MESHFIELD_ROAD_TJUNC,		// (道路) 丁字路
 	TEXTURE_MESHFIELD_MAX,				// この列挙型の総数
 } TEXTURE_MESHFIELD;
 
@@ -96,7 +102,7 @@ void InitMeshField(void)
 		g_aMeshField[nCntMeshField].nPartHeight = 0;								// 縦の分割数
 		g_aMeshField[nCntMeshField].nNumVtx     = 0;								// 必要頂点数
 		g_aMeshField[nCntMeshField].nNumIdx     = 0;								// 必要インデックス数
-		g_aMeshField[nCntMeshField].nType       = TEXTURE_MESHFIELD_NORMAL;			// 種類
+		g_aMeshField[nCntMeshField].nType       = TEXTURE_MESHFIELD_ROAD_LINE;		// 種類
 		g_aMeshField[nCntMeshField].bUse        = false;							// 使用状況
 	}
 
