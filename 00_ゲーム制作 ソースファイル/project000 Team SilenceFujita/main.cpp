@@ -1268,7 +1268,7 @@ void DrawDebugEditObject(void)
 		&aDeb[0],
 		"\n　 位置　 [%.4f, %.4f, %.4f]"
 		"\n　 拡大率 [%.4f, %.4f, %.4f]"
-		"\n　 向き　 [%.4f]"
+		"\n　 向き　 [%d]"
 		"\n　 種類　 [%d]"
 		"\n　 色　　 [%.2f, %.2f, %.2f]"
 		"\n   影     [%s]"
@@ -1277,7 +1277,7 @@ void DrawDebugEditObject(void)
 		"\n\n",
 		edit->pos.x, edit->pos.y, edit->pos.z,
 		edit->scale.x, edit->scale.y, edit->scale.z,
-		edit->rot.y, edit->nType,
+		(int)D3DXToDegree(edit->rot.y), edit->nType,
 		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.r,
 		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.g,
 		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b,
@@ -1389,6 +1389,7 @@ void DrawDebugControlObject(void)
 		"\nマテリアルのリセットB値：[LSHIFT+N] 　"
 		"\nオブジェクトの縦の移動：[LSHIFT+W/S] 　"
 		"\nオブジェクトの縦の位置の初期化：[LSHIFT+A/D] 　"
+		"\nオブジェクトの15度回転：[LSHIFT+Q/E] 　"
 	);
 
 	// テキストの描画
