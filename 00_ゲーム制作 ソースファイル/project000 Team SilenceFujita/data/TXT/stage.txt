@@ -51,6 +51,50 @@ STAGE_MESHFIELDSET
 	END_MESHFIELDSET
 	
 	MESHFIELDSET
+		POS = 2500 0 2250
+		ROT = 0 0 0
+		WIDTH = 1000
+		HEIGHT = 500
+		PARTWIDTH = 2
+		PARTHEIGHT = 1
+		TYPE = 2
+	END_MESHFIELDSET
+	
+	MESHFIELDSET
+		POS = 2500 0 -2250
+		ROT = 0 0 0
+		WIDTH = 1000
+		HEIGHT = 500
+		PARTWIDTH = 2
+		PARTHEIGHT = 1
+		TYPE = 2
+	END_MESHFIELDSET
+	
+	MESHFIELDSET
+		POS = 2500 0 -6750
+		ROT = 0 180 0
+		WIDTH = 1000
+		HEIGHT = 500
+		PARTWIDTH = 2
+		PARTHEIGHT = 1
+		TYPE = 3
+	END_MESHFIELDSET
+	
+	MESHFIELDSET
+		POS = 2500 0 6750
+		ROT = 0 0 0
+		WIDTH = 1000
+		HEIGHT = 500
+		PARTWIDTH = 2
+		PARTHEIGHT = 1
+		TYPE = 3
+	END_MESHFIELDSET
+	
+	======================================================================
+	
+	======================================================================
+	
+	MESHFIELDSET
 		POS = -2500 0 0
 		ROT = 0 0 0
 		WIDTH = 500
@@ -80,30 +124,6 @@ STAGE_MESHFIELDSET
 		TYPE = 0
 	END_MESHFIELDSET
 	
-	======================================================================
-	
-	======================================================================
-	
-	MESHFIELDSET
-		POS = 2500 0 2250
-		ROT = 0 0 0
-		WIDTH = 1000
-		HEIGHT = 500
-		PARTWIDTH = 2
-		PARTHEIGHT = 1
-		TYPE = 2
-	END_MESHFIELDSET
-	
-	MESHFIELDSET
-		POS = 2500 0 -2250
-		ROT = 0 0 0
-		WIDTH = 1000
-		HEIGHT = 500
-		PARTWIDTH = 2
-		PARTHEIGHT = 1
-		TYPE = 2
-	END_MESHFIELDSET
-	
 	MESHFIELDSET
 		POS = -2500 0 2250
 		ROT = 0 0 0
@@ -124,30 +144,6 @@ STAGE_MESHFIELDSET
 		TYPE = 2
 	END_MESHFIELDSET
 	
-	===========================================================================
-	
-	===========================================================================
-	
-	MESHFIELDSET
-		POS = 2250 0 -6750
-		ROT = 0 180 0
-		WIDTH = 500
-		HEIGHT = 500
-		PARTWIDTH = 1
-		PARTHEIGHT = 1
-		TYPE = 3
-	END_MESHFIELDSET
-	
-	MESHFIELDSET
-		POS = 2750 0 -6750
-		ROT = 0 180 0
-		WIDTH = 500
-		HEIGHT = 500
-		PARTWIDTH = 1
-		PARTHEIGHT = 1
-		TYPE = 3
-	END_MESHFIELDSET
-	
 	MESHFIELDSET
 		POS = -2500 0 -6750
 		ROT = 0 180 0
@@ -159,27 +155,7 @@ STAGE_MESHFIELDSET
 	END_MESHFIELDSET
 	
 	MESHFIELDSET
-		POS = 2250 0 6750
-		ROT = 0 0 0
-		WIDTH = 500
-		HEIGHT = 500
-		PARTWIDTH = 1
-		PARTHEIGHT = 1
-		TYPE = 3
-	END_MESHFIELDSET
-	
-	MESHFIELDSET
-		POS = 2750 0 6750
-		ROT = 0 0 0
-		WIDTH = 500
-		HEIGHT = 500
-		PARTWIDTH = 1
-		PARTHEIGHT = 1
-		TYPE = 3
-	END_MESHFIELDSET
-	
-	MESHFIELDSET
-		POS = - 0 6750
+		POS = -2500 0 6750
 		ROT = 0 0 0
 		WIDTH = 500
 		HEIGHT = 500
