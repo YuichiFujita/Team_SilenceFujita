@@ -151,7 +151,7 @@ void DrawObject(void)
 	D3DXMATERIAL      blackMat;					// マテリアルデータ (黄＋黒)
 
 #ifdef _DEBUG	// デバッグ処理
-	D3DXMATERIAL      deleteMat;				// 削除マテリアルデータ (赤)
+	D3DXMATERIAL deleteMat;						// 削除マテリアルデータ (赤)
 #endif
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
@@ -247,8 +247,18 @@ void DrawObject(void)
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aObject[nCntObject].modelData.pTexture[nCntMat]);
 
+				if (g_aObject[nCntObject].scale != NONE_SCALE)
+				{ // 拡大率が変更されている場合
+
+					// 頂点法線の自動正規化を有効にする
+					pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
+				}
+
 				// モデルの描画
 				g_aObject[nCntObject].modelData.pMesh->DrawSubset(nCntMat);
+
+				// 頂点法線の自動正規化を無効にする
+				pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
 			}
 
 			// 保存していたマテリアルを戻す
