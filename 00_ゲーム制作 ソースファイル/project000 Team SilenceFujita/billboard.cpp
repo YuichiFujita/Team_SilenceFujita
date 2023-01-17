@@ -65,6 +65,9 @@ void InitBillboard(void)
 		g_aBillboard[nCntSet].nAnimPattern = 0;
 
 		//使用していない
+		g_aBillboard[nCntSet].bShadow = false;
+
+		//使用していない
 		g_aBillboard[nCntSet].bUse = false;
 
 		//色を初期化する
@@ -388,6 +391,9 @@ void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radiu
 
 			//ビルボードの状態を設定する
 			g_aBillboard[nCntBill].State = BILLBOARDSTATE_USE;
+
+			//影の状態を設定する
+			g_aBillboard[nCntBill].bShadow = bShadow;
 
 			if (bShadow == true)
 			{//影を入れる

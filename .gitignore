@@ -351,3 +351,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/00_ゲーム制作 ソースファイル/project000 Team SilenceFujita/Debug
+/00_ゲーム制作 ソースファイル/project000 Team SilenceFujita/Release

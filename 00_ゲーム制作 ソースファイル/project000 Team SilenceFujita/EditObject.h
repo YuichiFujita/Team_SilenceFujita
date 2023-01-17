@@ -27,6 +27,13 @@ typedef struct
 	int Shadowtype;										//影の種類
 }EDITSHADOW;
 
+//当たり判定関係の構造体
+typedef struct
+{
+	char *pCollisionMode[SHADOWTYPE_MAX];					//当たり判定の種類の表記
+	int Collisiontype;										//当たり判定の種類
+}EDITCOLLISION;
+
 //セットオブジェクトの情報
 typedef struct
 {
@@ -44,6 +51,7 @@ typedef struct
 	D3DXMATERIAL EditMaterial[MODELTYPE_OBJECT_MAX][MAX_MATERIAL];		//カスタム用のマテリアル情報
 	BREAK Break;										//破壊の変数
 	EDITSHADOW Shadowtype;								//影の変数
+	EDITCOLLISION Collisiontype;						//当たり判定の変数
 }EditObject;
 
 //プロトタイプ宣言
