@@ -377,26 +377,26 @@ void MovePlayer(void)
 	{ // 左方向の操作が行われた場合
 
 		// 向きを更新
-		g_player.rot.y -= 0.01f * (g_player.move.x * 0.1f);
+		g_player.rot.y -= 0.013f * (g_player.move.x * 0.1f);
 
-		if (g_player.move.x >= 15.0f)
+		if (g_player.move.x >= 12.0f)
 		{ // 移動量が一定値以上の場合
 
 			// 移動量を更新
-			g_player.move.x -= 0.05f;
+			g_player.move.x -= 0.1f;
 		}
 	}
 	else if (GetKeyboardPress(DIK_D) == true)
 	{ // 右方向の操作が行われた場合
 
 		// 向きを更新
-		g_player.rot.y += 0.01f * (g_player.move.x * 0.1f);
+		g_player.rot.y += 0.013f * (g_player.move.x * 0.1f);
 
-		if (g_player.move.x >= 15.0f)
+		if (g_player.move.x >= 12.0f)
 		{ // 移動量が一定値以上の場合
 
 			// 移動量を更新
-			g_player.move.x -= 0.05f;
+			g_player.move.x -= 0.1f;
 		}
 	}
 
