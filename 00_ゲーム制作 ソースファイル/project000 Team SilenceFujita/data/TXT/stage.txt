@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 873b102dfbd0d6d417bd17b7f8a968db32acdf31
 #===========================================================
 #
 #	ステージの配置情報 [stage_game.txt]
@@ -449,6 +452,10 @@ SETSTAGE_BILLBOARD
 		ANIMPAT    = 8
 	END_SET_BILLBOARD
 
+<<<<<<< HEAD
 END_SETSTAGE_BILLBOARD
 =======
 >>>>>>> 9834f86c6300b040ac3e1ee869c012142b8e4a7d
+=======
+END_SETSTAGE_BILLBOARD
+>>>>>>> 873b102dfbd0d6d417bd17b7f8a968db32acdf31
