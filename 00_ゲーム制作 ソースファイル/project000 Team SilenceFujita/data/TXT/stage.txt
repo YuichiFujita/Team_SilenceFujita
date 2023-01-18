@@ -8,10 +8,10 @@
 #	ИЏУЃФЌИЌВћПоХс
 #===========================================================
 STAGE_LIMITSET
-	NEAR = 7000
-	FAR = -7000
-	RIGHT = 7000
-	LEFT = -7000
+	NEAR = 500
+	FAR = -500
+	RIGHT = 500
+	LEFT = -500
 	FIELD = 0
 END_STAGE_LIMITSET
 
