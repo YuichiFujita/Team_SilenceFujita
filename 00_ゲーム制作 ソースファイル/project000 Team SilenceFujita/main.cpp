@@ -1462,7 +1462,7 @@ void DrawDebugPolice(void)
 	RECT rect =
 	{ // 初期値
 		0,					// ウインドウの左上 X座標
-		0,					// ウインドウの左上 Y座標
+		500,				// ウインドウの左上 Y座標
 		SCREEN_WIDTH,		// ウインドウの幅
 		SCREEN_HEIGHT		// ウインドウの高さ
 	};
@@ -1476,10 +1476,12 @@ void DrawDebugPolice(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n警察の向き：[%.3f] 　"
-		"\n警察の位置：[%.3f,%.3f,%.3f] 　",
-		pPolice->rot.y,
-		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z
+		"\n警察の向き：[%d] 　"
+		"\n警察の位置：[%.3f,%.3f,%.3f] 　"
+		"\n警察のスピード：[%.3f,%.3f,%.3f]",
+		(int)D3DXToDegree(pPolice->rot.y),
+		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
+		pPolice->move.x, pPolice->move.y, pPolice->move.z
 	);
 
 	// テキストの描画
