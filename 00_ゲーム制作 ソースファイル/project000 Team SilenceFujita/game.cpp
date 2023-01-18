@@ -24,9 +24,12 @@
 #include "pause.h"
 #include "shadow.h"
 #include "object.h"
+#include "player.h"
+#include "Police.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
+#include "SoundDJ.h"
 #endif
 
 //**********************************************************************************************************************
@@ -36,6 +39,7 @@ GAMESTATE g_gameState;			// ゲームの状態
 int       g_nCounterGameState;	// 状態管理カウンター
 bool      g_bPause;				// ポーズ状態の ON / OFF
 int       g_nGameMode;			// エディットの ON / OFF
+int		  g_nSoundDJ;			//現在流れているサウンド
 
 //======================================================================================================================
 //	ゲーム画面の初期化処理
@@ -50,12 +54,18 @@ void InitGame(void)
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
 	g_nGameMode         = GAMEMODE_PLAY;		// エディットの ON / OFF
+#ifdef _DEBUG	// デバッグ処理
+	g_nSoundDJ			= FUJITA_DJ_LABEL_ONE;	//サウンドを初期化する
+#endif
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 影の初期化
 	InitShadow();
+
+	// プレイヤーの初期化
+	InitPlayer();
 
 	// オブジェクトの初期化
 	InitObject();
@@ -84,6 +94,9 @@ void InitGame(void)
 	// ポーズの初期化
 	InitPause();
 
+	// 警察の初期化
+	InitPolice();
+
 	// ステージのセットアップ
 	TxtSetStage();
 
@@ -100,6 +113,9 @@ void UninitGame(void)
 {
 	// 影の終了
 	UninitShadow();
+
+	// プレイヤーの終了
+	UninitPlayer();
 
 	// オブジェクトの終了
 	UninitObject();
@@ -127,6 +143,9 @@ void UninitGame(void)
 
 	// ポーズの終了
 	UninitPause();
+
+	// 警察の終了
+	UninitPolice();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
@@ -209,8 +228,14 @@ void UpdateGame(void)
 			// メッシュウォールの更新
 			UpdateMeshWall();
 
+			// プレイヤーの更新
+			UpdatePlayer();
+
 			// オブジェクトの更新
 			UpdateObject();
+
+			// 警察の更新
+			UpdatePolice();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -218,6 +243,30 @@ void UpdateGame(void)
 			// ポーズの更新
 			UpdatePause();
 		}
+	}
+
+	if (GetKeyboardTrigger(DIK_F5) == true)
+	{ // [F5] が押された場合
+
+		// サウンドの停止
+		StopSoundDJ();
+
+		// サウンドを流す
+		PlaySound(g_nSoundDJ, true);
+	}
+
+	if (GetKeyboardTrigger(DIK_F4) == true)
+	{ // [F4] が押された場合
+
+		// サウンドを変える
+		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
+	}
+
+	if (GetKeyboardTrigger(DIK_F6) == true)
+	{ // [F6]が押された場合
+
+		// サウンドの停止
+		StopSoundDJ((SOUND_DJ_LABEL)g_nSoundDJ);
 	}
 
 	// ビルボードの更新
@@ -260,11 +309,17 @@ void UpdateGame(void)
 		// メッシュウォールの更新
 		UpdateMeshWall();
 
+		// プレイヤーの更新
+		UpdatePlayer();
+
 		// オブジェクトの更新
 		UpdateObject();
 
 		// ビルボードの更新
 		UpdateBillboard();
+
+		// 警察の更新
+		UpdatePolice();
 
 		// エフェクトの更新
 		UpdateEffect();
@@ -301,11 +356,17 @@ void DrawGame(void)
 	// 影の描画
 	DrawShadow();
 
+	// プレイヤーの描画
+	DrawPlayer();
+
 	// オブジェクトの描画
 	DrawObject();
 
 	// ビルボードの描画
 	DrawBillboard();
+
+	// 警察の描画
+	DrawPolice();
 
 	// エフェクトの描画
 	DrawEffect();

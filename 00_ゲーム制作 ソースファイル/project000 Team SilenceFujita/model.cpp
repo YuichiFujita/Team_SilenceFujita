@@ -22,9 +22,10 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\BigTree.x",	// 大木
 	"data\\MODEL_OBJECT\\YellowTree.x",	// 黄色い木
 	"data\\MODEL_OBJECT\\Grass.x",		// 草
+	"data\\MODEL_OBJECT\\KariPolice.x",	// 仮の警察
 
 	// プレイヤーモデル
-	"data\\MODEL_PLAYER\\head.x",		// 頭
+	"data\\MODEL_PLAYER\\car000.x",		// 車
 };
 
 //************************************************************

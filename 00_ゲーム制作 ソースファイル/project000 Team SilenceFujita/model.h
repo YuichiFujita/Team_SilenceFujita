@@ -19,9 +19,10 @@ typedef enum
 	MODELTYPE_OBJECT_BIGTREE,		// 大木
 	MODELTYPE_OBJECT_YELLOWTREE,	// 黄色い木
 	MODELTYPE_OBJECT_GRASS,			// 草
+	MODELTYPE_OBJECT_POLICE,		// 仮の警察
 
 	// プレイヤーモデル
-	MODELTYPE_PLAYER_HEAD,			// 頭
+	MODELTYPE_PLAYER_CAR,			// 車
 	MODELTYPE_MAX,					// 全モデルの総数
 } MODELTYPE;
 
@@ -30,8 +31,10 @@ typedef enum
 //************************************************************
 #define INIT_VTX_MIN	(D3DXVECTOR3( 9999.0f,  9999.0f,  9999.0f))		// モデルの最小の頂点座標の初期値
 #define INIT_VTX_MAX	(D3DXVECTOR3(-9999.0f, -9999.0f, -9999.0f))		// モデルの最大の頂点座標の初期値
-#define FROM_OBJECT				(0)		// オブジェクトのモデル列挙の開始地点
-#define MODELTYPE_OBJECT_MAX	(6)		// オブジェクトのモデルの総数
+#define FROM_OBJECT				(0)	// オブジェクトのモデル列挙の開始地点
+#define MODELTYPE_OBJECT_MAX	(7)	// オブジェクトのモデルの総数
+#define FROM_PLAYER				(7)	// プレイヤーのモデル列挙の開始地点
+#define MODELTYPE_PLAYER_MAX	(1)	// プレイヤーのモデルの総数
 
 //************************************************************
 //	構造体定義 (Model)

@@ -45,16 +45,18 @@ void InitObject(void)
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		g_aObject[nCntObject].pos           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aObject[nCntObject].rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
-		g_aObject[nCntObject].scale         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
-		g_aObject[nCntObject].state         = ACTIONSTATE_NONE;						// 状態
-		g_aObject[nCntObject].nLife         = 0;									// 体力
-		g_aObject[nCntObject].nBreakType    = BREAKTYPE_NONE;						// 壊れ方の種類
-		g_aObject[nCntObject].nType         = 0;									// オブジェクトの種類
-		g_aObject[nCntObject].nCounterState = 0; 									// 状態管理カウンター
-		g_aObject[nCntObject].nShadowID     = NONE_SHADOW;							// 影のインデックス
-		g_aObject[nCntObject].bUse          = false;								// 使用状況
+		g_aObject[nCntObject].pos            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+		g_aObject[nCntObject].rot            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
+		g_aObject[nCntObject].scale          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
+		g_aObject[nCntObject].state          = ACTIONSTATE_NONE;					// 状態
+		g_aObject[nCntObject].nLife          = 0;									// 体力
+		g_aObject[nCntObject].nCollisionType = COLLISIONTYPE_NONE;					// 当たり判定の種類
+		g_aObject[nCntObject].nShadowType    = SHADOWTYPE_NONE;						// 影の種類
+		g_aObject[nCntObject].nBreakType     = BREAKTYPE_NONE;						// 壊れ方の種類
+		g_aObject[nCntObject].nType          = 0;									// オブジェクトの種類
+		g_aObject[nCntObject].nCounterState  = 0; 									// 状態管理カウンター
+		g_aObject[nCntObject].nShadowID      = NONE_SHADOW;							// 影のインデックス
+		g_aObject[nCntObject].bUse           = false;								// 使用状況
 
 		// モデル情報の初期化
 		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
@@ -149,7 +151,7 @@ void DrawObject(void)
 	D3DXMATERIAL      blackMat;					// マテリアルデータ (黄＋黒)
 
 #ifdef _DEBUG	// デバッグ処理
-	D3DXMATERIAL      deleteMat;				// 削除マテリアルデータ (赤)
+	D3DXMATERIAL deleteMat;						// 削除マテリアルデータ (赤)
 #endif
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
@@ -245,8 +247,18 @@ void DrawObject(void)
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aObject[nCntObject].modelData.pTexture[nCntMat]);
 
+				if (g_aObject[nCntObject].scale != NONE_SCALE)
+				{ // 拡大率が変更されている場合
+
+					// 頂点法線の自動正規化を有効にする
+					pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
+				}
+
 				// モデルの描画
 				g_aObject[nCntObject].modelData.pMesh->DrawSubset(nCntMat);
+
+				// 頂点法線の自動正規化を無効にする
+				pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
 			}
 
 			// 保存していたマテリアルを戻す
@@ -258,7 +270,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
@@ -270,11 +282,13 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 		{ // オブジェクトが使用されていない場合
 
 			// 引数を代入
-			g_aObject[nCntObject].pos        = pos;			// 位置
-			g_aObject[nCntObject].rot        = rot;			// 向き
-			g_aObject[nCntObject].scale      = scale;		// 拡大率
-			g_aObject[nCntObject].nType      = nType;		// オブジェクトの種類
-			g_aObject[nCntObject].nBreakType = nBreakType;	// 壊れ方の種類
+			g_aObject[nCntObject].pos            = pos;					// 位置
+			g_aObject[nCntObject].rot            = rot;					// 向き
+			g_aObject[nCntObject].scale          = scale;				// 拡大率
+			g_aObject[nCntObject].nType          = nType;				// オブジェクトの種類
+			g_aObject[nCntObject].nBreakType     = nBreakType;			// 壊れ方の種類
+			g_aObject[nCntObject].nShadowType    = nShadowType;			// 影の種類
+			g_aObject[nCntObject].nCollisionType = nCollisionType;		// 当たり判定の種類
 
 			// オブジェクトの情報を初期化
 			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態
@@ -315,14 +329,35 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse = pMat[nCntMat].MatD3D.Diffuse;
 			}
 
-			// 影のインデックスを設定
-			g_aObject[nCntObject].nShadowID = SetCircleShadow
-			( // 引数
-				0.5f,																						// α値
-				fabsf(g_aObject[nCntObject].modelData.vtxMax.x - g_aObject[nCntObject].modelData.vtxMin.x),	// 半径
-				&g_aObject[nCntObject].nShadowID,															// 影の親の影インデックス
-				&g_aObject[nCntObject].bUse																	// 影の親の使用状況
-			);
+			if (nShadowType == SHADOWTYPE_CIRCLE)
+			{ // 丸影の場合
+
+				// 影のインデックスを設定
+				g_aObject[nCntObject].nShadowID = SetCircleShadow
+				( // 引数
+					0.5f,																						// α値
+					fabsf(g_aObject[nCntObject].modelData.vtxMax.x - g_aObject[nCntObject].modelData.vtxMin.x),	// 半径
+					&g_aObject[nCntObject].nShadowID,															// 影の親の影インデックス
+					&g_aObject[nCntObject].bUse																	// 影の親の使用状況
+				);
+			}
+			else if (nShadowType == SHADOWTYPE_MODEL)
+			{ // モデル影の場合
+
+				// 影のインデックスを設定
+				g_aObject[nCntObject].nShadowID = SetModelShadow
+				( // 引数
+					g_aObject[nCntObject].modelData,	// モデル情報
+					&g_aObject[nCntObject].nShadowID,	// 影の親の影インデックス
+					&g_aObject[nCntObject].bUse			// 影の親の使用状況
+				);
+			}
+			else
+			{ // 影無しの場合
+
+				// 影のインデックスを設定
+				g_aObject[nCntObject].nShadowID = NONE_SHADOW;	// 影を設定しない
+			}
 
 			// 影の位置設定
 			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
@@ -404,46 +439,61 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, floa
 		if (g_aObject[nCntObject].bUse == true)
 		{ // オブジェクトが使用されている場合
 
-			// 前後の当たり判定
-			if (pPos->x + fWidth > g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
-			&&  pPos->x - fWidth < g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
-			{ // ブロックの左右の範囲内の場合
+			switch (g_aObject[nCntObject].nCollisionType)
+			{ // 当たり判定の種類ごとの処理
+			case COLLISIONTYPE_NONE:
 
-				if (pPos->z    + fDepth >  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z
-					&&  pOldPos->z + fDepth <= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z)
-				{ // 前からの当たり判定
+				// 無し
 
-					// 位置を補正
-					pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z - fDepth - 0.01f;
+				// 処理を抜ける
+				break;
+
+			case COLLISIONTYPE_ON:
+
+				// 前後の当たり判定
+				if (pPos->x + fWidth > g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
+				&&  pPos->x - fWidth < g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
+				{ // ブロックの左右の範囲内の場合
+
+					if (pPos->z    + fDepth >  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z
+						&&  pOldPos->z + fDepth <= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z)
+					{ // 前からの当たり判定
+
+						// 位置を補正
+						pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z - fDepth - 0.01f;
+					}
+					else if (pPos->z    - fDepth <  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z
+					     &&  pOldPos->z - fDepth >= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
+					{ // 後ろからの当たり判定
+
+						// 位置を補正
+						pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z + fDepth + 0.01f;
+					}
 				}
-				else if (pPos->z    - fDepth <  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z
-				     &&  pOldPos->z - fDepth >= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
-				{ // 後ろからの当たり判定
 
-					// 位置を補正
-					pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z + fDepth + 0.01f;
+				// 左右の当たり判定
+				if (pPos->z + fDepth > g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z
+				&&  pPos->z - fDepth < g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
+				{ // ブロックの前後の範囲内の場合
+
+					if (pPos->x    + fWidth >  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
+					&&  pOldPos->x + fWidth <= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x)
+					{ // 左からの当たり判定
+
+						// 位置を補正
+						pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x - fWidth - 0.01f;
+					}
+					else if (pPos->x    - fWidth <  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x
+					     &&  pOldPos->x - fWidth >= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
+					{ // 右からの当たり判定
+						
+						// 位置を補正
+						pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x + fWidth + 0.01f;
+					}
 				}
-			}
 
-			// 左右の当たり判定
-			if (pPos->z + fDepth > g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z
-			&&  pPos->z - fDepth < g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
-			{ // ブロックの前後の範囲内の場合
-
-				if (pPos->x    + fWidth >  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
-				&&  pOldPos->x + fWidth <= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x)
-				{ // 左からの当たり判定
-
-					// 位置を補正
-					pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x - fWidth - 0.01f;
-				}
-				else if (pPos->x    - fWidth <  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x
-				     &&  pOldPos->x - fWidth >= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
-				{ // 右からの当たり判定
-					
-					// 位置を補正
-					pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x + fWidth + 0.01f;
-				}
+				// 処理を抜ける
+				break;
 			}
 		}
 	}

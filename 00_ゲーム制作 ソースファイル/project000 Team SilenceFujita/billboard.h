@@ -38,6 +38,7 @@ typedef struct
 	int nAnimCounter;								//アニメカウンター
 	int nAnimPattern;								//アニメパターンNo.
 	int nShadow;									//影のインデックス(影の番号)
+	bool bShadow;									//影の使用状況
 	bool bUse;										//使用しているかどうか
 	BillboardAnim Anim;								//アニメーション関係
 }Billboard;
@@ -64,7 +65,7 @@ void InitBillboard(void);							//ビルボードの初期化処理
 void UninitBillboard(void);							//ビルボードの終了処理
 void UpdateBillboard(void);							//ビルボードの更新処理
 void DrawBillboard(void);							//ビルボードの描画処理
-void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radius, D3DXCOLOR col, int AnimCnt, int AnimPtrn, bool bAnim);	//ビルボードの設定処理
+void SetBillboard(D3DXVECTOR3 rot, D3DXVECTOR3 pos, int nType, D3DXVECTOR2 Radius, D3DXCOLOR col, int AnimCnt, int AnimPtrn, bool bAnim, bool bShadow);	//ビルボードの設定処理
 Billboard *GetBillboard(void);						//ビルボードの取得処理
 
 #endif

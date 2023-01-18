@@ -27,6 +27,7 @@
 #include "EditObject.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
+#include "Police.h"
 #endif
 
 //************************************************************
@@ -62,6 +63,7 @@ void DrawDebugEditObject(void);			// エディットオブジェクトモードのデバッグ表示
 void DrawDebugEditBillboard(void);		// エディットビルボードモードのデバッグ表示
 void DrawDebugControlObject(void);		// エディットオブジェクト操作説明
 void DrawDebugControlBillboard(void);	// エディットビルボード操作説明
+void DrawDebugPolice(void);				//警察のデバッグ表記
 #endif
 
 //************************************************************
@@ -696,27 +698,30 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 void TxtSetStage(void)
 {
 	// 変数を宣言
-	int         nEnd;		// テキスト読み込み終了の確認用
-	StageLimit  stageLimit;	// ステージの移動範囲の代入用
-	D3DXVECTOR3 pos;		// 位置の代入用
-	D3DXVECTOR3 rot;		// 向きの代入用
-	D3DXVECTOR3 scale;		// 拡大率の代入用
-	D3DXCOLOR   col;		// 色の代入用
-	D3DXVECTOR2 radius;		// 半径の代入用
-	int         nType;		// 種類の代入用
-	int         nBreakType;	// 壊れ方の種類の代入用
-	int         nNumMat;	// マテリアル数の代入用
-	int         nAnimCnt;	// 再生カウントの代入用
-	int         nAnimPat;	// 再生パターンの代入用
-	int         nAnim;		// アニメーションの ON / OFF の設定用
-	bool        bAnim;		// アニメーションの ON / OFF の代入用
+	int         nEnd;			// テキスト読み込み終了の確認用
+	StageLimit  stageLimit;		// ステージの移動範囲の代入用
+	D3DXVECTOR3 pos;			// 位置の代入用
+	D3DXVECTOR3 rot;			// 向きの代入用
+	D3DXVECTOR3 scale;			// 拡大率の代入用
+	D3DXCOLOR   col;			// 色の代入用
+	D3DXVECTOR2 radius;			// 半径の代入用
+	int         nType;			// 種類の代入用
+	int         nBreakType;		// 壊れ方の種類の代入用
+	int         nShadowType;	// 影の種類の代入用
+	int         nCollisionType;	// 当たり判定の種類の代入用
+	int         nNumMat;		// マテリアル数の代入用
+	int         nAnimCnt;		// 再生カウントの代入用
+	int         nAnimPat;		// 再生パターンの代入用
+	int         nAnim;			// アニメーションの ON / OFF の設定用
+	bool        bAnim;			// アニメーションの ON / OFF の代入用
+	bool        bShadow;		// 影の ON / OFF の代入
 
 	// 変数配列を宣言
 	char         aString[MAX_STRING];	// テキストの文字列の代入用
 	D3DXMATERIAL aMat[MAX_MATERIAL];	// マテリアルの情報の代入用
 
 	// ポインタを宣言
-	FILE *pFile;			// ファイルポインタ
+	FILE *pFile;				// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
 	pFile = fopen(STAGE_SETUP_TXT, "r");
@@ -811,18 +816,28 @@ void TxtSetStage(void)
 							}
 							else if (strcmp(&aString[0], "TYPE") == 0)
 							{ // 読み込んだ文字列が TYPE の場合
-								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-								fscanf(pFile, "%d", &nType);		// オブジェクトの種類を読み込む
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);			// オブジェクトの種類を読み込む
 							}
 							else if (strcmp(&aString[0], "BREAKTYPE") == 0)
 							{ // 読み込んだ文字列が BREAKTYPE の場合
-								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-								fscanf(pFile, "%d", &nBreakType);	// 壊れ方の種類を読み込む
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nBreakType);		// 壊れ方の種類を読み込む
+							}
+							else if (strcmp(&aString[0], "SHADOWTYPE") == 0)
+							{ // 読み込んだ文字列が SHADOWTYPE の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nShadowType);		// 影の種類を読み込む
+							}
+							else if (strcmp(&aString[0], "COLLTYPE") == 0)
+							{ // 読み込んだ文字列が COLLTYPE の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nCollisionType);	// 当たり判定の種類を読み込む
 							}
 							else if (strcmp(&aString[0], "NUMMAT") == 0)
 							{ // 読み込んだ文字列が NUMMAT の場合
-								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-								fscanf(pFile, "%d", &nNumMat);		// マテリアル数を読み込む
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nNumMat);			// マテリアル数を読み込む
 
 								for (int nCntMat = 0; nCntMat < nNumMat; nCntMat++)
 								{ // マテリアル数分繰り返す
@@ -854,7 +869,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
@@ -903,7 +918,15 @@ void TxtSetStage(void)
 							else if (strcmp(&aString[0], "TYPE") == 0)
 							{ // 読み込んだ文字列が TYPE の場合
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
-								fscanf(pFile, "%d", &nType);			// 種類を読み込む
+								fscanf(pFile, "%d", &nType);			// ビルボードの種類を読み込む
+							}
+							else if (strcmp(&aString[0], "SHADOWTYPE") == 0)
+							{ // 読み込んだ文字列が SHADOWTYPE の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nShadowType);		// 影の種類を読み込む
+
+								// 影の ON / OFF を設定
+								bShadow = (nShadowType == 0) ? false : true;
 							}
 							else if (strcmp(&aString[0], "ANIMATION") == 0)
 							{ // 読み込んだ文字列が ANIMATION の場合
@@ -926,7 +949,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_BILLBOARD") != 0);	// 読み込んだ文字列が END_SET_BILLBOARD ではない場合ループ
 
 						// ビルボードの設定
-						SetBillboard(rot, pos, nType, radius, col, nAnimCnt, nAnimPat, bAnim);
+						SetBillboard(rot, pos, nType, radius, col, nAnimCnt, nAnimPat, bAnim, bShadow);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_BILLBOARD") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
@@ -1218,6 +1241,9 @@ void DrawDebug(void)
 				DrawDebugEditBillboard();
 			}
 		}
+
+		//警察のデバッグ表記
+		DrawDebugPolice();				
 	}
 }
 
@@ -1245,23 +1271,28 @@ void DrawDebugEditObject(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-		"\n　 ---------------------------------------------"
 		"\n　 位置　 [%.4f, %.4f, %.4f]"
 		"\n　 拡大率 [%.4f, %.4f, %.4f]"
-		"\n　 向き　 [%.4f]"
+		"\n　 向き　 [%d]"
 		"\n　 種類　 [%d]"
-		"\n　 色　　 [%.2f, %.2f, %.2f]",
+		"\n　 色　　 [%.2f, %.2f, %.2f]"
+		"\n   影     [%s]"
+		"\n   壊れ方 [%s]"
+		"\n   判定　 [%s]"
+		"\n\n",
 		edit->pos.x, edit->pos.y, edit->pos.z,
 		edit->scale.x, edit->scale.y, edit->scale.z,
-		edit->rot.y, edit->nType,
+		(int)D3DXToDegree(edit->rot.y), edit->nType,
 		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.r,
 		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.g,
-		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b
+		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b,
+		edit->Shadowtype.pShadowMode[edit->Shadowtype.Shadowtype],
+		edit->Break.pBreakMode[edit->Break.Breaktype],
+		edit->Collisiontype.pCollisionMode[edit->Collisiontype.Collisiontype]
 	);
 
 	// テキストの描画
-	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_BOTTOM, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
 
 //==============================================
@@ -1288,22 +1319,23 @@ void DrawDebugEditBillboard(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-		"\n　 ---------------------------------------------"
 		"\n　 位置　 [%.4f, %.4f, %.4f]"
 		"\n　 拡大率 [%.4f, %.4f]"
 		"\n　 種類　 [%d]"
 		"\n　 色　　 [%.2f,%.2f,%.2f]"
+		"\n   影     [%d]  (0：OFF,  1：ON)"
 		"\n　 ---------------------------------------------"
-		"\n　 アニメーション　　　：%d　(0：OFF,  1：ON)"
+		"\n　 アニメーション　　　：%d  (0：OFF,  1：ON)"
 		"\n　 アニメーションプレイ：%d　(0：STOP, 1：PLAY)"
 		"\n　 ---------------------------------------------"
 		"\n　 アニメーションパターン：%d"
-		"\n　 アニメーションカウンタ：%d",
+		"\n　 アニメーションカウンタ：%d"
+		"\n\n",
 		Editbillboard->pos.x, Editbillboard->pos.y, Editbillboard->pos.z,
 		Editbillboard->Radius.x, Editbillboard->Radius.y,
 		Editbillboard->nType,
 		Editbillboard->col.r, Editbillboard->col.g, Editbillboard->col.b,
+		Editbillboard->bShadow,
 		Editbillboard->EditAnim.bAnim,
 		Editbillboard->bAnimReplay,
 		Editbillboard->EditAnim.nAnimPattern,
@@ -1311,7 +1343,7 @@ void DrawDebugEditBillboard(void)
 	);
 
 	// テキストの描画
-	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_BOTTOM, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
 
 //==============================================
@@ -1341,9 +1373,12 @@ void DrawDebugControlObject(void)
 		"\n全体の拡大：[4] 　"
 		"\n全体の縮小：[5] 　"
 		"\n設置スタイルの変更：[6] 　"
+		"\n破壊の種類の変更：[7] 　"
+		"\n影の種類の変更：[8] 　"
 		"\nオブジェクトの削除：[9] 　"
 		"\nオブジェクトの設置：[0] 　"
 		"\nマテリアルの変更：[SPACE] 　"
+		"\n当たり判定の種類の変更：[BACKSPACE] 　"
 		"\n--------------------------------------------- 　"
 		"\nオブジェクトの移動：[W/A/S/D] 　"
 		"\nオブジェクトの向き変更：[Q/E] 　"
@@ -1357,6 +1392,9 @@ void DrawDebugControlObject(void)
 		"\nマテリアルのリセットR値：[LSHIFT+V] 　"
 		"\nマテリアルのリセットG値：[LSHIFT+B] 　"
 		"\nマテリアルのリセットB値：[LSHIFT+N] 　"
+		"\nオブジェクトの縦の移動：[LSHIFT+W/S] 　"
+		"\nオブジェクトの縦の位置の初期化：[LSHIFT+A/D] 　"
+		"\nオブジェクトの15度回転：[LSHIFT+Q/E] 　"
 	);
 
 	// テキストの描画
@@ -1385,12 +1423,13 @@ void DrawDebugControlBillboard(void)
 	( // 引数
 		&aDeb[0],
 		"\n種類変更：[1] 　"
+		"\n影の使用：[2] 　"
 		"\n拡大率のリセット：[3] 　"
 		"\n全体の拡大：[4] 　"
 		"\n全体の縮小：[5] 　"
 		"\n設置スタイルの変更：[6] 　"
-		"\nビルボードのアニメーション化：[7] 　"
-		"\nビルボードのアニメーション再生：[8] 　"
+		"\nアニメーション化：[7] 　"
+		"\nアニメーション再生：[8] 　"
 		"\nビルボードの削除：[9] 　"
 		"\nビルボードの設置：[0] 　"
 		"\n--------------------------------------------- 　"
@@ -1407,6 +1446,40 @@ void DrawDebugControlBillboard(void)
 		"\n--------------------------------------------- 　"
 		"\nアニメーションのカウンタ：[LSHIFT+←/→] 　"
 		"\nアニメーションのパターン：[LSHIFT+↑/↓] 　"
+		"\nビルボードの縦の移動：[LSHIFT+W/S] 　"
+		"\nビルボードの縦の位置の初期化：[LSHIFT+A/D] 　"
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+//==============================================
+//警察のデバッグ表記
+//==============================================
+void DrawDebugPolice(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	Police *pPolice = GetPoliceData();	//警察の情報を取得する
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n警察の向き：[%.3f] 　"
+		"\n警察の位置：[%.3f,%.3f,%.3f] 　",
+		pPolice->rot.y,
+		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z
 	);
 
 	// テキストの描画

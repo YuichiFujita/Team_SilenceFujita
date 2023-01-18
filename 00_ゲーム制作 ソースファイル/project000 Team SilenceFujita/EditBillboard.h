@@ -27,6 +27,7 @@ typedef struct
 	int nColorCount;									//色を変えるときのカウント
 	bool bAnimReplay;									//アニメーションリプレイするかどうか
 	BillboardAnim EditAnim;								//アニメーション関係
+	bool bShadow;										//影を付けるかどうか
 }EditBillboard;
 
 //プロトタイプ宣言
