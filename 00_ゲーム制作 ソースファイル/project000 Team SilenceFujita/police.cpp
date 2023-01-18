@@ -71,6 +71,7 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].nLife		= 0;								// 体力
 		g_aPolice[nCntPolice].nShadowID = NONE_SHADOW;						// 影のインデックス
 		g_aPolice[nCntPolice].bUse		= false;							// 使用状況
+		g_aPolice[nCntPolice].nPoliDest = POLICEDESTINATION_RIGHT;			// 警察の行先
 
 		// モデル情報の初期化
 		g_aPolice[nCntPolice].modelData.dwNumMat = 0;						// マテリアルの数
@@ -112,18 +113,6 @@ void UpdatePolice(void)
 			//// プレイヤーの移動量の更新
 			//MovePlayer(&g_aPolice[nCntPolice].bMove, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].rot);
 
-			// プレイヤーの位置の更新
-			PosPlayer(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
-
-			if (g_aPolice[nCntPolice].pos.y < 0.0f)
-			{//Y軸の位置が0.0fだった場合
-				//縦への移動量を0.0fにする
-				g_aPolice[nCntPolice].move.y = 0.0f;
-
-				//位置を0.0fに戻す
-				g_aPolice[nCntPolice].pos.y = 0.0f;
-			}
-
 			//----------------------------------------------------
 			//	当たり判定
 			//----------------------------------------------------
@@ -164,6 +153,18 @@ void UpdatePolice(void)
 			case POLICESTATE_STOP:			//足止め処理
 
 				break;						//抜け出す
+			}
+
+			// プレイヤーの位置の更新
+			PosPlayer(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
+
+			if (g_aPolice[nCntPolice].pos.y < 0.0f)
+			{//Y軸の位置が0.0fだった場合
+				//縦への移動量を0.0fにする
+				g_aPolice[nCntPolice].move.y = 0.0f;
+
+				//位置を0.0fに戻す
+				g_aPolice[nCntPolice].pos.y = 0.0f;
 			}
 
 			// プレイヤーの補正の更新処理
@@ -240,14 +241,15 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 		if (g_aPolice[nCntPolice].bUse == false)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
-			g_aPolice[nCntPolice].pos = pos;					// 現在の位置
-			g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;	// 前回の位置
-			g_aPolice[nCntPolice].rot = rot;					// 向き
-			g_aPolice[nCntPolice].rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
-			g_aPolice[nCntPolice].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);// 移動量
-			g_aPolice[nCntPolice].State = POLICESTATE_PATROL;	// パトロール状態にする
-			g_aPolice[nCntPolice].nLife = POLI_LIFE;				// 体力
-			g_aPolice[nCntPolice].bMove = false;				// 移動していない
+			g_aPolice[nCntPolice].pos		= pos;								// 現在の位置
+			g_aPolice[nCntPolice].posOld	= g_aPolice[nCntPolice].pos;		// 前回の位置
+			g_aPolice[nCntPolice].rot		= rot;								// 向き
+			g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
+			g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aPolice[nCntPolice].State		= POLICESTATE_PATROL;				// パトロール状態にする
+			g_aPolice[nCntPolice].nLife		= POLI_LIFE;						// 体力
+			g_aPolice[nCntPolice].bMove		= false;							// 移動していない
+			g_aPolice[nCntPolice].nPoliDest = POLICEDESTINATION_RIGHT;			// 警察の向き
 
 			// 使用している状態にする
 			g_aPolice[nCntPolice].bUse = true;
@@ -602,12 +604,22 @@ void PatrolPoliceAct(Police *pPolice)
 		pPolice->move.x = MAX_POLI_FORWARD_PATROL;
 	}
 
-	if (pPolice->pos.x >= GetLimitStage().fRight + (POLICAR_WIDTH * 2))
+	if (/*pPolice->pos.x >= GetLimitStage().fRight + (POLICAR_WIDTH * 2) || */pPolice->nPoliDest == POLICEDESTINATION_RIGHT)
 	{ // 右の壁が警察より左側にある場合
 		if (pPolice->pos.z >= GetLimitStage().fNear + (POLICAR_WIDTH * 2))
 		{ // 左にある壁が途切れたら
-			// 向きを補正
-			pPolice->rot.y = D3DXToRadian(-90);
+
+			// 向きを更新
+			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
+
+			if (pPolice->rot.y <= D3DXToRadian(-90))
+			{//一定の向きに達した場合
+				// 向きを補正
+				pPolice->rot.y = D3DXToRadian(-90);
+
+				//警察の行先を設定する
+				pPolice->nPoliDest = POLICEDESTINATION_NEAR;
+			}
 
 			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
 			{ // 移動量が一定値以上の場合
@@ -618,6 +630,9 @@ void PatrolPoliceAct(Police *pPolice)
 
 			// 移動量を減速
 			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+			// 手前の壁に這わせる
+			pPolice->pos.z = GetLimitStage().fNear + (POLICAR_WIDTH * 2);
 		}
 		else
 		{ // 左にある壁がまだあったら
@@ -625,12 +640,23 @@ void PatrolPoliceAct(Police *pPolice)
 			pPolice->pos.x = GetLimitStage().fRight + (POLICAR_WIDTH * 2);
 		}
 	}
-	if (pPolice->pos.z >= GetLimitStage().fNear + (POLICAR_WIDTH * 2))
+
+	if (/*pPolice->pos.z >= GetLimitStage().fNear + (POLICAR_WIDTH * 2) || */pPolice->nPoliDest == POLICEDESTINATION_NEAR)
 	{ // 手前の壁が警察より奥にある場合
 		if (pPolice->pos.x <= GetLimitStage().fLeft - (POLICAR_WIDTH * 2))
 		{ // 左にある壁が途切れたら
-			// 向きを補正
-			pPolice->rot.y = D3DXToRadian(180);
+
+			// 向きを更新
+			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
+
+			if (pPolice->rot.y <= D3DXToRadian(-180))
+			{ // 一定の向きに達した場合
+				// 向きを補正
+				pPolice->rot.y = D3DXToRadian(180);
+
+				//警察の行先を設定する
+				pPolice->nPoliDest = POLICEDESTINATION_LEFT;
+			}
 
 			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
 			{ // 移動量が一定値以上の場合
@@ -641,6 +667,9 @@ void PatrolPoliceAct(Police *pPolice)
 
 			// 移動量を減速
 			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+			// 左の壁に這わせる
+			pPolice->pos.x = GetLimitStage().fLeft - (POLICAR_WIDTH * 2);
 		}
 		else
 		{ // 左にある壁がまだあったら
@@ -648,12 +677,23 @@ void PatrolPoliceAct(Police *pPolice)
 			pPolice->pos.z = GetLimitStage().fNear + (POLICAR_WIDTH * 2);
 		}
 	}
-	if (pPolice->pos.x <= GetLimitStage().fLeft - (POLICAR_WIDTH * 2))
+
+	if (/*pPolice->pos.x <= GetLimitStage().fLeft - (POLICAR_WIDTH * 2) || */pPolice->nPoliDest == POLICEDESTINATION_LEFT)
 	{//左の壁が警察より右にある場合
 		if (pPolice->pos.z <= GetLimitStage().fFar - (POLICAR_WIDTH * 2))
 		{ // 左にある壁が途切れたら
-			// 向きを補正
-			pPolice->rot.y = D3DXToRadian(90);
+
+			// 向きを更新
+			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
+
+			if (pPolice->rot.y <= D3DXToRadian(90))
+			{ // 一定の向きに達した場合
+				// 向きを補正
+				pPolice->rot.y = D3DXToRadian(90);
+
+				//警察の行先を設定する
+				pPolice->nPoliDest = POLICEDESTINATION_FAR;
+			}
 
 			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
 			{ // 移動量が一定値以上の場合
@@ -664,6 +704,9 @@ void PatrolPoliceAct(Police *pPolice)
 
 			// 移動量を減速
 			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+			// 左の壁に這わせる
+			pPolice->pos.z = GetLimitStage().fFar - (POLICAR_WIDTH * 2);
 		}
 		else
 		{ // 左にある壁がまだあったら
@@ -671,12 +714,23 @@ void PatrolPoliceAct(Police *pPolice)
 			pPolice->pos.x = GetLimitStage().fLeft - (POLICAR_WIDTH * 2);
 		}
 	}
-	if (pPolice->pos.z <= GetLimitStage().fFar - (POLICAR_WIDTH * 2))
+
+	if (/*pPolice->pos.z <= GetLimitStage().fFar - (POLICAR_WIDTH * 2) || */pPolice->nPoliDest == POLICEDESTINATION_FAR)
 	{//奥の壁が警察より手前にある場合
 		if (pPolice->pos.x >= GetLimitStage().fRight + (POLICAR_WIDTH * 2))
 		{ // 左にある壁が途切れたら
-			// 向きを補正
-			pPolice->rot.y = D3DXToRadian(0);
+
+			// 向きを更新
+			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
+
+			if (pPolice->rot.y <= D3DXToRadian(0))
+			{ // 一定の向きに達した場合
+				// 向きを補正
+				pPolice->rot.y = D3DXToRadian(0);
+
+				//警察の行先を設定する
+				pPolice->nPoliDest = POLICEDESTINATION_RIGHT;
+			}
 
 			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
 			{ // 移動量が一定値以上の場合
@@ -687,6 +741,9 @@ void PatrolPoliceAct(Police *pPolice)
 
 			// 移動量を減速
 			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+			// 右の壁に這わせる
+			pPolice->pos.x = GetLimitStage().fRight + (POLICAR_WIDTH * 2);
 		}
 		else
 		{ // 左にある壁がまだあったら
