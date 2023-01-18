@@ -90,9 +90,9 @@ STAGE_MESHFIELDSET
 		TYPE = 3
 	END_MESHFIELDSET
 	
-	======================================================================
+	========================================================
 	
-	======================================================================
+	========================================================
 	
 	MESHFIELDSET
 		POS = -2500 0 0
@@ -162,6 +162,50 @@ STAGE_MESHFIELDSET
 		PARTWIDTH = 1
 		PARTHEIGHT = 1
 		TYPE = 3
+	END_MESHFIELDSET
+	
+	========================================================
+	
+	========================================================
+	
+	MESHFIELDSET
+		POS = -125 0 6750
+		ROT = 0 90 0
+		WIDTH = 500
+		HEIGHT = 4250
+		PARTWIDTH = 1
+		PARTHEIGHT = 8
+		TYPE = 0
+	END_MESHFIELDSET
+	
+	MESHFIELDSET
+		POS = -125 0 2250
+		ROT = 0 90 0
+		WIDTH = 500
+		HEIGHT = 4250
+		PARTWIDTH = 1
+		PARTHEIGHT = 8
+		TYPE = 0
+	END_MESHFIELDSET
+	
+	MESHFIELDSET
+		POS = -125 0 -2250
+		ROT = 0 90 0
+		WIDTH = 500
+		HEIGHT = 4250
+		PARTWIDTH = 1
+		PARTHEIGHT = 8
+		TYPE = 0
+	END_MESHFIELDSET
+	
+	MESHFIELDSET
+		POS = -125 0 -6750
+		ROT = 0 90 0
+		WIDTH = 500
+		HEIGHT = 4250
+		PARTWIDTH = 1
+		PARTHEIGHT = 8
+		TYPE = 0
 	END_MESHFIELDSET
 
 END_STAGE_MESHFIELDSET
