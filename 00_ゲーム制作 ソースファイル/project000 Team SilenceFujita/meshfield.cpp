@@ -373,15 +373,25 @@ bool CollisionMeshField(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pM
 		if (g_aMeshField[nCntMeshField].bUse == true)
 		{ // メッシュフィールドが使用されている場合
 
-			nVtxPos0 = 1;
-			nVtxPos1 = ((g_aMeshField[nCntMeshField].nPartWidth) * 2) + 1;
-			nVtxPos2 = g_aMeshField[nCntMeshField].nNumIdx - (((g_aMeshField[nCntMeshField].nPartWidth ) * 2) - 1);
-			nVtxPos3 = g_aMeshField[nCntMeshField].nNumIdx - 2;
+			//nVtxPos0 = g_aMeshField[nCntMeshField].nNumIdx - 2;
+			//nVtxPos1 = ((g_aMeshField[nCntMeshField].nPartWidth) * 2) + 1;
+			//nVtxPos2 = 1;
+			//nVtxPos3 = g_aMeshField[nCntMeshField].nNumIdx - (((g_aMeshField[nCntMeshField].nPartWidth) * 2) + 3);
+			
+			nVtxPos0 = 0;
+			nVtxPos1 = g_aMeshField[nCntMeshField].nPartWidth;
+			nVtxPos2 = (g_aMeshField[nCntMeshField].nPartWidth + 1) * (g_aMeshField[nCntMeshField].nPartHeight + 1) - 1;
+			nVtxPos3 = (g_aMeshField[nCntMeshField].nPartWidth + 1) * g_aMeshField[nCntMeshField].nPartHeight;
 
-			if (OuterProduct(pVtx[nVtxPos0].pos, pVtx[nVtxPos1].pos, *pPos, *pOldPos) > 0
-			&&  OuterProduct(pVtx[nVtxPos1].pos, pVtx[nVtxPos2].pos, *pPos, *pOldPos) > 0
-			&&  OuterProduct(pVtx[nVtxPos2].pos, pVtx[nVtxPos3].pos, *pPos, *pOldPos) > 0
-			&&  OuterProduct(pVtx[nVtxPos3].pos, pVtx[nVtxPos0].pos, *pPos, *pOldPos) > 0)
+			float a = OuterProduct(pVtx[nVtxPos0].pos, pVtx[nVtxPos1].pos, *pPos, *pOldPos);
+			float b = OuterProduct(pVtx[nVtxPos1].pos, pVtx[nVtxPos2].pos, *pPos, *pOldPos);
+			float c = OuterProduct(pVtx[nVtxPos2].pos, pVtx[nVtxPos3].pos, *pPos, *pOldPos);
+			float d = OuterProduct(pVtx[nVtxPos3].pos, pVtx[nVtxPos0].pos, *pPos, *pOldPos);
+
+			if (a > 0
+			&&  b > 0
+			&&  c > 0
+			&&  d > 0)
 			{ // 場合
 
 				// 位置を補正
@@ -532,13 +542,12 @@ float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos, D
 	D3DXVECTOR3 vecMove;		// 移動ベクトル
 	D3DXVECTOR3 vecLine;		// 境界線ベクトル
 	D3DXVECTOR3 vecToPos;		// メッシュウォールの左端と弾の現在位置のベクトル
-	D3DXVECTOR3 vecToOldPos;	// メッシュウォールの左端と弾の過去位置のベクトル
-	float       fSmallArea;		// 現在の面積
-	float       fBigArea;		// 最大の面積
-	float       fRate;			// 面積の割合
+	//float       fSmallArea;		// 現在の面積
+	//float       fBigArea;		// 最大の面積
+	//float       fRate;			// 面積の割合
 
-	// 移動ベクトルを求める
-	vecMove = pos - oldPos;
+	//// 移動ベクトルを求める
+	//vecMove = pos - oldPos;
 
 	// 境界線ベクトルを求める
 	vecLine = posRight - posLeft;
@@ -546,15 +555,15 @@ float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos, D
 	// メッシュウォールの左端と弾の現在位置のベクトルを求める
 	vecToPos = pos - posLeft;
 
-	// vecToPos と vecMove でできた平行四辺形の面積を求める
-	fSmallArea = (vecToPos.z * vecMove.x) - (vecToPos.x * vecMove.z);
+	//// vecToPos と vecMove でできた平行四辺形の面積を求める
+	//fSmallArea = (vecToPos.z * vecMove.x) - (vecToPos.x * vecMove.z);
 
-	// vecLine と vecMove でできた平行四辺形の面積を求める
-	fBigArea = (vecLine.z  * vecMove.x) - (vecLine.x  * vecMove.z);
+	//// vecLine と vecMove でできた平行四辺形の面積を求める
+	//fBigArea = (vecLine.z  * vecMove.x) - (vecLine.x  * vecMove.z);
 
-	// 面積の割合を求める
-	fRate = fSmallArea / fBigArea;
+	//// 面積の割合を求める
+	//fRate = fSmallArea / fBigArea;
 
 	// 外積の結果を返す
-	return (vecLine.z * vecToOldPos.x) - (vecLine.x * vecToOldPos.z);
+	return (vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z);
 }

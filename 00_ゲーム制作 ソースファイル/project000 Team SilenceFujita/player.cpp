@@ -507,26 +507,24 @@ void RevPlayer(void)
 void LandPlayer(void)
 {
 	if (CollisionMeshField(&g_player.pos, &g_player.oldPos, &g_player.move, PLAY_WIDTH, PLAY_DEPTH) == false)
-	{
 
-		if (g_player.pos.y < GetLimitStage().fField)
-		{ // 範囲外の場合 (下)
+	if (g_player.pos.y < GetLimitStage().fField)
+	{ // 範囲外の場合 (下)
 
-			// ジャンプしていない状態にする
-			g_player.bJump = false;
+		// ジャンプしていない状態にする
+		g_player.bJump = false;
 
-			// 位置を補正
-			g_player.pos.y = GetLimitStage().fField;
+		// 位置を補正
+		g_player.pos.y = GetLimitStage().fField;
 
-			// 移動量を初期化
-			g_player.move.y = 0.0f;
-		}
-		else
-		{ // 地面に当たっていない場合
+		// 移動量を初期化
+		g_player.move.y = 0.0f;
+	}
+	else
+	{ // 地面に当たっていない場合
 
-			// ジャンプしている状態にする
-			g_player.bJump = true;
-		}
+		// ジャンプしている状態にする
+		g_player.bJump = true;
 	}
 }
 
