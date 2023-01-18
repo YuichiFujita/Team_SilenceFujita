@@ -20,6 +20,18 @@ END_STAGE_LIMITSET
 #===========================================================
 STAGE_MESHFIELDSET
 
+	// 検証用
+	MESHFIELDSET
+		POS = 0 100 1000
+		ROT = 0 0 0
+		WIDTH = 500
+		HEIGHT = 500
+		PARTWIDTH = 2
+		PARTHEIGHT = 2
+		TYPE = 4
+	END_MESHFIELDSET
+
+
 	MESHFIELDSET
 		POS = 2500 0 0
 		ROT = 0 0 0
@@ -207,14 +219,14 @@ STAGE_MESHFIELDSET
 		PARTHEIGHT = 8
 		TYPE = 0
 	END_MESHFIELDSET
-
+	
 END_STAGE_MESHFIELDSET
 
 #===========================================================
 #	メッシュウォールの配置情報
 #===========================================================
 STAGE_MESHWALLSET
-
+	
 	MESHWALLSET
 		POS = 0 0 7000
 		ROT = 0 0 0
