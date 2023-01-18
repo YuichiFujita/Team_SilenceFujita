@@ -33,10 +33,10 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void InitMeshWall(void);						// メッシュウォールの初期化処理
-void UninitMeshWall(void);						// メッシュウォールの終了処理
-void UpdateMeshWall(void);						// メッシュウォールの更新処理
-void DrawMeshWall(void);						// メッシュウォールの描画処理
-MeshWall *GetMeshWall(void);					// メッシュウォールの取得処理
+void InitMeshWall(void);		// メッシュウォールの初期化処理
+void UninitMeshWall(void);		// メッシュウォールの終了処理
+void UpdateMeshWall(void);		// メッシュウォールの更新処理
+void DrawMeshWall(void);		// メッシュウォールの描画処理
+MeshWall *GetMeshWall(void);	// メッシュウォールの取得処理
 
 #endif

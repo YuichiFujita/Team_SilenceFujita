@@ -237,7 +237,7 @@ void DrawShadow(void)
 	posLight = D3DXVECTOR4(-light.Direction.x, -light.Direction.y, -light.Direction.z, 0.0f);
 
 	// ïΩñ èÓïÒÇê∂ê¨
-	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	pos    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	normal = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
 	D3DXPlaneFromPointNormal(&plane, &pos, &normal);
 

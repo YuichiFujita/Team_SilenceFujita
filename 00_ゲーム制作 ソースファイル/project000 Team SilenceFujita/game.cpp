@@ -24,6 +24,8 @@
 #include "pause.h"
 #include "shadow.h"
 #include "object.h"
+#include "player.h"
+#include "Police.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -62,6 +64,9 @@ void InitGame(void)
 	// 影の初期化
 	InitShadow();
 
+	// プレイヤーの初期化
+	InitPlayer();
+
 	// オブジェクトの初期化
 	InitObject();
 
@@ -89,6 +94,9 @@ void InitGame(void)
 	// ポーズの初期化
 	InitPause();
 
+	// 警察の初期化
+	InitPolice();
+
 	// ステージのセットアップ
 	TxtSetStage();
 
@@ -105,6 +113,9 @@ void UninitGame(void)
 {
 	// 影の終了
 	UninitShadow();
+
+	// プレイヤーの終了
+	UninitPlayer();
 
 	// オブジェクトの終了
 	UninitObject();
@@ -132,6 +143,9 @@ void UninitGame(void)
 
 	// ポーズの終了
 	UninitPause();
+
+	// 警察の終了
+	UninitPolice();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
@@ -201,6 +215,9 @@ void UpdateGame(void)
 
 		// エディットメインの更新
 		UpdateEditmain();
+
+		// 警察の更新
+		UpdatePolice();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -213,6 +230,9 @@ void UpdateGame(void)
 
 			// メッシュウォールの更新
 			UpdateMeshWall();
+
+			// プレイヤーの更新
+			UpdatePlayer();
 
 			// オブジェクトの更新
 			UpdateObject();
@@ -289,11 +309,17 @@ void UpdateGame(void)
 		// メッシュウォールの更新
 		UpdateMeshWall();
 
+		// プレイヤーの更新
+		UpdatePlayer();
+
 		// オブジェクトの更新
 		UpdateObject();
 
 		// ビルボードの更新
 		UpdateBillboard();
+
+		// 警察の更新
+		UpdatePolice();
 
 		// エフェクトの更新
 		UpdateEffect();
@@ -330,11 +356,17 @@ void DrawGame(void)
 	// 影の描画
 	DrawShadow();
 
+	// プレイヤーの描画
+	DrawPlayer();
+
 	// オブジェクトの描画
 	DrawObject();
 
 	// ビルボードの描画
 	DrawBillboard();
+
+	// 警察の描画
+	DrawPolice();
 
 	// エフェクトの描画
 	DrawEffect();

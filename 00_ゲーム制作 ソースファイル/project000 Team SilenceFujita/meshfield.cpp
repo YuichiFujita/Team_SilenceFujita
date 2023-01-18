@@ -11,11 +11,6 @@
 #include "meshfield.h"
 
 //**********************************************************************************************************************
-//	マクロ定義
-//**********************************************************************************************************************
-#define MAX_MESHFIELD		(128)		// メッシュフィールドの最大数
-
-//**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
 const char *apTextureMeshField[] =		// テクスチャの相対パス
@@ -24,6 +19,7 @@ const char *apTextureMeshField[] =		// テクスチャの相対パス
 	"data\\TEXTURE\\road001.png",		// 曲がり角度のテクスチャの相対パス
 	"data\\TEXTURE\\road002.png",		// 交差点のテクスチャの相対パス
 	"data\\TEXTURE\\road003.png",		// 丁字路のテクスチャの相対パス
+	"data\\TEXTURE\\field000.png",		// 歩道のテクスチャの相対パス
 };
 
 //**********************************************************************************************************************
@@ -35,32 +31,17 @@ typedef enum
 	TEXTURE_MESHFIELD_ROAD_TURN,		// (道路) 曲がり角度
 	TEXTURE_MESHFIELD_ROAD_CROSS,		// (道路) 交差点
 	TEXTURE_MESHFIELD_ROAD_TJUNC,		// (道路) 丁字路
+	TEXTURE_MESHFIELD_SIDEWALK,			// 歩道
 	TEXTURE_MESHFIELD_MAX,				// この列挙型の総数
 } TEXTURE_MESHFIELD;
-
-//**********************************************************************************************************************
-//	構造体定義 (MeshField)
-//**********************************************************************************************************************
-typedef struct
-{
-	D3DXVECTOR3 pos;					// 位置
-	D3DXVECTOR3 rot;					// 向き
-	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
-	float       fWidth;					// 横幅
-	float       fHeight;				// 縦幅
-	int         nPartWidth;				// 横の分割数
-	int         nPartHeight;			// 縦の分割数
-	int         nNumVtx;				// 必要頂点数
-	int         nNumIdx;				// 必要インデックス数
-	int         nType;					// 種類
-	bool        bUse;					// 使用状況
-} MeshField;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight, int nType);	// メッシュフィールドの設定処理
 void TxtSetMeshField(void);																										// メッシュフィールドのセットアップ処理
+
+float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos, D3DXVECTOR3 oldPos);	// 外積処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -102,7 +83,7 @@ void InitMeshField(void)
 		g_aMeshField[nCntMeshField].nPartHeight = 0;								// 縦の分割数
 		g_aMeshField[nCntMeshField].nNumVtx     = 0;								// 必要頂点数
 		g_aMeshField[nCntMeshField].nNumIdx     = 0;								// 必要インデックス数
-		g_aMeshField[nCntMeshField].nType       = TEXTURE_MESHFIELD_ROAD_LINE;		// 種類
+		g_aMeshField[nCntMeshField].nType       = 0;								// 種類
 		g_aMeshField[nCntMeshField].bUse        = false;							// 使用状況
 	}
 
@@ -369,6 +350,69 @@ void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight,
 }
 
 //======================================================================================================================
+//	メッシュフィールドとの当たり判定
+//======================================================================================================================
+bool CollisionMeshField(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth)
+{
+	// 変数を宣言
+	int  nVtxPos0 = 0;
+	int  nVtxPos1 = 0;
+	int  nVtxPos2 = 0;
+	int  nVtxPos3 = 0;
+	bool bLand = false;	// 着地状況
+
+	// ポインタを宣言
+	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	g_pVtxBuffMeshField->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
+	{ // メッシュフィールドの最大表示数分繰り返す
+
+		if (g_aMeshField[nCntMeshField].bUse == true)
+		{ // メッシュフィールドが使用されている場合
+
+			nVtxPos0 = 1;
+			nVtxPos1 = ((g_aMeshField[nCntMeshField].nPartWidth) * 2) + 1;
+			nVtxPos2 = g_aMeshField[nCntMeshField].nNumIdx - (((g_aMeshField[nCntMeshField].nPartWidth ) * 2) - 1);
+			nVtxPos3 = g_aMeshField[nCntMeshField].nNumIdx - 2;
+
+			if (OuterProduct(pVtx[nVtxPos0].pos, pVtx[nVtxPos1].pos, *pPos, *pOldPos) > 0
+			&&  OuterProduct(pVtx[nVtxPos1].pos, pVtx[nVtxPos2].pos, *pPos, *pOldPos) > 0
+			&&  OuterProduct(pVtx[nVtxPos2].pos, pVtx[nVtxPos3].pos, *pPos, *pOldPos) > 0
+			&&  OuterProduct(pVtx[nVtxPos3].pos, pVtx[nVtxPos0].pos, *pPos, *pOldPos) > 0)
+			{ // 場合
+
+				// 位置を補正
+				pMove->y = g_aMeshField[nCntMeshField].pos.y;
+
+				// 移動量を初期化
+				pMove->y = 0.0f;
+
+				// 着地している状態にする
+				bLand = true;
+			}
+		}
+	}
+
+	// 頂点バッファをアンロックする
+	g_pVtxBuffMeshField->Unlock();
+
+	// 着地状況を返す
+	return bLand;
+}
+
+//======================================================================================================================
+//	メッシュフィールドの取得処理
+//======================================================================================================================
+MeshField *GetMeshField(void)
+{
+	// メッシュフィールドの情報の先頭アドレスを返す
+	return &g_aMeshField[0];
+}
+
+//======================================================================================================================
 //	メッシュフィールドのセットアップ処理
 //======================================================================================================================
 void TxtSetMeshField(void)
@@ -477,4 +521,40 @@ void TxtSetMeshField(void)
 		// エラーメッセージボックス
 		MessageBox(NULL, "ステージファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
+}
+
+//======================================================================================================================
+//	外積処理
+//======================================================================================================================
+float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos, D3DXVECTOR3 oldPos)
+{
+	// 変数を宣言
+	D3DXVECTOR3 vecMove;		// 移動ベクトル
+	D3DXVECTOR3 vecLine;		// 境界線ベクトル
+	D3DXVECTOR3 vecToPos;		// メッシュウォールの左端と弾の現在位置のベクトル
+	D3DXVECTOR3 vecToOldPos;	// メッシュウォールの左端と弾の過去位置のベクトル
+	float       fSmallArea;		// 現在の面積
+	float       fBigArea;		// 最大の面積
+	float       fRate;			// 面積の割合
+
+	// 移動ベクトルを求める
+	vecMove = pos - oldPos;
+
+	// 境界線ベクトルを求める
+	vecLine = posRight - posLeft;
+
+	// メッシュウォールの左端と弾の現在位置のベクトルを求める
+	vecToPos = pos - posLeft;
+
+	// vecToPos と vecMove でできた平行四辺形の面積を求める
+	fSmallArea = (vecToPos.z * vecMove.x) - (vecToPos.x * vecMove.z);
+
+	// vecLine と vecMove でできた平行四辺形の面積を求める
+	fBigArea = (vecLine.z  * vecMove.x) - (vecLine.x  * vecMove.z);
+
+	// 面積の割合を求める
+	fRate = fSmallArea / fBigArea;
+
+	// 外積の結果を返す
+	return (vecLine.z * vecToOldPos.x) - (vecLine.x * vecToOldPos.z);
 }

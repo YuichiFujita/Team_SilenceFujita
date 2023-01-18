@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #===========================================================
 #
 #	ステージの配置情報 [stage_game.txt]
@@ -449,3 +450,5 @@ SETSTAGE_BILLBOARD
 	END_SET_BILLBOARD
 
 END_SETSTAGE_BILLBOARD
+=======
+>>>>>>> 9834f86c6300b040ac3e1ee869c012142b8e4a7d
