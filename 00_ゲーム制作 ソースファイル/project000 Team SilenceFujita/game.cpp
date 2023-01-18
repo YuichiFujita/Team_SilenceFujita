@@ -215,6 +215,9 @@ void UpdateGame(void)
 
 		// エディットメインの更新
 		UpdateEditmain();
+
+		// 警察の更新
+		UpdatePolice();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -233,9 +236,6 @@ void UpdateGame(void)
 
 			// オブジェクトの更新
 			UpdateObject();
-
-			// 警察の更新
-			UpdatePolice();
 		}
 		else
 		{ // ポーズ状態の場合

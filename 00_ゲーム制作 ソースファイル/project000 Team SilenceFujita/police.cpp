@@ -22,8 +22,20 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define OBJ_LIFE	(50)		// オブジェクトの体力
-#define POLICE_GRAVITY	(0.75f)	// プレイヤーにかかる重力
+#define POLI_LIFE				(50)		// オブジェクトの体力
+#define POLI_GRAVITY			(0.75f)		// プレイヤーにかかる重力
+#define POLI_MOVE_FORWARD		(0.1f)		// プレイヤー前進時の移動量
+#define POLI_MOVE_BACKWARD		(0.2f)		// プレイヤー後退時の移動量
+#define POLI_MOVE_ROT			(0.012f)	// プレイヤーの向き変更量
+#define REV_POLI_MOVE_ROT		(0.1f)		// 移動量による向き変更量の補正係数
+#define SUB_POLI_MOVE_VALUE		(15.0f)		// 向き変更時の減速が行われる移動量
+#define SUB_POLI_MOVE			(0.05f)		// 向き変更時の減速量
+#define MAX_POLI_FORWARD		(30.0f)		// 前進時の最高速度
+#define MAX_POLI_FORWARD_PATROL (15.0f)		// パトロール中の前進時の最高速度
+#define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
+#define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
+#define POLICAR_WIDTH			(30.0f)		// パトカーの縦幅
+#define POLICAR_HEIGHT			(30.0f)		// パトカーの奥行
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -73,7 +85,7 @@ void InitPolice(void)
 	}
 
 	//警察の設定処理
-	SetPolice(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	SetPolice(D3DXVECTOR3(600.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //======================================================================================================================
@@ -97,8 +109,8 @@ void UpdatePolice(void)
 			// 前回位置の更新
 			g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
-			// プレイヤーの移動量の更新
-			MovePlayer(&g_aPolice[nCntPolice].bMove, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].rot);
+			//// プレイヤーの移動量の更新
+			//MovePlayer(&g_aPolice[nCntPolice].bMove, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].rot);
 
 			// プレイヤーの位置の更新
 			PosPlayer(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
@@ -112,9 +124,6 @@ void UpdatePolice(void)
 				g_aPolice[nCntPolice].pos.y = 0.0f;
 			}
 
-			// プレイヤーの補正の更新処理
-			RevPlayer(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
-
 			//----------------------------------------------------
 			//	当たり判定
 			//----------------------------------------------------
@@ -123,8 +132,8 @@ void UpdatePolice(void)
 			( // 引数
 				&g_aPolice[nCntPolice].pos,		// 現在の位置
 				&g_aPolice[nCntPolice].posOld,	// 前回の位置
-				30.0f,				// 横幅
-				30.0f				// 奥行
+				POLICAR_WIDTH,				// 横幅
+				POLICAR_HEIGHT				// 奥行
 			);
 
 			//----------------------------------------------------
@@ -156,6 +165,9 @@ void UpdatePolice(void)
 
 				break;						//抜け出す
 			}
+
+			// プレイヤーの補正の更新処理
+			RevPlayer(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
 		}
 	}
 }
@@ -234,7 +246,7 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aPolice[nCntPolice].rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
 			g_aPolice[nCntPolice].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);// 移動量
 			g_aPolice[nCntPolice].State = POLICESTATE_PATROL;	// パトロール状態にする
-			g_aPolice[nCntPolice].nLife = OBJ_LIFE;				// 体力
+			g_aPolice[nCntPolice].nLife = POLI_LIFE;				// 体力
 			g_aPolice[nCntPolice].bMove = false;				// 移動していない
 
 			// 使用している状態にする
@@ -405,13 +417,6 @@ Police *GetPoliceData(void)
 //============================================================
 void MovePlayer(bool *bMove, D3DXVECTOR3 *move, D3DXVECTOR3 *rot)
 {
-#define MOVE_FORWARD	(0.1f)		// プレイヤー前進時の移動量
-#define MOVE_BACKWARD	(0.2f)		// プレイヤー後退時の移動量
-#define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
-#define REV_MOVE_ROT	(0.1f)		// 移動量による向き変更量の補正係数
-#define SUB_MOVE_VALUE	(15.0f)		// 向き変更時の減速が行われる移動量
-#define SUB_MOVE		(0.05f)		// 向き変更時の減速量
-
 	if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
 	{ // 前進の操作が行われた場合
 
@@ -477,29 +482,26 @@ void MovePlayer(bool *bMove, D3DXVECTOR3 *move, D3DXVECTOR3 *rot)
 //============================================================
 void PosPlayer(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove)
 {
-#define MAX_FORWARD		(30.0f)		// 前進時の最高速度
-#define MAX_BACKWARD	(8.0f)		// 後退時の最高速度
-#define REV_MOVE_SUB	(0.04f)		// 移動量の減速係数
 
 	//--------------------------------------------------------
 	//	重力の更新
 	//--------------------------------------------------------
-	move->y -= POLICE_GRAVITY;
+	move->y -= POLI_GRAVITY;
 
 	//--------------------------------------------------------
 	//	移動量の補正
 	//--------------------------------------------------------
-	if (move->x > 30.0f)
+	if (move->x > MAX_POLI_FORWARD)
 	{ // プレイヤーの移動量 (x) が一定値以上の場合
 
 		// プレイヤーの移動量 (x) を補正
-		move->x = 30.0f;
+		move->x = MAX_POLI_FORWARD;
 	}
-	else if (move->x < -8.0f)
+	else if (move->x < -MAX_POLI_BACKWARD)
 	{ // プレイヤーの移動量 (x) が一定値以下の場合
 
 		// プレイヤーの移動量 (x) を補正
-		move->x = -8.0f;
+		move->x = -MAX_POLI_BACKWARD;
 	}
 
 	//--------------------------------------------------------
@@ -588,81 +590,158 @@ void RevPlayer(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 void PatrolPoliceAct(Police *pPolice)
 {
 	// 移動量を更新
-	pPolice->move.x += 0.1f;
+	pPolice->move.x += POLI_MOVE_FORWARD;
 
 	// 移動している状態にする
 	pPolice->bMove = true;
 
-	if (pPolice->move.x > 15.0f)
+	if (pPolice->move.x > MAX_POLI_FORWARD_PATROL)
 	{ // プレイヤーの移動量 (x) が一定値以上の場合
 
 		// プレイヤーの移動量 (x) を補正
-		pPolice->move.x = 15.0f;
+		pPolice->move.x = MAX_POLI_FORWARD_PATROL;
 	}
 
-	if (pPolice->pos.z + cosf(pPolice->rot.y) * 130.0f > GetLimitStage().fNear - (30.0f * 2))
-	{//手前の壁にぶつかりそうになった場合
-		// 向きを更新
-		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
+	if (pPolice->pos.x >= GetLimitStage().fRight + (POLICAR_WIDTH * 2))
+	{ // 右の壁が警察より左側にある場合
+		if (pPolice->pos.z >= GetLimitStage().fNear + (POLICAR_WIDTH * 2))
+		{ // 左にある壁が途切れたら
+			// 向きを補正
+			pPolice->rot.y = D3DXToRadian(-90);
 
-		if (pPolice->move.x >= 15.0f)
-		{ // 移動量が一定値以上の場合
+			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
+			{ // 移動量が一定値以上の場合
 
-		  // 移動量を更新
-			pPolice->move.x -= 0.05f;
+				// 移動量を更新
+				pPolice->move.x -= SUB_POLI_MOVE;
+			}
+
+			// 移動量を減速
+			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
 		}
-
-		// 移動量を減速
-		pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
-	}
-
-	if (pPolice->pos.z + cosf(pPolice->rot.y) * 130.0f < GetLimitStage().fFar + (30.0f * 2))
-	{//奥の壁にぶつかりそうになった場合
-		// 向きを更新
-		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
-
-		if (pPolice->move.x >= 15.0f)
-		{ // 移動量が一定値以上の場合
-
-			// 移動量を更新
-			pPolice->move.x -= 0.05f;
+		else
+		{ // 左にある壁がまだあったら
+			// 右の壁に這わせる
+			pPolice->pos.x = GetLimitStage().fRight + (POLICAR_WIDTH * 2);
 		}
-
-		// 移動量を減速
-		pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
 	}
+	if (pPolice->pos.z >= GetLimitStage().fNear + (POLICAR_WIDTH * 2))
+	{ // 手前の壁が警察より奥にある場合
+		if (pPolice->pos.x <= GetLimitStage().fLeft - (POLICAR_WIDTH * 2))
+		{ // 左にある壁が途切れたら
+			// 向きを補正
+			pPolice->rot.y = D3DXToRadian(180);
 
-	if (pPolice->pos.x + sinf(pPolice->rot.y) * 130.0f > GetLimitStage().fRight - (30.0f * 2))
-	{//右の壁にぶつかりそうになった場合
-		// 向きを更新
-		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
+			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
+			{ // 移動量が一定値以上の場合
 
-		if (pPolice->move.x >= 15.0f)
-		{ // 移動量が一定値以上の場合
+				// 移動量を更新
+				pPolice->move.x -= SUB_POLI_MOVE;
+			}
 
-			// 移動量を更新
-			pPolice->move.x -= 0.05f;
+			// 移動量を減速
+			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
 		}
-
-		// 移動量を減速
-		pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
-	}
-
-	if (pPolice->pos.x + sinf(pPolice->rot.y) * 130.0f < GetLimitStage().fLeft + (30.0f * 2))
-	{//左の壁にぶつかりそうになった場合
-		// 向きを更新
-		pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
-
-		if (pPolice->move.x >= 15.0f)
-		{ // 移動量が一定値以上の場合
-
-			// 移動量を更新
-			pPolice->move.x -= 0.05f;
+		else
+		{ // 左にある壁がまだあったら
+			// 手前の壁に這わせる
+			pPolice->pos.z = GetLimitStage().fNear + (POLICAR_WIDTH * 2);
 		}
-
-		// 移動量を減速
-		pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
 	}
+	if (pPolice->pos.x <= GetLimitStage().fLeft - (POLICAR_WIDTH * 2))
+	{//左の壁が警察より右にある場合
+		if (pPolice->pos.z <= GetLimitStage().fFar - (POLICAR_WIDTH * 2))
+		{ // 左にある壁が途切れたら
+			// 向きを補正
+			pPolice->rot.y = D3DXToRadian(90);
+
+			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
+			{ // 移動量が一定値以上の場合
+
+			  // 移動量を更新
+				pPolice->move.x -= SUB_POLI_MOVE;
+			}
+
+			// 移動量を減速
+			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+		}
+		else
+		{ // 左にある壁がまだあったら
+			// 左の壁に這わせる
+			pPolice->pos.x = GetLimitStage().fLeft - (POLICAR_WIDTH * 2);
+		}
+	}
+	if (pPolice->pos.z <= GetLimitStage().fFar - (POLICAR_WIDTH * 2))
+	{//奥の壁が警察より手前にある場合
+		if (pPolice->pos.x >= GetLimitStage().fRight + (POLICAR_WIDTH * 2))
+		{ // 左にある壁が途切れたら
+			// 向きを補正
+			pPolice->rot.y = D3DXToRadian(0);
+
+			if (pPolice->move.x >= MAX_POLI_FORWARD_PATROL)
+			{ // 移動量が一定値以上の場合
+
+				// 移動量を更新
+				pPolice->move.x -= SUB_POLI_MOVE;
+			}
+
+			// 移動量を減速
+			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+		}
+		else
+		{ // 左にある壁がまだあったら
+			// 左の壁に這わせる
+			pPolice->pos.z = GetLimitStage().fFar - (POLICAR_WIDTH * 2);
+		}
+	}
+
+	//if (GetLimitStage().fFar > pPolice->pos.z)
+	//{ // 右の壁に当たりそうな場合
+	//	// 向きを更新
+	//	pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
+
+	//	if (pPolice->move.x >= 15.0f)
+	//	{ // 移動量が一定値以上の場合
+
+	//		// 移動量を更新
+	//		pPolice->move.x -= 0.05f;
+	//	}
+
+	//	// 移動量を減速
+	//	pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
+	//}
+
+	//if (GetLimitStage().fLeft > pPolice->pos.x)
+	//{ // 右の壁に当たりそうな場合
+	//	// 向きを更新
+	//	pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
+
+	//	if (pPolice->move.x >= 15.0f)
+	//	{ // 移動量が一定値以上の場合
+
+	//		// 移動量を更新
+	//		pPolice->move.x -= 0.05f;
+	//	}
+
+	//	// 移動量を減速
+	//	pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
+	//}
+
+	//if (GetLimitStage().fRight < pPolice->pos.x)
+	//{ // 右の壁に当たりそうな場合
+	//	// 向きを更新
+	//	pPolice->rot.y -= 0.012f * (pPolice->move.x * 0.5f);
+
+	//	if (pPolice->move.x >= 15.0f)
+	//	{ // 移動量が一定値以上の場合
+
+	//		// 移動量を更新
+	//		pPolice->move.x -= 0.05f;
+	//	}
+
+	//	// 移動量を減速
+	//	pPolice->move.x += (0.0f - pPolice->move.x) * 0.04f;
+	//}
 }
 
 #ifdef _DEBUG	// デバッグ処理
