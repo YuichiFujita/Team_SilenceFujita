@@ -21,6 +21,7 @@
 const char *apTextureValue[] =		// テクスチャの相対パス
 {
 	"data\\TEXTURE\\number000.png",	// 数字 (通常) のテクスチャの相対パス
+	"data\\TEXTURE\\number001.png",	// 数字 (赤) のテクスチャの相対パス
 };
 
 //**********************************************************************************************************************
@@ -164,6 +165,9 @@ void DrawValue(int nDigit, int nType)
 //======================================================================================================================
 void SetValue(D3DXVECTOR3 pos, int nValue, int nMaxValue, float fWidth, float fHeight, float fSpace, float fAlpha)
 {
+	// 変数を宣言
+	int nDigit = 1;			// テクスチャ座標計算用
+
 	// 変数配列を宣言
 	int aTexU[MAX_VALUE];	// 各桁の数字を格納
 
@@ -184,19 +188,21 @@ void SetValue(D3DXVECTOR3 pos, int nValue, int nMaxValue, float fWidth, float fH
 		nValue = 0;
 	}
 
-	for (int nCntValue = 0; nCntValue < MAX_VALUE; nCntValue++)
+	for (int nCntDigit = 0; nCntDigit < MAX_VALUE; nCntDigit++)
 	{ // 桁の最大数分繰り返す
 
-		// 配列 (aTexU) の要素に引数の値を一桁ずつ代入
-		//aTexU[4] = nValue % 100000 / 10000;		// 5桁目
-		//aTexU[3] = nValue % 10000 / 1000;		// 4桁目
-		//aTexU[2] = nValue % 1000 / 100;			// 3桁目
-		//aTexU[1] = nValue % 100 / 10;			// 2桁目
+		// 計算用割り出し
+		nDigit *= 10;
+	}
 
-		aTexU[nCntValue] = nValue % 10 / 1;				// 1桁目
+	for (int nCntTex = MAX_VALUE - 1; nCntTex >= 0; nCntTex--)
+	{ // 桁数の最大から桁数の最小まで繰り返す
 
+		// テクスチャ座標を設定
+		aTexU[nCntTex] = (nValue % nDigit) / (nDigit / 10);
 
-		aTexU[nCntValue] = nValue % (10 + (nCntValue * 10)) / 1;				// 1桁目
+		// 計算用割り出し
+		nDigit /= 10;
 	}
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得

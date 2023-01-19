@@ -17,13 +17,13 @@
 #define MAX_VELO		(3)			// 使用するポリゴン数
 
 #define VELO_POS_X		(70.0f)		// 速度バーの絶対座標 (x)
-#define VELO_POS_Y		(660.0f)	// 速度バーの絶対座標 (y)
+#define VELO_POS_Y		(655.0f)	// 速度バーの絶対座標 (y)
 #define VELO_WIDTH_MUL	(6.8f)		// 速度バーの横幅のプレイヤー速度乗算量
 #define VELO_HEIGHT		(15.0f)		// 速度バーの縦幅 / 2
 #define VELO_PULS_Y		(65.0f)		// 速度バーの縦幅の追加量
 
 #define VELO_BG_POS_X	(190.0f)	// 速度バーの背景の絶対座標 (x)
-#define VELO_BG_POS_Y	(625.0f)	// 速度バーの背景の絶対座標 (x)
+#define VELO_BG_POS_Y	(620.0f)	// 速度バーの背景の絶対座標 (x)
 #define VELO_BG_WIDTH	(165.0f)	// 速度バーの背景の横幅 / 2
 #define VELO_BG_HEIGHT	(80.0f)		// 速度バーの背景の縦幅 / 2
 

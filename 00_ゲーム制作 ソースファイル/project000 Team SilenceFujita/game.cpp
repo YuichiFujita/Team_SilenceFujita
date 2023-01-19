@@ -28,6 +28,7 @@
 #include "player.h"
 #include "Police.h"
 #include "score.h"
+#include "timer.h"
 #include "velocity.h"
 
 #ifdef _DEBUG	// デバッグ処理
@@ -101,6 +102,9 @@ void InitGame(void)
 	// 体力バーの初期化
 	InitLife();
 
+	// タイマーの初期化
+	InitTimer();
+
 	// 速度バーの初期化
 	InitVelocity();
 
@@ -159,6 +163,9 @@ void UninitGame(void)
 
 	// 体力バーの終了
 	UninitLife();
+
+	// タイマーの終了
+	UninitTimer();
 
 	// 速度バーの終了
 	UninitVelocity();
@@ -306,6 +313,9 @@ void UpdateGame(void)
 	// 体力バーの更新
 	UpdateLife();
 
+	// タイマーの更新
+	UpdateTimer();
+
 	// 速度バーの更新
 	UpdateVelocity();
 
@@ -364,6 +374,9 @@ void UpdateGame(void)
 		// 体力バーの更新
 		UpdateLife();
 
+		// タイマーの更新
+		UpdateTimer();
+
 		// 速度バーの更新
 		UpdateVelocity();
 
@@ -419,6 +432,9 @@ void DrawGame(void)
 
 	// 体力バーの描画
 	DrawLife();
+
+	// タイマーの描画
+	DrawTimer();
 
 	// 速度バーの描画
 	DrawVelocity();

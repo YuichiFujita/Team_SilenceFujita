@@ -22,7 +22,7 @@
 
 #define SCORE_POS_VAL_X	(1210.0f)	// スコア (値) の絶対座標 (x)
 #define SCORE_POS_X		(1020.0f)	// スコア (背景) の絶対座標 (x)
-#define SCORE_POS_Y		(660.0f)	// スコアの絶対座標 (y)
+#define SCORE_POS_Y		(655.0f)	// スコアの絶対座標 (y)
 #define SCORE_WIDTH		(235.0f)	// スコアの横幅 / 2
 #define SCORE_HEIGHT	(45.0f)		// スコアの縦幅 / 2
 

@@ -13,6 +13,7 @@
 typedef enum
 {
 	VALUETYPE_NORMAL = 0,	// ”Žš (’Êí)
+	VALUETYPE_RED,			// ”Žš (Ô)
 	VALUETYPE_MAX,			// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 } VALUETYPE;
 
