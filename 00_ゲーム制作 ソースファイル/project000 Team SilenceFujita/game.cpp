@@ -17,6 +17,7 @@
 #include "billboard.h"
 #include "camera.h"
 #include "effect.h"
+#include "life.h"
 #include "light.h"
 #include "meshfield.h"
 #include "meshwall.h"
@@ -55,8 +56,9 @@ void InitGame(void)
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
 	g_nGameMode         = GAMEMODE_PLAY;		// エディットの ON / OFF
+
 #ifdef _DEBUG	// デバッグ処理
-	g_nSoundDJ			= FUJITA_DJ_LABEL_ONE;	//サウンドを初期化する
+	g_nSoundDJ = FUJITA_DJ_LABEL_ONE;			// サウンドを初期化する
 #endif
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -94,6 +96,9 @@ void InitGame(void)
 
 	// パーティクルの初期化
 	InitParticle();
+
+	// 体力バーの初期化
+	InitLife();
 
 	// スコアの初期化
 	InitScore();
@@ -148,7 +153,10 @@ void UninitGame(void)
 	// パーティクルの終了
 	UninitParticle();
 
-	// スコアの初期化
+	// 体力バーの終了
+	UninitLife();
+
+	// スコアの終了
 	UninitScore();
 
 	// ポーズの終了
@@ -288,6 +296,9 @@ void UpdateGame(void)
 	// パーティクルの更新
 	UpdateParticle();
 
+	// 体力バーの更新
+	UpdateLife();
+
 	// スコアの更新
 	UpdateScore();
 
@@ -340,6 +351,9 @@ void UpdateGame(void)
 		// パーティクルの更新
 		UpdateParticle();
 
+		// 体力バーの更新
+		UpdateLife();
+
 		// スコアの更新
 		UpdateScore();
 
@@ -389,6 +403,9 @@ void DrawGame(void)
 
 	// パーティクルの描画
 	DrawParticle();
+
+	// 体力バーの描画
+	DrawLife();
 
 	// スコアの描画
 	DrawScore();
