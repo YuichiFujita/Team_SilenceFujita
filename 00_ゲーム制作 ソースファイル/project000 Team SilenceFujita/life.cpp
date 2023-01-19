@@ -16,12 +16,12 @@
 //**********************************************************************************************************************
 #define MAX_LIFE		(3)			// 使用するポリゴン数
 
-#define LIFE_POS_X		(70.0f)		// 体力バーの絶対座標 (x)
-#define LIFE_POS_Y		(60.0f)		// 体力バーの絶対座標 (y)
+#define LIFE_POS_X		(60.0f)		// 体力バーの絶対座標 (x)
+#define LIFE_POS_Y		(65.0f)		// 体力バーの絶対座標 (y)
 #define LIFE_WIDTH_MUL	(3.8f)		// 体力バーの横幅のプレイヤー体力乗算量
 #define LIFE_HEIGHT		(25.0f)		// 体力バーの縦幅 / 2
 
-#define LIFE_BG_POS_X	(260.0f)	// 体力バーの背景の絶対座標 (x)
+#define LIFE_BG_POS_X	(250.0f)	// 体力バーの背景の絶対座標 (x)
 #define LIFE_BG_WIDTH	(225.0f)	// 体力バーの背景の横幅 / 2
 #define LIFE_BG_HEIGHT	(45.0f)		// 体力バーの背景の縦幅 / 2
 

@@ -17,12 +17,13 @@
 #define MAX_VELO		(3)			// 使用するポリゴン数
 
 #define VELO_POS_X		(70.0f)		// 速度バーの絶対座標 (x)
-#define VELO_POS_Y		(660.0f)	// 速度バーの絶対座標 (y)
+#define VELO_POS_Y		(655.0f)	// 速度バーの絶対座標 (y)
 #define VELO_WIDTH_MUL	(6.8f)		// 速度バーの横幅のプレイヤー速度乗算量
-#define VELO_HEIGHT		(25.0f)		// 速度バーの縦幅 / 2
+#define VELO_HEIGHT		(15.0f)		// 速度バーの縦幅 / 2
+#define VELO_PULS_Y		(65.0f)		// 速度バーの縦幅の追加量
 
 #define VELO_BG_POS_X	(190.0f)	// 速度バーの背景の絶対座標 (x)
-#define VELO_BG_POS_Y	(625.0f)	// 速度バーの背景の絶対座標 (x)
+#define VELO_BG_POS_Y	(620.0f)	// 速度バーの背景の絶対座標 (x)
 #define VELO_BG_WIDTH	(165.0f)	// 速度バーの背景の横幅 / 2
 #define VELO_BG_HEIGHT	(80.0f)		// 速度バーの背景の縦幅 / 2
 
@@ -117,10 +118,14 @@ void InitVelocity(void)
 	//	速度バー (赤)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[4].pos = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y - VELO_HEIGHT, 0.0f);
-	pVtx[5].pos = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y - VELO_HEIGHT, 0.0f);
-	pVtx[6].pos = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[7].pos = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[4].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
+
+	pVtx[5].pos.x = VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL);
+	pVtx[5].pos.y = (VELO_POS_Y - VELO_HEIGHT) - VELO_PULS_Y;
+	pVtx[5].pos.z = 0.0f;
+
+	pVtx[6].pos = D3DXVECTOR3(VELO_POS_X,                                  VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[4].rhw = 1.0f;
@@ -138,10 +143,14 @@ void InitVelocity(void)
 	//	速度バー (黄)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[8].pos  = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y - VELO_HEIGHT, 0.0f);
-	pVtx[9].pos  = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y - VELO_HEIGHT, 0.0f);
-	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[8].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
+
+	pVtx[9].pos.x = VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL);
+	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - VELO_PULS_Y;
+	pVtx[9].pos.z = 0.0f;
+
+	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                  VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[8].rhw  = 1.0f;
@@ -198,8 +207,12 @@ void UpdateVelocity(void)
 	g_pVtxBuffVelocity->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点座標を設定
-	pVtx[8].pos  = D3DXVECTOR3(VELO_POS_X,                                             VELO_POS_Y - VELO_HEIGHT, 0.0f);
-	pVtx[9].pos  = D3DXVECTOR3(VELO_POS_X + (fabsf(pPlayer->move.x) * VELO_WIDTH_MUL), VELO_POS_Y - VELO_HEIGHT, 0.0f);
+	pVtx[8].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
+
+	pVtx[9].pos.x = VELO_POS_X + (fabsf(pPlayer->move.x) * VELO_WIDTH_MUL);
+	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - (fabsf(pPlayer->move.x) * (VELO_PULS_Y / MAX_FORWARD));
+	pVtx[9].pos.z = 0.0f;
+
 	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                             VELO_POS_Y + VELO_HEIGHT, 0.0f);
 	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (fabsf(pPlayer->move.x) * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
