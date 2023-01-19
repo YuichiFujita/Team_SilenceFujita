@@ -82,7 +82,7 @@ void InitPlayer(void)
 	g_player.modelData.fRadius  = 0.0f;			// 半径
 
 	// プレイヤーの位置・向きの設定
-	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	SetPositionPlayer(D3DXVECTOR3(2000.0f, 0.0f, 2000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //============================================================

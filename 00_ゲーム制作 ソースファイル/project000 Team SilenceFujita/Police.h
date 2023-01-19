@@ -25,6 +25,7 @@ typedef enum
 {
 	POLICESTATE_PATROL = 0,				// パトロール
 	POLICESTATE_CHASE,					// 追跡処理
+	POLICESTATE_PATBACK,				//パトロールに戻るときの処理
 	POLICESTATE_STOP,					// 足止め処理
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
@@ -40,6 +41,17 @@ typedef enum
 	POLICEDESTINATION_LEFT,				//左の壁
 	POLICEDESTINATION_MAX				//この列挙型の総数
 }POLICEDEST;
+
+//**********************************************************************************************************************
+//	警察車両の曲がり角
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3 Near;					//手前の曲がり角
+	D3DXVECTOR3 Far;					//奥の曲がり角
+	D3DXVECTOR3 Right;					//右の曲がり角
+	D3DXVECTOR3 Left;					//左の曲がり角
+}POLICECURVE;
 
 //**********************************************************************************************************************
 //	構造体定義 (Police)
@@ -58,7 +70,8 @@ typedef struct
 	int			 nLife;					// 寿命
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
-	POLICEDEST   nPoliDest;				//警察の行先
+	POLICEDEST   nPoliDest;				// 警察の行先
+	POLICECURVE  nPoliCurve;			//警察のカーブ位置
 }Police;
 
 //**********************************************************************************************************************
