@@ -549,9 +549,9 @@ float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos)
 	// 
 	D3DXVec3Normalize(&vecDel, &vecDel);
 
-	vecDel.x += vecDel.x;
-	vecDel.y += vecDel.y;
-	vecDel.z += vecDel.z;
+	vecDel.x += vecDel.x + vecDel.x + vecDel.x + vecDel.x;
+	vecDel.y += vecDel.y + vecDel.y + vecDel.y + vecDel.y;
+	vecDel.z += vecDel.z + vecDel.z + vecDel.z + vecDel.z;
 
 	// 
 	vecToPos -= vecDel;
