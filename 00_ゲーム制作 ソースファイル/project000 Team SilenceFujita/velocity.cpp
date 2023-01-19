@@ -1,6 +1,6 @@
 //======================================================================================================================
 //
-//	体力バー処理 [life.cpp]
+//	速度バー処理 [velocity.cpp]
 //	Author：藤田勇一
 //
 //======================================================================================================================
@@ -8,29 +8,28 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
-#include "life.h"
+#include "velocity.h"
 #include "player.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_LIFE		(3)			// 使用するポリゴン数
+#define MAX_VELO		(3)			// 使用するポリゴン数
 
-#define LIFE_POS_X		(70.0f)	// 体力バーの絶対座標 (x)
-#define LIFE_POS_Y		(60.0f)		// 体力バーの絶対座標 (y)
-#define LIFE_WIDTH_MUL	(3.8f)		// 体力バーの横幅のプレイヤー体力乗算量
-#define LIFE_HEIGHT		(25.0f)		// 体力バーの縦幅 / 2
+#define VELO_POS_X		(70.0f)		// 速度バーの絶対座標 (x)
+#define VELO_POS_Y		(660.0f)	// 速度バーの絶対座標 (y)
+#define VELO_WIDTH_MUL	(6.8f)		// 速度バーの横幅のプレイヤー速度乗算量
+#define VELO_HEIGHT		(25.0f)		// 速度バーの縦幅 / 2
 
-#define LIFE_BG_POS_X	(260.0f)	// 体力バーの背景の絶対座標 (x)
-#define LIFE_BG_WIDTH	(225.0f)	// 体力バーの背景の横幅 / 2
-#define LIFE_BG_HEIGHT	(45.0f)		// 体力バーの背景の縦幅 / 2
-
-#define CNT_FRAME		((int)(DAMAGE_TIME_PLAY * 0.5f))	// 体力を減らしきるフレーム数
+#define VELO_BG_POS_X	(190.0f)	// 速度バーの背景の絶対座標 (x)
+#define VELO_BG_POS_Y	(625.0f)	// 速度バーの背景の絶対座標 (x)
+#define VELO_BG_WIDTH	(165.0f)	// 速度バーの背景の横幅 / 2
+#define VELO_BG_HEIGHT	(80.0f)		// 速度バーの背景の縦幅 / 2
 
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
-const char *apTextureLife[] =		// テクスチャの相対パス
+const char *apTextureVelocity[] =		// テクスチャの相対パス
 {
 	"data\\TEXTURE\\ui000.png",		// ライフ背景のテクスチャの相対パス
 	NULL,							// NULL
@@ -38,82 +37,63 @@ const char *apTextureLife[] =		// テクスチャの相対パス
 };
 
 //**********************************************************************************************************************
-//	列挙型定義 (TEXTURE_LIFE)
+//	列挙型定義 (TEXTURE_VELO)
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_LIFE_NORMAL = 0,		// ライフの背景
-	TEXTURE_LIFE_NULL_00,			// NULL
-	TEXTURE_LIFE_NULL_01,			// NULL
-	TEXTURE_LIFE_MAX,				// この列挙型の総数
-} TEXTURE_LIFE;
-
-//**********************************************************************************************************************
-//	構造体を定義 (Life)
-//**********************************************************************************************************************
-typedef struct
-{
-	LIFESTATE state;				// 状態
-	float     fChange;				// 1フレームの体力変動量
-	float     fNowLife;				// 現在の体力
-	int       nCounterState;		// 状態管理カウンター
-} Life;
+	TEXTURE_VELO_NORMAL = 0,		// ライフの背景
+	TEXTURE_VELO_NULL_00,			// NULL
+	TEXTURE_VELO_NULL_01,			// NULL
+	TEXTURE_VELO_MAX,				// この列挙型の総数
+} TEXTURE_VELO;
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-LPDIRECT3DTEXTURE9      g_apTextureLife[TEXTURE_LIFE_MAX] = {};	// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffLife = NULL;					// 頂点バッファへのポインタ
-
-Life g_life;	// 体力の情報
+LPDIRECT3DTEXTURE9      g_apTextureVelocity[TEXTURE_VELO_MAX] = {};	// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffVelocity = NULL;					// 頂点バッファへのポインタ
 
 //======================================================================================================================
-//	体力バーの初期化処理
+//	速度バーの初期化処理
 //======================================================================================================================
-void InitLife(void)
+void InitVelocity(void)
 {
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	VERTEX_2D *pVtx;							// 頂点情報へのポインタ
 
-	for (int nCntLife = 0; nCntLife < TEXTURE_LIFE_MAX; nCntLife++)
+	for (int nCntVelocity = 0; nCntVelocity < TEXTURE_VELO_MAX; nCntVelocity++)
 	{ // 使用するテクスチャ数分繰り返す
 
 		// テクスチャの読み込み
-		D3DXCreateTextureFromFile(pDevice, apTextureLife[nCntLife], &g_apTextureLife[nCntLife]);
+		D3DXCreateTextureFromFile(pDevice, apTextureVelocity[nCntVelocity], &g_apTextureVelocity[nCntVelocity]);
 	}
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
 	( // 引数
-		sizeof(VERTEX_2D) * 4 * MAX_LIFE,		// 必要頂点数
+		sizeof(VERTEX_2D) * 4 * MAX_VELO,	// 必要頂点数
 		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_2D,							// 頂点フォーマット
+		FVF_VERTEX_2D,						// 頂点フォーマット
 		D3DPOOL_MANAGED,
-		&g_pVtxBuffLife,
+		&g_pVtxBuffVelocity,
 		NULL
 	);
-
-	// 体力の情報の初期化
-	g_life.state         = LIFESTATE_NORMAL;	// 状態
-	g_life.fChange       = 0;					// 1フレームの体力変動量
-	g_life.fNowLife      = (float)PLAY_LIFE;	// 現在の体力
-	g_life.nCounterState = 0;					// 状態管理カウンター
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	頂点情報の初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffLife->Lock(0, 0, (void**)&pVtx, 0);
+	g_pVtxBuffVelocity->Lock(0, 0, (void**)&pVtx, 0);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	体力バー (背景)
+	//	速度バー (背景)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[0].pos = D3DXVECTOR3(LIFE_BG_POS_X - LIFE_BG_WIDTH, LIFE_POS_Y - LIFE_BG_HEIGHT, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(LIFE_BG_POS_X + LIFE_BG_WIDTH, LIFE_POS_Y - LIFE_BG_HEIGHT, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(LIFE_BG_POS_X - LIFE_BG_WIDTH, LIFE_POS_Y + LIFE_BG_HEIGHT, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(LIFE_BG_POS_X + LIFE_BG_WIDTH, LIFE_POS_Y + LIFE_BG_HEIGHT, 0.0f);
+	pVtx[0].pos = D3DXVECTOR3(VELO_BG_POS_X - VELO_BG_WIDTH, VELO_BG_POS_Y - VELO_BG_HEIGHT, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(VELO_BG_POS_X + VELO_BG_WIDTH, VELO_BG_POS_Y - VELO_BG_HEIGHT, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(VELO_BG_POS_X - VELO_BG_WIDTH, VELO_BG_POS_Y + VELO_BG_HEIGHT, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(VELO_BG_POS_X + VELO_BG_WIDTH, VELO_BG_POS_Y + VELO_BG_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[0].rhw = 1.0f;
@@ -134,13 +114,13 @@ void InitLife(void)
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	体力バー (赤)
+	//	速度バー (赤)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[4].pos = D3DXVECTOR3(LIFE_POS_X,                                       LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-	pVtx[5].pos = D3DXVECTOR3(LIFE_POS_X + (float)(PLAY_LIFE * LIFE_WIDTH_MUL), LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-	pVtx[6].pos = D3DXVECTOR3(LIFE_POS_X,                                       LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-	pVtx[7].pos = D3DXVECTOR3(LIFE_POS_X + (float)(PLAY_LIFE * LIFE_WIDTH_MUL), LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
+	pVtx[4].pos = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y - VELO_HEIGHT, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y - VELO_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[4].rhw = 1.0f;
@@ -155,13 +135,13 @@ void InitLife(void)
 	pVtx[7].col = D3DCOLOR_RGBA(205,  0,  0, 255);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	体力バー (黄)
+	//	速度バー (黄)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[8].pos  = D3DXVECTOR3(LIFE_POS_X,                                       LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-	pVtx[9].pos  = D3DXVECTOR3(LIFE_POS_X + (float)(PLAY_LIFE * LIFE_WIDTH_MUL), LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-	pVtx[10].pos = D3DXVECTOR3(LIFE_POS_X,                                       LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(LIFE_POS_X + (float)(PLAY_LIFE * LIFE_WIDTH_MUL), LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
+	pVtx[8].pos  = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y - VELO_HEIGHT, 0.0f);
+	pVtx[9].pos  = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y - VELO_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                         VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (float)(MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[8].rhw  = 1.0f;
@@ -176,134 +156,78 @@ void InitLife(void)
 	pVtx[11].col = D3DCOLOR_RGBA(205, 160,  0, 255);
 
 	// 頂点バッファをアンロックする
-	g_pVtxBuffLife->Unlock();
+	g_pVtxBuffVelocity->Unlock();
 }
 
 //======================================================================================================================
-//	体力バーの終了処理
+//	速度バーの終了処理
 //======================================================================================================================
-void UninitLife(void)
+void UninitVelocity(void)
 {
 	// テクスチャの破棄
-	for (int nCntLife = 0; nCntLife < TEXTURE_LIFE_MAX; nCntLife++)
+	for (int nCntVelocity = 0; nCntVelocity < TEXTURE_VELO_MAX; nCntVelocity++)
 	{ // 使用するテクスチャ数分繰り返す
 
-		if (g_apTextureLife[nCntLife] != NULL)
-		{ // 変数 (g_apTextureLife) がNULLではない場合
+		if (g_apTextureVelocity[nCntVelocity] != NULL)
+		{ // 変数 (g_apTextureVelocity) がNULLではない場合
 
-			g_apTextureLife[nCntLife]->Release();
-			g_apTextureLife[nCntLife] = NULL;
+			g_apTextureVelocity[nCntVelocity]->Release();
+			g_apTextureVelocity[nCntVelocity] = NULL;
 		}
 	}
 
 	// 頂点バッファの破棄
-	if (g_pVtxBuffLife != NULL)
-	{ // 変数 (g_pVtxBuffLife) がNULLではない場合
+	if (g_pVtxBuffVelocity != NULL)
+	{ // 変数 (g_pVtxBuffVelocity) がNULLではない場合
 
-		g_pVtxBuffLife->Release();
-		g_pVtxBuffLife = NULL;
+		g_pVtxBuffVelocity->Release();
+		g_pVtxBuffVelocity = NULL;
 	}
 }
 
 //======================================================================================================================
-//	体力バーの更新処理
+//	速度バーの更新処理
 //======================================================================================================================
-void UpdateLife(void)
+void UpdateVelocity(void)
 {
 	// ポインタを宣言
-	VERTEX_2D *pVtx;	// 頂点情報へのポインタ
+	VERTEX_2D *pVtx;					// 頂点情報へのポインタ
+	Player    *pPlayer = GetPlayer();	// プレイヤーの情報
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffLife->Lock(0, 0, (void**)&pVtx, 0);
+	g_pVtxBuffVelocity->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (g_life.state == LIFESTATE_CHANGE)
-	{ // 体力変動状態の場合
-
-		// カウンターを減算
-		g_life.nCounterState--;
-
-		// 現在の体力バーから受けたダメージ分を加算
-		g_life.fNowLife += g_life.fChange;
-
-		// 頂点座標を設定
-		pVtx[8].pos  = D3DXVECTOR3(LIFE_POS_X,                                      LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-		pVtx[9].pos  = D3DXVECTOR3(LIFE_POS_X + (g_life.fNowLife * LIFE_WIDTH_MUL), LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-		pVtx[10].pos = D3DXVECTOR3(LIFE_POS_X,                                      LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-		pVtx[11].pos = D3DXVECTOR3(LIFE_POS_X + (g_life.fNowLife * LIFE_WIDTH_MUL), LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-
-		if (g_life.nCounterState <= 0)
-		{ // カウンターが 0以下になった場合
-
-			// 通常状態にする
-			g_life.state = LIFESTATE_NORMAL;
-
-			// 頂点座標を再設定
-			pVtx[8].pos  = D3DXVECTOR3(LIFE_POS_X,                                           LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-			pVtx[9].pos  = D3DXVECTOR3(LIFE_POS_X + (int)(g_life.fNowLife * LIFE_WIDTH_MUL), LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-			pVtx[10].pos = D3DXVECTOR3(LIFE_POS_X,                                           LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-			pVtx[11].pos = D3DXVECTOR3(LIFE_POS_X + (int)(g_life.fNowLife * LIFE_WIDTH_MUL), LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-		}
-
-		// 体力ゲージの補正
-		if (pVtx[9].pos.x < LIFE_POS_X)
-		{ // ゲージが減りすぎた場合
-
-			// 体力ゲージを 0に補正
-			pVtx[9].pos  = D3DXVECTOR3(LIFE_POS_X, LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-			pVtx[11].pos = D3DXVECTOR3(LIFE_POS_X, LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-		}
-		else if (pVtx[9].pos.x > LIFE_POS_X + (float)(PLAY_LIFE * LIFE_WIDTH_MUL))
-		{ // ゲージが増えすぎた場合
-
-			// 体力ゲージを 100に補正
-			pVtx[9].pos  = D3DXVECTOR3(LIFE_POS_X + (float)(PLAY_LIFE * LIFE_WIDTH_MUL), LIFE_POS_Y - LIFE_HEIGHT, 0.0f);
-			pVtx[11].pos = D3DXVECTOR3(LIFE_POS_X + (float)(PLAY_LIFE * LIFE_WIDTH_MUL), LIFE_POS_Y + LIFE_HEIGHT, 0.0f);
-		}
-	}
+	// 頂点座標を設定
+	pVtx[8].pos  = D3DXVECTOR3(VELO_POS_X,                                             VELO_POS_Y - VELO_HEIGHT, 0.0f);
+	pVtx[9].pos  = D3DXVECTOR3(VELO_POS_X + (fabsf(pPlayer->move.x) * VELO_WIDTH_MUL), VELO_POS_Y - VELO_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                             VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (fabsf(pPlayer->move.x) * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// 頂点バッファをアンロックする
-	g_pVtxBuffLife->Unlock();
+	g_pVtxBuffVelocity->Unlock();
 }
 
 //======================================================================================================================
-//	体力バーの描画処理
+//	速度バーの描画処理
 //======================================================================================================================
-void DrawLife(void)
+void DrawVelocity(void)
 {
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
 	// 頂点バッファをデータストリームに設定
-	pDevice->SetStreamSource(0, g_pVtxBuffLife, 0, sizeof(VERTEX_2D));
+	pDevice->SetStreamSource(0, g_pVtxBuffVelocity, 0, sizeof(VERTEX_2D));
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	for (int nCntLife = 0; nCntLife < MAX_LIFE; nCntLife++)
+	for (int nCntVelocity = 0; nCntVelocity < MAX_VELO; nCntVelocity++)
 	{ // 使用するポリゴン数分繰り返す
 
 		// テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureLife[nCntLife]);
+		pDevice->SetTexture(0, g_apTextureVelocity[nCntVelocity]);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntLife * 4, 2);
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntVelocity * 4, 2);
 	}
-}
-
-//======================================================================================================================
-//	体力バーの設定処理
-//======================================================================================================================
-void SetLife(int nLife, int nDamage)
-{
-	// 引数を代入
-	g_life.fNowLife = (float)nLife;		// 現在の体力
-
-	// 1フレームの体力変動量を求める
-	g_life.fChange = ((float)nDamage / (float)CNT_FRAME);
-
-	// 状態を設定
-	g_life.state = LIFESTATE_CHANGE;	// 数値変動状態
-
-	// カウンターを設定
-	g_life.nCounterState = CNT_FRAME;	// 状態管理カウンター
 }

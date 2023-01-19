@@ -31,7 +31,6 @@
 #define SUB_MOVE		(0.2f)		// 向き変更時の減速量
 
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
-#define MAX_FORWARD		(35.0f)		// 前進時の最高速度
 #define MAX_BACKWARD	(-8.0f)		// 後退時の最高速度
 #define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
 
