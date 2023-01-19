@@ -95,7 +95,7 @@ void InitGame(void)
 	InitPause();
 
 	// 警察の初期化
-	InitPolice();
+	//InitPolice();
 
 	// ステージのセットアップ
 	TxtSetStage();
@@ -145,7 +145,7 @@ void UninitGame(void)
 	UninitPause();
 
 	// 警察の終了
-	UninitPolice();
+	//UninitPolice();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
@@ -217,7 +217,7 @@ void UpdateGame(void)
 		UpdateEditmain();
 
 		// 警察の更新
-		UpdatePolice();
+		//UpdatePolice();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -319,7 +319,7 @@ void UpdateGame(void)
 		UpdateBillboard();
 
 		// 警察の更新
-		UpdatePolice();
+		//UpdatePolice();
 
 		// エフェクトの更新
 		UpdateEffect();
@@ -366,7 +366,7 @@ void DrawGame(void)
 	DrawBillboard();
 
 	// 警察の描画
-	DrawPolice();
+	//DrawPolice();
 
 	// エフェクトの描画
 	DrawEffect();
