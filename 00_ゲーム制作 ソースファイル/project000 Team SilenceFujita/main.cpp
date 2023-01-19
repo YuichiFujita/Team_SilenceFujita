@@ -1250,7 +1250,7 @@ void DrawDebug(void)
 		}
 
 		//警察のデバッグ表記
-		DrawDebugPolice();				
+		//DrawDebugPolice();				
 	}
 }
 
@@ -1460,6 +1460,8 @@ void DrawDebugControlBillboard(void)
 	// テキストの描画
 	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
+
+#if 0
 //==============================================
 //警察のデバッグ表記
 //==============================================
@@ -1494,4 +1496,6 @@ void DrawDebugPolice(void)
 	// テキストの描画
 	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
+#endif
+
 #endif
