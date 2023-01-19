@@ -100,6 +100,7 @@ void InitGame(void)
 
 	// ポーズの初期化
 	InitPause();
+
 	// ステージのセットアップ
 	TxtSetStage();
 
@@ -223,7 +224,7 @@ void UpdateGame(void)
 		UpdateEditmain();
 
 		// 警察の更新
-		//UpdatePolice();
+		UpdatePolice();
 	}
 	else
 	{ // ゲームモードだった場合
