@@ -23,9 +23,10 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	POLICESTATE_PATROL = 0,				// パトロール
+	POLICESTATE_SPAWN = 0,				// 出現
+	POLICESTATE_PATROL,					// パトロール
 	POLICESTATE_CHASE,					// 追跡処理
-	POLICESTATE_PATBACK,				//パトロールに戻るときの処理
+	POLICESTATE_PATBACK,				// パトロールに戻るときの処理
 	POLICESTATE_STOP,					// 足止め処理
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
@@ -81,7 +82,7 @@ void InitPolice(void);					// 警察の初期化処理
 void UninitPolice(void);				// 警察の終了処理
 void UpdatePolice(void);				// 警察の更新処理
 void DrawPolice(void);					// 警察の描画処理
-void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// 警察の設定処理
+void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST PoliDest);		// 警察の設定処理
 void HitPolice(Police *pPolice, int nDamage);												// 警察のダメージ判定
 void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth);	// 警察との当たり判定
 Police *GetPoliceData(void);																// 警察の取得処理

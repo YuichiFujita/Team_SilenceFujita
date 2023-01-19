@@ -139,8 +139,8 @@ void UpdatePlayer(void)
 		// プレイヤーの着地の更新処理
 		LandPlayer();
 
-		////プレイヤーのカメラの状態変化処理
-		//CameraChangePlayer();
+		//プレイヤーのカメラの状態変化処理
+		CameraChangePlayer();
 
 		//----------------------------------------------------
 		//	当たり判定
