@@ -27,6 +27,16 @@
 //************************************************************
 //	構造体定義 (Player)
 //************************************************************
+typedef enum
+{
+	PLAYERCAME_NORMAL = 0,		//通常のカメラ
+	PLAYERCAME_BACK,			//後ろを観るカメラ
+	PLAYERCAME_MAX				//この列挙型の総数
+}PLAYCAMESTATE;
+
+//************************************************************
+//	構造体定義 (Player)
+//************************************************************
 typedef struct
 {
 	D3DXVECTOR3 pos;				// 現在の位置
@@ -40,6 +50,7 @@ typedef struct
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター
 	int         nShadowID;			// 影のインデックス
+	int			nCameraState;		//カメラの状態
 	bool        bMove;				// 移動状況
 	bool        bJump;				// ジャンプ状況
 	bool        bUse;				// 使用状況

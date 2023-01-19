@@ -207,17 +207,11 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
-	// カメラの更新
-	UpdateCamera();
-
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
 		// エディットメインの更新
 		UpdateEditmain();
-
-		// 警察の更新
-		UpdatePolice();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -236,6 +230,9 @@ void UpdateGame(void)
 
 			// オブジェクトの更新
 			UpdateObject();
+
+			// 警察の更新
+			UpdatePolice();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -244,6 +241,9 @@ void UpdateGame(void)
 			UpdatePause();
 		}
 	}
+
+	// カメラの更新
+	UpdateCamera();
 
 	if (GetKeyboardTrigger(DIK_F5) == true)
 	{ // [F5] が押された場合
