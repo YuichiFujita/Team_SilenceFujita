@@ -18,10 +18,22 @@
 #include "shadow.h"
 #include "sound.h"
 
+#include "meshfield.h"
+
 //************************************************************
 //	マクロ定義
 //************************************************************
+#define MOVE_FORWARD	(0.1f)		// プレイヤー前進時の移動量
+#define MOVE_BACKWARD	(0.2f)		// プレイヤー後退時の移動量
+#define MOVE_ROT		(0.013f)	// プレイヤーの向き変更量
+#define REV_MOVE_ROT	(0.09f)		// 移動量による向き変更量の補正係数
+#define SUB_MOVE_VALUE	(10.0f)		// 向き変更時の減速が行われる移動量
+#define SUB_MOVE		(0.2f)		// 向き変更時の減速量
+
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
+#define MAX_FORWARD		(35.0f)		// 前進時の最高速度
+#define MAX_BACKWARD	(-8.0f)		// 後退時の最高速度
+#define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
 
 //************************************************************
 //	プロトタイプ宣言
@@ -29,6 +41,7 @@
 void MovePlayer(void);	// プレイヤーの移動量の更新処理
 void PosPlayer(void);	// プレイヤーの位置の更新処理
 void RevPlayer(void);	// プレイヤーの補正の更新処理
+void LandPlayer(void);	// プレイヤーの着地の更新処理
 
 //************************************************************
 //	グローバル変数
@@ -120,6 +133,9 @@ void UpdatePlayer(void)
 
 		// プレイヤーの補正の更新処理
 		RevPlayer();
+
+		// プレイヤーの着地の更新処理
+		LandPlayer();
 
 		//----------------------------------------------------
 		//	当たり判定
@@ -341,18 +357,11 @@ void HitPlayer(MainPlayer *pPlayer, int nDamage)
 //============================================================
 void MovePlayer(void)
 {
-#define MOVE_FORWARD	(0.1f)		// プレイヤー前進時の移動量
-#define MOVE_BACKWARD	(0.2f)		// プレイヤー後退時の移動量
-#define MOVE_ROT		(0.01f)		// プレイヤーの向き変更量
-#define REV_MOVE_ROT	(0.1f)		// 移動量による向き変更量の補正係数
-#define SUB_MOVE_VALUE	(15.0f)		// 向き変更時の減速が行われる移動量
-#define SUB_MOVE		(0.05f)		// 向き変更時の減速量
-
 	if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
 	{ // 前進の操作が行われた場合
 
 		// 移動量を更新
-		g_player.move.x += 0.1f;
+		g_player.move.x += MOVE_FORWARD;
 
 		// 移動している状態にする
 		g_player.bMove = true;
@@ -361,7 +370,7 @@ void MovePlayer(void)
 	{ // 後退の操作が行われた場合
 
 		// 移動量を更新
-		g_player.move.x -= 0.2f;
+		g_player.move.x -= MOVE_BACKWARD;
 
 		// 移動している状態にする
 		g_player.bMove = true;
@@ -377,26 +386,26 @@ void MovePlayer(void)
 	{ // 左方向の操作が行われた場合
 
 		// 向きを更新
-		g_player.rot.y -= 0.01f * (g_player.move.x * 0.1f);
+		g_player.rot.y -= MOVE_ROT * (g_player.move.x * REV_MOVE_ROT);
 
-		if (g_player.move.x >= 15.0f)
+		if (g_player.move.x >= SUB_MOVE_VALUE)
 		{ // 移動量が一定値以上の場合
 
 			// 移動量を更新
-			g_player.move.x -= 0.05f;
+			g_player.move.x -= SUB_MOVE;
 		}
 	}
 	else if (GetKeyboardPress(DIK_D) == true)
 	{ // 右方向の操作が行われた場合
 
 		// 向きを更新
-		g_player.rot.y += 0.01f * (g_player.move.x * 0.1f);
+		g_player.rot.y += MOVE_ROT * (g_player.move.x * REV_MOVE_ROT);
 
-		if (g_player.move.x >= 15.0f)
+		if (g_player.move.x >= SUB_MOVE_VALUE)
 		{ // 移動量が一定値以上の場合
 
 			// 移動量を更新
-			g_player.move.x -= 0.05f;
+			g_player.move.x -= SUB_MOVE;
 		}
 	}
 
@@ -413,10 +422,6 @@ void MovePlayer(void)
 //============================================================
 void PosPlayer(void)
 {
-#define MAX_FORWARD		(30.0f)		// 前進時の最高速度
-#define MAX_BACKWARD	(8.0f)		// 後退時の最高速度
-#define REV_MOVE_SUB	(0.04f)		// 移動量の減速係数
-
 	//--------------------------------------------------------
 	//	重力の更新
 	//--------------------------------------------------------
@@ -425,17 +430,17 @@ void PosPlayer(void)
 	//--------------------------------------------------------
 	//	移動量の補正
 	//--------------------------------------------------------
-	if (g_player.move.x > 30.0f)
+	if (g_player.move.x > MAX_FORWARD)
 	{ // プレイヤーの移動量 (x) が一定値以上の場合
 
 		// プレイヤーの移動量 (x) を補正
-		g_player.move.x = 30.0f;
+		g_player.move.x = MAX_FORWARD;
 	}
-	else if (g_player.move.x < -8.0f)
+	else if (g_player.move.x < MAX_BACKWARD)
 	{ // プレイヤーの移動量 (x) が一定値以下の場合
 
 		// プレイヤーの移動量 (x) を補正
-		g_player.move.x = -8.0f;
+		g_player.move.x = MAX_BACKWARD;
 	}
 
 	//--------------------------------------------------------
@@ -452,7 +457,7 @@ void PosPlayer(void)
 	{ // 移動していない状態の場合
 
 		// 移動量を減速
-		g_player.move.x += (0.0f - g_player.move.x) * 0.04f;
+		g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_SUB;
 	}
 }
 
@@ -494,27 +499,34 @@ void RevPlayer(void)
 		// 左に位置を補正
 		g_player.pos.x = GetLimitStage().fLeft + (PLAY_WIDTH * 2);
 	}
+}
 
-	//--------------------------------------------------------
-	//	ジャンプ判定
-	//--------------------------------------------------------
-	if (g_player.pos.y < GetLimitStage().fField)
-	{ // 地面に当たっている場合
+//============================================================
+//	プレイヤーの着地の更新処理
+//============================================================
+void LandPlayer(void)
+{
+	if (CollisionMeshField(&g_player.pos, &g_player.oldPos, &g_player.move, PLAY_WIDTH, PLAY_DEPTH) == false)
+	{
 
-		// ジャンプしていない状態にする
-		g_player.bJump = false;
+		if (g_player.pos.y < GetLimitStage().fField)
+		{ // 範囲外の場合 (下)
 
-		// 地面に位置を補正
-		g_player.pos.y = GetLimitStage().fField;
+			// ジャンプしていない状態にする
+			g_player.bJump = false;
 
-		// 移動量を初期化
-		g_player.move.y = 0.0f;
-	}
-	else
-	{ // 地面に当たっていない場合
+			// 位置を補正
+			g_player.pos.y = GetLimitStage().fField;
 
-		// ジャンプしている状態にする
-		g_player.bJump = true;
+			// 移動量を初期化
+			g_player.move.y = 0.0f;
+		}
+		else
+		{ // 地面に当たっていない場合
+
+			// ジャンプしている状態にする
+			g_player.bJump = true;
+		}
 	}
 }
 
