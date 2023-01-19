@@ -25,28 +25,27 @@
 //************************************************************
 #define MOVE_FORWARD	(0.1f)		// プレイヤー前進時の移動量
 #define MOVE_BACKWARD	(0.2f)		// プレイヤー後退時の移動量
-#define MOVE_ROT		(0.013f)	// プレイヤーの向き変更量
-#define REV_MOVE_ROT	(0.09f)		// 移動量による向き変更量の補正係数
+#define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
+#define REV_MOVE_ROT	(0.085f)	// 移動量による向き変更量の補正係数
 #define SUB_MOVE_VALUE	(10.0f)		// 向き変更時の減速が行われる移動量
 #define SUB_MOVE		(0.2f)		// 向き変更時の減速量
-
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
-#define MAX_BACKWARD	(-8.0f)		// 後退時の最高速度
+#define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
 
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
-void MovePlayer(void);	// プレイヤーの移動量の更新処理
-void PosPlayer(void);	// プレイヤーの位置の更新処理
-void RevPlayer(void);	// プレイヤーの補正の更新処理
-void LandPlayer(void);	// プレイヤーの着地の更新処理
-void CameraChangePlayer(void);		//プレイヤーのカメラの状態変化処理
+void MovePlayer(void);				// プレイヤーの移動量の更新処理
+void PosPlayer(void);				// プレイヤーの位置の更新処理
+void RevPlayer(void);				// プレイヤーの補正の更新処理
+void LandPlayer(void);				// プレイヤーの着地の更新処理
+void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
 
 //************************************************************
 //	グローバル変数
 //************************************************************
-Player g_player;		// プレイヤー情報
+Player g_player;	// プレイヤー情報
 
 //============================================================
 //	プレイヤーの初期化処理
