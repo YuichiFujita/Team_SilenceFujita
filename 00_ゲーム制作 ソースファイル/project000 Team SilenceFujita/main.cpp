@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 #include "model.h"
+#include "value.h"
 #include "sound.h"
 #include "fade.h"
 
@@ -435,6 +436,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		return E_FAIL;
 	}
 
+	// 数値の初期化
+	InitValue();
+
 	// サウンドの初期化
 	InitSound(hWnd);
 
@@ -463,6 +467,9 @@ void Uninit(void)
 
 	// モデルの終了
 	UninitModel();
+
+	// 数値の終了
+	UninitValue();
 
 	// サウンドの終了
 	UninitSound();
