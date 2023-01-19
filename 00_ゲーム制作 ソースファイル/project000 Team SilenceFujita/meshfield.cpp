@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "meshfield.h"
+#include "player.h"
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -385,10 +386,10 @@ float CollisionMeshField(D3DXVECTOR3 pos)
 			vexPos[3].y = g_aMeshField[nCntMeshField].pos.y;
 			vexPos[3].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y - fAngle) * fLength;
 
-			if (OuterProduct(vexPos[0], vexPos[1], pos) < 0
-			&&  OuterProduct(vexPos[1], vexPos[2], pos) < 0
-			&&  OuterProduct(vexPos[2], vexPos[3], pos) < 0
-			&&  OuterProduct(vexPos[3], vexPos[0], pos) < 0)
+			if (OuterProduct(vexPos[0], vexPos[1], D3DXVECTOR3(pos.x + PLAY_WIDTH, pos.y, pos.z + PLAY_DEPTH)) < 0
+			&&  OuterProduct(vexPos[1], vexPos[2], D3DXVECTOR3(pos.x + PLAY_WIDTH, pos.y, pos.z + PLAY_DEPTH)) < 0
+			&&  OuterProduct(vexPos[2], vexPos[3], D3DXVECTOR3(pos.x + PLAY_WIDTH, pos.y, pos.z + PLAY_DEPTH)) < 0
+			&&  OuterProduct(vexPos[3], vexPos[0], D3DXVECTOR3(pos.x + PLAY_WIDTH, pos.y, pos.z + PLAY_DEPTH)) < 0)
 			{ // 四辺の内側にいる場合 (当たっている場合)
 
 				if (fLandPosY < g_aMeshField[nCntMeshField].pos.y)
@@ -533,12 +534,27 @@ float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos)
 	// 変数を宣言
 	D3DXVECTOR3 vecLine;		// 境界線ベクトル
 	D3DXVECTOR3 vecToPos;		// 左端と位置のベクトル
+	D3DXVECTOR3 vecDel;
+	D3DXVECTOR3 vec;
 
 	// 境界線ベクトルを求める
 	vecLine = posRight - posLeft;
 
 	// 左端と位置のベクトルを求める
 	vecToPos = pos - posLeft;
+
+	// 
+	vecDel = -vecToPos;
+
+	// 
+	D3DXVec3Normalize(&vecDel, &vecDel);
+
+	vecDel.x += vecDel.x;
+	vecDel.y += vecDel.y;
+	vecDel.z += vecDel.z;
+
+	// 
+	vecToPos -= vecDel;
 
 	// 外積の計算結果を返す
 	return (vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z);
