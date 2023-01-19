@@ -15,6 +15,7 @@
 #include "Police.h"
 #include "shadow.h"
 #include "sound.h"
+#include "player.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -48,6 +49,7 @@ void RevPlayer(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);		// プレイヤーの補正の更新処
 void PatrolPoliceAct(Police *pPolice);					//警察のパトロール行動処理
 void PatrolCarSearch(Police *pPolice);					//警察車両の探知処理
 void ChasePoliceAct(Police *pPolice);					//警察の追跡処理
+void PatrolBackPoliceAct(Police *pPolice);				//警察のパトロールに戻るときの処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -96,7 +98,7 @@ void InitPolice(void)
 	}
 
 	//警察の設定処理
-	SetPolice(D3DXVECTOR3(600.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //======================================================================================================================
@@ -272,7 +274,7 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aPolice[nCntPolice].bUse = true;
 
 			// モデル情報を設定
-			g_aPolice[nCntPolice].modelData = GetModelData(MODELTYPE_OBJECT_POLICE);	// モデル情報
+			g_aPolice[nCntPolice].modelData = GetModelData(MODELTYPE_PLAYER_CAR + FROM_OBJECT);	// モデル情報
 
 			// 影のインデックスを設定
 			g_aPolice[nCntPolice].nShadowID = SetModelShadow
@@ -286,10 +288,10 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			SetPositionShadow(g_aPolice[nCntPolice].nShadowID, g_aPolice[nCntPolice].pos, g_aPolice[nCntPolice].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
 			//位置を初期化する
-			g_aPolice[nCntPolice].nPoliCurve.Far = D3DXVECTOR3(-1300.0f, 0.0f, -900.0f);
-			g_aPolice[nCntPolice].nPoliCurve.Left = D3DXVECTOR3(-1300.0f, 0.0f, 700.0f);
-			g_aPolice[nCntPolice].nPoliCurve.Near = D3DXVECTOR3(1400.0f, 0.0f, 700.0f);
-			g_aPolice[nCntPolice].nPoliCurve.Right = D3DXVECTOR3(1400.0f, 0.0f, -900.0f);
+			g_aPolice[nCntPolice].nPoliCurve.Far = D3DXVECTOR3(2925.0f, 0.0f, -2075.0f);
+			g_aPolice[nCntPolice].nPoliCurve.Left = D3DXVECTOR3(2925.0f, 0.0f, 2075.0f);
+			g_aPolice[nCntPolice].nPoliCurve.Near = D3DXVECTOR3(6575.0f, 0.0f, 2075.0f);
+			g_aPolice[nCntPolice].nPoliCurve.Right = D3DXVECTOR3(6575.0f, 0.0f, -2075.0f);
 
 			// 処理を抜ける
 			break;
@@ -614,6 +616,10 @@ void RevPlayer(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 //============================================================
 void PatrolPoliceAct(Police *pPolice)
 {
+	Player *pPlayer = GetPlayer();					//プレイヤーの情報を取得する
+
+	float fDist;									//目標の距離
+
 	// 移動量を更新
 	pPolice->move.x += POLI_MOVE_FORWARD;
 
@@ -775,8 +781,14 @@ void PatrolPoliceAct(Police *pPolice)
 		}
 	}
 
-	//警察車両の探知処理
-	PatrolCarSearch(pPolice);
+	//目的の距離を設定する
+	fDist = fabsf(sqrtf((pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x) + (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z)));
+
+	if (fDist <= 700.0f)
+	{ // 目的の距離が一定以内に入ったら
+		// 追跡状態に移行する
+		pPolice->State = POLICESTATE_CHASE;
+	}
 
 	//if (GetLimitStage().fFar > pPolice->pos.z)
 	//{ // 右の壁に当たりそうな場合
@@ -832,53 +844,53 @@ void PatrolPoliceAct(Police *pPolice)
 //============================================================
 void PatrolCarSearch(Police *pPolice)
 {
-	EditObject *pEditObject = GetEditObject();		//エディットオブジェクトの
+	Player *pPlayer = GetPlayer();					//プレイヤーの情報を取得する
 
 	float fDist, fRotDest, fRotDiff;				//目標の距離,角度
 
 	//目的の距離を設定する
-	fDist = fabsf(sqrtf((pEditObject->pos.x - pPolice->pos.x) * (pEditObject->pos.x - pPolice->pos.x) + (pEditObject->pos.z - pPolice->pos.z) * (pEditObject->pos.z - pPolice->pos.z)));
+	fDist = fabsf(sqrtf((pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x) + (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z)));
+
+	//目的の向きを設定する
+	fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
 
 	if (fDist <= 700.0f)
 	{//目的の距離が一定以内に入ったら
 		//追跡状態に移行する
 		pPolice->State = POLICESTATE_CHASE;
 
-		//目的の向きを設定する
-		fRotDest = atan2f(pEditObject->pos.x - pPolice->pos.x, pEditObject->pos.z - pPolice->pos.z);
-
 		//向きの差分を求める
 		fRotDiff = fRotDest - pPolice->rot.y * 0.8f;
 
 		if (fRotDiff > D3DX_PI)
-		{//角度が3.14fより大きかった場合
-			//角度から1周分減らす
+		{ // 角度が3.14fより大きかった場合
+			// 角度から1周分減らす
 			fRotDiff = -D3DX_PI;
 		}
 		else if (fRotDiff < -D3DX_PI)
-		{//角度が-3.14fより小さかった場合
-			//角度に1周分加える
+		{ // 角度が-3.14fより小さかった場合
+			// 角度に1周分加える
 			fRotDiff = D3DX_PI;
 		}
 
-		//角度を補正する
+		// 角度を補正する
 		pPolice->rot.y += fRotDiff;
 
 		if (pPolice->rot.y > D3DX_PI)
-		{//角度が3.14fより大きかった場合
-			//角度から1周分減らす
+		{ // 角度が3.14fより大きかった場合
+			// 角度から1周分減らす
 			pPolice->rot.y = -D3DX_PI;
 		}
 		else if (pPolice->rot.y < -D3DX_PI)
-		{//角度が-3.14fより小さかった場合
-			//角度に1周分加える
+		{ // 角度が-3.14fより小さかった場合
+			// 角度に1周分加える
 			pPolice->rot.y = D3DX_PI;
 		}
 	}
 	else
 	{ // 範囲内に入っていない場合
-		//巡回状態にする
-		pPolice->State = POLICESTATE_PATROL;
+		//巡回に戻る状態にする
+		pPolice->State = POLICESTATE_PATBACK;
 	}
 }
 
@@ -889,6 +901,20 @@ void ChasePoliceAct(Police *pPolice)
 {
 	//警察車両の探知処理
 	PatrolCarSearch(pPolice);
+
+	if (pPolice->move.x >= 28.0f)
+	{ // 移動量が一定値以上の場合
+		// 移動量を更新
+		pPolice->move.x -= 0.05f;
+	}
+}
+
+//============================================================
+//警察のパトロールに戻るときの処理
+//============================================================
+void PatrolBackPoliceAct(Police *pPolice)
+{
+
 }
 
 #ifdef _DEBUG	// デバッグ処理

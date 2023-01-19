@@ -236,11 +236,6 @@ void DrawShadow(void)
 	pDevice->GetLight(1, &light);
 	posLight = D3DXVECTOR4(-light.Direction.x, -light.Direction.y, -light.Direction.z, 0.0f);
 
-	// 平面情報を生成
-	pos    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	normal = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-	D3DXPlaneFromPointNormal(&plane, &pos, &normal);
-
 	for (int nCntShadow = 0; nCntShadow < MAX_SHADOW; nCntShadow++)
 	{ // 影の最大表示数分繰り返す
 
@@ -291,6 +286,11 @@ void DrawShadow(void)
 				break;
 
 			case SHADOWTYPE_MODEL:	// モデル影
+
+				// 平面情報を生成
+				pos    = g_aShadow[nCntShadow].pos;
+				normal = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+				D3DXPlaneFromPointNormal(&plane, &pos, &normal);
 
 				// シャドウマトリックスの初期化
 				D3DXMatrixIdentity(&mtxShadow);
@@ -453,6 +453,9 @@ void SetPositionShadow(int nShadowID, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECT
 			break;
 
 		case SHADOWTYPE_MODEL:	// モデル影
+
+			// 引数の影の位置を設定
+			g_aShadow[nShadowID].pos = pos;
 
 			// 影の親のワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aShadow[nShadowID].mtxParent);

@@ -42,6 +42,7 @@ void MovePlayer(void);	// プレイヤーの移動量の更新処理
 void PosPlayer(void);	// プレイヤーの位置の更新処理
 void RevPlayer(void);	// プレイヤーの補正の更新処理
 void LandPlayer(void);	// プレイヤーの着地の更新処理
+void CameraChangePlayer(void);		//プレイヤーのカメラの状態変化処理
 
 //************************************************************
 //	グローバル変数
@@ -68,6 +69,7 @@ void InitPlayer(void)
 	g_player.nShadowID     = NONE_SHADOW;					// 影のインデックス
 	g_player.bMove         = false;							// 移動状況
 	g_player.bJump         = false;							// ジャンプ状況
+	g_player.nCameraState  = PLAYERCAME_NORMAL;				//プレイヤーのカメラ
 	g_player.bUse          = false;							// 使用状況
 
 	// モデル情報の初期化
@@ -136,6 +138,9 @@ void UpdatePlayer(void)
 
 		// プレイヤーの着地の更新処理
 		LandPlayer();
+
+		////プレイヤーのカメラの状態変化処理
+		//CameraChangePlayer();
 
 		//----------------------------------------------------
 		//	当たり判定
@@ -536,6 +541,33 @@ Player *GetPlayer(void)
 {
 	// プレイヤー本体の情報アドレスを返す
 	return &g_player;
+}
+
+//============================================================
+//プレイヤーのカメラの状態変化処理
+//============================================================
+void CameraChangePlayer(void)
+{
+	Camera *pCamera = GetCamera();
+
+	if (GetKeyboardTrigger(DIK_J) == true)
+	{//Jキーを押した場合
+		//カメラの状態を変える
+		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYERCAME_MAX;
+
+		if (g_player.nCameraState == PLAYERCAME_NORMAL)
+		{
+			// 目標の注視点の位置を更新
+			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * 25.0f;	// プレイヤーの位置より少し前
+			pCamera->posR.y = g_player.pos.y + 110.0f;									// プレイヤーの位置と同じ
+			pCamera->posR.z = g_player.pos.z + cosf(g_player.rot.y + D3DX_PI) * 25.0f;	// プレイヤーの位置より少し前
+
+			// 目標の視点の位置を更新
+			pCamera->posV.x = pCamera->posR.x + ((pCamera->fDis * sinf(pCamera->rot.x)) * sinf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+			pCamera->posV.y = 200.0f;																				// 固定の高さ
+			pCamera->posV.z = pCamera->posR.z + ((pCamera->fDis * sinf(pCamera->rot.x)) * cosf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+		}
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理
