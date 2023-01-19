@@ -544,19 +544,22 @@ Player *GetPlayer(void)
 }
 
 //============================================================
-//プレイヤーのカメラの状態変化処理
+//	プレイヤーのカメラの状態変化処理
 //============================================================
 void CameraChangePlayer(void)
 {
-	Camera *pCamera = GetCamera();
+	// ポインタを宣言
+	Camera *pCamera = GetCamera();	// カメラの情報
 
 	if (GetKeyboardTrigger(DIK_J) == true)
-	{//Jキーを押した場合
-		//カメラの状態を変える
+	{ // Jキーを押した場合
+
+		// カメラの状態を変える
 		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYERCAME_MAX;
 
 		if (g_player.nCameraState == PLAYERCAME_NORMAL)
 		{
+
 			// 目標の注視点の位置を更新
 			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * 25.0f;	// プレイヤーの位置より少し前
 			pCamera->posR.y = g_player.pos.y + 110.0f;									// プレイヤーの位置と同じ

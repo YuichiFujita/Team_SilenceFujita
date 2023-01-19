@@ -26,6 +26,7 @@
 #include "object.h"
 #include "player.h"
 #include "Police.h"
+#include "score.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -67,6 +68,9 @@ void InitGame(void)
 	// プレイヤーの初期化
 	InitPlayer();
 
+	// 警察の初期化
+	InitPolice();
+
 	// オブジェクトの初期化
 	InitObject();
 
@@ -91,12 +95,11 @@ void InitGame(void)
 	// パーティクルの初期化
 	InitParticle();
 
+	// スコアの初期化
+	InitScore();
+
 	// ポーズの初期化
 	InitPause();
-
-	// 警察の初期化
-	InitPolice();
-
 	// ステージのセットアップ
 	TxtSetStage();
 
@@ -116,6 +119,9 @@ void UninitGame(void)
 
 	// プレイヤーの終了
 	UninitPlayer();
+
+	// 警察の終了
+	UninitPolice();
 
 	// オブジェクトの終了
 	UninitObject();
@@ -141,11 +147,11 @@ void UninitGame(void)
 	// パーティクルの終了
 	UninitParticle();
 
+	// スコアの初期化
+	UninitScore();
+
 	// ポーズの終了
 	UninitPause();
-
-	// 警察の終了
-	UninitPolice();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
@@ -207,11 +213,17 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
+	// カメラの更新
+	UpdateCamera();
+
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
 		// エディットメインの更新
 		UpdateEditmain();
+
+		// 警察の更新
+		//UpdatePolice();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -228,11 +240,11 @@ void UpdateGame(void)
 			// プレイヤーの更新
 			UpdatePlayer();
 
-			// オブジェクトの更新
-			UpdateObject();
-
 			// 警察の更新
 			UpdatePolice();
+
+			// オブジェクトの更新
+			UpdateObject();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -241,9 +253,6 @@ void UpdateGame(void)
 			UpdatePause();
 		}
 	}
-
-	// カメラの更新
-	UpdateCamera();
 
 	if (GetKeyboardTrigger(DIK_F5) == true)
 	{ // [F5] が押された場合
@@ -277,6 +286,9 @@ void UpdateGame(void)
 
 	// パーティクルの更新
 	UpdateParticle();
+
+	// スコアの更新
+	UpdateScore();
 
 	// 影の更新
 	UpdateShadow();
@@ -312,20 +324,23 @@ void UpdateGame(void)
 		// プレイヤーの更新
 		UpdatePlayer();
 
+		// 警察の更新
+		UpdatePolice();
+
 		// オブジェクトの更新
 		UpdateObject();
 
 		// ビルボードの更新
 		UpdateBillboard();
 
-		// 警察の更新
-		UpdatePolice();
-
 		// エフェクトの更新
 		UpdateEffect();
 
 		// パーティクルの更新
 		UpdateParticle();
+
+		// スコアの更新
+		UpdateScore();
 
 		// 影の更新
 		UpdateShadow();
@@ -359,20 +374,23 @@ void DrawGame(void)
 	// プレイヤーの描画
 	DrawPlayer();
 
+	// 警察の描画
+	DrawPolice();
+
 	// オブジェクトの描画
 	DrawObject();
 
 	// ビルボードの描画
 	DrawBillboard();
 
-	// 警察の描画
-	DrawPolice();
-
 	// エフェクトの描画
 	DrawEffect();
 
 	// パーティクルの描画
 	DrawParticle();
+
+	// スコアの描画
+	DrawScore();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合
