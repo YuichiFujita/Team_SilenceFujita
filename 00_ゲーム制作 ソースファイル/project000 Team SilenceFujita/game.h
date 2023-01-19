@@ -39,5 +39,6 @@ void SetEnablePause(bool bPause);					// ポーズ状態の設定処理
 GAMESTATE GetGameState(void);						// ゲーム画面の状態取得処理
 bool GetPause(void);								// ポーズ状態の取得処理
 int  GetGameMode(void);								// ゲームモードの取得処理
+void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3DXVECTOR3 WallRpos, D3DXVECTOR3 WallLpos, bool *bUse, int *nShadow);		//外積の当たり判定
 
 #endif
