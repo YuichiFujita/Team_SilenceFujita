@@ -16,10 +16,10 @@
 //**********************************************************************************************************************
 #define MAX_LIFE		(3)			// 使用するポリゴン数
 
-#define LIFE_POS_X		(100.0f)	// 体力バーの絶対座標 (x)
+#define LIFE_POS_X		(70.0f)		// 体力バーの絶対座標 (x)
 #define LIFE_POS_Y		(60.0f)		// 体力バーの絶対座標 (y)
-#define LIFE_WIDTH_MUL	(3.2f)		// 体力バーの横幅のプレイヤー体力乗算量
-#define LIFE_HEIGHT		(21.0f)		// 体力バーの縦幅 / 2
+#define LIFE_WIDTH_MUL	(3.8f)		// 体力バーの横幅のプレイヤー体力乗算量
+#define LIFE_HEIGHT		(25.0f)		// 体力バーの縦幅 / 2
 
 #define LIFE_BG_POS_X	(260.0f)	// 体力バーの背景の絶対座標 (x)
 #define LIFE_BG_WIDTH	(225.0f)	// 体力バーの背景の横幅 / 2
@@ -96,7 +96,7 @@ void InitLife(void)
 
 	// 体力の情報の初期化
 	g_life.state         = LIFESTATE_NORMAL;	// 状態
-	g_life.fChange       = 0;					// 1フレームの体力変動量
+	g_life.fChange       = 0.0f;				// 1フレームの体力変動量
 	g_life.fNowLife      = (float)PLAY_LIFE;	// 現在の体力
 	g_life.nCounterState = 0;					// 状態管理カウンター
 

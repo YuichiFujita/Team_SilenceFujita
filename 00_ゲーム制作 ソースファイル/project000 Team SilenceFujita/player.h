@@ -20,6 +20,7 @@
 #define PLAY_DEPTH			(18.0f)	// プレイヤーの奥行 / 2
 
 #define PLAY_LIFE			(100)	// プレイヤーの体力
+#define MAX_FORWARD			(35.0f)	// 前進時の最高速度
 
 #define DAMAGE_TIME_PLAY	(30)					// ダメージ状態を保つ時間
 #define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)	// 無敵状態に変更する時間
