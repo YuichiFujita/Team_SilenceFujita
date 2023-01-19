@@ -41,7 +41,7 @@ typedef enum
 void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight, int nType);	// メッシュフィールドの設定処理
 void TxtSetMeshField(void);																										// メッシュフィールドのセットアップ処理
 
-float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos, D3DXVECTOR3 oldPos);	// 外積処理
+float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos);	// 外積処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -352,20 +352,14 @@ void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight,
 //======================================================================================================================
 //	メッシュフィールドとの当たり判定
 //======================================================================================================================
-bool CollisionMeshField(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth)
+float CollisionMeshField(D3DXVECTOR3 pos)
 {
 	// 変数を宣言
-	int  nVtxPos0 = 0;
-	int  nVtxPos1 = 0;
-	int  nVtxPos2 = 0;
-	int  nVtxPos3 = 0;
-	bool bLand = false;	// 着地状況
+	float fLandPosY = GetLimitStage().fField;	// 着地予定の y座標
+	float fAngle, fLength;						// 頂点座標の計算用
 
-	// ポインタを宣言
-	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
-
-	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffMeshField->Lock(0, 0, (void**)&pVtx, 0);
+	// 変数配列を宣言
+	D3DXVECTOR3 vexPos[4];	// 頂点位置
 
 	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
 	{ // メッシュフィールドの最大表示数分繰り返す
@@ -373,34 +367,42 @@ bool CollisionMeshField(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pM
 		if (g_aMeshField[nCntMeshField].bUse == true)
 		{ // メッシュフィールドが使用されている場合
 
-			nVtxPos0 = 1;
-			nVtxPos1 = ((g_aMeshField[nCntMeshField].nPartWidth) * 2) + 1;
-			nVtxPos2 = g_aMeshField[nCntMeshField].nNumIdx - (((g_aMeshField[nCntMeshField].nPartWidth ) * 2) - 1);
-			nVtxPos3 = g_aMeshField[nCntMeshField].nNumIdx - 2;
+			// 対角線の長さ、角度を求める
+			fAngle  = atan2f(g_aMeshField[nCntMeshField].fWidth, g_aMeshField[nCntMeshField].fHeight);
+			fLength = sqrtf((g_aMeshField[nCntMeshField].fWidth * g_aMeshField[nCntMeshField].fWidth) + (g_aMeshField[nCntMeshField].fHeight * g_aMeshField[nCntMeshField].fHeight)) * 0.5f;
 
-			if (OuterProduct(pVtx[nVtxPos0].pos, pVtx[nVtxPos1].pos, *pPos, *pOldPos) > 0
-			&&  OuterProduct(pVtx[nVtxPos1].pos, pVtx[nVtxPos2].pos, *pPos, *pOldPos) > 0
-			&&  OuterProduct(pVtx[nVtxPos2].pos, pVtx[nVtxPos3].pos, *pPos, *pOldPos) > 0
-			&&  OuterProduct(pVtx[nVtxPos3].pos, pVtx[nVtxPos0].pos, *pPos, *pOldPos) > 0)
-			{ // 場合
+			// 頂点座標を求める
+			vexPos[0].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI + fAngle)) * fLength;
+			vexPos[0].y = g_aMeshField[nCntMeshField].pos.y;
+			vexPos[0].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI + fAngle)) * fLength;
+			vexPos[1].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI - fAngle)) * fLength;
+			vexPos[1].y = g_aMeshField[nCntMeshField].pos.y;
+			vexPos[1].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI - fAngle)) * fLength;
+			vexPos[2].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y + fAngle) * fLength;
+			vexPos[2].y = g_aMeshField[nCntMeshField].pos.y;
+			vexPos[2].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y + fAngle) * fLength;
+			vexPos[3].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y - fAngle) * fLength;
+			vexPos[3].y = g_aMeshField[nCntMeshField].pos.y;
+			vexPos[3].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y - fAngle) * fLength;
 
-				// 位置を補正
-				pMove->y = g_aMeshField[nCntMeshField].pos.y;
+			if (OuterProduct(vexPos[0], vexPos[1], pos) < 0
+			&&  OuterProduct(vexPos[1], vexPos[2], pos) < 0
+			&&  OuterProduct(vexPos[2], vexPos[3], pos) < 0
+			&&  OuterProduct(vexPos[3], vexPos[0], pos) < 0)
+			{ // 四辺の内側にいる場合 (当たっている場合)
 
-				// 移動量を初期化
-				pMove->y = 0.0f;
+				if (fLandPosY < g_aMeshField[nCntMeshField].pos.y)
+				{ // 現在の着地点よりメッシュフィールドの方が上の場合
 
-				// 着地している状態にする
-				bLand = true;
+					// 現在の着地点にメッシュフィールドの座標を設定
+					fLandPosY = g_aMeshField[nCntMeshField].pos.y;
+				}
 			}
 		}
 	}
 
-	// 頂点バッファをアンロックする
-	g_pVtxBuffMeshField->Unlock();
-
-	// 着地状況を返す
-	return bLand;
+	// 着地する y座標を返す
+	return fLandPosY;
 }
 
 //======================================================================================================================
@@ -526,35 +528,18 @@ void TxtSetMeshField(void)
 //======================================================================================================================
 //	外積処理
 //======================================================================================================================
-float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos, D3DXVECTOR3 oldPos)
+float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos)
 {
 	// 変数を宣言
-	D3DXVECTOR3 vecMove;		// 移動ベクトル
 	D3DXVECTOR3 vecLine;		// 境界線ベクトル
-	D3DXVECTOR3 vecToPos;		// メッシュウォールの左端と弾の現在位置のベクトル
-	D3DXVECTOR3 vecToOldPos;	// メッシュウォールの左端と弾の過去位置のベクトル
-	float       fSmallArea;		// 現在の面積
-	float       fBigArea;		// 最大の面積
-	float       fRate;			// 面積の割合
-
-	// 移動ベクトルを求める
-	vecMove = pos - oldPos;
+	D3DXVECTOR3 vecToPos;		// 左端と位置のベクトル
 
 	// 境界線ベクトルを求める
 	vecLine = posRight - posLeft;
 
-	// メッシュウォールの左端と弾の現在位置のベクトルを求める
+	// 左端と位置のベクトルを求める
 	vecToPos = pos - posLeft;
 
-	// vecToPos と vecMove でできた平行四辺形の面積を求める
-	fSmallArea = (vecToPos.z * vecMove.x) - (vecToPos.x * vecMove.z);
-
-	// vecLine と vecMove でできた平行四辺形の面積を求める
-	fBigArea = (vecLine.z  * vecMove.x) - (vecLine.x  * vecMove.z);
-
-	// 面積の割合を求める
-	fRate = fSmallArea / fBigArea;
-
-	// 外積の結果を返す
-	return (vecLine.z * vecToOldPos.x) - (vecLine.x * vecToOldPos.z);
+	// 外積の計算結果を返す
+	return (vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z);
 }
