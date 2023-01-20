@@ -241,6 +241,9 @@ void UpdateGame(void)
 
 		// エディットメインの更新
 		UpdateEditmain();
+
+		// カメラの更新
+		UpdateCamera();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -428,16 +431,16 @@ void DrawGame(void)
 	DrawParticle();
 
 	// 体力バーの描画
-	DrawLife();
+	//DrawLife();
 
 	// タイマーの描画
-	DrawTimer();
+	//DrawTimer();
 
 	// 速度バーの描画
-	DrawVelocity();
+	//DrawVelocity();
 
 	// スコアの描画
-	DrawScore();
+	//DrawScore();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合
