@@ -101,9 +101,9 @@ void InitPolice(void)
 	}
 
 	//警察の設定処理
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
+	SetPolice(D3DXVECTOR3(-4000.0f, 0.0f, 6000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
@@ -121,6 +121,11 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
+	if (GetKeyboardTrigger(DIK_RSHIFT) == true)
+	{
+		g_aPolice[0].state = POLICESTATE_PATBACK;
+	}
+
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
@@ -165,12 +170,15 @@ void UpdatePolice(void)
 
 			case POLICESTATE_CHASE:			//追跡処理
 
-				//警察の追跡処理
+				// 警察の追跡処理
 				ChasePoliceAct(&g_aPolice[nCntPolice]);
 
 				break;						//抜け出す
 
 			case POLICESTATE_PATBACK:		//パトロールへ戻る処理
+
+				// 警察のパトロールに戻るときの処理
+				PatrolBackPoliceAct(&g_aPolice[nCntPolice]);				
 
 				break;						//抜け出す
 
@@ -282,7 +290,7 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest)
 			g_aPolice[nCntPolice].rot		= rot;								// 向き
 			g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
 			g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// パトロール状態にする
+			g_aPolice[nCntPolice].state		= POLICESTATE_STOP;					// パトロール状態にする
 			g_aPolice[nCntPolice].nLife		= POLI_LIFE;						// 体力
 			g_aPolice[nCntPolice].bMove		= false;							// 移動していない
 			g_aPolice[nCntPolice].poliDest = poliDest;							// 警察の向き
@@ -900,8 +908,22 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 
 				if (fLength <= (pPolice->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
 				{ // オブジェクトが当たっている
-					// 目標の移動量をセーブする
-					move->x += (0.0f - move->x) * 0.5f;
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
+
+						// 移動量を設定する
+						move->x = sinf(targetrot.y) * -3.0f;
+
+						break;						//抜け出す
+
+					case COLLOBJECTTYPE_POLICE:		//警察の場合
+
+						// 目標の移動量をセーブする
+						move->x += (0.0f - move->x) * 0.5f;
+
+						break;						//抜け出す
+					}
 				}
 			}
 		}
@@ -918,8 +940,23 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 
 			if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
 			{ // オブジェクトが当たっている
-				// 目標の移動量をセーブする
-				move->x += (0.0f - move->x) * 0.5f;
+
+				switch (collObject)
+				{
+				case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
+
+					// 移動量を設定する
+					move->x = sinf(targetrot.y) * -3.0f;
+
+					break;						//抜け出す
+
+				case COLLOBJECTTYPE_POLICE:		//警察の場合
+
+					// 目標の移動量をセーブする
+					move->x += (0.0f - move->x) * 0.5f;
+
+					break;						//抜け出す
+				}
 			}
 		}
 	}
@@ -930,7 +967,137 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 void PatrolBackPoliceAct(Police *pPolice)
 {
+	float fDist, fSave;					//現在の位置からの距離、距離を保存する変数
+	int nSavePoint;						//どこの曲がり角かを保存する変数
 
+	for (int nCnt = 0; nCnt < 4; nCnt++)
+	{
+		switch (nCnt)
+		{
+		case POLICEDESTINATION_NEAR:	// 奥の比較
+
+			// 距離を測る
+			fDist = fabsf(sqrtf((pPolice->poliCurve.Near.x - pPolice->pos.x) * (pPolice->poliCurve.Near.x - pPolice->pos.x) + (pPolice->poliCurve.Near.z - pPolice->pos.z) * (pPolice->poliCurve.Near.z - pPolice->pos.z)));
+
+			// セーブする
+			fSave = fDist;
+
+			break;						// 抜け出す
+
+		case POLICEDESTINATION_FAR:		// 手前の比較
+
+			// 距離を測る
+			fDist = fabsf(sqrtf((pPolice->poliCurve.Far.x - pPolice->pos.x) * (pPolice->poliCurve.Far.x - pPolice->pos.x) + (pPolice->poliCurve.Far.z - pPolice->pos.z) * (pPolice->poliCurve.Far.z - pPolice->pos.z)));
+
+			break;						// 抜け出す
+
+		case POLICEDESTINATION_RIGHT:	// 右との比較
+
+			//距離を測る
+			fDist = fabsf(sqrtf((pPolice->poliCurve.Right.x - pPolice->pos.x) * (pPolice->poliCurve.Right.x - pPolice->pos.x) + (pPolice->poliCurve.Right.z - pPolice->pos.z) * (pPolice->poliCurve.Right.z - pPolice->pos.z)));
+
+			break;						// 抜け出す
+
+		case POLICEDESTINATION_LEFT:	// 左との比較
+
+			//距離を測る
+			fDist = fabsf(sqrtf((pPolice->poliCurve.Left.x - pPolice->pos.x) * (pPolice->poliCurve.Left.x - pPolice->pos.x) + (pPolice->poliCurve.Left.z - pPolice->pos.z) * (pPolice->poliCurve.Left.z - pPolice->pos.z)));
+
+			break;						// 抜け出す
+		}
+
+		if (fSave > fDist)
+		{//セーブした距離よりも計算した距離の方が長かった場合
+			//セーブを更新する
+			fSave = fDist;
+
+			//セーブポイントを保存する
+			nSavePoint = nCnt;
+		}
+	}
+
+	switch (nSavePoint)
+	{
+	case POLICEDESTINATION_NEAR:	// 手前の場合
+
+		// 角度を設定する
+		pPolice->rot.y = atan2f(pPolice->poliCurve.Near.x - pPolice->pos.x, pPolice->poliCurve.Near.z - pPolice->pos.z);
+
+		break;						// 抜け出す
+
+	case POLICEDESTINATION_FAR:		// 奥の場合
+
+		// 角度を設定する
+		pPolice->rot.y = atan2f(pPolice->poliCurve.Far.x - pPolice->pos.x, pPolice->poliCurve.Far.z - pPolice->pos.z);
+
+		break;						// 抜け出す
+
+	case POLICEDESTINATION_RIGHT:	// 右の場合
+
+		// 角度を設定する
+		pPolice->rot.y = atan2f(pPolice->poliCurve.Right.x - pPolice->pos.x, pPolice->poliCurve.Right.z - pPolice->pos.z);
+
+		break;						// 抜け出す
+
+	case POLICEDESTINATION_LEFT:	//左の場合
+
+		// 角度を設定する
+		pPolice->rot.y = atan2f(pPolice->poliCurve.Left.x - pPolice->pos.x, pPolice->poliCurve.Left.z - pPolice->pos.z);
+
+		break;						//抜け出す
+	}
+
+	if (fDist <= 30.0f)
+	{//距離が20.0f以下になった場合
+		// 移動量を更新
+		pPolice->move.x -= (pPolice->move.x - fDist);
+	}
+
+	// 移動量を更新
+	pPolice->move.x += 0.1f;
+
+	//移動している状態にする
+	pPolice->bMove = true;
+
+	if (fDist <= 1.0f)
+	{ // 距離が1.0f以下になった場合
+		// パトロール状態に変える
+		pPolice->state = POLICESTATE_PATROL;
+
+		switch (nSavePoint)
+		{
+		case POLICEDESTINATION_NEAR:		//手前の場合
+
+			//セーブ地点を補正する
+			nSavePoint = POLICEDESTINATION_RIGHT;
+
+			break;							//抜け出す
+
+		case POLICEDESTINATION_FAR:			//奥の場合
+
+			//セーブ地点を補正する
+			nSavePoint = POLICEDESTINATION_LEFT;
+
+			break;							//抜け出す
+
+		case POLICEDESTINATION_RIGHT:		//右の場合
+
+			//セーブ地点を補正する
+			nSavePoint = POLICEDESTINATION_FAR;
+
+			break;							//抜け出す
+
+		case POLICEDESTINATION_LEFT:		//左の場合
+
+			//セーブ地点を補正する
+			nSavePoint = POLICEDESTINATION_NEAR;
+
+			break;							//抜け出す
+		}
+
+		// セーブポイントにする
+		pPolice->poliDest = (POLICEDEST)nSavePoint;
+	}
 }
 
 //============================================================
