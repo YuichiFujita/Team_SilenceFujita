@@ -22,6 +22,7 @@ typedef enum
 	//MODELTYPE_OBJECT_APART,		// アパート
 	MODELTYPE_OBJECT_HOUSE,			// 家
 	MODELTYPE_OBJECT_CURRYSHOP,		// カレー屋
+	MODELTYPE_OBJECT_BILL,			// ビル
 	//MODELTYPE_OBJECT_POLICE,		// 仮の警察
 
 	// プレイヤーモデル
@@ -35,8 +36,8 @@ typedef enum
 #define INIT_VTX_MIN	(D3DXVECTOR3( 9999.0f,  9999.0f,  9999.0f))		// モデルの最小の頂点座標の初期値
 #define INIT_VTX_MAX	(D3DXVECTOR3(-9999.0f, -9999.0f, -9999.0f))		// モデルの最大の頂点座標の初期値
 #define FROM_OBJECT				(0)	// オブジェクトのモデル列挙の開始地点
-#define MODELTYPE_OBJECT_MAX	(8)	// オブジェクトのモデルの総数
-#define FROM_PLAYER				(8)	// プレイヤーのモデル列挙の開始地点
+#define MODELTYPE_OBJECT_MAX	(9)	// オブジェクトのモデルの総数
+#define FROM_PLAYER				(9)	// プレイヤーのモデル列挙の開始地点
 #define MODELTYPE_PLAYER_MAX	(1)	// プレイヤーのモデルの総数
 
 //************************************************************
