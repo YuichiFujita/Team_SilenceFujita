@@ -23,9 +23,10 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	POLICESTATE_PATROL = 0,				// パトロール
+	POLICESTATE_SPAWN = 0,				// 出現
+	POLICESTATE_PATROL,					// パトロール
 	POLICESTATE_CHASE,					// 追跡処理
-	POLICESTATE_PATBACK,				//パトロールに戻るときの処理
+	POLICESTATE_PATBACK,				// パトロールに戻るときの処理
 	POLICESTATE_STOP,					// 足止め処理
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
@@ -41,6 +42,16 @@ typedef enum
 	POLICEDESTINATION_LEFT,				//左の壁
 	POLICEDESTINATION_MAX				//この列挙型の総数
 }POLICEDEST;
+
+//**********************************************************************************************************************
+//	ぶつかったもののタイプ
+//**********************************************************************************************************************
+typedef enum
+{
+	COLLOBJECTTYPE_PLAYER = 0,			//プレイヤー
+	COLLOBJECTTYPE_POLICE,				//警察
+	COLLOBJECTTYPE_MAX					//この列挙型の総数
+}COLLOBJECTTYPE;
 
 //**********************************************************************************************************************
 //	警察車両の曲がり角
@@ -65,13 +76,13 @@ typedef struct
 	D3DXVECTOR3  rotDest;				// 目標の向き
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報
-	POLICESTATE  State;					// 警察車両の状態
+	POLICESTATE  state;					// 警察車両の状態
 	int			 nShadowID;				// 影のインデックス
 	int			 nLife;					// 寿命
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
-	POLICEDEST   nPoliDest;				// 警察の行先
-	POLICECURVE  nPoliCurve;			//警察のカーブ位置
+	POLICEDEST   poliDest;				// 警察の行先
+	POLICECURVE  poliCurve;				// 警察のカーブ位置
 }Police;
 
 //**********************************************************************************************************************
@@ -81,10 +92,11 @@ void InitPolice(void);					// 警察の初期化処理
 void UninitPolice(void);				// 警察の終了処理
 void UpdatePolice(void);				// 警察の更新処理
 void DrawPolice(void);					// 警察の描画処理
-void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// 警察の設定処理
+void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest);		// 警察の設定処理
 void HitPolice(Police *pPolice, int nDamage);												// 警察のダメージ判定
-void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth);	// 警察との当たり判定
+void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// 警察との当たり判定
 Police *GetPoliceData(void);																// 警察の取得処理
+void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// 車の停止処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

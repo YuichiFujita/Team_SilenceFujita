@@ -19,35 +19,34 @@
 #include "sound.h"
 
 #include "meshfield.h"
+#include "Police.h"
 
 //************************************************************
 //	マクロ定義
 //************************************************************
 #define MOVE_FORWARD	(0.1f)		// プレイヤー前進時の移動量
 #define MOVE_BACKWARD	(0.2f)		// プレイヤー後退時の移動量
-#define MOVE_ROT		(0.013f)	// プレイヤーの向き変更量
-#define REV_MOVE_ROT	(0.09f)		// 移動量による向き変更量の補正係数
+#define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
+#define REV_MOVE_ROT	(0.085f)	// 移動量による向き変更量の補正係数
 #define SUB_MOVE_VALUE	(10.0f)		// 向き変更時の減速が行われる移動量
 #define SUB_MOVE		(0.2f)		// 向き変更時の減速量
-
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
-#define MAX_FORWARD		(35.0f)		// 前進時の最高速度
-#define MAX_BACKWARD	(-8.0f)		// 後退時の最高速度
+#define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
 
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
-void MovePlayer(void);	// プレイヤーの移動量の更新処理
-void PosPlayer(void);	// プレイヤーの位置の更新処理
-void RevPlayer(void);	// プレイヤーの補正の更新処理
-void LandPlayer(void);	// プレイヤーの着地の更新処理
-void CameraChangePlayer(void);		//プレイヤーのカメラの状態変化処理
+void MovePlayer(void);				// プレイヤーの移動量の更新処理
+void PosPlayer(void);				// プレイヤーの位置の更新処理
+void RevPlayer(void);				// プレイヤーの補正の更新処理
+void LandPlayer(void);				// プレイヤーの着地の更新処理
+void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
 
 //************************************************************
 //	グローバル変数
 //************************************************************
-Player g_player;		// プレイヤー情報
+Player g_player;	// プレイヤー情報
 
 //============================================================
 //	プレイヤーの初期化処理
@@ -69,7 +68,8 @@ void InitPlayer(void)
 	g_player.nShadowID     = NONE_SHADOW;					// 影のインデックス
 	g_player.bMove         = false;							// 移動状況
 	g_player.bJump         = false;							// ジャンプ状況
-	g_player.nCameraState  = PLAYERCAME_NORMAL;				//プレイヤーのカメラ
+	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;			// カメラの状態
+	g_player.bCameraFirst  = false;							// 一人称カメラの状況
 	g_player.bUse          = false;							// 使用状況
 
 	// モデル情報の初期化
@@ -139,8 +139,18 @@ void UpdatePlayer(void)
 		// プレイヤーの着地の更新処理
 		LandPlayer();
 
-		////プレイヤーのカメラの状態変化処理
-		//CameraChangePlayer();
+		//プレイヤーのカメラの状態変化処理
+		CameraChangePlayer();
+
+		// 車の停止処理
+		CollisionStopCar
+		( // 引数
+			g_player.pos,				//位置
+			g_player.rot,				//向き
+			&g_player.move,				//移動量
+			g_player.modelData.fRadius,	//半径
+			COLLOBJECTTYPE_PLAYER		//対象のタイプ
+		);
 
 		//----------------------------------------------------
 		//	当たり判定
@@ -152,6 +162,15 @@ void UpdatePlayer(void)
 			&g_player.oldPos,	// 前回の位置
 			PLAY_WIDTH,			// 横幅
 			PLAY_DEPTH			// 奥行
+		);
+
+		// 警察との当たり判定
+		CollisionPolice
+		( // 引数
+			&g_player.pos,		//現在の位置
+			&g_player.oldPos,	//前回の位置
+			PLAY_WIDTH,			//横幅
+			PLAY_DEPTH			//奥行
 		);
 
 		//----------------------------------------------------
@@ -544,29 +563,21 @@ Player *GetPlayer(void)
 }
 
 //============================================================
-//プレイヤーのカメラの状態変化処理
+//	プレイヤーのカメラの状態変化処理
 //============================================================
 void CameraChangePlayer(void)
 {
-	Camera *pCamera = GetCamera();
-
 	if (GetKeyboardTrigger(DIK_J) == true)
-	{//Jキーを押した場合
-		//カメラの状態を変える
-		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYERCAME_MAX;
+	{ // Jキーを押した場合
+		// カメラの状態を変える
+		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYCAMESTATE_MAX;
+	}
 
-		if (g_player.nCameraState == PLAYERCAME_NORMAL)
-		{
-			// 目標の注視点の位置を更新
-			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * 25.0f;	// プレイヤーの位置より少し前
-			pCamera->posR.y = g_player.pos.y + 110.0f;									// プレイヤーの位置と同じ
-			pCamera->posR.z = g_player.pos.z + cosf(g_player.rot.y + D3DX_PI) * 25.0f;	// プレイヤーの位置より少し前
+	if (GetKeyboardTrigger(DIK_K) == true)
+	{ // Kキーを押した場合
 
-			// 目標の視点の位置を更新
-			pCamera->posV.x = pCamera->posR.x + ((pCamera->fDis * sinf(pCamera->rot.x)) * sinf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
-			pCamera->posV.y = 200.0f;																				// 固定の高さ
-			pCamera->posV.z = pCamera->posR.z + ((pCamera->fDis * sinf(pCamera->rot.x)) * cosf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
-		}
+		// 一人称カメラの状況を変える
+		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
 	}
 }
 

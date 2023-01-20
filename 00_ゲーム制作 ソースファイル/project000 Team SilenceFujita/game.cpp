@@ -17,6 +17,7 @@
 #include "billboard.h"
 #include "camera.h"
 #include "effect.h"
+#include "life.h"
 #include "light.h"
 #include "meshfield.h"
 #include "meshwall.h"
@@ -26,11 +27,16 @@
 #include "object.h"
 #include "player.h"
 #include "Police.h"
+#include "score.h"
+#include "timer.h"
+#include "velocity.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
 #include "SoundDJ.h"
 #endif
+
+#include "bomb.h"
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -54,8 +60,9 @@ void InitGame(void)
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
 	g_nGameMode         = GAMEMODE_PLAY;		// エディットの ON / OFF
+
 #ifdef _DEBUG	// デバッグ処理
-	g_nSoundDJ			= FUJITA_DJ_LABEL_ONE;	//サウンドを初期化する
+	g_nSoundDJ = FUJITA_DJ_LABEL_ONE;			// サウンドを初期化する
 #endif
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -66,6 +73,9 @@ void InitGame(void)
 
 	// プレイヤーの初期化
 	InitPlayer();
+
+	// 警察の初期化
+	InitPolice();
 
 	// オブジェクトの初期化
 	InitObject();
@@ -91,11 +101,20 @@ void InitGame(void)
 	// パーティクルの初期化
 	InitParticle();
 
+	// 体力バーの初期化
+	InitLife();
+
+	// タイマーの初期化
+	InitTimer();
+
+	// 速度バーの初期化
+	InitVelocity();
+
+	// スコアの初期化
+	InitScore();
+
 	// ポーズの初期化
 	InitPause();
-
-	// 警察の初期化
-	//InitPolice();
 
 	// ステージのセットアップ
 	TxtSetStage();
@@ -104,6 +123,10 @@ void InitGame(void)
 	// エディットメインの初期化
 	InitEditmain();
 #endif
+
+
+	// 爆弾の初期化
+	InitBomb();
 }
 
 //======================================================================================================================
@@ -116,6 +139,9 @@ void UninitGame(void)
 
 	// プレイヤーの終了
 	UninitPlayer();
+
+	// 警察の終了
+	UninitPolice();
 
 	// オブジェクトの終了
 	UninitObject();
@@ -141,16 +167,29 @@ void UninitGame(void)
 	// パーティクルの終了
 	UninitParticle();
 
+	// 体力バーの終了
+	UninitLife();
+
+	// タイマーの終了
+	UninitTimer();
+
+	// 速度バーの終了
+	UninitVelocity();
+
+	// スコアの終了
+	UninitScore();
+
 	// ポーズの終了
 	UninitPause();
-
-	// 警察の終了
-	//UninitPolice();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
 	UninitEditmain();
 #endif
+
+
+	// 爆弾の終了
+	UninitBomb();
 }
 
 //======================================================================================================================
@@ -207,17 +246,14 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
-	// カメラの更新
-	UpdateCamera();
-
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
 		// エディットメインの更新
 		UpdateEditmain();
 
-		// 警察の更新
-		//UpdatePolice();
+		// カメラの更新
+		UpdateCamera();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -234,6 +270,9 @@ void UpdateGame(void)
 			// プレイヤーの更新
 			UpdatePlayer();
 
+			// 警察の更新
+			UpdatePolice();
+
 			// オブジェクトの更新
 			UpdateObject();
 		}
@@ -244,6 +283,9 @@ void UpdateGame(void)
 			UpdatePause();
 		}
 	}
+
+	// カメラの更新
+	UpdateCamera();
 
 	if (GetKeyboardTrigger(DIK_F5) == true)
 	{ // [F5] が押された場合
@@ -277,6 +319,18 @@ void UpdateGame(void)
 
 	// パーティクルの更新
 	UpdateParticle();
+
+	// 体力バーの更新
+	UpdateLife();
+
+	// タイマーの更新
+	UpdateTimer();
+
+	// 速度バーの更新
+	UpdateVelocity();
+
+	// スコアの更新
+	UpdateScore();
 
 	// 影の更新
 	UpdateShadow();
@@ -312,20 +366,32 @@ void UpdateGame(void)
 		// プレイヤーの更新
 		UpdatePlayer();
 
+		// 警察の更新
+		UpdatePolice();
+
 		// オブジェクトの更新
 		UpdateObject();
 
 		// ビルボードの更新
 		UpdateBillboard();
 
-		// 警察の更新
-		//UpdatePolice();
-
 		// エフェクトの更新
 		UpdateEffect();
 
 		// パーティクルの更新
 		UpdateParticle();
+
+		// 体力バーの更新
+		UpdateLife();
+
+		// タイマーの更新
+		UpdateTimer();
+
+		// 速度バーの更新
+		UpdateVelocity();
+
+		// スコアの更新
+		UpdateScore();
 
 		// 影の更新
 		UpdateShadow();
@@ -337,6 +403,10 @@ void UpdateGame(void)
 		UpdatePause();
 	}
 #endif
+
+
+	// 爆弾の更新
+	UpdateBomb();
 }
 
 //======================================================================================================================
@@ -359,20 +429,32 @@ void DrawGame(void)
 	// プレイヤーの描画
 	DrawPlayer();
 
+	// 警察の描画
+	DrawPolice();
+
 	// オブジェクトの描画
 	DrawObject();
 
 	// ビルボードの描画
 	DrawBillboard();
 
-	// 警察の描画
-	//DrawPolice();
-
 	// エフェクトの描画
 	DrawEffect();
 
 	// パーティクルの描画
 	DrawParticle();
+
+	// 体力バーの描画
+	DrawLife();
+
+	// タイマーの描画
+	DrawTimer();
+
+	// 速度バーの描画
+	DrawVelocity();
+
+	// スコアの描画
+	DrawScore();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合
@@ -389,6 +471,10 @@ void DrawGame(void)
 		DrawEditmain();
 	}
 #endif
+
+
+	// 爆弾の描画
+	DrawBomb();
 }
 
 //======================================================================================================================
