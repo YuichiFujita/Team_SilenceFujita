@@ -10,11 +10,21 @@
 #include "main.h"
 #include "velocity.h"
 #include "player.h"
+#include "value.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
 #define MAX_VELO		(3)			// 使用するポリゴン数
+
+#define VAL_VELO_WIDTH	(30.0f)		// スコアの数値の横幅 / 2
+#define VAL_VELO_HEIGHT	(30.0f)		// スコアの数値の縦幅 / 2
+#define VAL_VELO_SPACE	(47.0f)		// スコアの数値間の幅 (x)
+#define VAL_VELO_DIGIT	(3)			// スコアの数値間の幅 (x)
+
+#define VELO_POS_VAL_X	(200.0f)	// スコア (値) の絶対座標 (x)
+#define VELO_POS_VAL_Y	(600.0f)	// スコアの絶対座標 (y)
+#define MAX_SPEED		(180)		// 表示上の最高速度
 
 #define VELO_POS_X		(70.0f)		// 速度バーの絶対座標 (x)
 #define VELO_POS_Y		(655.0f)	// 速度バーの絶対座標 (y)
@@ -227,6 +237,7 @@ void DrawVelocity(void)
 {
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
 
 	// 頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0, g_pVtxBuffVelocity, 0, sizeof(VERTEX_2D));
@@ -243,4 +254,27 @@ void DrawVelocity(void)
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntVelocity * 4, 2);
 	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	数値の描画
+	//------------------------------------------------------------------------------------------------------------------
+	// 数値の設定
+	SetValue
+	( // 引数
+		D3DXVECTOR3
+		( // 引数
+			VELO_POS_VAL_X,	// 位置 (x)
+			VELO_POS_VAL_Y,	// 位置 (y)
+			0.0f			// 位置 (z)
+		),
+		(int)(fabsf(pPlayer->move.x) * (MAX_SPEED / MAX_FORWARD)),	// 値
+		MAX_SPEED,			// 値の最大値
+		VAL_VELO_WIDTH,		// 横幅
+		VAL_VELO_HEIGHT,	// 縦幅
+		VAL_VELO_SPACE,		// 数値間の幅
+		1.0f				// α値
+	);
+
+	// 数値の描画
+	DrawValue(VAL_VELO_DIGIT, VALUETYPE_NORMAL);
 }
