@@ -101,11 +101,11 @@ void InitPolice(void)
 	}
 
 	//警察の設定処理
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 800.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 600.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 400.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
+	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //======================================================================================================================
@@ -121,7 +121,6 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
-#if 0
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
@@ -140,20 +139,27 @@ void UpdatePolice(void)
 			SetPositionShadow
 			( // 引数
 				g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
-				g_aPolice[nCntPolice].pos,		// 位置
-				g_aPolice[nCntPolice].rot,		// 向き
-				NONE_SCALE			// 拡大率
+				g_aPolice[nCntPolice].pos,			// 位置
+				g_aPolice[nCntPolice].rot,			// 向き
+				NONE_SCALE							// 拡大率
 			);
 
 			switch (g_aPolice[nCntPolice].state)
 			{//状態で判断する
-			case POLICESTATE_PATROL:		//パトロール状態
+			case POLICESTATE_PATROL:				//パトロール状態
 
 				// 警察のパトロール行動処理
 				PatrolPoliceAct(&g_aPolice[nCntPolice]);
 
 				// 車の停止処理
-				CollisionStopCar(&g_aPolice[nCntPolice].pos, g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].modelData.fRadius);
+				CollisionStopCar
+				( // 引数
+					g_aPolice[nCntPolice].pos,		//位置
+					g_aPolice[nCntPolice].rot,		//向き
+					&g_aPolice[nCntPolice].move,	//移動量
+					g_aPolice[nCntPolice].modelData.fRadius,	//半径
+					COLLOBJECTTYPE_POLICE			//対象のサイズ
+				);
 
 				break;						//抜け出す
 
@@ -185,8 +191,7 @@ void UpdatePolice(void)
 				&g_aPolice[nCntPolice].pos,		// 現在の位置
 				&g_aPolice[nCntPolice].posOld,	// 前回の位置
 				POLICAR_WIDTH,					// 横幅
-				POLICAR_HEIGHT,					// 奥行
-				&g_aPolice[nCntPolice].move.x	// 移動量
+				POLICAR_HEIGHT					// 奥行	
 			);
 
 			if (g_aPolice[nCntPolice].pos.y < 0.0f)
@@ -202,7 +207,6 @@ void UpdatePolice(void)
 			RevPlayer(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
 		}
 	}
-#endif
 }
 
 //======================================================================================================================
@@ -375,7 +379,7 @@ void HitPolice(Police *pPolice, int nDamage)
 //======================================================================================================================
 //	オブジェクトとの当たり判定
 //======================================================================================================================
-void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth, float *pMove)
+void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth)
 {
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -877,9 +881,9 @@ void ChasePoliceAct(Police *pPolice)
 //============================================================
 // 車の停止処理
 //============================================================
-void CollisionStopCar(D3DXVECTOR3 *targetpos, D3DXVECTOR3 targetrot, float fTargetRadius)
+void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject)
 {
-	D3DXVECTOR3 stopCarpos = D3DXVECTOR3(targetpos->x + sinf(targetrot.y) * 300.0f, 0.0f, targetpos->z + cosf(targetrot.y) * 300.0f);				// 止まる車の位置
+	D3DXVECTOR3 stopCarpos = D3DXVECTOR3(targetpos.x + sinf(targetrot.y) * 300.0f, 0.0f, targetpos.z + cosf(targetrot.y) * 300.0f);				// 止まる車の位置
 
 	float fLength;										// 長さの変数
 
@@ -894,9 +898,10 @@ void CollisionStopCar(D3DXVECTOR3 *targetpos, D3DXVECTOR3 targetrot, float fTarg
 				fLength = (pPolice->pos.x - stopCarpos.x) * (pPolice->pos.x - stopCarpos.x)
 					+ (pPolice->pos.z - stopCarpos.z) * (pPolice->pos.z - stopCarpos.z);
 
-				if (fLength <= (pPolice->modelData.fRadius * fTargetRadius))
+				if (fLength <= (pPolice->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
 				{ // オブジェクトが当たっている
-					
+					// 目標の移動量をセーブする
+					move->x += (0.0f - move->x) * 0.5f;
 				}
 			}
 		}
@@ -911,9 +916,10 @@ void CollisionStopCar(D3DXVECTOR3 *targetpos, D3DXVECTOR3 targetrot, float fTarg
 			fLength = (pPlayer->pos.x - stopCarpos.x) * (pPlayer->pos.x - stopCarpos.x)
 				+ (pPlayer->pos.z - stopCarpos.z) * (pPlayer->pos.z - stopCarpos.z);
 
-			if (fLength <= (pPlayer->modelData.fRadius * fTargetRadius))
+			if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
 			{ // オブジェクトが当たっている
-				
+				// 目標の移動量をセーブする
+				move->x += (0.0f - move->x) * 0.5f;
 			}
 		}
 	}

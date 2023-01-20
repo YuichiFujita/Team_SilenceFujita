@@ -246,14 +246,14 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
-	// カメラの更新
-	UpdateCamera();
-
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
 		// エディットメインの更新
 		UpdateEditmain();
+
+		// カメラの更新
+		UpdateCamera();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -283,6 +283,9 @@ void UpdateGame(void)
 			UpdatePause();
 		}
 	}
+
+	// カメラの更新
+	UpdateCamera();
 
 	if (GetKeyboardTrigger(DIK_F5) == true)
 	{ // [F5] が押された場合
@@ -442,16 +445,16 @@ void DrawGame(void)
 	DrawParticle();
 
 	// 体力バーの描画
-	DrawLife();
+	//DrawLife();
 
 	// タイマーの描画
-	DrawTimer();
+	//DrawTimer();
 
 	// 速度バーの描画
-	DrawVelocity();
+	//DrawVelocity();
 
 	// スコアの描画
-	DrawScore();
+	//DrawScore();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合

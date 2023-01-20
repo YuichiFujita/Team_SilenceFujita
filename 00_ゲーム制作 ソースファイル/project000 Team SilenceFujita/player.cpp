@@ -68,7 +68,8 @@ void InitPlayer(void)
 	g_player.nShadowID     = NONE_SHADOW;					// 影のインデックス
 	g_player.bMove         = false;							// 移動状況
 	g_player.bJump         = false;							// ジャンプ状況
-	g_player.nCameraState  = PLAYERCAME_NORMAL;				//プレイヤーのカメラ
+	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;			// カメラの状態
+	g_player.bCameraFirst  = false;							// 一人称カメラの状況
 	g_player.bUse          = false;							// 使用状況
 
 	// モデル情報の初期化
@@ -142,7 +143,14 @@ void UpdatePlayer(void)
 		CameraChangePlayer();
 
 		// 車の停止処理
-		CollisionStopCar(&g_player.pos, g_player.rot, g_player.modelData.fRadius);
+		CollisionStopCar
+		( // 引数
+			g_player.pos,				//位置
+			g_player.rot,				//向き
+			&g_player.move,				//移動量
+			g_player.modelData.fRadius,	//半径
+			COLLOBJECTTYPE_PLAYER		//対象のタイプ
+		);
 
 		//----------------------------------------------------
 		//	当たり判定
@@ -154,6 +162,15 @@ void UpdatePlayer(void)
 			&g_player.oldPos,	// 前回の位置
 			PLAY_WIDTH,			// 横幅
 			PLAY_DEPTH			// 奥行
+		);
+
+		// 警察との当たり判定
+		CollisionPolice
+		( // 引数
+			&g_player.pos,		//現在の位置
+			&g_player.oldPos,	//前回の位置
+			PLAY_WIDTH,			//横幅
+			PLAY_DEPTH			//奥行
 		);
 
 		//----------------------------------------------------
@@ -552,9 +569,15 @@ void CameraChangePlayer(void)
 {
 	if (GetKeyboardTrigger(DIK_J) == true)
 	{ // Jキーを押した場合
-
 		// カメラの状態を変える
-		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYERCAME_MAX;
+		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYCAMESTATE_MAX;
+	}
+
+	if (GetKeyboardTrigger(DIK_K) == true)
+	{ // Kキーを押した場合
+
+		// 一人称カメラの状況を変える
+		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
 	}
 }
 

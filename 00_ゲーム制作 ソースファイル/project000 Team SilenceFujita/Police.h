@@ -44,6 +44,16 @@ typedef enum
 }POLICEDEST;
 
 //**********************************************************************************************************************
+//	ぶつかったもののタイプ
+//**********************************************************************************************************************
+typedef enum
+{
+	COLLOBJECTTYPE_PLAYER = 0,			//プレイヤー
+	COLLOBJECTTYPE_POLICE,				//警察
+	COLLOBJECTTYPE_MAX					//この列挙型の総数
+}COLLOBJECTTYPE;
+
+//**********************************************************************************************************************
 //	警察車両の曲がり角
 //**********************************************************************************************************************
 typedef struct
@@ -84,9 +94,9 @@ void UpdatePolice(void);				// 警察の更新処理
 void DrawPolice(void);					// 警察の描画処理
 void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest);		// 警察の設定処理
 void HitPolice(Police *pPolice, int nDamage);												// 警察のダメージ判定
-void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth, float *move); 	// 警察との当たり判定
+void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// 警察との当たり判定
 Police *GetPoliceData(void);																// 警察の取得処理
-void CollisionStopCar(D3DXVECTOR3 *targetpos, D3DXVECTOR3 targetrot, float fTargetRadius);	// 車の停止処理
+void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// 車の停止処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
