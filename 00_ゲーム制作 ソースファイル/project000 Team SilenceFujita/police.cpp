@@ -199,7 +199,7 @@ void UpdatePolice(void)
 				&g_aPolice[nCntPolice].pos,		// 現在の位置
 				&g_aPolice[nCntPolice].posOld,	// 前回の位置
 				POLICAR_WIDTH,					// 横幅
-				POLICAR_HEIGHT					// 奥行
+				POLICAR_HEIGHT					// 奥行	
 			);
 
 			if (g_aPolice[nCntPolice].pos.y < 0.0f)
