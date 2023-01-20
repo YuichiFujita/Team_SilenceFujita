@@ -16,7 +16,7 @@
 
 //プロトタイプ宣言
 void TypeChangeEditBillboard(void);						//種類変更処理
-void MoveEditBillboard(float Camerarot);				//移動処理
+void MoveEditBillboard(void);							//移動処理
 void SetEditBillboard(D3DXVECTOR3 rot);					//ビルボードの設定処理
 void DeleteEditBillboard(void);							//ビルボードの削除処理
 void ScaleBillboardX(void);								//ビルボードの拡大縮小処理(X軸)
@@ -215,7 +215,7 @@ void UpdateEditBillboard(void)
 	TypeChangeEditBillboard();
 
 	//移動処理
-	MoveEditBillboard(pCamera->rot.y);
+	MoveEditBillboard();
 
 	//ビルボードの削除処理
 	DeleteEditBillboard();
@@ -382,7 +382,7 @@ void TypeChangeEditBillboard(void)
 //=======================================
 //移動処理
 //=======================================
-void MoveEditBillboard(float Camerarot)
+void MoveEditBillboard(void)
 {
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{//左シフトキーが押されていた場合
@@ -390,34 +390,62 @@ void MoveEditBillboard(float Camerarot)
 		return;
 	}
 
-	if (g_nStyleBillboard == EDITSTYLE_BILLBOARD)
-	{//ビルボード設置モードだった場合
-		if (GetKeyboardPress(DIK_W) == true)
-		{//Wキーを押した場合
-			//位置を奥に進める
-			g_EditBillboard.pos.x += sinf(Camerarot) * 5.0f;
-			g_EditBillboard.pos.z += cosf(Camerarot) * 5.0f;
-		}
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左コントロールキーを押していた場合
+		if (g_nStyleBillboard == EDITSTYLE_BILLBOARD)
+		{//ビルボード設置モードだった場合
+			if (GetKeyboardTrigger(DIK_W) == true)
+			{//Wキーを押した場合
+				//位置を奥に進める
+				g_EditBillboard.pos.z += 4.0f;
+			}
 
-		if (GetKeyboardPress(DIK_S) == true)
-		{//Sキーを押した場合
-			//位置を手前に進める
-			g_EditBillboard.pos.x += -sinf(Camerarot) * 5.0f;
-			g_EditBillboard.pos.z += -cosf(Camerarot) * 5.0f;
-		}
+			if (GetKeyboardTrigger(DIK_S) == true)
+			{//Sキーを押した場合
+				//位置を手前に進める
+				g_EditBillboard.pos.z -= 4.0f;
+			}
 
-		if (GetKeyboardPress(DIK_A) == true)
-		{//Aキーを押した場合
-			//位置を左に進める
-			g_EditBillboard.pos.x += sinf(-D3DX_PI * 0.5f - Camerarot) * 5.0f;
-			g_EditBillboard.pos.z += -cosf(-D3DX_PI * 0.5f - Camerarot) * 5.0f;
-		}
+			if (GetKeyboardTrigger(DIK_A) == true)
+			{//Aキーを押した場合
+				//位置を左に進める
+				g_EditBillboard.pos.x -= 4.0f;
+			}
 
-		if (GetKeyboardPress(DIK_D) == true)
-		{//Dキーを押した場合
-			//位置を右に進める
-			g_EditBillboard.pos.x += sinf(D3DX_PI * 0.5f - Camerarot) * 5.0f;
-			g_EditBillboard.pos.z += -cosf(D3DX_PI * 0.5f - Camerarot) * 5.0f;
+			if (GetKeyboardTrigger(DIK_D) == true)
+			{//Dキーを押した場合
+				//位置を右に進める
+				g_EditBillboard.pos.x += 4.0f;
+			}
+		}
+	}
+	else
+	{//左コントロールキーを押していない場合
+		if (g_nStyleBillboard == EDITSTYLE_BILLBOARD)
+		{//ビルボード設置モードだった場合
+			if (GetKeyboardPress(DIK_W) == true)
+			{//Wキーを押した場合
+				//位置を奥に進める
+				g_EditBillboard.pos.z += 16.0f;
+			}
+
+			if (GetKeyboardPress(DIK_S) == true)
+			{//Sキーを押した場合
+				//位置を手前に進める
+				g_EditBillboard.pos.z -= 16.0f;
+			}
+
+			if (GetKeyboardPress(DIK_A) == true)
+			{//Aキーを押した場合
+				//位置を左に進める
+				g_EditBillboard.pos.x -= 16.0f;
+			}
+
+			if (GetKeyboardPress(DIK_D) == true)
+			{//Dキーを押した場合
+				//位置を右に進める
+				g_EditBillboard.pos.x += 16.0f;
+			}
 		}
 	}
 }
@@ -854,23 +882,40 @@ void UpDownEditBillboard(void)
 {
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{//左SHIFTキーを押している場合
-		if (GetKeyboardPress(DIK_W) == true)
-		{//Wキーを押している場合
-			//位置を奥に進める
-			g_EditBillboard.pos.y += 1.0f;
-		}
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_W) == true)
+			{//Wキーを押している場合
+				//位置を奥に進める
+				g_EditBillboard.pos.y += 2.0f;
+			}
 
-		if (GetKeyboardPress(DIK_S) == true)
-		{//Sキーを押している場合
-			//位置を手前に進める
-			g_EditBillboard.pos.y -= 1.0f;
+			if (GetKeyboardTrigger(DIK_S) == true)
+			{//Sキーを押している場合
+				//位置を手前に進める
+				g_EditBillboard.pos.y -= 2.0f;
+			}
 		}
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_W) == true)
+			{//Wキーを押している場合
+				//位置を奥に進める
+				g_EditBillboard.pos.y += 6.0f;
+			}
 
-		if (GetKeyboardTrigger(DIK_A) == true || GetKeyboardTrigger(DIK_D) == true)
-		{//AキーかDキーを押した場合
-			//地面に戻す
-			g_EditBillboard.pos.y = 0.0f;
+			if (GetKeyboardPress(DIK_S) == true)
+			{//Sキーを押している場合
+				//位置を手前に進める
+				g_EditBillboard.pos.y -= 6.0f;
+			}
 		}
+	}
+
+	if (GetKeyboardTrigger(DIK_A) == true || GetKeyboardTrigger(DIK_D) == true)
+	{//AキーかDキーを押した場合
+		//地面に戻す
+		g_EditBillboard.pos.y = 0.0f;
 	}
 }
 

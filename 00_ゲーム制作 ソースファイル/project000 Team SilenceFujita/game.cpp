@@ -265,9 +265,6 @@ void UpdateGame(void)
 
 			// オブジェクトの更新
 			UpdateObject();
-
-			// カメラの更新
-			UpdateCamera();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -276,6 +273,9 @@ void UpdateGame(void)
 			UpdatePause();
 		}
 	}
+
+	// カメラの更新
+	UpdateCamera();
 
 	if (GetKeyboardTrigger(DIK_F5) == true)
 	{ // [F5] が押された場合
