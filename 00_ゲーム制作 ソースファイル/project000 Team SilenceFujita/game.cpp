@@ -365,8 +365,11 @@ void DrawGame(void)
 	// ビルボードの描画
 	DrawBillboard();
 
+#if 0
+
 	// 警察の描画
 	DrawPolice();
+#endif // 0
 
 	// エフェクトの描画
 	DrawEffect();

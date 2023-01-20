@@ -1458,6 +1458,7 @@ void DrawDebugControlBillboard(void)
 //==============================================
 void DrawDebugPolice(void)
 {
+#if 0
 	// 変数を宣言
 	RECT rect =
 	{ // 初期値
@@ -1486,5 +1487,6 @@ void DrawDebugPolice(void)
 
 	// テキストの描画
 	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
+#endif
 }
 #endif

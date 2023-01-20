@@ -111,6 +111,8 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
+#if 0
+
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
@@ -187,6 +189,7 @@ void UpdatePolice(void)
 			RevPlayer(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
 		}
 	}
+#endif
 }
 
 //======================================================================================================================
