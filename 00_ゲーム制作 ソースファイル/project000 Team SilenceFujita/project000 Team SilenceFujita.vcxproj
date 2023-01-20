@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
+    <ClCompile Include="calculation.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="EditBillboard.cpp" />
     <ClCompile Include="Editmain.cpp" />
@@ -187,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />
+    <ClInclude Include="calculation.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="EditBillboard.h" />
     <ClInclude Include="Editmain.h" />
