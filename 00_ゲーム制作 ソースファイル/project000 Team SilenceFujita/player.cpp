@@ -546,28 +546,11 @@ Player *GetPlayer(void)
 //============================================================
 void CameraChangePlayer(void)
 {
-	// ポインタを宣言
-	Camera *pCamera = GetCamera();	// カメラの情報
-
 	if (GetKeyboardTrigger(DIK_J) == true)
 	{ // Jキーを押した場合
 
 		// カメラの状態を変える
 		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYERCAME_MAX;
-
-		if (g_player.nCameraState == PLAYERCAME_NORMAL)
-		{
-
-			// 目標の注視点の位置を更新
-			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * 25.0f;	// プレイヤーの位置より少し前
-			pCamera->posR.y = g_player.pos.y + 110.0f;									// プレイヤーの位置と同じ
-			pCamera->posR.z = g_player.pos.z + cosf(g_player.rot.y + D3DX_PI) * 25.0f;	// プレイヤーの位置より少し前
-
-			// 目標の視点の位置を更新
-			pCamera->posV.x = pCamera->posR.x + ((pCamera->fDis * sinf(pCamera->rot.x)) * sinf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
-			pCamera->posV.y = 200.0f;																				// 固定の高さ
-			pCamera->posV.z = pCamera->posR.z + ((pCamera->fDis * sinf(pCamera->rot.x)) * cosf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
-		}
 	}
 }
 

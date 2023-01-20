@@ -222,8 +222,20 @@ void MoveFollowCamera(void)
 
 		// 目標の視点の位置を更新
 		g_camera.posV.x = g_camera.posR.x - ((g_camera.fDis * sinf(g_camera.rot.x)) * sinf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
-		g_camera.posV.y = POS_V_Y;																					// 固定の高さ
+		g_camera.posV.y = POS_V_Y;																				// 固定の高さ
 		g_camera.posV.z = g_camera.posR.z - ((g_camera.fDis * sinf(g_camera.rot.x)) * cosf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+	}
+	else if (pPlayer->nCameraState == PLAYERCAME_FIRST)
+	{ // 一人称カメラだった場合
+		// 目標の視点の位置を更新
+		g_camera.posV.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * 50.0f;				// 目標注視点から距離分離れた位置
+		g_camera.posV.y = pPlayer->pos.y + 80.0f;		// 固定の高さ
+		g_camera.posV.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * 50.0f;				// 目標注視点から距離分離れた位置
+
+		// 目標の注始点を更新する
+		g_camera.posR.x = g_camera.posV.x - ((g_camera.fDis * sinf(g_camera.rot.x)) * sinf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+		g_camera.posR.y = g_camera.posV.y;				// 視点と同じ高さ
+		g_camera.posR.z = g_camera.posV.z - ((g_camera.fDis * sinf(g_camera.rot.x)) * cosf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
 	}
 
 	// カメラの向きをプレイヤーの向きに合わせる

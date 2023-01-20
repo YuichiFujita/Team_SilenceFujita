@@ -32,6 +32,7 @@ typedef enum
 {
 	PLAYERCAME_NORMAL = 0,		//通常のカメラ
 	PLAYERCAME_BACK,			//後ろを観るカメラ
+	PLAYERCAME_FIRST,			//一人称カメラ
 	PLAYERCAME_MAX				//この列挙型の総数
 }PLAYCAMESTATE;
 
