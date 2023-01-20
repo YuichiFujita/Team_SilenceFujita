@@ -241,9 +241,6 @@ void UpdateGame(void)
 
 		// エディットメインの更新
 		UpdateEditmain();
-
-		// 警察の更新
-		UpdatePolice();
 	}
 	else
 	{ // ゲームモードだった場合
