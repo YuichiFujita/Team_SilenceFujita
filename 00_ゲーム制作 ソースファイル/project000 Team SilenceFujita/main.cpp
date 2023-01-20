@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 #include "model.h"
+#include "value.h"
 #include "sound.h"
 #include "fade.h"
 
@@ -435,6 +436,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		return E_FAIL;
 	}
 
+	// 数値の初期化
+	InitValue();
+
 	// サウンドの初期化
 	InitSound(hWnd);
 
@@ -463,6 +467,9 @@ void Uninit(void)
 
 	// モデルの終了
 	UninitModel();
+
+	// 数値の終了
+	UninitValue();
 
 	// サウンドの終了
 	UninitSound();
@@ -1124,6 +1131,7 @@ void DrawDebug(void)
 	float       cameraDis    = GetCameraDis();		// カメラの距離
 	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
+	Police *pPolice = GetPoliceData();				//警察の情報を取得する
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1150,7 +1158,11 @@ void DrawDebug(void)
 		"　 [カメラ注視点] %.1f, %.1f, %.1f\n"
 		"　 [ カメラ向き ] %.1f, %.1f, %.1f\n"
 		"　 [ カメラ距離 ] %.1f\n"
-		"　 [エフェクト数] %-4d　 [パーティクル数] %-3d\n",
+		"　 [エフェクト数] %-4d　 [パーティクル数] %-3d\n"
+		"   ---------------------------------------------　\n"
+		"   警察の向き：[%d]\n"
+		"   警察の位置：[%.3f,%.3f,%.3f]\n"
+		"   警察のスピード：[%.3f,%.3f,%.3f]",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1163,7 +1175,10 @@ void DrawDebug(void)
 		cameraRot.z,		// カメラの向き (z)
 		cameraDis,			// カメラの距離
 		nNumEffect,			// エフェクトの総数
-		nNumParticle		// パーティクルの総数
+		nNumParticle,		// パーティクルの総数
+		(int)D3DXToDegree(pPolice->rot.y),
+		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
+		pPolice->move.x, pPolice->move.y, pPolice->move.z
 	);
 
 	//--------------------------------------------------------
@@ -1243,7 +1258,7 @@ void DrawDebug(void)
 		}
 
 		//警察のデバッグ表記
-		DrawDebugPolice();				
+		//DrawDebugPolice();				
 	}
 }
 
@@ -1453,40 +1468,15 @@ void DrawDebugControlBillboard(void)
 	// テキストの描画
 	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
+
+#if 1
 //==============================================
 //警察のデバッグ表記
 //==============================================
 void DrawDebugPolice(void)
 {
-#if 0
-	// 変数を宣言
-	RECT rect =
-	{ // 初期値
-		0,					// ウインドウの左上 X座標
-		500,				// ウインドウの左上 Y座標
-		SCREEN_WIDTH,		// ウインドウの幅
-		SCREEN_HEIGHT		// ウインドウの高さ
-	};
 
-	// 変数配列を宣言
-	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
-
-	Police *pPolice = GetPoliceData();	//警察の情報を取得する
-
-	// 文字列に代入
-	sprintf
-	( // 引数
-		&aDeb[0],
-		"\n警察の向き：[%d] 　"
-		"\n警察の位置：[%.3f,%.3f,%.3f] 　"
-		"\n警察のスピード：[%.3f,%.3f,%.3f]",
-		(int)D3DXToDegree(pPolice->rot.y),
-		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
-		pPolice->move.x, pPolice->move.y, pPolice->move.z
-	);
-
-	// テキストの描画
-	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
-#endif
 }
+#endif
+
 #endif

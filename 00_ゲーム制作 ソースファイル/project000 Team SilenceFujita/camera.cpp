@@ -187,29 +187,56 @@ void MoveFollowCamera(void)
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();		// プレイヤーの情報
 
-	// 目標の注視点の位置を更新
-	g_camera.destPosR.x = pPlayer->pos.x + sinf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
-	g_camera.destPosR.y = pPlayer->pos.y + POS_R_PLUS_Y;								// プレイヤーの位置と同じ
-	g_camera.destPosR.z = pPlayer->pos.z + cosf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+	if (pPlayer->nCameraState == PLAYERCAME_NORMAL)
+	{ // 通常のカメラの場合
+		// 目標の注視点の位置を更新
+		g_camera.destPosR.x = pPlayer->pos.x + sinf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+		g_camera.destPosR.y = pPlayer->pos.y + POS_R_PLUS_Y;								// プレイヤーの位置と同じ
+		g_camera.destPosR.z = pPlayer->pos.z + cosf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
 
-	// 目標の視点の位置を更新
-	g_camera.destPosV.x = g_camera.destPosR.x + ((g_camera.fDis * sinf(g_camera.rot.x)) * sinf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
-	g_camera.destPosV.y = POS_V_Y;																					// 固定の高さ
-	g_camera.destPosV.z = g_camera.destPosR.z + ((g_camera.fDis * sinf(g_camera.rot.x)) * cosf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+		// 目標の視点の位置を更新
+		g_camera.destPosV.x = g_camera.destPosR.x + ((g_camera.fDis * sinf(g_camera.rot.x)) * sinf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+		g_camera.destPosV.y = POS_V_Y;																					// 固定の高さ
+		g_camera.destPosV.z = g_camera.destPosR.z + ((g_camera.fDis * sinf(g_camera.rot.x)) * cosf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
 
-	// 目標の位置までの差分を計算
-	diffPosV = g_camera.destPosV - g_camera.posV;	// 視点
-	diffPosR = g_camera.destPosR - g_camera.posR;	// 注視点
+		// 目標の位置までの差分を計算
+		diffPosV = g_camera.destPosV - g_camera.posV;	// 視点
+		diffPosR = g_camera.destPosR - g_camera.posR;	// 注視点
 
-	// 視点の位置を更新
-	g_camera.posV.x += diffPosV.x * REV_POS_V;
-	g_camera.posV.y += diffPosV.y * REV_POS_V_Y;
-	g_camera.posV.z += diffPosV.z * REV_POS_V;
+		// 視点の位置を更新
+		g_camera.posV.x += diffPosV.x * REV_POS_V;
+		g_camera.posV.y += diffPosV.y * REV_POS_V_Y;
+		g_camera.posV.z += diffPosV.z * REV_POS_V;
 
-	// 注視点の位置を更新
-	g_camera.posR.x += diffPosR.x * REV_POS_R;
-	g_camera.posR.y += diffPosR.y * REV_POS_R_Y;
-	g_camera.posR.z += diffPosR.z * REV_POS_R;
+		// 注視点の位置を更新
+		g_camera.posR.x += diffPosR.x * REV_POS_R;
+		g_camera.posR.y += diffPosR.y * REV_POS_R_Y;
+		g_camera.posR.z += diffPosR.z * REV_POS_R;
+	}
+	else if (pPlayer->nCameraState == PLAYERCAME_BACK)
+	{ // 後ろを観るカメラだった場合
+		// 目標の注視点の位置を更新
+		g_camera.posR.x = pPlayer->pos.x + sinf(pPlayer->rot.y + D3DX_PI) * -80.0f;		// プレイヤーの位置より少し後ろ
+		g_camera.posR.y = pPlayer->pos.y + POS_R_PLUS_Y;								// プレイヤーの位置と同じ
+		g_camera.posR.z = pPlayer->pos.z + cosf(pPlayer->rot.y + D3DX_PI) * -80.0f;		// プレイヤーの位置より少し後ろ
+
+		// 目標の視点の位置を更新
+		g_camera.posV.x = g_camera.posR.x - ((g_camera.fDis * sinf(g_camera.rot.x)) * sinf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+		g_camera.posV.y = POS_V_Y;																				// 固定の高さ
+		g_camera.posV.z = g_camera.posR.z - ((g_camera.fDis * sinf(g_camera.rot.x)) * cosf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+	}
+	else if (pPlayer->nCameraState == PLAYERCAME_FIRST)
+	{ // 一人称カメラだった場合
+		// 目標の視点の位置を更新
+		g_camera.posV.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * 50.0f;				// 目標注視点から距離分離れた位置
+		g_camera.posV.y = pPlayer->pos.y + 80.0f;		// 固定の高さ
+		g_camera.posV.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * 50.0f;				// 目標注視点から距離分離れた位置
+
+		// 目標の注始点を更新する
+		g_camera.posR.x = g_camera.posV.x - ((g_camera.fDis * sinf(g_camera.rot.x)) * sinf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+		g_camera.posR.y = g_camera.posV.y;				// 視点と同じ高さ
+		g_camera.posR.z = g_camera.posV.z - ((g_camera.fDis * sinf(g_camera.rot.x)) * cosf(g_camera.rot.y));	// 目標注視点から距離分離れた位置
+	}
 
 	// カメラの向きをプレイヤーの向きに合わせる
 	g_camera.rot.y = pPlayer->rot.y;
