@@ -19,6 +19,7 @@
 #include "sound.h"
 
 #include "meshfield.h"
+#include "Police.h"
 
 //************************************************************
 //	マクロ定義
@@ -139,6 +140,9 @@ void UpdatePlayer(void)
 
 		//プレイヤーのカメラの状態変化処理
 		CameraChangePlayer();
+
+		// 車の停止処理
+		CollisionStopCar(&g_player.pos, g_player.rot, g_player.modelData.fRadius);
 
 		//----------------------------------------------------
 		//	当たり判定
