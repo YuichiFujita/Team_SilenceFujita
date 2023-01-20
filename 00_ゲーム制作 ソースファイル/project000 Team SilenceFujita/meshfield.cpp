@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
+#include "calculation.h"
 #include "meshfield.h"
 #include "player.h"
 
@@ -41,8 +42,6 @@ typedef enum
 //**********************************************************************************************************************
 void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, int nPartWidth, int nPartHeight, int nType);	// メッシュフィールドの設定処理
 void TxtSetMeshField(void);																										// メッシュフィールドのセットアップ処理
-
-float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos);	// 外積処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -356,11 +355,10 @@ void SetMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight,
 float CollisionMeshField(D3DXVECTOR3 pos)
 {
 	// 変数を宣言
-	float fLandPosY = GetLimitStage().fField;	// 着地予定の y座標
-	float fAngle, fLength;						// 頂点座標の計算用
+	float fLandPosY = GetLimitStage().fField;		// 着地予定の y座標
 
 	// 変数配列を宣言
-	D3DXVECTOR3 vexPos[4];	// 頂点位置
+	D3DXVECTOR3 vexPos[4];	// 頂点位置 ([※] 0：右上　1：左上　2：左下　3：右下)
 
 	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
 	{ // メッシュフィールドの最大表示数分繰り返す
@@ -368,28 +366,20 @@ float CollisionMeshField(D3DXVECTOR3 pos)
 		if (g_aMeshField[nCntMeshField].bUse == true)
 		{ // メッシュフィールドが使用されている場合
 
-			// 対角線の長さ、角度を求める
-			fAngle  = atan2f(g_aMeshField[nCntMeshField].fWidth, g_aMeshField[nCntMeshField].fHeight);
-			fLength = sqrtf((g_aMeshField[nCntMeshField].fWidth * g_aMeshField[nCntMeshField].fWidth) + (g_aMeshField[nCntMeshField].fHeight * g_aMeshField[nCntMeshField].fHeight)) * 0.5f;
+			// 四頂点の位置の計算
+			VecSizePos
+			( // 引数
+				&vexPos[0],
+				g_aMeshField[nCntMeshField].pos,	// 絶対座標
+				g_aMeshField[nCntMeshField].rot,	// 向き
+				g_aMeshField[nCntMeshField].fWidth,	// 横幅 / 2
+				g_aMeshField[nCntMeshField].fHeight	// 縦幅 / 2
+			);
 
-			// 頂点座標を求める
-			vexPos[0].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI + fAngle)) * fLength;
-			vexPos[0].y = g_aMeshField[nCntMeshField].pos.y;
-			vexPos[0].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI + fAngle)) * fLength;
-			vexPos[1].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI - fAngle)) * fLength;
-			vexPos[1].y = g_aMeshField[nCntMeshField].pos.y;
-			vexPos[1].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y + (D3DX_PI - fAngle)) * fLength;
-			vexPos[2].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y + fAngle) * fLength;
-			vexPos[2].y = g_aMeshField[nCntMeshField].pos.y;
-			vexPos[2].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y + fAngle) * fLength;
-			vexPos[3].x = g_aMeshField[nCntMeshField].pos.x + sinf(g_aMeshField[nCntMeshField].rot.y - fAngle) * fLength;
-			vexPos[3].y = g_aMeshField[nCntMeshField].pos.y;
-			vexPos[3].z = g_aMeshField[nCntMeshField].pos.z + cosf(g_aMeshField[nCntMeshField].rot.y - fAngle) * fLength;
-
-			if (OuterProduct(vexPos[0], vexPos[1], pos) < 0
-			&&  OuterProduct(vexPos[1], vexPos[2], pos) < 0
-			&&  OuterProduct(vexPos[2], vexPos[3], pos) < 0
-			&&  OuterProduct(vexPos[3], vexPos[0], pos) < 0)
+			if (LineOuterProduct(vexPos[0], vexPos[1], pos) < 0
+			&&  LineOuterProduct(vexPos[1], vexPos[2], pos) < 0
+			&&  LineOuterProduct(vexPos[2], vexPos[3], pos) < 0
+			&&  LineOuterProduct(vexPos[3], vexPos[0], pos) < 0)
 			{ // 四辺の内側にいる場合 (当たっている場合)
 
 				if (fLandPosY < g_aMeshField[nCntMeshField].pos.y)
@@ -524,23 +514,4 @@ void TxtSetMeshField(void)
 		// エラーメッセージボックス
 		MessageBox(NULL, "ステージファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
-}
-
-//======================================================================================================================
-//	外積処理
-//======================================================================================================================
-float OuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos)
-{
-	// 変数を宣言
-	D3DXVECTOR3 vecLine;	// 境界線ベクトル
-	D3DXVECTOR3 vecToPos;	// 左端と位置のベクトル
-
-	// 境界線ベクトルを求める
-	vecLine = posRight - posLeft;
-
-	// 左端と位置のベクトルを求める
-	vecToPos = pos - posLeft;
-
-	// 外積の計算結果を返す
-	return (vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z);
 }
