@@ -18,7 +18,7 @@
 
 //プロトタイプ宣言
 void TypeChangeEdit(void);								//種類変更処理
-void MoveEdit(float Camerarot);							//移動処理
+void MoveEdit(void);									//移動処理
 void RotationEdit(void);								//回転処理
 void SetEdit(void);										//オブジェクトの設定処理
 void DeleteEditObject(void);							//オブジェクトの消去
@@ -189,7 +189,7 @@ void UpdateEditObject(void)
 	TypeChangeEdit();
 
 	//移動処理
-	MoveEdit(pCamera->rot.y);
+	MoveEdit();
 
 	//回転処理
 	RotationEdit();
@@ -377,7 +377,7 @@ void TypeChangeEdit(void)
 //=======================================
 //移動処理
 //=======================================
-void MoveEdit(float Camerarot)
+void MoveEdit(void)
 {
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{//左シフトキーが押されていた場合
@@ -385,34 +385,62 @@ void MoveEdit(float Camerarot)
 		return;
 	}
 
-	if (g_nStyleObject == EDITSTYLE_OBJECT)
-	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_W) == true)
-		{//Wキーを押した場合
-		 //位置を奥に進める
-			g_EditObject.pos.x += sinf(Camerarot) * 5.0f;
-			g_EditObject.pos.z += cosf(Camerarot) * 5.0f;
-		}
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左コントロールキーを押していた場合
+		if (g_nStyleObject == EDITSTYLE_OBJECT)
+		{//オブジェクト設置モードだった場合
+			if (GetKeyboardTrigger(DIK_W) == true)
+			{//Wキーを押した場合
+				//位置を奥に進める
+				g_EditObject.pos.z += 4.0f;
+			}
 
-		if (GetKeyboardPress(DIK_S) == true)
-		{//Sキーを押した場合
-		 //位置を手前に進める
-			g_EditObject.pos.x += -sinf(Camerarot) * 5.0f;
-			g_EditObject.pos.z += -cosf(Camerarot) * 5.0f;
-		}
+			if (GetKeyboardTrigger(DIK_S) == true)
+			{//Sキーを押した場合
+				//位置を手前に進める
+				g_EditObject.pos.z -= 4.0f;
+			}
 
-		if (GetKeyboardPress(DIK_A) == true)
-		{//Aキーを押した場合
-		 //位置を左に進める
-			g_EditObject.pos.x += sinf(-D3DX_PI * 0.5f - Camerarot) * 5.0f;
-			g_EditObject.pos.z += -cosf(-D3DX_PI * 0.5f - Camerarot) * 5.0f;
-		}
+			if (GetKeyboardTrigger(DIK_A) == true)
+			{//Aキーを押した場合
+				//位置を左に進める
+				g_EditObject.pos.x -= 4.0f;
+			}
 
-		if (GetKeyboardPress(DIK_D) == true)
-		{//Dキーを押した場合
-		 //位置を右に進める
-			g_EditObject.pos.x += sinf(D3DX_PI * 0.5f - Camerarot) * 5.0f;
-			g_EditObject.pos.z += -cosf(D3DX_PI * 0.5f - Camerarot) * 5.0f;
+			if (GetKeyboardTrigger(DIK_D) == true)
+			{//Dキーを押した場合
+				//位置を右に進める
+				g_EditObject.pos.x += 4.0f;
+			}
+		}
+	}
+	else
+	{//左コントロールを押していない場合
+		if (g_nStyleObject == EDITSTYLE_OBJECT)
+		{//オブジェクト設置モードだった場合
+			if (GetKeyboardPress(DIK_W) == true)
+			{//Wキーを押した場合
+			 //位置を奥に進める
+				g_EditObject.pos.z += 16.0f;
+			}
+
+			if (GetKeyboardPress(DIK_S) == true)
+			{//Sキーを押した場合
+			 //位置を手前に進める
+				g_EditObject.pos.z -= 16.0f;
+			}
+
+			if (GetKeyboardPress(DIK_A) == true)
+			{//Aキーを押した場合
+			 //位置を左に進める
+				g_EditObject.pos.x -= 16.0f;
+			}
+
+			if (GetKeyboardPress(DIK_D) == true)
+			{//Dキーを押した場合
+			 //位置を右に進める
+				g_EditObject.pos.x += 16.0f;
+			}
 		}
 	}
 }
@@ -822,16 +850,33 @@ void UpDownEditObject(void)
 {
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{//左SHIFTキーを押している場合
-		if (GetKeyboardPress(DIK_W) == true)
-		{//Wキーを押している場合
-			//位置を奥に進める
-			g_EditObject.pos.y += 1.0f;
-		}
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_W) == true)
+			{//Wキーを押している場合
+				//位置を奥に進める
+				g_EditObject.pos.y += 2.0f;
+			}
 
-		if (GetKeyboardPress(DIK_S) == true)
-		{//Sキーを押している場合
-			//位置を手前に進める
-			g_EditObject.pos.y -= 1.0f;
+			if (GetKeyboardTrigger(DIK_S) == true)
+			{//Sキーを押している場合
+				//位置を手前に進める
+				g_EditObject.pos.y -= 2.0f;
+			}
+		}
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_W) == true)
+			{//Wキーを押している場合
+			 //位置を奥に進める
+				g_EditObject.pos.y += 6.0f;
+			}
+
+			if (GetKeyboardPress(DIK_S) == true)
+			{//Sキーを押している場合
+			 //位置を手前に進める
+				g_EditObject.pos.y -= 6.0f;
+			}
 		}
 
 		if (GetKeyboardTrigger(DIK_A) == true || GetKeyboardTrigger(DIK_D) == true)

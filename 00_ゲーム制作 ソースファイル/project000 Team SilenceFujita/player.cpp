@@ -143,7 +143,14 @@ void UpdatePlayer(void)
 		CameraChangePlayer();
 
 		// 車の停止処理
-		CollisionStopCar(g_player.pos, g_player.rot, &g_player.move, g_player.modelData.fRadius);
+		CollisionStopCar
+		( // 引数
+			g_player.pos,				//位置
+			g_player.rot,				//向き
+			&g_player.move,				//移動量
+			g_player.modelData.fRadius,	//半径
+			COLLOBJECTTYPE_PLAYER		//対象のタイプ
+		);
 
 		//----------------------------------------------------
 		//	当たり判定
@@ -155,6 +162,15 @@ void UpdatePlayer(void)
 			&g_player.oldPos,	// 前回の位置
 			PLAY_WIDTH,			// 横幅
 			PLAY_DEPTH			// 奥行
+		);
+
+		// 警察との当たり判定
+		CollisionPolice
+		( // 引数
+			&g_player.pos,		//現在の位置
+			&g_player.oldPos,	//前回の位置
+			PLAY_WIDTH,			//横幅
+			PLAY_DEPTH			//奥行
 		);
 
 		//----------------------------------------------------
