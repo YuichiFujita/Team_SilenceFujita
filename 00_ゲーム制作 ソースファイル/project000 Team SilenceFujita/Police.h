@@ -86,7 +86,7 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest);		// Œx@‚
 void HitPolice(Police *pPolice, int nDamage);												// Œx@‚Ìƒ_ƒ[ƒW”»’è
 void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth, float *move); 	// Œx@‚Æ‚Ì“–‚½‚è”»’è
 Police *GetPoliceData(void);																// Œx@‚Ìæ“¾ˆ—
-void CollisionStopCar(D3DXVECTOR3 *targetpos, D3DXVECTOR3 targetrot, float fTargetRadius);	// Ô‚Ì’â~ˆ—
+void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius);	// Ô‚Ì’â~ˆ—
 
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾ (ƒfƒoƒbƒO—p)

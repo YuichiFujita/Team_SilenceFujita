@@ -26,14 +26,13 @@
 #define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)	// 無敵状態に変更する時間
 
 //************************************************************
-//	構造体定義 (Player)
+//	カメラの列挙 (PlayerCamera)
 //************************************************************
 typedef enum
 {
-	PLAYERCAME_NORMAL = 0,		//通常のカメラ
-	PLAYERCAME_BACK,			//後ろを観るカメラ
-	PLAYERCAME_FIRST,			//一人称カメラ
-	PLAYERCAME_MAX				//この列挙型の総数
+	PLAYCAMESTATE_NORMAL = 0,		// 通常のカメラ
+	PLAYCAMESTATE_BACK,				// 一人称カメラ
+	PLAYCAMESTATE_MAX				// この列挙型の総数
 }PLAYCAMESTATE;
 
 //************************************************************
@@ -52,7 +51,8 @@ typedef struct
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター
 	int         nShadowID;			// 影のインデックス
-	int			nCameraState;		//カメラの状態
+	int			nCameraState;		// 前向きカメラの状態
+	bool		bCameraFirst;		// 一人称カメラの状況
 	bool        bMove;				// 移動状況
 	bool        bJump;				// ジャンプ状況
 	bool        bUse;				// 使用状況

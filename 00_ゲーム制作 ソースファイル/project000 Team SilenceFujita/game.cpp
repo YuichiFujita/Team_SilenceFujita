@@ -236,9 +236,6 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
-	// カメラの更新
-	UpdateCamera();
-
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
@@ -268,6 +265,9 @@ void UpdateGame(void)
 
 			// オブジェクトの更新
 			UpdateObject();
+
+			// カメラの更新
+			UpdateCamera();
 		}
 		else
 		{ // ポーズ状態の場合
