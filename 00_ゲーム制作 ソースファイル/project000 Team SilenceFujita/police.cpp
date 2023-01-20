@@ -101,11 +101,11 @@ void InitPolice(void)
 	}
 
 	//警察の設定処理
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
-	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 800.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 600.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 400.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_RIGHT);
 }
 
 //======================================================================================================================
@@ -122,7 +122,6 @@ void UninitPolice(void)
 void UpdatePolice(void)
 {
 #if 0
-
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
