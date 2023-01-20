@@ -1396,6 +1396,7 @@ void DrawDebugControlObject(void)
 		"\n当たり判定の種類の変更：[BACKSPACE] 　"
 		"\n--------------------------------------------- 　"
 		"\nオブジェクトの移動：[W/A/S/D] 　"
+		"\nオブジェクトの平面移動微調整：[LCTRL+W/A/S/D] 　"
 		"\nオブジェクトの向き変更：[Q/E] 　"
 		"\nオブジェクトのX軸の拡大縮小：[U/J] 　"
 		"\nオブジェクトのY軸の拡大縮小：[I/K] 　"
@@ -1408,6 +1409,7 @@ void DrawDebugControlObject(void)
 		"\nマテリアルのリセットG値：[LSHIFT+B] 　"
 		"\nマテリアルのリセットB値：[LSHIFT+N] 　"
 		"\nオブジェクトの縦の移動：[LSHIFT+W/S] 　"
+		"\nオブジェクトの縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
 		"\nオブジェクトの縦の位置の初期化：[LSHIFT+A/D] 　"
 		"\nオブジェクトの15度回転：[LSHIFT+Q/E] 　"
 	);
@@ -1449,6 +1451,7 @@ void DrawDebugControlBillboard(void)
 		"\nビルボードの設置：[0] 　"
 		"\n--------------------------------------------- 　"
 		"\nビルボードの移動：[W/A/S/D] 　"
+		"\nビルボードの平面移動微調整：[LCTRL+W/A/S/D] 　"
 		"\nビルボードのX軸の拡大縮小：[U/J] 　"
 		"\nビルボードのY軸の拡大縮小：[I/K] 　"
 		"\n--------------------------------------------- 　"
@@ -1463,6 +1466,7 @@ void DrawDebugControlBillboard(void)
 		"\nアニメーションのパターン：[LSHIFT+↑/↓] 　"
 		"\nビルボードの縦の移動：[LSHIFT+W/S] 　"
 		"\nビルボードの縦の位置の初期化：[LSHIFT+A/D] 　"
+		"\nビルボードの縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
 	);
 
 	// テキストの描画
