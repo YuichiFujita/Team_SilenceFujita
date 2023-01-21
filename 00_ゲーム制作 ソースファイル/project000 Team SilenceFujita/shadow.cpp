@@ -101,7 +101,7 @@ void InitShadow(void)
 		g_aShadow[nCntShadow].modelDataParent.dwNumMat = 0;				// マテリアルの数
 		g_aShadow[nCntShadow].modelDataParent.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
 		g_aShadow[nCntShadow].modelDataParent.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
-		g_aShadow[nCntShadow].modelDataParent.fHeight  = 0.0f;			// 縦幅
+		g_aShadow[nCntShadow].modelDataParent.size     = INIT_SIZE;		// 大きさ
 		g_aShadow[nCntShadow].modelDataParent.fRadius  = 0.0f;			// 半径
 	}
 

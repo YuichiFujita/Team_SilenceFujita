@@ -30,6 +30,9 @@ typedef enum
 
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,			// 車
+
+	// エディットモデル
+	MODELTYPE_EDIT_COLLISION,		// 当たり判定
 	MODELTYPE_MAX,					// 全モデルの総数
 } MODELTYPE;
 
@@ -38,10 +41,14 @@ typedef enum
 //************************************************************
 #define INIT_VTX_MIN	(D3DXVECTOR3( 9999.0f,  9999.0f,  9999.0f))		// モデルの最小の頂点座標の初期値
 #define INIT_VTX_MAX	(D3DXVECTOR3(-9999.0f, -9999.0f, -9999.0f))		// モデルの最大の頂点座標の初期値
-#define FROM_OBJECT				(0)		// オブジェクトのモデル列挙の開始地点
-#define MODELTYPE_OBJECT_MAX	(12)	// オブジェクトのモデルの総数
-#define FROM_PLAYER				(12)	// プレイヤーのモデル列挙の開始地点
-#define MODELTYPE_PLAYER_MAX	(1)		// プレイヤーのモデルの総数
+#define INIT_SIZE		(D3DXVECTOR3(0.0f, 0.0f, 0.0f))					// モデルサイズの初期値
+
+#define FROM_OBJECT		(0)		// オブジェクトのモデル列挙の開始地点
+#define MODEL_OBJ_MAX	(12)	// オブジェクトのモデルの総数
+#define FROM_PLAYER		(12)	// プレイヤーのモデル列挙の開始地点
+#define MODEL_PLAY_MAX	(1)		// プレイヤーのモデルの総数
+#define FROM_EDIT		(13)	// エディットのモデル列挙の開始地点
+#define MODEL_EDIT_MAX	(1)		// エディットのモデルの総数
 
 //************************************************************
 //	構造体定義 (Model)
@@ -54,7 +61,7 @@ typedef struct
 	DWORD              dwNumMat;	// マテリアルの数
 	D3DXVECTOR3        vtxMin;		// 最小の頂点座標
 	D3DXVECTOR3        vtxMax;		// 最大の頂点座標
-	float              fHeight;		// 縦幅
+	D3DXVECTOR3        size;		// 大きさ
 	float              fRadius;		// 半径
 }Model;
 

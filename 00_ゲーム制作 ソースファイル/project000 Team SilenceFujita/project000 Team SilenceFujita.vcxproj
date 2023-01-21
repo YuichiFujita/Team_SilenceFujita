@@ -160,6 +160,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="EditBillboard.cpp" />
+    <ClCompile Include="EditCollision.cpp" />
     <ClCompile Include="Editmain.cpp" />
     <ClCompile Include="EditObject.cpp" />
     <ClCompile Include="effect.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="EditBillboard.h" />
+    <ClInclude Include="EditCollision.h" />
     <ClInclude Include="Editmain.h" />
     <ClInclude Include="EditObject.h" />
     <ClInclude Include="effect.h" />

@@ -90,7 +90,7 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].modelData.dwNumMat = 0;						// マテリアルの数
 		g_aPolice[nCntPolice].modelData.vtxMin   = INIT_VTX_MIN;			// 最小の頂点座標
 		g_aPolice[nCntPolice].modelData.vtxMax   = INIT_VTX_MAX;			// 最大の頂点座標
-		g_aPolice[nCntPolice].modelData.fHeight  = 0.0f;					// 縦幅
+		g_aPolice[nCntPolice].modelData.size     = INIT_SIZE;				// 大きさ
 		g_aPolice[nCntPolice].modelData.fRadius  = 0.0f;					// 半径
 
 		// 曲がり角の位置の初期化
