@@ -1,11 +1,11 @@
 //======================================================================================================================
 //
-//	警察ヘッダー [Police.h]
+//	車ヘッダー [Car.h]
 //	Author：小原立暉
 //
 //======================================================================================================================
-#ifndef _POLICE_H_						// このマクロ定義がされていない場合
-#define _POLICE_H_						// 二重インクルード防止のマクロを定義する
+#ifndef _CAR_H_						// このマクロ定義がされていない場合
+#define _CAR_H_						// 二重インクルード防止のマクロを定義する
 
 //**********************************************************************************************************************
 //	インクルードファイル
@@ -16,43 +16,30 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_POLICE			(128)		// 使用する警察の最大数
+#define MAX_CAR			(128)		// 使用する車の最大数
+#define MAX_CURVE		(10)		// 曲がれる最大数
 
 //**********************************************************************************************************************
-//	警察車両の状態
+//	曲がり角で曲がる角度
 //**********************************************************************************************************************
 typedef enum
 {
-	POLICESTATE_SPAWN = 0,				// 出現
-	POLICESTATE_PATROL,					// パトロール
-	POLICESTATE_CHASE,					// 追跡処理
-	POLICESTATE_PATBACK,				// パトロールに戻るときの処理
-	POLICESTATE_STOP,					// 足止め処理
-	POLICESTATE_MAX						// この列挙型の総数
-}POLICESTATE;
-
-//**********************************************************************************************************************
-//	警察車両の向かう先
-//**********************************************************************************************************************
-typedef enum
-{
-	POLICEDESTINATION_NEAR = 0,			//近くの壁
-	POLICEDESTINATION_FAR,				//奥の壁
-	POLICEDESTINATION_RIGHT,			//右の壁
-	POLICEDESTINATION_LEFT,				//左の壁
-	POLICEDESTINATION_MAX				//この列挙型の総数
-}POLICEDEST;
+	CURVE_RIGHT = 0,					//右に曲がる
+	CURVE_LEFT,							//左に曲がる
+	CURVE_MAX							//この列挙型の総数
+}CURVEANGLE;
 
 //**********************************************************************************************************************
 //	警察車両の曲がり角
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 Near;					//手前の曲がり角
-	D3DXVECTOR3 Far;					//奥の曲がり角
-	D3DXVECTOR3 Right;					//右の曲がり角
-	D3DXVECTOR3 Left;					//左の曲がり角
-}POLICECURVE;
+	D3DXVECTOR3 curvePoint[MAX_CURVE];	//曲がるポイント
+	CURVEANGLE  curveAngle[MAX_CURVE];	//曲がる方向
+	int nNowCurve;						//現在の曲がり角
+	int nCurveTime;						//曲がる回数
+	bool bCurveX[MAX_CURVE];			//X軸上を走っているかどうか
+}CARCURVE;
 
 //**********************************************************************************************************************
 //	構造体定義 (Police)
@@ -63,33 +50,39 @@ typedef struct
 	D3DXVECTOR3  posOld;				// 前回の位置
 	D3DXVECTOR3  move;					// 移動量
 	D3DXVECTOR3  rot;					// 向き
-	D3DXVECTOR3  rotDest;				// 目標の向き
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報
-	POLICESTATE  state;					// 警察車両の状態
 	int			 nShadowID;				// 影のインデックス
-	int			 nLife;					// 寿命
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
-	POLICEDEST   poliDest;				// 警察の行先
-	POLICECURVE  poliCurve;				// 警察のカーブ位置
-}Police;
+	CARCURVE	 carCurve;				// 曲がり角関係
+}Car;
+
+//**********************************************************************************************************************
+//	ぶつかったもののタイプ
+//**********************************************************************************************************************
+typedef enum
+{
+	COLLOBJECTTYPE_PLAYER = 0,			// プレイヤー
+	COLLOBJECTTYPE_POLICE,				// 警察
+	COLLOBJECTTYPE_CAR,					// 車
+	COLLOBJECTTYPE_MAX					// この列挙型の総数
+}COLLOBJECTTYPE;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void InitPolice(void);					// 警察の初期化処理
-void UninitPolice(void);				// 警察の終了処理
-void UpdatePolice(void);				// 警察の更新処理
-void DrawPolice(void);					// 警察の描画処理
-void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest);		// 警察の設定処理
-void HitPolice(Police *pPolice, int nDamage);												// 警察のダメージ判定
-void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// 警察との当たり判定
-Police *GetPoliceData(void);																// 警察の取得処理
+void InitCar(void);					// 車の初期化処理
+void UninitCar(void);				// 車の終了処理
+void UpdateCar(void);				// 車の更新処理
+void DrawCar(void);					// 車の描画処理
+void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CARCURVE carCurve);		// 車の設定処理
+void CollisionCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// 車との当たり判定
+Car *GetCarData(void);																		// 車の取得処理
+void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// 車の停止処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
 //**********************************************************************************************************************
-int GetNumPolice(void);					// オブジェクトの総数取得処理
 
 #endif

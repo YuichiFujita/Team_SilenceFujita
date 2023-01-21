@@ -10,7 +10,8 @@
 #include "main.h"
 #include "input.h"
 #include "model.h"
-
+ 
+#include "Car.h"
 #include "Police.h"
 #include "shadow.h"
 #include "sound.h"
@@ -42,9 +43,8 @@
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void MovePlayer(bool *bMove, D3DXVECTOR3 *move, D3DXVECTOR3 *rot);	// プレイヤーの移動量の更新処理
-void PosPlayer(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	// プレイヤーの位置の更新処理
-void RevPlayer(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);		// プレイヤーの補正の更新処理
+void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	// プレイヤーの位置の更新処理
+void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);		// プレイヤーの補正の更新処理
 void PatrolPoliceAct(Police *pPolice);					// 警察のパトロール行動処理
 void PatrolCarSearch(Police *pPolice);					// 警察車両の探知処理
 void ChasePoliceAct(Police *pPolice);					// 警察の追跡処理
@@ -101,7 +101,7 @@ void InitPolice(void)
 	}
 
 	//警察の設定処理
-	SetPolice(D3DXVECTOR3(-4000.0f, 0.0f, 6000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	//SetPolice(D3DXVECTOR3(-4000.0f, 0.0f, 6000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
 	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -133,9 +133,6 @@ void UpdatePolice(void)
 
 			// 前回位置の更新
 			g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
-
-			//// プレイヤーの移動量の更新
-			//MovePlayer(&g_aPolice[nCntPolice].bMove, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].rot);
 
 			//----------------------------------------------------
 			//	影の更新
@@ -188,7 +185,7 @@ void UpdatePolice(void)
 			}
 
 			// プレイヤーの位置の更新
-			PosPlayer(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
+			PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
 
 			//----------------------------------------------------
 			//	当たり判定
@@ -212,7 +209,7 @@ void UpdatePolice(void)
 			}
 
 			// プレイヤーの補正の更新処理
-			RevPlayer(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
+			RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
 		}
 	}
 }
@@ -445,76 +442,10 @@ Police *GetPoliceData(void)
 }
 
 //============================================================
-//	プレイヤーの移動量の更新処理
-//============================================================
-void MovePlayer(bool *bMove, D3DXVECTOR3 *move, D3DXVECTOR3 *rot)
-{
-	if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
-	{ // 前進の操作が行われた場合
-
-		// 移動量を更新
-		move->x += 0.1f;
-
-		// 移動している状態にする
-		*bMove = true;
-	}
-	else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true || GetJoyStickPressLY(0) < 0)
-	{ // 後退の操作が行われた場合
-
-		// 移動量を更新
-		move->x -= 0.2f;
-
-		// 移動している状態にする
-		*bMove = true;
-	}
-	else
-	{ // 移動していない場合
-
-		// 移動していない状態にする
-		*bMove = false;
-	}
-
-	if (GetKeyboardPress(DIK_A) == true)
-	{ // 左方向の操作が行われた場合
-
-		// 向きを更新
-		rot->y -= 0.012f * (move->x * 0.1f);
-
-		if (move->x >= 15.0f)
-		{ // 移動量が一定値以上の場合
-
-			// 移動量を更新
-			move->x -= 0.05f;
-		}
-	}
-	else if (GetKeyboardPress(DIK_D) == true)
-	{ // 右方向の操作が行われた場合
-
-		// 向きを更新
-		rot->y += 0.012f * (move->x * 0.1f);
-
-		if (move->x >= 15.0f)
-		{ // 移動量が一定値以上の場合
-
-			// 移動量を更新
-			move->x -= 0.05f;
-		}
-	}
-
-	//if (GetKeyboardPress(DIK_SPACE) == true)
-	//{ // 加速の操作が行われた場合
-
-	//	// 移動量を更新
-	//	g_player.move.x += 20.0f;
-	//}
-}
-
-//============================================================
 //	プレイヤーの位置の更新処理
 //============================================================
-void PosPlayer(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove)
+void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove)
 {
-
 	//--------------------------------------------------------
 	//	重力の更新
 	//--------------------------------------------------------
@@ -557,7 +488,7 @@ void PosPlayer(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove
 //============================================================
 //	プレイヤーの補正の更新処理
 //============================================================
-void RevPlayer(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
+void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 {
 	//--------------------------------------------------------
 	//	向きの正規化
@@ -883,82 +814,6 @@ void ChasePoliceAct(Police *pPolice)
 	{ // 移動量が一定値以上の場合
 		// 移動量を更新
 		pPolice->move.x -= 0.05f;
-	}
-}
-
-//============================================================
-// 車の停止処理
-//============================================================
-void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject)
-{
-	D3DXVECTOR3 stopCarpos = D3DXVECTOR3(targetpos.x + sinf(targetrot.y) * 300.0f, 0.0f, targetpos.z + cosf(targetrot.y) * 300.0f);				// 止まる車の位置
-
-	float fLength;										// 長さの変数
-
-	{// 警察との当たり判定
-		Police *pPolice = GetPoliceData();				// 警察の情報を取得する
-
-		for (int nCntPoli = 0; nCntPoli < MAX_POLICE; nCntPoli++, pPolice++)
-		{
-			if (pPolice->bUse == true)
-			{ // 使用している場合
-				// 長さを測る
-				fLength = (pPolice->pos.x - stopCarpos.x) * (pPolice->pos.x - stopCarpos.x)
-					+ (pPolice->pos.z - stopCarpos.z) * (pPolice->pos.z - stopCarpos.z);
-
-				if (fLength <= (pPolice->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
-				{ // オブジェクトが当たっている
-					switch (collObject)
-					{
-					case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
-
-						// 移動量を設定する
-						move->x = sinf(targetrot.y) * -3.0f;
-
-						break;						//抜け出す
-
-					case COLLOBJECTTYPE_POLICE:		//警察の場合
-
-						// 目標の移動量をセーブする
-						move->x += (0.0f - move->x) * 0.5f;
-
-						break;						//抜け出す
-					}
-				}
-			}
-		}
-	}
-
-	{//プレイヤーとの当たり判定
-		Player *pPlayer = GetPlayer();
-
-		if (pPlayer->bUse == true)
-		{ // 使用している場合
-			// 長さを測る
-			fLength = (pPlayer->pos.x - stopCarpos.x) * (pPlayer->pos.x - stopCarpos.x)
-				+ (pPlayer->pos.z - stopCarpos.z) * (pPlayer->pos.z - stopCarpos.z);
-
-			if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
-			{ // オブジェクトが当たっている
-
-				switch (collObject)
-				{
-				case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
-
-					// 移動量を設定する
-					move->x = sinf(targetrot.y) * -3.0f;
-
-					break;						//抜け出す
-
-				case COLLOBJECTTYPE_POLICE:		//警察の場合
-
-					// 目標の移動量をセーブする
-					move->x += (0.0f - move->x) * 0.5f;
-
-					break;						//抜け出す
-				}
-			}
-		}
 	}
 }
 

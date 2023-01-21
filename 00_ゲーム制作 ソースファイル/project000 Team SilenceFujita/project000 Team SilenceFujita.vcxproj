@@ -158,6 +158,7 @@
     <ClCompile Include="bomb.cpp" />
     <ClCompile Include="calculation.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="Car.cpp" />
     <ClCompile Include="EditBillboard.cpp" />
     <ClCompile Include="EditCollision.cpp" />
     <ClCompile Include="Editmain.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="Human.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
@@ -191,6 +193,7 @@
     <ClInclude Include="bomb.h" />
     <ClInclude Include="calculation.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="Car.h" />
     <ClInclude Include="EditBillboard.h" />
     <ClInclude Include="EditCollision.h" />
     <ClInclude Include="Editmain.h" />
@@ -198,6 +201,7 @@
     <ClInclude Include="effect.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="Human.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />
