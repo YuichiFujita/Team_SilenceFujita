@@ -34,11 +34,13 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 curvePoint[MAX_CURVE];	//曲がるポイント
-	CURVEANGLE  curveAngle[MAX_CURVE];	//曲がる方向
-	int nNowCurve;						//現在の曲がり角
-	int nCurveTime;						//曲がる回数
-	bool bCurveX[MAX_CURVE];			//X軸上を走っているかどうか
+	D3DXVECTOR3 curvePoint[MAX_CURVE];	// 曲がるポイント
+	CURVEANGLE  curveAngle[MAX_CURVE];	// 曲がる方向
+	int nNowCurve;						// 現在の曲がり角
+	int nCurveTime;						// 曲がる回数
+	int fCurveRot;						// 目標の向き
+	bool bCurveX[MAX_CURVE];			// X軸上を走っているかどうか
+	bool bCurvePlus[MAX_CURVE];			// 座標上で＋方向に進んでいるかどうか
 }CARCURVE;
 
 //**********************************************************************************************************************
