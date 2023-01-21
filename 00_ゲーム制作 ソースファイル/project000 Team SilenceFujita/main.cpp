@@ -29,6 +29,7 @@
 #include "EditBillboard.h"
 #include "SoundDJ.h"
 #include "Police.h"
+#include "Car.h"
 #endif
 
 //************************************************************
@@ -1131,7 +1132,7 @@ void DrawDebug(void)
 	float       cameraDis    = GetCameraDis();		// カメラの距離
 	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
-	Police *pPolice = GetPoliceData();				//警察の情報を取得する
+	Car *pCar = GetCarData();						// 車の情報を取得する
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1160,9 +1161,9 @@ void DrawDebug(void)
 		"　 [ カメラ距離 ] %.1f\n"
 		"　 [エフェクト数] %-4d　 [パーティクル数] %-3d\n"
 		"   ---------------------------------------------　\n"
-		"   警察の向き：[%d]\n"
-		"   警察の位置：[%.3f,%.3f,%.3f]\n"
-		"   警察のスピード：[%.3f,%.3f,%.3f]",
+		"   車の向き：[%d]\n"
+		"   車の位置：[%.3f,%.3f,%.3f]\n"
+		"   車のスピード：[%.3f,%.3f,%.3f]",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1176,9 +1177,9 @@ void DrawDebug(void)
 		cameraDis,			// カメラの距離
 		nNumEffect,			// エフェクトの総数
 		nNumParticle,		// パーティクルの総数
-		(int)D3DXToDegree(pPolice->rot.y),
-		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
-		pPolice->move.x, pPolice->move.y, pPolice->move.z
+		(int)D3DXToDegree(pCar->rot.y),
+		pCar->pos.x, pCar->pos.y, pCar->pos.z,
+		pCar->move.x, pCar->move.y, pCar->move.z
 	);
 
 	//--------------------------------------------------------

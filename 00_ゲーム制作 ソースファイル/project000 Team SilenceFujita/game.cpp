@@ -16,6 +16,7 @@
 
 #include "billboard.h"
 #include "camera.h"
+#include "Car.h"
 #include "effect.h"
 #include "life.h"
 #include "light.h"
@@ -79,6 +80,9 @@ void InitGame(void)
 
 	// オブジェクトの初期化
 	InitObject();
+
+	//車の初期化処理
+	InitCar();
 
 	// カメラの初期化
 	InitCamera();
@@ -145,6 +149,9 @@ void UninitGame(void)
 
 	// オブジェクトの終了
 	UninitObject();
+
+	//車の終了処理
+	UninitCar();
 
 	// カメラの終了
 	UninitCamera();
@@ -275,6 +282,9 @@ void UpdateGame(void)
 
 			// オブジェクトの更新
 			UpdateObject();
+
+			//車の更新処理
+			UpdateCar();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -431,6 +441,9 @@ void DrawGame(void)
 
 	// 警察の描画
 	DrawPolice();
+
+	//車の描画処理
+	DrawCar();
 
 	// オブジェクトの描画
 	DrawObject();
