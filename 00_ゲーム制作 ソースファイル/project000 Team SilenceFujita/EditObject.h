@@ -1,12 +1,12 @@
 #ifdef _DEBUG	// デバッグ処理
 //===================================
 //
-//エディットヘッダー[Edit.h]
+//エディットヘッダー[EditObject.h]
 //Author 小原立暉
 //
 //===================================
-#ifndef _EDIT_H_
-#define _EDIT_H_
+#ifndef _EDITOBJECT_H_
+#define _EDITOBJECT_H_
 
 #include "main.h"
 #include "object.h"
@@ -30,8 +30,8 @@ typedef struct
 //当たり判定関係の構造体
 typedef struct
 {
-	char *pCollisionMode[SHADOWTYPE_MAX];					//当たり判定の種類の表記
-	int Collisiontype;										//当たり判定の種類
+	char *pCollisionMode[COLLISIONTYPE_MAX];			//当たり判定の種類の表記
+	int Collisiontype;									//当たり判定の種類
 }EDITCOLLISION;
 
 //セットオブジェクトの情報
@@ -47,8 +47,8 @@ typedef struct
 	Model modelData;									//モデルの基本情報
 	int nCntMaterial;									//マテリアルの番号
 	int nColorCount;									//色を変えるときのカウント
-	D3DXMATERIAL MatCopy[MODELTYPE_OBJECT_MAX][MAX_MATERIAL];			//マテリアルのコピー
-	D3DXMATERIAL EditMaterial[MODELTYPE_OBJECT_MAX][MAX_MATERIAL];		//カスタム用のマテリアル情報
+	D3DXMATERIAL MatCopy[MODEL_OBJ_MAX][MAX_MATERIAL];			//マテリアルのコピー
+	D3DXMATERIAL EditMaterial[MODEL_OBJ_MAX][MAX_MATERIAL];		//カスタム用のマテリアル情報
 	BREAK Break;										//破壊の変数
 	EDITSHADOW Shadowtype;								//影の変数
 	EDITCOLLISION Collisiontype;						//当たり判定の変数

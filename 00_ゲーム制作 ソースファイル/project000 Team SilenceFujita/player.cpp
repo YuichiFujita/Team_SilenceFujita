@@ -80,11 +80,11 @@ void InitPlayer(void)
 	g_player.modelData.dwNumMat = 0;			// マテリアルの数
 	g_player.modelData.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
 	g_player.modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
-	g_player.modelData.fHeight  = 0.0f;			// 縦幅
+	g_player.modelData.size     = INIT_SIZE;	// 大きさ
 	g_player.modelData.fRadius  = 0.0f;			// 半径
 
 	// プレイヤーの位置・向きの設定
-	SetPositionPlayer(D3DXVECTOR3(2000.0f, 0.0f, 2000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //============================================================
@@ -160,6 +160,7 @@ void UpdatePlayer(void)
 		( // 引数
 			&g_player.pos,		// 現在の位置
 			&g_player.oldPos,	// 前回の位置
+			&g_player.move,		// 移動量
 			PLAY_WIDTH,			// 横幅
 			PLAY_DEPTH			// 奥行
 		);
@@ -167,10 +168,10 @@ void UpdatePlayer(void)
 		// 警察との当たり判定
 		CollisionPolice
 		( // 引数
-			&g_player.pos,		//現在の位置
-			&g_player.oldPos,	//前回の位置
-			PLAY_WIDTH,			//横幅
-			PLAY_DEPTH			//奥行
+			&g_player.pos,		// 現在の位置
+			&g_player.oldPos,	// 前回の位置
+			PLAY_WIDTH,			// 横幅
+			PLAY_DEPTH			// 奥行
 		);
 
 		//----------------------------------------------------
