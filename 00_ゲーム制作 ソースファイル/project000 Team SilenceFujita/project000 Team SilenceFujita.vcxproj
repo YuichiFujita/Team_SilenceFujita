@@ -159,6 +159,7 @@
     <ClCompile Include="calculation.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Car.cpp" />
+    <ClCompile Include="curve.cpp" />
     <ClCompile Include="EditBillboard.cpp" />
     <ClCompile Include="EditCollision.cpp" />
     <ClCompile Include="Editmain.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="calculation.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="Car.h" />
+    <ClInclude Include="curve.h" />
     <ClInclude Include="EditBillboard.h" />
     <ClInclude Include="EditCollision.h" />
     <ClInclude Include="Editmain.h" />

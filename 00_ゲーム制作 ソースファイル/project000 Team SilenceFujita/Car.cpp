@@ -57,7 +57,7 @@ Car g_aCar[MAX_CAR];		// 車の情報
 //======================================================================================================================
 void InitCar(void)
 {
-	CARCURVE CarCurveInfo;				//情報
+	CURVE CarCurveInfo;				//情報
 
 	//曲がる回数
 	CarCurveInfo.nCurveTime = 8;
@@ -398,7 +398,7 @@ void DrawCar(void)
 //======================================================================================================================
 //	車の設定処理
 //======================================================================================================================
-void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CARCURVE carCurve)
+void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
 {
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
