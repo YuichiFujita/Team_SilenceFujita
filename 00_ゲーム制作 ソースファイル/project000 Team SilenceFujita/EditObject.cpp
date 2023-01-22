@@ -388,13 +388,13 @@ void SaveCurrentEdit(void)
 	if (pEditCollision->collision.stateRot == ROTSTATE_0
 	||  pEditCollision->collision.stateRot == ROTSTATE_180)
 	{ // 角度が0度、または180度の場合
-		pEditCollision->collision.fWidth  = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
-		pEditCollision->collision.fHeight = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
+		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
+		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
 	}
 	else
 	{ // 角度90度、または270度の場合
-		pEditCollision->collision.fWidth  = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
-		pEditCollision->collision.fHeight = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
+		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
+		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
 	}
 
 	//現在の作成した当たり判定をセーブ

@@ -94,7 +94,7 @@ void InitObject(void)
 		g_aCollision[nCntObject].stateRot = ROTSTATE_0;						// 向き状態
 		g_aCollision[nCntObject].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
 		g_aCollision[nCntObject].fWidth   = 0.0f;							// 横幅
-		g_aCollision[nCntObject].fHeight  = 0.0f;							// 縦幅
+		g_aCollision[nCntObject].fDepth   = 0.0f;							// 奥行
 	}
 }
 
@@ -535,22 +535,22 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 				&&  pPos->x - fWidth < pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth)
 				{ // ブロックの左右の範囲内の場合
 
-					if (pPos->z    + fDepth >  pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight
-					&&  pOldPos->z + fDepth <= pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight)
+					if (pPos->z    + fDepth >  pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth
+					&&  pOldPos->z + fDepth <= pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth)
 					{ // 前からの当たり判定
 
 						// 位置を補正
-						pPos->z = pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight - fDepth - 0.01f;
+						pPos->z = pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth - fDepth - 0.01f;
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
 					}
-					else if (pPos->z    - fDepth <  pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight
-					     &&  pOldPos->z - fDepth >= pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight)
+					else if (pPos->z    - fDepth <  pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth
+					     &&  pOldPos->z - fDepth >= pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth)
 					{ // 後ろからの当たり判定
 
 						// 位置を補正
-						pPos->z = pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight + fDepth + 0.01f;
+						pPos->z = pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth + fDepth + 0.01f;
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -558,8 +558,8 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 				}
 
 				// 左右の当たり判定
-				if (pPos->z + fDepth > pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight
-				&&  pPos->z - fDepth < pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight)
+				if (pPos->z + fDepth > pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth
+				&&  pPos->z - fDepth < pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth)
 				{ // ブロックの前後の範囲内の場合
 
 					if (pPos->x    + fWidth >  pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth

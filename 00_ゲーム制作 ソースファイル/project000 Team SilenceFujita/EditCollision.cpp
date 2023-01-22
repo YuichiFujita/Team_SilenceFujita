@@ -35,51 +35,10 @@ void InitEditCollision(void)
 	g_EditCollision.collision.stateRot = ROTSTATE_0;					// 向き状態
 	g_EditCollision.collision.scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
 	g_EditCollision.collision.fWidth   = 0.0f;							// 横幅
-	g_EditCollision.collision.fHeight  = 0.0f;							// 縦幅
+	g_EditCollision.collision.fDepth   = 0.0f;							// 奥行
 
 	g_EditCollision.modelData = GetModelData(MODELTYPE_EDIT_COLLISION);	// モデル情報
 	g_EditCollision.nType     = GetEditObject()->nType;					// オブジェクトの種類
-
-#if 0
-	//エディットオブジェクトの位置を初期化する
-	g_EditCollision.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-	//エディットオブジェクトの向きを初期化する
-	g_EditCollision.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-	//エディットオブジェクトの拡大率を初期化する
-	g_EditCollision.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-
-	//エディットオブジェクトの番号を初期化する
-	g_EditCollision.nSetNumber = -1;
-
-	//使用しない
-	g_EditCollision.bUse = false;
-
-	//エディットオブジェクトの種類を初期化する
-	g_EditCollision.nType = MODELTYPE_OBJECT_TREE;
-
-	//モデルの基本情報
-	g_EditCollision.modelData = GetModelData(g_EditCollision.nType + FROM_OBJECT);
-
-	//選択中のマテリアルの番号を初期化する
-	g_EditCollision.nCntMaterial = 0;
-
-	//色を変えるカウントを初期化する
-	g_EditCollision.nColorCount = 0;
-
-	//壊れない
-	g_EditCollision.Break.Breaktype = BREAKTYPE_NONE;
-
-	//影無し
-	g_EditCollision.Shadowtype.Shadowtype = SHADOWTYPE_NONE;
-
-	//当たり判定あり
-	g_EditCollision.Collisiontype.Collisiontype = COLLISIONTYPE_ON;
-	
-	//スタイルを設定する
-	g_nStyleObject = EDITSTYLE_OBJECT;
-#endif
 }
 
 //========================================

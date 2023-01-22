@@ -92,7 +92,7 @@ void UninitCamera(void)
 void UpdateCamera(void)
 {
 #ifdef _DEBUG	// デバッグ処理
-	#if 0
+	#if 1
 		switch (GetGameMode())
 		{ // ゲームモードごとの処理
 		case GAMEMODE_PLAY:

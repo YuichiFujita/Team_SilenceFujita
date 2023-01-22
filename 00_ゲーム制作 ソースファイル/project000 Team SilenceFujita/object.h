@@ -66,7 +66,7 @@ typedef struct
 	ROTSTATE    stateRot;				// Œü‚«ó‘Ô
 	D3DXVECTOR3 scale;					// Šg‘å—¦
 	float       fWidth;					// ‰¡•
-	float       fHeight;				// c•
+	float       fDepth;					// ‰œs
 }Collision;
 
 //**********************************************************************************************************************

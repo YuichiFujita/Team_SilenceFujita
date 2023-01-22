@@ -128,7 +128,7 @@ void UpdatePlayer(void)
 			}
 		}
 
-#if 0
+#if 1
 		// プレイヤーの移動量の更新
 		MovePlayer();
 
@@ -442,6 +442,13 @@ void MovePlayer(void)
 
 			// 移動量を更新
 			g_player.move.x -= SUB_MOVE;
+
+			if (g_player.move.x < SUB_MOVE_VALUE)
+			{ // 移動量が一定値より小さい場合
+
+				// 最低限の移動量を代入
+				g_player.move.x = SUB_MOVE_VALUE;
+			}
 		}
 	}
 	else if (GetKeyboardPress(DIK_D) == true)
@@ -455,6 +462,13 @@ void MovePlayer(void)
 
 			// 移動量を更新
 			g_player.move.x -= SUB_MOVE;
+
+			if (g_player.move.x < SUB_MOVE_VALUE)
+			{ // 移動量が一定値より小さい場合
+
+				// 最低限の移動量を代入
+				g_player.move.x = SUB_MOVE_VALUE;
+			}
 		}
 	}
 
