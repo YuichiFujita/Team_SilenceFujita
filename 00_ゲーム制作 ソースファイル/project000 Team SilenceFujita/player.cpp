@@ -128,6 +128,7 @@ void UpdatePlayer(void)
 			}
 		}
 
+#if 0
 		// プレイヤーの移動量の更新
 		MovePlayer();
 
@@ -142,6 +143,28 @@ void UpdatePlayer(void)
 
 		//プレイヤーのカメラの状態変化処理
 		CameraChangePlayer();
+#else
+		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
+		{ // 奥移動の操作が行われた場合
+
+			g_player.pos.z += 10.0f;
+		}
+		if (GetKeyboardPress(DIK_S) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true || GetJoyStickPressLY(0) < 0)
+		{ // 手前移動の操作が行われた場合
+
+			g_player.pos.z -= 10.0f;
+		}
+		if (GetKeyboardPress(DIK_A) == true || GetJoyKeyPress(JOYKEY_LEFT, 0) == true || GetJoyStickPressLX(0) < 0)
+		{ // 左移動の操作が行われた場合
+
+			g_player.pos.x -= 10.0f;
+		}
+		if (GetKeyboardPress(DIK_D) == true || GetJoyKeyPress(JOYKEY_RIGHT, 0) == true || GetJoyStickPressLX(0) > 0)
+		{ // 右移動の操作が行われた場合
+
+			g_player.pos.x += 10.0f;
+		}
+#endif
 
 		// 車の停止処理
 		CollisionStopCar

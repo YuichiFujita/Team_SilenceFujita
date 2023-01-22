@@ -358,7 +358,7 @@ float CollisionMeshField(D3DXVECTOR3 pos)
 	float fLandPosY = GetLimitStage().fField;		// 着地予定の y座標
 
 	// 変数配列を宣言
-	D3DXVECTOR3 vexPos[4];	// 頂点位置 ([※] 0：右上　1：左上　2：左下　3：右下)
+	D3DXVECTOR3 vecPos[4];	// 頂点位置 ([※] 0：右上　1：左上　2：左下　3：右下)
 
 	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
 	{ // メッシュフィールドの最大表示数分繰り返す
@@ -369,17 +369,17 @@ float CollisionMeshField(D3DXVECTOR3 pos)
 			// 四頂点の位置の計算
 			VecSizePos
 			( // 引数
-				&vexPos[0],
+				&vecPos[0],
 				g_aMeshField[nCntMeshField].pos,	// 絶対座標
 				g_aMeshField[nCntMeshField].rot,	// 向き
-				g_aMeshField[nCntMeshField].fWidth,	// 横幅 / 2
-				g_aMeshField[nCntMeshField].fHeight	// 縦幅 / 2
+				g_aMeshField[nCntMeshField].fWidth,	// 横幅
+				g_aMeshField[nCntMeshField].fHeight	// 縦幅
 			);
 
-			if (LineOuterProduct(vexPos[0], vexPos[1], pos) < 0
-			&&  LineOuterProduct(vexPos[1], vexPos[2], pos) < 0
-			&&  LineOuterProduct(vexPos[2], vexPos[3], pos) < 0
-			&&  LineOuterProduct(vexPos[3], vexPos[0], pos) < 0)
+			if (LineOuterProduct(vecPos[0], vecPos[1], pos) < 0
+			&&  LineOuterProduct(vecPos[1], vecPos[2], pos) < 0
+			&&  LineOuterProduct(vecPos[2], vecPos[3], pos) < 0
+			&&  LineOuterProduct(vecPos[3], vecPos[0], pos) < 0)
 			{ // 四辺の内側にいる場合 (当たっている場合)
 
 				if (fLandPosY < g_aMeshField[nCntMeshField].pos.y)

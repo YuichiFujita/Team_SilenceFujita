@@ -322,6 +322,22 @@ SETSTAGE_OBJECT
 		10_MAT AMB = 0.00 0.00 0.00 1.00
 	END_SET_OBJECT
 
+	SET_OBJECT
+		POS        = 0.0 0.0 224.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+		SHADOWTYPE = 0
+		COLLTYPE   = 2
+
+		NUMMAT     = 2
+		00_MAT DIF = 0.80 0.80 0.80 1.00
+		00_MAT AMB = 0.00 0.00 0.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
 END_SETSTAGE_OBJECT
 
 #===========================================================

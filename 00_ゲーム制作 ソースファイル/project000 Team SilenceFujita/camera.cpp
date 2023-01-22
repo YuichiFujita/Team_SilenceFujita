@@ -92,30 +92,41 @@ void UninitCamera(void)
 void UpdateCamera(void)
 {
 #ifdef _DEBUG	// デバッグ処理
-	switch (GetGameMode())
-	{ // ゲームモードごとの処理
-	case GAMEMODE_PLAY:
-
-		// カメラの位置の更新 (追従)
-		MoveFollowCamera();
-
-		// 処理を抜ける
-		break;
-
-	case GAMEMODE_EDIT:
-
+	#if 0
+		switch (GetGameMode())
+		{ // ゲームモードごとの処理
+		case GAMEMODE_PLAY:
+	
+			// カメラの位置の更新 (追従)
+			MoveFollowCamera();
+	
+			// 処理を抜ける
+			break;
+	
+		case GAMEMODE_EDIT:
+	
+			// カメラの位置の更新 (操作)
+			MoveCamera();
+	
+			// カメラの距離の更新 (操作)
+			DisCamera();
+	
+			// カメラの向きの更新 (操作)
+			RotCamera();
+	
+			// 処理を抜ける
+			break;
+		}
+	#else
 		// カメラの位置の更新 (操作)
 		MoveCamera();
-
+	
 		// カメラの距離の更新 (操作)
 		DisCamera();
-
+	
 		// カメラの向きの更新 (操作)
 		RotCamera();
-
-		// 処理を抜ける
-		break;
-	}
+	#endif
 #endif
 
 #ifdef NDEBUG	// リリース処理

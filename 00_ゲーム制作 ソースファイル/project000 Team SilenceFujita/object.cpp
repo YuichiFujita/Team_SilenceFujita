@@ -35,6 +35,10 @@
 Object    g_aObject[MAX_OBJECT];		// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];	// 当たり判定の情報
 
+
+void a(int nCntObject, D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos);
+
+
 //======================================================================================================================
 //	オブジェクトの初期化処理
 //======================================================================================================================
@@ -83,12 +87,15 @@ void InitObject(void)
 
 	// 当たり判定の情報の初期化
 	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
-	{ // オブジェクトの最大表示数分繰り返す
+	{ // オブジェクトの種類の総数分繰り返す
 
-		g_aCollision[nCntObject].pos    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCollision[nCntObject].vecPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
-		g_aCollision[nCntObject].rot    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCollision[nCntObject].scale  = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
+		g_aCollision[nCntObject].pos      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCollision[nCntObject].vecPos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+		g_aCollision[nCntObject].rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aCollision[nCntObject].stateRot = ROTSTATE_0;						// 向き状態
+		g_aCollision[nCntObject].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
+		g_aCollision[nCntObject].fWidth   = 0.0f;							// 横幅
+		g_aCollision[nCntObject].fHeight  = 0.0f;							// 縦幅
 	}
 }
 
@@ -454,14 +461,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 			switch (g_aObject[nCntObject].nCollisionType)
 			{ // 当たり判定の種類ごとの処理
-			case COLLISIONTYPE_NONE:
+			case COLLISIONTYPE_NONE:	// 当たり判定無し
 
 				// 無し
 
 				// 処理を抜ける
 				break;
 
-			case COLLISIONTYPE_MODEL:
+			case COLLISIONTYPE_MODEL:	// モデル頂点の当たり判定
 
 				// 前後の当たり判定
 				if (pPos->x + fWidth > g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
@@ -511,6 +518,67 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						
 						// 位置を補正
 						pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x + fWidth + 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+				}
+
+				// 処理を抜ける
+				break;
+
+			case COLLISIONTYPE_CREATE:	// 作成した当たり判定 (汎用)
+
+				D3DXVECTOR3 pos = g_aObject[nCntObject].pos - g_aCollision[g_aObject[nCntObject].nType].vecPos;
+
+				// 前後の当たり判定
+				if (pPos->x + fWidth > pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
+				&&  pPos->x - fWidth < pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth)
+				{ // ブロックの左右の範囲内の場合
+
+					if (pPos->z    + fDepth >  pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight
+					&&  pOldPos->z + fDepth <= pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight)
+					{ // 前からの当たり判定
+
+						// 位置を補正
+						pPos->z = pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight - fDepth - 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+					else if (pPos->z    - fDepth <  pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight
+					     &&  pOldPos->z - fDepth >= pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight)
+					{ // 後ろからの当たり判定
+
+						// 位置を補正
+						pPos->z = pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight + fDepth + 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+				}
+
+				// 左右の当たり判定
+				if (pPos->z + fDepth > pos.z - g_aCollision[g_aObject[nCntObject].nType].fHeight
+				&&  pPos->z - fDepth < pos.z + g_aCollision[g_aObject[nCntObject].nType].fHeight)
+				{ // ブロックの前後の範囲内の場合
+
+					if (pPos->x    + fWidth >  pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
+					&&  pOldPos->x + fWidth <= pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth)
+					{ // 左からの当たり判定
+
+						// 位置を補正
+						pPos->x = pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth - fWidth - 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+					else if (pPos->x    - fWidth <  pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth
+					     &&  pOldPos->x - fWidth >= pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth)
+					{ // 右からの当たり判定
+						
+						// 位置を補正
+						pPos->x = pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth + fWidth + 0.01f;
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
