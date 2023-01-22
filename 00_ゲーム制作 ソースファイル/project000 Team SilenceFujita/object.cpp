@@ -70,7 +70,6 @@ void InitObject(void)
 		g_aObject[nCntObject].modelData.pTexture = NULL;							// テクスチャへのポインタ
 		g_aObject[nCntObject].modelData.pMesh    = NULL;							// メッシュ (頂点情報) へのポインタ
 		g_aObject[nCntObject].modelData.pBuffMat = NULL;							// マテリアルへのポインタ
-		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
 		g_aObject[nCntObject].modelData.vtxMin   = INIT_VTX_MIN;					// 最小の頂点座標
 		g_aObject[nCntObject].modelData.vtxMax   = INIT_VTX_MAX;					// 最大の頂点座標
 		g_aObject[nCntObject].modelData.size     = INIT_SIZE;						// 大きさ
