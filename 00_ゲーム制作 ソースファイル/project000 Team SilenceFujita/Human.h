@@ -43,7 +43,7 @@ void InitHuman(void);					// 人間の初期化処理
 void UninitHuman(void);					// 人間の終了処理
 void UpdateHuman(void);					// 人間の更新処理
 void DrawHuman(void);					// 人間の描画処理
-void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE humanCurve);		// 人間の設定処理
+void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve);		// 人間の設定処理
 Human *GetHumanData(void);				// 人間の取得処理
 
 //**********************************************************************************************************************
