@@ -167,6 +167,7 @@
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="Human.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="effect.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="Human.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />

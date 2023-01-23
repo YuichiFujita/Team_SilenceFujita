@@ -380,6 +380,12 @@ void UpdateGame(void)
 		// オブジェクトの更新
 		UpdateObject();
 
+		//車の更新
+		UpdateCar();
+
+		//人間の更新
+		UpdateHuman();
+
 		// ビルボードの更新
 		UpdateBillboard();
 
