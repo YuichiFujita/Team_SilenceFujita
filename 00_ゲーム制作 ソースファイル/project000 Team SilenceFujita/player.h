@@ -16,7 +16,7 @@
 //	マクロ定義
 //************************************************************
 #define PLAY_WIDTH			(45.0f)	// プレイヤーの横幅 / 2
-#define PLAY_HEIGHT			(55.0f)	// プレイヤーの縦幅
+#define PLAY_HEIGHT			(25.0f)	// プレイヤーの縦幅
 #define PLAY_DEPTH			(45.0f)	// プレイヤーの奥行 / 2
 
 #define PLAY_LIFE			(100)	// プレイヤーの体力
