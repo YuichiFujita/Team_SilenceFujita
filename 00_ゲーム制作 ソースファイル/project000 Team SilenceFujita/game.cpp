@@ -85,9 +85,6 @@ void InitGame(void)
 	// 車の初期化処理
 	InitCar();
 
-	// 人間の初期化処理
-	InitHuman();
-
 	// カメラの初期化
 	InitCamera();
 
@@ -156,9 +153,6 @@ void UninitGame(void)
 
 	// 車の終了処理
 	UninitCar();
-
-	// 人間の終了処理
-	UninitHuman();
 
 	// カメラの終了
 	UninitCamera();
@@ -289,9 +283,6 @@ void UpdateGame(void)
 
 			// 車の更新
 			UpdateCar();
-
-			// 人間の更新
-			UpdateHuman();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -451,9 +442,6 @@ void DrawGame(void)
 
 	// 車の描画
 	DrawCar();
-
-	// 人間の描画
-	DrawHuman();
 
 	// オブジェクトの描画
 	DrawObject();
