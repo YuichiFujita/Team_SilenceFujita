@@ -385,16 +385,16 @@ void SaveCurrentEdit(void)
 	EditCollision *pEditCollision = GetEditCollision();
 
 	// 横幅と縦幅を計算
-	if (pEditCollision->collision.stateRot == ROTSTATE_0
-	||  pEditCollision->collision.stateRot == ROTSTATE_180)
+	if (pEditCollision->stateRot == ROTSTATE_0
+	||  pEditCollision->stateRot == ROTSTATE_180)
 	{ // 角度が0度、または180度の場合
-		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
-		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
+		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->scale.x) * 0.5f;
+		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->scale.z) * 0.5f;
 	}
 	else
 	{ // 角度90度、または270度の場合
-		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
-		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
+		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->scale.z) * 0.5f;
+		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->scale.x) * 0.5f;
 	}
 
 	//現在の作成した当たり判定をセーブ
@@ -506,7 +506,7 @@ void MoveEdit(void)
 	}
 
 	//当たり判定の位置を反映 (ベクトルの逆方向)
-	pEditCollision->collision.pos = g_EditObject.pos - pEditCollision->collision.vecPos;
+	pEditCollision->pos = g_EditObject.pos - pEditCollision->collision.vecPos;
 }
 
 //=======================================
@@ -571,13 +571,13 @@ void ScaleObjectX(void)
 		{//Uキーを押した場合
 			//X軸を拡大する
 			g_EditObject.scale.x += 0.02f;
-			pEditCollision->collision.scale.x += 0.02f;
+			pEditCollision->scale.x += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_J) == true)
 		{//Jキーを押した場合
 			//X軸を縮小する
 			g_EditObject.scale.x -= 0.02f;
-			pEditCollision->collision.scale.x -= 0.02f;
+			pEditCollision->scale.x -= 0.02f;
 		}
 	}
 }
@@ -596,13 +596,13 @@ void ScaleObjectY(void)
 		{//Iキーを押した場合
 			//Y軸を拡大する
 			g_EditObject.scale.y += 0.02f;
-			pEditCollision->collision.scale.y += 0.02f;
+			pEditCollision->scale.y += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_K) == true)
 		{//Kキーを押した場合
 			//Y軸を縮小する
 			g_EditObject.scale.y -= 0.02f;
-			pEditCollision->collision.scale.y -= 0.02f;
+			pEditCollision->scale.y -= 0.02f;
 		}
 	}
 }
@@ -621,13 +621,13 @@ void ScaleObjectZ(void)
 		{//Oキーを押した場合
 			//Z軸を拡大する
 			g_EditObject.scale.z += 0.02f;
-			pEditCollision->collision.scale.z += 0.02f;
+			pEditCollision->scale.z += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_L) == true)
 		{//Lキーを押した場合
 			//Z軸を縮小する
 			g_EditObject.scale.z -= 0.02f;
-			pEditCollision->collision.scale.z -= 0.02f;
+			pEditCollision->scale.z -= 0.02f;
 		}
 	}
 }
@@ -649,9 +649,9 @@ void ScaleObject(void)
 			g_EditObject.scale.y += 0.02f;
 			g_EditObject.scale.z += 0.02f;
 
-			pEditCollision->collision.scale.x += 0.02f;
-			pEditCollision->collision.scale.y += 0.02f;
-			pEditCollision->collision.scale.z += 0.02f;
+			pEditCollision->scale.x += 0.02f;
+			pEditCollision->scale.y += 0.02f;
+			pEditCollision->scale.z += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_5) == true)
 		{//5キーを押した場合
@@ -660,9 +660,9 @@ void ScaleObject(void)
 			g_EditObject.scale.y -= 0.02f;
 			g_EditObject.scale.z -= 0.02f;
 
-			pEditCollision->collision.scale.x -= 0.02f;
-			pEditCollision->collision.scale.y -= 0.02f;
-			pEditCollision->collision.scale.z -= 0.02f;
+			pEditCollision->scale.x -= 0.02f;
+			pEditCollision->scale.y -= 0.02f;
+			pEditCollision->scale.z -= 0.02f;
 		}
 	}
 }
@@ -687,7 +687,7 @@ void ResetEdit(void)
 		{//3キーを押した場合
 			//拡大率を初期化する
 			g_EditObject.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-			pEditCollision->collision.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			pEditCollision->scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 		}
 	}
 }
@@ -984,7 +984,7 @@ void UpDownEditObject(void)
 	}
 
 	//当たり判定の位置を反映 (ベクトルの逆方向)
-	pEditCollision->collision.pos = g_EditObject.pos - pEditCollision->collision.vecPos;
+	pEditCollision->pos = g_EditObject.pos - pEditCollision->collision.vecPos;
 }
 
 //=======================================
