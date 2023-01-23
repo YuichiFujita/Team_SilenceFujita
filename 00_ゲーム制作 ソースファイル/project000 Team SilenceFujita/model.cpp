@@ -29,6 +29,9 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\bill002.x",	//ビルver2
 	"data\\MODEL_OBJECT\\ARCS.x",		//スーパー
 	"data\\MODEL_OBJECT\\Bakery.x",		//パン屋
+	"data\\MODEL_OBJECT\\farecar.x",	//消防車
+	"data\\MODEL_OBJECT\\policecar.x",	//パトカー
+	"data\\MODEL_OBJECT\\CityOffice.x",	//市役所
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",		// 車

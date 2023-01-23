@@ -10,14 +10,12 @@
 
 #include "main.h"
 #include "model.h"
+#include "object.h"
 
 //セットオブジェクトの情報
 typedef struct
 {
-	D3DXVECTOR3 pos;					// 位置
-	D3DXVECTOR3 vecPos;					// 位置ベクトル
-	D3DXVECTOR3 rot;					// 向き
-	D3DXVECTOR3 scale;					// 拡大率
+	Collision   collision;				// 当たり判定情報
 	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
 	Model       modelData;				// モデル情報
 	int         nType;					// オブジェクトの種類

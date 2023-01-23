@@ -478,7 +478,7 @@ void DrawGame(void)
 
 	// タイマーの描画
 	DrawTimer();
-
+	
 	// 速度バーの描画
 	DrawVelocity();
 

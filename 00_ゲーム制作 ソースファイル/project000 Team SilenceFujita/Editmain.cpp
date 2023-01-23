@@ -142,7 +142,7 @@ void StyleChange(void)
 void CollisionStyleChange(void)
 {
 	if (GetEditObject()->Collisiontype.Collisiontype == COLLISIONTYPE_CREATE
-	||  GetEditObject()->Collisiontype.Collisiontype == COLLISIONTYPE_ONLY)
+	/*||  GetEditObject()->Collisiontype.Collisiontype == COLLISIONTYPE_ONLY*/)
 	{//“–‚½‚è”»’è‚Ìí—Ş‚ªì¬ŠÖ˜A‚Ìí—Ş‚Ìê‡
 		if (GetKeyboardTrigger(DIK_RETURN) == true)
 		{//EnterƒL[‚ğ‰Ÿ‚µ‚½ê‡

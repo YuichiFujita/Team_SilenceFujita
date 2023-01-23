@@ -91,7 +91,7 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.pBuffMat = NULL;				// マテリアルへのポインタ
 		g_aCar[nCntCar].modelData.vtxMin = INIT_VTX_MIN;		// 最小の頂点座標
 		g_aCar[nCntCar].modelData.vtxMax = INIT_VTX_MAX;		// 最大の頂点座標
-		g_aCar[nCntCar].modelData.size = INIT_SIZE;				// 縦幅
+		g_aCar[nCntCar].modelData.size = INIT_SIZE;				// 大きさ
 		g_aCar[nCntCar].modelData.fRadius = 0.0f;				// 半径
 	}
 }

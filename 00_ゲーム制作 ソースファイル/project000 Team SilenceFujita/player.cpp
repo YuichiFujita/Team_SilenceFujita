@@ -128,6 +128,7 @@ void UpdatePlayer(void)
 			}
 		}
 
+#if 1
 		// プレイヤーの移動量の更新
 		MovePlayer();
 
@@ -142,6 +143,28 @@ void UpdatePlayer(void)
 
 		//プレイヤーのカメラの状態変化処理
 		CameraChangePlayer();
+#else
+		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
+		{ // 奥移動の操作が行われた場合
+
+			g_player.pos.z += 10.0f;
+		}
+		if (GetKeyboardPress(DIK_S) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true || GetJoyStickPressLY(0) < 0)
+		{ // 手前移動の操作が行われた場合
+
+			g_player.pos.z -= 10.0f;
+		}
+		if (GetKeyboardPress(DIK_A) == true || GetJoyKeyPress(JOYKEY_LEFT, 0) == true || GetJoyStickPressLX(0) < 0)
+		{ // 左移動の操作が行われた場合
+
+			g_player.pos.x -= 10.0f;
+		}
+		if (GetKeyboardPress(DIK_D) == true || GetJoyKeyPress(JOYKEY_RIGHT, 0) == true || GetJoyStickPressLX(0) > 0)
+		{ // 右移動の操作が行われた場合
+
+			g_player.pos.x += 10.0f;
+		}
+#endif
 
 		// 車の停止処理
 		CollisionStopCar
@@ -419,6 +442,13 @@ void MovePlayer(void)
 
 			// 移動量を更新
 			g_player.move.x -= SUB_MOVE;
+
+			if (g_player.move.x < SUB_MOVE_VALUE)
+			{ // 移動量が一定値より小さい場合
+
+				// 最低限の移動量を代入
+				g_player.move.x = SUB_MOVE_VALUE;
+			}
 		}
 	}
 	else if (GetKeyboardPress(DIK_D) == true)
@@ -432,6 +462,13 @@ void MovePlayer(void)
 
 			// 移動量を更新
 			g_player.move.x -= SUB_MOVE;
+
+			if (g_player.move.x < SUB_MOVE_VALUE)
+			{ // 移動量が一定値より小さい場合
+
+				// 最低限の移動量を代入
+				g_player.move.x = SUB_MOVE_VALUE;
+			}
 		}
 	}
 
