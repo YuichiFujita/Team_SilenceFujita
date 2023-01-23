@@ -18,6 +18,7 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
+#include "Human.h"
 #include "life.h"
 #include "light.h"
 #include "meshfield.h"
@@ -81,8 +82,11 @@ void InitGame(void)
 	// オブジェクトの初期化
 	InitObject();
 
-	//車の初期化処理
+	// 車の初期化処理
 	InitCar();
+
+	// 人間の初期化処理
+	InitHuman();
 
 	// カメラの初期化
 	InitCamera();
@@ -150,8 +154,11 @@ void UninitGame(void)
 	// オブジェクトの終了
 	UninitObject();
 
-	//車の終了処理
+	// 車の終了処理
 	UninitCar();
+
+	// 人間の終了処理
+	UninitHuman();
 
 	// カメラの終了
 	UninitCamera();
@@ -258,9 +265,6 @@ void UpdateGame(void)
 
 		// エディットメインの更新
 		UpdateEditmain();
-
-		// カメラの更新
-		UpdateCamera();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -283,8 +287,11 @@ void UpdateGame(void)
 			// オブジェクトの更新
 			UpdateObject();
 
-			//車の更新処理
+			// 車の更新
 			UpdateCar();
+
+			// 人間の更新
+			UpdateHuman();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -442,8 +449,11 @@ void DrawGame(void)
 	// 警察の描画
 	DrawPolice();
 
-	//車の描画処理
+	// 車の描画
 	DrawCar();
+
+	// 人間の描画
+	DrawHuman();
 
 	// オブジェクトの描画
 	DrawObject();
@@ -462,7 +472,7 @@ void DrawGame(void)
 
 	// タイマーの描画
 	DrawTimer();
-
+	
 	// 速度バーの描画
 	DrawVelocity();
 
