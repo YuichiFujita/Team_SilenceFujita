@@ -24,20 +24,22 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define OBJ_LIFE	(50)		// オブジェクトの体力
+#define COLLISION_SETUP_TXT	"data\\TXT\\collision.txt"	// ステージセットアップ用のテキストファイルの相対パス
 
-#define DAMAGE_TIME_OBJ		(20)					// ダメージ状態を保つ時間
-#define UNR_TIME_OBJ		(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
+#define OBJ_LIFE			(50)						// オブジェクトの体力
+#define DAMAGE_TIME_OBJ		(20)						// ダメージ状態を保つ時間
+#define UNR_TIME_OBJ		(DAMAGE_TIME_OBJ - 10)		// 無敵状態に変更する時間
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void TxtSetCollision(void);				// 当たり判定のセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
 Object    g_aObject[MAX_OBJECT];		// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];	// 当たり判定の情報
-
-
-void a(int nCntObject, D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos);
-
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -88,14 +90,13 @@ void InitObject(void)
 	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
 	{ // オブジェクトの種類の総数分繰り返す
 
-		g_aCollision[nCntObject].pos      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCollision[nCntObject].vecPos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
-		g_aCollision[nCntObject].rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCollision[nCntObject].stateRot = ROTSTATE_0;						// 向き状態
-		g_aCollision[nCntObject].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
-		g_aCollision[nCntObject].fWidth   = 0.0f;							// 横幅
-		g_aCollision[nCntObject].fDepth   = 0.0f;							// 奥行
+		g_aCollision[nCntObject].vecPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+		g_aCollision[nCntObject].fWidth = 0.0f;								// 横幅
+		g_aCollision[nCntObject].fDepth = 0.0f;								// 奥行
 	}
+
+	// 当たり判定のセットアップ
+	TxtSetCollision();
 }
 
 //======================================================================================================================
@@ -528,7 +529,8 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 			case COLLISIONTYPE_CREATE:	// 作成した当たり判定 (汎用)
 
-				D3DXVECTOR3 pos = g_aObject[nCntObject].pos - g_aCollision[g_aObject[nCntObject].nType].vecPos;
+				// 変数を宣言
+				D3DXVECTOR3 pos = g_aObject[nCntObject].pos - g_aCollision[g_aObject[nCntObject].nType].vecPos;	// 当たり判定の中心座標
 
 				// 前後の当たり判定
 				if (pPos->x + fWidth > pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
@@ -609,6 +611,93 @@ Collision *GetCollision(void)
 	return &g_aCollision[0];
 }
 
+//============================================================
+//	当たり判定のセットアップ処理
+//============================================================
+void TxtSetCollision(void)
+{
+	// 変数を宣言
+	int nEnd;					// テキスト読み込み終了の確認用
+	int nType;					// 種類の代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE *pFile;				// ファイルポインタ
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(COLLISION_SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
+
+			if (strcmp(&aString[0], "SETCOLL_OBJECT") == 0)
+			{ // 読み込んだ文字列が SETCOLL_OBJECT の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETCOLL_OBJECT ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_COLLISION") == 0)
+					{ // 読み込んだ文字列が SET_COLLISION の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_COLLISION ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// 種類を読み込む
+							}
+							else if (strcmp(&aString[0], "VECPOS") == 0)
+							{ // 読み込んだ文字列が VECPOS の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf
+								( // 引数
+									pFile, "%f%f%f",
+									&g_aCollision[nType].vecPos.x,	// 位置ベクトル (x) を読み込む
+									&g_aCollision[nType].vecPos.y,	// 位置ベクトル (y) を読み込む
+									&g_aCollision[nType].vecPos.z	// 位置ベクトル (z) を読み込む
+								);
+							}
+							else if (strcmp(&aString[0], "WIDTH") == 0)
+							{ // 読み込んだ文字列が WIDTH の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f", &g_aCollision[nType].fWidth);	// 横幅を読み込む
+							}
+							else if (strcmp(&aString[0], "DEPTH") == 0)
+							{ // 読み込んだ文字列が DEPTH の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f", &g_aCollision[nType].fDepth);	// 奥行を読み込む
+							}
+						} while (strcmp(&aString[0], "END_SET_COLLISION") != 0);	// 読み込んだ文字列が END_SET_COLLISION ではない場合ループ
+					}
+				} while (strcmp(&aString[0], "END_SETCOLL_OBJECT") != 0);			// 読み込んだ文字列が END_SETCOLL_OBJECT ではない場合ループ
+			}
+		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "当たり判定ファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
 
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================
