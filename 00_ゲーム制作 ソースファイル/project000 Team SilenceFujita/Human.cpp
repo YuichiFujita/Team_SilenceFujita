@@ -16,6 +16,7 @@
 #include "sound.h"
 #include "player.h"
 #include "Police.h"
+#include "curve.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -24,20 +25,19 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define HUMAN_LIFE				(50)		// オブジェクトの体力
-#define HUMAN_GRAVITY				(0.75f)		// プレイヤーにかかる重力
-#define HUMAN_MOVE_FORWARD		(0.1f)		// プレイヤー前進時の移動量
-#define HUMAN_MOVE_BACKWARD		(0.2f)		// プレイヤー後退時の移動量
-#define HUMAN_MOVE_ROT			(0.012f)	// プレイヤーの向き変更量
-#define REV_HUMAN_MOVE_ROT		(0.1f)		// 移動量による向き変更量の補正係数
+#define HUMAN_LIFE					(50)		// 人の体力
+#define HUMAN_GRAVITY				(0.75f)		// 人にかかる重力
+#define HUMAN_MOVE_FORWARD			(0.1f)		// 人前進時の移動量
+#define HUMAN_MOVE_BACKWARD			(0.2f)		// 人後退時の移動量
+#define HUMAN_MOVE_ROT				(0.012f)	// 人の向き変更量
+#define REV_HUMAN_MOVE_ROT			(0.1f)		// 移動量による向き変更量の補正係数
 #define SUB_HUMAN_MOVE_VALUE		(15.0f)		// 向き変更時の減速が行われる移動量
-#define SUB_HUMAN_MOVE			(0.05f)		// 向き変更時の減速量
-#define MAX_HUMAN_FORWARD			(30.0f)		// 前進時の最高速度
-#define MAX_HUMAN_FORWARD_PATROL  (15.0f)		// パトロール中の前進時の最高速度
-#define MAX_HUMAN_BACKWARD		(8.0f)		// 後退時の最高速度
-#define REV_HUMAN_MOVE_SUB		(0.04f)		// 移動量の減速係数
-#define HUMAN_WIDTH				(30.0f)		// パトカーの縦幅
-#define HUMAN_HEIGHT				(30.0f)		// パトカーの奥行
+#define SUB_HUMAN_MOVE				(0.05f)		// 向き変更時の減速量
+#define MAX_HUMAN_FORWARD			(2.0f)		// 前進時の最高速度
+#define MAX_HUMAN_BACKWARD			(8.0f)		// 後退時の最高速度
+#define REV_HUMAN_MOVE_SUB			(0.04f)		// 移動量の減速係数
+#define HUMAN_WIDTH					(10.0f)		// 人の縦幅
+#define HUMAN_HEIGHT				(10.0f)		// 人の奥行
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -69,7 +69,7 @@ void InitHuman(void)
 		case 0:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(6575.0f, 0.0f, 2075.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(6500.0f, 0.0f, 2000.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = false;
@@ -88,7 +88,7 @@ void InitHuman(void)
 		case 1:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(2075.0f, 0.0f, 2075.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(2000.0f, 0.0f, 2000.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = true;
@@ -107,7 +107,7 @@ void InitHuman(void)
 		case 2:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(2075.0f, 0.0f, 6575.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(2000.0f, 0.0f, 6500.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = false;
@@ -126,7 +126,7 @@ void InitHuman(void)
 		case 3:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-6575.0f, 0.0f, 6575.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-6500.0f, 0.0f, 6500.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = true;
@@ -145,7 +145,7 @@ void InitHuman(void)
 		case 4:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-6575.0f, 0.0f, 2425.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-6500.0f, 0.0f, 2500.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = false;
@@ -164,7 +164,7 @@ void InitHuman(void)
 		case 5:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-2325.0f, 0.0f, 2425.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-2250.0f, 0.0f, 2500.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = true;
@@ -183,7 +183,7 @@ void InitHuman(void)
 		case 6:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-2325.0f, 0.0f, -2075.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-2250.0f, 0.0f, -2000.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = false;
@@ -202,7 +202,7 @@ void InitHuman(void)
 		case 7:
 
 			//次曲がるポイント
-			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(6575.0f, 0.0f, -2075.0f);
+			HumanCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(6500.0f, 0.0f, -2000.0f);
 
 			//今走ってる軸
 			HumanCurveInfo.bCurveX[nCntInfo] = true;
@@ -389,7 +389,7 @@ void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 			g_aHuman[nCntHuman].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aHuman[nCntHuman].bMove = false;							// 移動していない
 
-																	// 使用している状態にする
+			// 使用している状態にする
 			g_aHuman[nCntHuman].bUse = true;
 
 			// モデル情報を設定
@@ -400,7 +400,7 @@ void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 			( // 引数
 				g_aHuman[nCntHuman].modelData,	// モデル情報
 				&g_aHuman[nCntHuman].nShadowID,	// 影の親の影インデックス
-				&g_aHuman[nCntHuman].bUse			// 影の親の使用状況
+				&g_aHuman[nCntHuman].bUse		// 影の親の使用状況
 			);
 
 			// 影の位置設定
@@ -409,16 +409,16 @@ void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 			//曲がり角関係の設定
 			for (int nCntCurve = 0; nCntCurve < humanCurve.nCurveTime; nCntCurve++)
 			{
-				g_aHuman[nCntHuman].carCurve.curveAngle[nCntCurve] = humanCurve.curveAngle[nCntCurve];	// 次曲がる方向
+				g_aHuman[nCntHuman].carCurve.fCurveRot[nCntCurve] = humanCurve.fCurveRot[nCntCurve];	// 次曲がる向き
 				g_aHuman[nCntHuman].carCurve.curvePoint[nCntCurve] = humanCurve.curvePoint[nCntCurve];	// 次曲がるポイント
-				g_aHuman[nCntHuman].carCurve.bCurveX[nCntCurve] = humanCurve.bCurveX[nCntCurve];		// 現在走っている軸
-				g_aHuman[nCntHuman].carCurve.bCurvePlus[nCntCurve] = humanCurve.bCurvePlus[nCntCurve];	// 現在走っている方向
-				g_aHuman[nCntHuman].carCurve.fCurveRot[nCntCurve] = humanCurve.fCurveRot[nCntCurve];	// 次曲がる目標の方向
 			}
 			g_aHuman[nCntHuman].carCurve.nNowCurve = 0;													// 現在のルート
 			g_aHuman[nCntHuman].carCurve.nCurveTime = humanCurve.nCurveTime;							// 曲がる回数
 
-																									// 処理を抜ける
+			//カーブの設定処理
+			SetCurvePoint(&g_aHuman[nCntHuman].carCurve, &g_aHuman[nCntHuman].rot, &g_aHuman[nCntHuman].pos);
+
+			// 処理を抜ける
 			break;
 		}
 	}
@@ -767,11 +767,11 @@ void CurveHuman(Human *pHuman)
 		}
 	}
 
-	if (pHuman->move.x > MAX_HUMAN_FORWARD_PATROL)
+	if (pHuman->move.x > MAX_HUMAN_FORWARD)
 	{ // プレイヤーの移動量 (x) が一定値以上の場合
 
 	  // プレイヤーの移動量 (x) を補正
-		pHuman->move.x = MAX_HUMAN_FORWARD_PATROL;
+		pHuman->move.x = MAX_HUMAN_FORWARD;
 	}
 }
 
