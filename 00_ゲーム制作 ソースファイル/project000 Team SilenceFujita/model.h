@@ -28,6 +28,7 @@ typedef enum
 	MODELTYPE_OBJECT_BAKERY,		// パン屋
 	MODELTYPE_OBJECT_FARECAR,		// 消防車
 	MODELTYPE_OBJECT_POLICE,		// パトカー
+	MODELTYPE_OBJECT_CITYOFFECE,	// 市役所
 
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,			// 車
@@ -45,8 +46,8 @@ typedef enum
 #define INIT_SIZE		(D3DXVECTOR3(0.0f, 0.0f, 0.0f))					// モデルサイズの初期値
 
 #define FROM_OBJECT		(0)		// オブジェクトのモデル列挙の開始地点
-#define MODEL_OBJ_MAX	(14)	// オブジェクトのモデルの総数
-#define FROM_PLAYER		(14)	// プレイヤーのモデル列挙の開始地点
+#define MODEL_OBJ_MAX	(15)	// オブジェクトのモデルの総数
+#define FROM_PLAYER		(15)	// プレイヤーのモデル列挙の開始地点
 #define MODEL_PLAY_MAX	(1)		// プレイヤーのモデルの総数
 #define FROM_EDIT		(13)	// エディットのモデル列挙の開始地点
 #define MODEL_EDIT_MAX	(1)		// エディットのモデルの総数
