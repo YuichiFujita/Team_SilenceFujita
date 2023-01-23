@@ -20,7 +20,7 @@
 #define MAX_CAR			(128)		// 使用する車の最大数
 
 //**********************************************************************************************************************
-//	構造体定義 (Police)
+//	構造体定義 (Car)
 //**********************************************************************************************************************
 typedef struct
 {
@@ -54,7 +54,7 @@ void InitCar(void);					// 車の初期化処理
 void UninitCar(void);				// 車の終了処理
 void UpdateCar(void);				// 車の更新処理
 void DrawCar(void);					// 車の描画処理
-void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve);		// 車の設定処理
+void SetCar(D3DXVECTOR3 pos, CURVE carCurve);		// 車の設定処理
 void CollisionCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// 車との当たり判定
 Car *GetCarData(void);																		// 車の取得処理
 void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// 車の停止処理

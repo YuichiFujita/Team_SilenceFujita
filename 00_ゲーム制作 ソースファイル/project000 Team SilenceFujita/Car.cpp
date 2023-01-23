@@ -57,171 +57,8 @@ Car g_aCar[MAX_CAR];		// 車の情報
 //======================================================================================================================
 void InitCar(void)
 {
-	CURVE CarCurveInfo;				//情報
-
-	//曲がる回数
-	CarCurveInfo.nCurveTime = 8;
-
-	for (int nCntInfo = 0; nCntInfo < CarCurveInfo.nCurveTime; nCntInfo++)
-	{
-		switch (nCntInfo)
-		{
-		case 0:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(6575.0f, 0.0f, 2075.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = false;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = true;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_LEFT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = -90;
-
-			break;				//抜け出す
-
-		case 1:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(2075.0f, 0.0f, 2075.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = true;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = false;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_RIGHT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = 0;
-
-			break;				//抜け出す
-
-		case 2:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(2075.0f, 0.0f, 6575.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = false;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = true;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_LEFT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = -90;
-
-			break;
-
-		case 3:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-6575.0f, 0.0f, 6575.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = true;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = false;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_LEFT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = -180;
-
-			break;				//抜け出す
-
-		case 4:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-6575.0f, 0.0f, 2425.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = false;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = false;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_LEFT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = 90;
-
-			break;				//抜け出す
-
-		case 5:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-2325.0f, 0.0f, 2425.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = true;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = true;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_RIGHT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = 180;
-
-			break;				//抜け出す
-
-		case 6:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(-2325.0f, 0.0f, -2075.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = false;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = false;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_LEFT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = 90;
-
-			break;				//抜け出す
-
-		case 7:
-
-			//次曲がるポイント
-			CarCurveInfo.curvePoint[nCntInfo] = D3DXVECTOR3(6575.0f, 0.0f, -2075.0f);
-
-			//今走ってる軸
-			CarCurveInfo.bCurveX[nCntInfo] = true;
-
-			//今走っている方向
-			CarCurveInfo.bCurvePlus[nCntInfo] = true;
-
-			//次曲がる方向
-			CarCurveInfo.curveAngle[nCntInfo] = CURVE_LEFT;
-
-			//次に向く角度
-			CarCurveInfo.fCurveRot[nCntInfo] = 0;
-
-			break;				//抜け出す
-		}
-	}
-
 	// ポインタを宣言
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();		// デバイスへのポインタ
 
 	// 車の情報の初期化
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
@@ -257,9 +94,6 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.size = INIT_SIZE;				// 縦幅
 		g_aCar[nCntCar].modelData.fRadius = 0.0f;				// 半径
 	}
-
-	//車の設定処理
-	SetCar(D3DXVECTOR3(6000.0f, 0.0f, -1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CarCurveInfo);
 }
 
 //======================================================================================================================
@@ -398,7 +232,7 @@ void DrawCar(void)
 //======================================================================================================================
 //	車の設定処理
 //======================================================================================================================
-void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
+void SetCar(D3DXVECTOR3 pos, CURVE carCurve)
 {
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -408,7 +242,6 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
 			// 引数を代入
 			g_aCar[nCntCar].pos = pos;								// 現在の位置
 			g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;			// 前回の位置
-			g_aCar[nCntCar].rot = rot;								// 向き
 			g_aCar[nCntCar].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aCar[nCntCar].bMove = false;							// 移動していない
 
@@ -423,7 +256,7 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
 			( // 引数
 				g_aCar[nCntCar].modelData,	// モデル情報
 				&g_aCar[nCntCar].nShadowID,	// 影の親の影インデックス
-				&g_aCar[nCntCar].bUse			// 影の親の使用状況
+				&g_aCar[nCntCar].bUse		// 影の親の使用状況
 			);
 
 			// 影の位置設定
@@ -432,14 +265,14 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
 			//曲がり角関係の設定
 			for (int nCntCurve = 0; nCntCurve < carCurve.nCurveTime; nCntCurve++)
 			{
-				g_aCar[nCntCar].carCurve.curveAngle[nCntCurve] = carCurve.curveAngle[nCntCurve];	// 次曲がる方向
-				g_aCar[nCntCar].carCurve.curvePoint[nCntCurve] = carCurve.curvePoint[nCntCurve];	// 次曲がるポイント
-				g_aCar[nCntCar].carCurve.bCurveX[nCntCurve] = carCurve.bCurveX[nCntCurve];			// 現在走っている軸
-				g_aCar[nCntCar].carCurve.bCurvePlus[nCntCurve] = carCurve.bCurvePlus[nCntCurve];	// 現在走っている方向
 				g_aCar[nCntCar].carCurve.fCurveRot[nCntCurve] = carCurve.fCurveRot[nCntCurve];		// 次曲がる目標の方向
+				g_aCar[nCntCar].carCurve.curvePoint[nCntCurve] = carCurve.curvePoint[nCntCurve];	// 次曲がる位置
 			}
 			g_aCar[nCntCar].carCurve.nNowCurve = 0;													// 現在のルート
 			g_aCar[nCntCar].carCurve.nCurveTime = carCurve.nCurveTime;								// 曲がる回数
+
+			//カーブポイントの設定処理
+			SetCurvePoint(&g_aCar[nCntCar].carCurve, &g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 
 			// 処理を抜ける
 			break;
@@ -890,7 +723,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					case COLLOBJECTTYPE_CAR:		//車の場合
 
 						// 目標の移動量をセーブする
-						move->x += (0.0f - move->x) * 0.5f;
+						move->x = 0.0f;
 
 						break;						//抜け出す
 					}
@@ -915,14 +748,14 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 				{
 				case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
 
-												// 移動量を設定する
+					// 移動量を設定する
 					move->x = sinf(targetrot.y) * -3.0f;
 
 					break;						//抜け出す
 
 				case COLLOBJECTTYPE_POLICE:		//車の場合
 
-												// 目標の移動量をセーブする
+					// 目標の移動量をセーブする
 					move->x += (0.0f - move->x) * 0.5f;
 
 					break;						//抜け出す
@@ -930,7 +763,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 				case COLLOBJECTTYPE_CAR:		//車の場合
 
 					// 目標の移動量をセーブする
-					move->x += (0.0f - move->x) * 0.5f;
+					move->x = 0.0f;
 
 					break;						//抜け出す
 				}
@@ -984,7 +817,7 @@ void CurveRotCar(Car *pCar)
 			{//次の曲がり角が右だった場合
 				if (pCar->carCurve.fCurveRot[(pCar->carCurve.nNowCurve + 1) % pCar->carCurve.nCurveTime] == -90)
 				{//次の曲がり角がマイナス方向に曲がる場合
-					//向きをプラスに戻す
+					//向きをマイナスに戻す
 					pCar->rot.y = (float)D3DXToRadian(-180);
 				}
 			}

@@ -259,7 +259,7 @@ void InitHuman(void)
 	}
 
 	//人間の設定処理
-	SetHuman(D3DXVECTOR3(6000.0f, 0.0f, -1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), HumanCurveInfo);
+	SetHuman(D3DXVECTOR3(6000.0f, 0.0f, -1000.0f), HumanCurveInfo);
 }
 
 //======================================================================================================================
@@ -357,7 +357,7 @@ void DrawHuman(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aHuman[nCntHuman].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-			  // マテリアルの設定
+				// マテリアルの設定
 				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
 				// テクスチャの設定
@@ -376,7 +376,7 @@ void DrawHuman(void)
 //======================================================================================================================
 //	人間の設定処理
 //======================================================================================================================
-void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
+void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 {
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -386,7 +386,6 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
 		  // 引数を代入
 			g_aHuman[nCntHuman].pos = pos;								// 現在の位置
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;			// 前回の位置
-			g_aHuman[nCntHuman].rot = rot;								// 向き
 			g_aHuman[nCntHuman].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aHuman[nCntHuman].bMove = false;							// 移動していない
 
@@ -408,16 +407,16 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CURVE carCurve)
 			SetPositionShadow(g_aHuman[nCntHuman].nShadowID, g_aHuman[nCntHuman].pos, g_aHuman[nCntHuman].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
 			//曲がり角関係の設定
-			for (int nCntCurve = 0; nCntCurve < carCurve.nCurveTime; nCntCurve++)
+			for (int nCntCurve = 0; nCntCurve < humanCurve.nCurveTime; nCntCurve++)
 			{
-				g_aHuman[nCntHuman].carCurve.curveAngle[nCntCurve] = carCurve.curveAngle[nCntCurve];	// 次曲がる方向
-				g_aHuman[nCntHuman].carCurve.curvePoint[nCntCurve] = carCurve.curvePoint[nCntCurve];	// 次曲がるポイント
-				g_aHuman[nCntHuman].carCurve.bCurveX[nCntCurve] = carCurve.bCurveX[nCntCurve];			// 現在走っている軸
-				g_aHuman[nCntHuman].carCurve.bCurvePlus[nCntCurve] = carCurve.bCurvePlus[nCntCurve];	// 現在走っている方向
-				g_aHuman[nCntHuman].carCurve.fCurveRot[nCntCurve] = carCurve.fCurveRot[nCntCurve];		// 次曲がる目標の方向
+				g_aHuman[nCntHuman].carCurve.curveAngle[nCntCurve] = humanCurve.curveAngle[nCntCurve];	// 次曲がる方向
+				g_aHuman[nCntHuman].carCurve.curvePoint[nCntCurve] = humanCurve.curvePoint[nCntCurve];	// 次曲がるポイント
+				g_aHuman[nCntHuman].carCurve.bCurveX[nCntCurve] = humanCurve.bCurveX[nCntCurve];		// 現在走っている軸
+				g_aHuman[nCntHuman].carCurve.bCurvePlus[nCntCurve] = humanCurve.bCurvePlus[nCntCurve];	// 現在走っている方向
+				g_aHuman[nCntHuman].carCurve.fCurveRot[nCntCurve] = humanCurve.fCurveRot[nCntCurve];	// 次曲がる目標の方向
 			}
 			g_aHuman[nCntHuman].carCurve.nNowCurve = 0;													// 現在のルート
-			g_aHuman[nCntHuman].carCurve.nCurveTime = carCurve.nCurveTime;								// 曲がる回数
+			g_aHuman[nCntHuman].carCurve.nCurveTime = humanCurve.nCurveTime;							// 曲がる回数
 
 																									// 処理を抜ける
 			break;
