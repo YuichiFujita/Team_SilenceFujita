@@ -1,13 +1,14 @@
 #ifdef _DEBUG	// デバッグ処理
 //===========================================
 //
-//オブジェクトのメイン処理[Object.cpp]
+//オブジェクトのメイン処理[EditObject.cpp]
 //Author 小原立暉
 //
 //===========================================
 #include "main.h"
 #include "model.h"
 #include "EditObject.h"
+#include "EditCollision.h"
 #include "Editmain.h"
 #include "input.h"
 #include "camera.h"
@@ -17,6 +18,7 @@
 #include "SoundDJ.h"
 
 //プロトタイプ宣言
+void SaveCurrentEdit(void);								//エディット状況の一時保存処理
 void TypeChangeEdit(void);								//種類変更処理
 void MoveEdit(void);									//移動処理
 void RotationEdit(void);								//回転処理
@@ -49,15 +51,18 @@ const char *c_apShadowmodename[SHADOWTYPE_MAX] =
 	"リアル影",
 };
 
-//影モードの表記
+//当たり判定モードの表記
 const char *c_apCollisionmodename[COLLISIONTYPE_MAX] =
 {
 	"当たり判定無し",
-	"当たり判定あり",
+	"モデル頂点の当たり判定",
+	"作成した汎用の当たり判定",
+	//"作成したそれぞれの当たり判定",
 };
 
 //グローバル変数
-EditObject g_EditObject;								//オブジェクトの情報
+EditObject  g_EditObject;								//オブジェクトの情報
+D3DXVECTOR3 g_aScaleObject[MODEL_OBJ_MAX];				//オブジェクトの拡大率の情報
 int g_nStyleObject;										//スタイルの変数
 
 //==========================================
@@ -103,7 +108,7 @@ void InitEditObject(void)
 		g_EditObject.Shadowtype.Shadowtype = SHADOWTYPE_NONE;
 
 		//当たり判定あり
-		g_EditObject.Collisiontype.Collisiontype = COLLISIONTYPE_ON;
+		g_EditObject.Collisiontype.Collisiontype = COLLISIONTYPE_MODEL;
 	}
 
 	for (int nCntBreak = 0; nCntBreak < BREAKTYPE_MAX; nCntBreak++)
@@ -120,7 +125,7 @@ void InitEditObject(void)
 
 	for (int nCntCollision = 0; nCntCollision < COLLISIONTYPE_MAX; nCntCollision++)
 	{
-		//影のデバッグ表記を設定
+		//当たり判定のデバッグ表記を設定
 		g_EditObject.Collisiontype.pCollisionMode[nCntCollision] = (char*)c_apCollisionmodename[nCntCollision];
 	}
 
@@ -128,7 +133,7 @@ void InitEditObject(void)
 	g_nStyleObject = EDITSTYLE_OBJECT;
 
 	//カスタム用のマテリアル情報
-	for (int nCntModel = 0; nCntModel < MODELTYPE_OBJECT_MAX; nCntModel++)
+	for (int nCntModel = 0; nCntModel < MODEL_OBJ_MAX; nCntModel++)
 	{ // モデルの初期化
 		//マテリアルの色を取得する
 		D3DXMATERIAL *pMat = (D3DXMATERIAL*)GetModelData(nCntModel + FROM_OBJECT).pBuffMat->GetBufferPointer();
@@ -139,6 +144,14 @@ void InitEditObject(void)
 			g_EditObject.MatCopy[nCntModel][nCntMat] = pMat[nCntMat];
 			g_EditObject.EditMaterial[nCntModel][nCntMat] = pMat[nCntMat];
 		}
+	}
+
+	// オブジェクトの拡大率の情報の初期化
+	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
+	{ // オブジェクトの種類の総数分繰り返す
+
+		// 拡大率の初期化
+		g_aScaleObject[nCntObject] = D3DXVECTOR3(1.0f, 1.0f, 1.0f);		//オブジェクトの拡大率情報
 	}
 }
 
@@ -156,7 +169,6 @@ void UninitEditObject(void)
 void UpdateEditObject(void)
 {
 	Object *pObject = GetObjectData();				//オブジェクトを取得する
-	Camera *pCamera = GetCamera();					//カメラの情報を取得する
 
 	g_nStyleObject = GetStyle();					//スタイルを取得する
 
@@ -178,6 +190,9 @@ void UpdateEditObject(void)
 				break;							//抜け出す
 			}
 		}
+
+		//エディット状況の一時保存処理
+		SaveCurrentEdit();
 	}
 	else
 	{//オブジェクト設置モードじゃなかった場合
@@ -185,64 +200,68 @@ void UpdateEditObject(void)
 		g_EditObject.bUse = false;
 	}
 
-	//種類変更処理
-	TypeChangeEdit();
+	if (GetCollisionStyle() == COLLISIONSTYLE_OBJECT)
+	{ // 当たり判定スタイルがオブジェクト変更状態の場合
 
-	//移動処理
-	MoveEdit();
+		//種類変更処理
+		TypeChangeEdit();
 
-	//回転処理
-	RotationEdit();
+		//移動処理
+		MoveEdit();
 
-	//オブジェクトの直角処理
-	RightAngleEditObject();
+		//回転処理
+		RotationEdit();
 
-	if (g_EditObject.rot.y > D3DX_PI)
-	{//3.14fより大きくなった場合
-		//-3.14fに補正する
-		g_EditObject.rot.y -= D3DX_PI * 2;
+		//オブジェクトの直角処理
+		RightAngleEditObject();
+
+		if (g_EditObject.rot.y > D3DX_PI)
+		{//3.14fより大きくなった場合
+			//-3.14fに補正する
+			g_EditObject.rot.y -= D3DX_PI * 2;
+		}
+		else if (g_EditObject.rot.y < -D3DX_PI)
+		{//-3.14fより小さくなった場合
+			//3.14fに補正する
+			g_EditObject.rot.y += D3DX_PI * 2;
+		}
+
+		//オブジェクトの消去
+		DeleteEditObject();
+
+		//オブジェクトの設定処理
+		SetEdit();
+
+		//オブジェクトの拡大縮小処理(X軸)
+		ScaleObjectX();
+
+		//オブジェクトの拡大縮小処理(Y軸)
+		ScaleObjectY();
+
+		//オブジェクトの拡大縮小処理(Z軸)
+		ScaleObjectZ();
+
+		//オブジェクトの拡大縮小処理
+		ScaleObject();
+
+		//オブジェクトの情報リセット処理
+		ResetEdit();
+
+		//マテリアルのエディット処理
+		EditMaterialCustom();
+
+		//オブジェクトの破壊エディット処理
+		BreakEdit();
+
+		//オブジェクトの影のエディット処理
+		ShadowEdit();
+
+		//オブジェクトの当たり判定のエディット処理
+		CollisionEdit();
+
+		//オブジェクトの上下移動処理
+		UpDownEditObject();
 	}
-	else if (g_EditObject.rot.y < -D3DX_PI)
-	{//-3.14fより小さくなった場合
-		//3.14fに補正する
-		g_EditObject.rot.y += D3DX_PI * 2;
-	}
-
-	//オブジェクトの消去
-	DeleteEditObject();
-
-	//オブジェクトの設定処理
-	SetEdit();
-
-	//オブジェクトの拡大縮小処理(X軸)
-	ScaleObjectX();	
-
-	//オブジェクトの拡大縮小処理(Y軸)
-	ScaleObjectY();
-
-	//オブジェクトの拡大縮小処理(Z軸)
-	ScaleObjectZ();
-
-	//オブジェクトの拡大縮小処理
-	ScaleObject();
-
-	//オブジェクトの情報リセット処理
-	ResetEdit();
-
-	//マテリアルのエディット処理
-	EditMaterialCustom();
-
-	//オブジェクトの破壊エディット処理
-	BreakEdit();
-
-	//オブジェクトの影のエディット処理
-	ShadowEdit();
-
-	//オブジェクトの当たり判定のエディット処理
-	CollisionEdit();
-
-	//オブジェクトの上下移動処理
-	UpDownEditObject();
 }
 
 //=====================================
@@ -357,19 +376,58 @@ void DeleteEditObject(void)
 }
 
 //=======================================
+//エディット状況の一時保存処理
+//=======================================
+void SaveCurrentEdit(void)
+{
+	//ポインタを宣言
+	Collision     *pCollision     = GetCollision();
+	EditCollision *pEditCollision = GetEditCollision();
+
+	// 横幅と縦幅を計算
+	if (pEditCollision->collision.stateRot == ROTSTATE_0
+	||  pEditCollision->collision.stateRot == ROTSTATE_180)
+	{ // 角度が0度、または180度の場合
+		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
+		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
+	}
+	else
+	{ // 角度90度、または270度の場合
+		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
+		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
+	}
+
+	//現在の作成した当たり判定をセーブ
+	pCollision[g_EditObject.nType] = pEditCollision->collision;
+
+	//現在のモデル拡大率をセーブ
+	g_aScaleObject[g_EditObject.nType] = g_EditObject.scale;
+}
+
+//=======================================
 //種類変更処理
 //=======================================
 void TypeChangeEdit(void)
 {
+	//ポインタを宣言
+	Collision     *pCollision     = GetCollision();
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
 		if (GetKeyboardTrigger(DIK_1) == true)
 		{//1キーを押した場合
 			//設定オブジェクトの種類を選択する
-			g_EditObject.nType = (g_EditObject.nType + 1) % MODELTYPE_OBJECT_MAX;
+			g_EditObject.nType = (g_EditObject.nType + 1) % MODEL_OBJ_MAX;
 
 			//設定する
 			g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
+
+			//現在の作成した当たり判定をロード
+			pEditCollision->collision = pCollision[g_EditObject.nType];
+
+			//現在のモデル拡大率をロード
+			g_EditObject.scale = g_aScaleObject[g_EditObject.nType];
 		}
 	}
 }
@@ -379,6 +437,9 @@ void TypeChangeEdit(void)
 //=======================================
 void MoveEdit(void)
 {
+	//ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{//左シフトキーが押されていた場合
 		//処理を抜ける
@@ -443,6 +504,9 @@ void MoveEdit(void)
 			}
 		}
 	}
+
+	//当たり判定の位置を反映 (ベクトルの逆方向)
+	pEditCollision->collision.pos = g_EditObject.pos - pEditCollision->collision.vecPos;
 }
 
 //=======================================
@@ -498,17 +562,22 @@ void SetEdit(void)
 //=======================================
 void ScaleObjectX(void)
 {
+	//ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
 		if (GetKeyboardPress(DIK_U) == true)
 		{//Uキーを押した場合
 			//X軸を拡大する
 			g_EditObject.scale.x += 0.02f;
+			pEditCollision->collision.scale.x += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_J) == true)
 		{//Jキーを押した場合
 			//X軸を縮小する
 			g_EditObject.scale.x -= 0.02f;
+			pEditCollision->collision.scale.x -= 0.02f;
 		}
 	}
 }
@@ -518,17 +587,22 @@ void ScaleObjectX(void)
 //=======================================
 void ScaleObjectY(void)
 {
+	//ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
 		if (GetKeyboardPress(DIK_I) == true)
 		{//Iキーを押した場合
 			//Y軸を拡大する
 			g_EditObject.scale.y += 0.02f;
+			pEditCollision->collision.scale.y += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_K) == true)
 		{//Kキーを押した場合
 			//Y軸を縮小する
 			g_EditObject.scale.y -= 0.02f;
+			pEditCollision->collision.scale.y -= 0.02f;
 		}
 	}
 }
@@ -538,17 +612,22 @@ void ScaleObjectY(void)
 //=======================================
 void ScaleObjectZ(void)
 {
+	//ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
 		if (GetKeyboardPress(DIK_O) == true)
 		{//Oキーを押した場合
 			//Z軸を拡大する
 			g_EditObject.scale.z += 0.02f;
+			pEditCollision->collision.scale.z += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_L) == true)
 		{//Lキーを押した場合
 			//Z軸を縮小する
 			g_EditObject.scale.z -= 0.02f;
+			pEditCollision->collision.scale.z -= 0.02f;
 		}
 	}
 }
@@ -558,6 +637,9 @@ void ScaleObjectZ(void)
 //=======================================
 void ScaleObject(void)
 {
+	//ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
 		if (GetKeyboardPress(DIK_4) == true)
@@ -566,6 +648,10 @@ void ScaleObject(void)
 			g_EditObject.scale.x += 0.02f;
 			g_EditObject.scale.y += 0.02f;
 			g_EditObject.scale.z += 0.02f;
+
+			pEditCollision->collision.scale.x += 0.02f;
+			pEditCollision->collision.scale.y += 0.02f;
+			pEditCollision->collision.scale.z += 0.02f;
 		}
 		else if (GetKeyboardPress(DIK_5) == true)
 		{//5キーを押した場合
@@ -573,6 +659,10 @@ void ScaleObject(void)
 			g_EditObject.scale.x -= 0.02f;
 			g_EditObject.scale.y -= 0.02f;
 			g_EditObject.scale.z -= 0.02f;
+
+			pEditCollision->collision.scale.x -= 0.02f;
+			pEditCollision->collision.scale.y -= 0.02f;
+			pEditCollision->collision.scale.z -= 0.02f;
 		}
 	}
 }
@@ -582,6 +672,9 @@ void ScaleObject(void)
 //=======================================
 void ResetEdit(void)
 {
+	//ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (GetKeyboardTrigger(DIK_2) == true)
 	{//2キーを押した場合
 		//角度を初期化する
@@ -594,6 +687,7 @@ void ResetEdit(void)
 		{//3キーを押した場合
 			//拡大率を初期化する
 			g_EditObject.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			pEditCollision->collision.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 		}
 	}
 }
@@ -848,6 +942,9 @@ void CollisionEdit(void)
 //=======================================
 void UpDownEditObject(void)
 {
+	//ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{//左SHIFTキーを押している場合
 		if (GetKeyboardPress(DIK_LCONTROL) == true)
@@ -885,6 +982,9 @@ void UpDownEditObject(void)
 			g_EditObject.pos.y = 0.0f;
 		}
 	}
+
+	//当たり判定の位置を反映 (ベクトルの逆方向)
+	pEditCollision->collision.pos = g_EditObject.pos - pEditCollision->collision.vecPos;
 }
 
 //=======================================
@@ -906,4 +1006,5 @@ void RightAngleEditObject(void)
 		}
 	}
 }
+
 #endif

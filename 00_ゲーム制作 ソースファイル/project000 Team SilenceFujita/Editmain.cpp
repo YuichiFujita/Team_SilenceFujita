@@ -8,6 +8,7 @@
 #include "main.h"
 #include "game.h"
 #include "EditObject.h"
+#include "EditCollision.h"
 #include "EditBillboard.h"
 #include "Editmain.h"
 #include "SoundDJ.h"
@@ -25,6 +26,7 @@ void DrawDebugControlBillboard(void);	//エディットビルボード操作説明
 
 //グローバル変数
 int g_EditStyle;						//スタイル
+int g_CollisionStyle;					//当たり判定スタイル
 
 //======================
 //初期化
@@ -34,11 +36,17 @@ void InitEditmain()
 	//エディットオブジェクトの初期化処理
 	InitEditObject();
 
+	//エディット当たり判定の初期化処理
+	InitEditCollision();
+
 	//エディットビルボードの初期化処理
 	InitEditBillboard();
 
 	//エディットオブジェクトスタイルにする
 	g_EditStyle = EDITSTYLE_OBJECT;
+
+	//当たり判定スタイル
+	g_CollisionStyle = COLLISIONSTYLE_OBJECT;
 }
 
 //============================
@@ -46,8 +54,11 @@ void InitEditmain()
 //============================
 void UninitEditmain(void)
 {
-	//エディットの終了処理
+	//エディットオブジェクトの終了処理
 	UninitEditObject();
+
+	//エディット当たり判定の終了処理
+	UninitEditCollision();
 
 	//エディットビルボードの終了処理
 	UninitEditBillboard();
@@ -61,10 +72,16 @@ void UpdateEditmain(void)
 	//スタイル変更処理
 	StyleChange();
 
+	//当たり判定スタイル変更処理
+	CollisionStyleChange();
+
 	if (g_EditStyle == EDITSTYLE_OBJECT)
 	{//オブジェクトエディットモードの場合
-		//エディットの更新処理
+		//エディットオブジェクトの更新処理
 		UpdateEditObject();
+
+		//エディット当たり判定の更新処理
+		UpdateEditCollision();
 	}
 	else if (g_EditStyle == EDITSTYLE_BILLBOARD)
 	{//ビルボードエディットモードの場合
@@ -82,6 +99,9 @@ void DrawEditmain(void)
 	{//オブジェクトエディットモードの場合
 		//エディットオブジェクトの描画処理
 		DrawEditObject();
+
+		//エディット当たり判定の描画処理
+		DrawEditCollision();
 	}
 	else if (g_EditStyle == EDITSTYLE_BILLBOARD)
 	{//ビルボードエディットモードの場合
@@ -117,12 +137,37 @@ void StyleChange(void)
 }
 
 //=======================================
+//当たり判定スタイル変更処理
+//=======================================
+void CollisionStyleChange(void)
+{
+	if (GetEditObject()->Collisiontype.Collisiontype == COLLISIONTYPE_CREATE
+	/*||  GetEditObject()->Collisiontype.Collisiontype == COLLISIONTYPE_ONLY*/)
+	{//当たり判定の種類が作成関連の種類の場合
+		if (GetKeyboardTrigger(DIK_RETURN) == true)
+		{//Enterキーを押した場合
+			//スタイルを選択する
+			g_CollisionStyle = (g_CollisionStyle + 1) % EDITSTYLE_MAX;
+		}
+	}
+}
+
+//=======================================
 //スタイルの取得処理
 //=======================================
 int GetStyle(void)
 {
 	//エディットスタイルを返す
 	return g_EditStyle;
+}
+
+//=======================================
+//当たり判定スタイルの取得処理
+//=======================================
+int GetCollisionStyle(void)
+{
+	//当たり判定スタイルを返す
+	return g_CollisionStyle;
 }
 
 //=======================================
@@ -269,4 +314,63 @@ void TxtSaveStage(void)
 		MessageBox(NULL, "ステージファイルの書き出しに失敗！", "警告！", MB_ICONWARNING);
 	}
 }
+
+#if 0
+//=======================================
+//	ステージの保存処理
+//=======================================
+void TxtSaveStage(void)
+{
+	// ポインタを宣言
+	FILE      *pFile;						// ファイルポインタ
+	Collision *pCollision = GetCollision();	// オブジェクトの情報ポインタ
+
+	// ファイルを書き出し方式で開く
+	pFile = fopen(SAVE_STAGE_TXT, "w");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+		
+		// 見出し
+		fprintf(pFile, "#===========================================================\n");
+		fprintf(pFile, "#\n");
+		fprintf(pFile, "#	エディットの保存当たり判定 [save_collision.txt]\n");
+		fprintf(pFile, "#	Author：藤田 勇一 & you\n");
+		fprintf(pFile, "#\n");
+		fprintf(pFile, "#===========================================================\n");
+		fprintf(pFile, "<>**<> ここから下をコピーし [collision.txt]に張り付け <>**<>\n");
+		fprintf(pFile, "\n");
+
+		// 当たり判定の設定の開始地点をテキストに書き出し
+		fprintf(pFile, "SETCOLL_OBJECT\n\n");
+
+		for (int nCntCollision = 0; nCntCollision < MAX_BILLBOARD; nCntCollision++, pCollision++)
+		{ // 当たり判定の最大表示数分繰り返す
+
+			// 当たり判定の情報の開始地点テキストに書き出し
+			fprintf(pFile, "	SET_COLLISION\n");
+
+			fprintf(pFile, "		TYPE       = %d\n", nCntCollision);															// 種類
+			fprintf(pFile, "		POS        = %.1f %.1f %.1f\n", pCollision->pos.x, pCollision->pos.y, pCollision->pos.z);	// 位置
+			fprintf(pFile, "		VECPOS     = %.1f %.1f %.1f\n", pCollision->pos.x, pCollision->pos.y, pCollision->pos.z);	// 位置
+			fprintf(pFile, "		ROT        = %.1f %.1f %.1f\n", pCollision->rot.x, pCollision->rot.y, pCollision->rot.z);	// 向き
+
+			// 当たり判定の情報の終了地点テキストに書き出し
+			fprintf(pFile, "	END_SET_COLLISION\n\n");
+		}
+
+		// 当たり判定の設定の終了地点をテキストに書き出し
+		fprintf(pFile, "END_SETCOLL_OBJECT\n\n");
+
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "ステージファイルの書き出しに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
+#endif
 #endif

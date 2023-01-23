@@ -20,6 +20,7 @@
 
 #include "meshfield.h"
 #include "Police.h"
+#include "Car.h"
 
 //************************************************************
 //	マクロ定義
@@ -80,11 +81,11 @@ void InitPlayer(void)
 	g_player.modelData.dwNumMat = 0;			// マテリアルの数
 	g_player.modelData.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
 	g_player.modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
-	g_player.modelData.fHeight  = 0.0f;			// 縦幅
+	g_player.modelData.size     = INIT_SIZE;	// 大きさ
 	g_player.modelData.fRadius  = 0.0f;			// 半径
 
 	// プレイヤーの位置・向きの設定
-	SetPositionPlayer(D3DXVECTOR3(2000.0f, 0.0f, 2000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //============================================================
@@ -127,6 +128,7 @@ void UpdatePlayer(void)
 			}
 		}
 
+#if 1
 		// プレイヤーの移動量の更新
 		MovePlayer();
 
@@ -141,6 +143,28 @@ void UpdatePlayer(void)
 
 		//プレイヤーのカメラの状態変化処理
 		CameraChangePlayer();
+#else
+		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
+		{ // 奥移動の操作が行われた場合
+
+			g_player.pos.z += 10.0f;
+		}
+		if (GetKeyboardPress(DIK_S) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true || GetJoyStickPressLY(0) < 0)
+		{ // 手前移動の操作が行われた場合
+
+			g_player.pos.z -= 10.0f;
+		}
+		if (GetKeyboardPress(DIK_A) == true || GetJoyKeyPress(JOYKEY_LEFT, 0) == true || GetJoyStickPressLX(0) < 0)
+		{ // 左移動の操作が行われた場合
+
+			g_player.pos.x -= 10.0f;
+		}
+		if (GetKeyboardPress(DIK_D) == true || GetJoyKeyPress(JOYKEY_RIGHT, 0) == true || GetJoyStickPressLX(0) > 0)
+		{ // 右移動の操作が行われた場合
+
+			g_player.pos.x += 10.0f;
+		}
+#endif
 
 		// 車の停止処理
 		CollisionStopCar
@@ -160,6 +184,7 @@ void UpdatePlayer(void)
 		( // 引数
 			&g_player.pos,		// 現在の位置
 			&g_player.oldPos,	// 前回の位置
+			&g_player.move,		// 移動量
 			PLAY_WIDTH,			// 横幅
 			PLAY_DEPTH			// 奥行
 		);
@@ -167,10 +192,10 @@ void UpdatePlayer(void)
 		// 警察との当たり判定
 		CollisionPolice
 		( // 引数
-			&g_player.pos,		//現在の位置
-			&g_player.oldPos,	//前回の位置
-			PLAY_WIDTH,			//横幅
-			PLAY_DEPTH			//奥行
+			&g_player.pos,		// 現在の位置
+			&g_player.oldPos,	// 前回の位置
+			PLAY_WIDTH,			// 横幅
+			PLAY_DEPTH			// 奥行
 		);
 
 		//----------------------------------------------------
@@ -417,6 +442,13 @@ void MovePlayer(void)
 
 			// 移動量を更新
 			g_player.move.x -= SUB_MOVE;
+
+			if (g_player.move.x < SUB_MOVE_VALUE)
+			{ // 移動量が一定値より小さい場合
+
+				// 最低限の移動量を代入
+				g_player.move.x = SUB_MOVE_VALUE;
+			}
 		}
 	}
 	else if (GetKeyboardPress(DIK_D) == true)
@@ -430,6 +462,13 @@ void MovePlayer(void)
 
 			// 移動量を更新
 			g_player.move.x -= SUB_MOVE;
+
+			if (g_player.move.x < SUB_MOVE_VALUE)
+			{ // 移動量が一定値より小さい場合
+
+				// 最低限の移動量を代入
+				g_player.move.x = SUB_MOVE_VALUE;
+			}
 		}
 	}
 

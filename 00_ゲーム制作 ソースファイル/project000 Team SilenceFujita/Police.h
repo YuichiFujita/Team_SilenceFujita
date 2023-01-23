@@ -44,16 +44,6 @@ typedef enum
 }POLICEDEST;
 
 //**********************************************************************************************************************
-//	‚Ô‚Â‚©‚Á‚½‚à‚Ì‚Ìƒ^ƒCƒv
-//**********************************************************************************************************************
-typedef enum
-{
-	COLLOBJECTTYPE_PLAYER = 0,			//ƒvƒŒƒCƒ„[
-	COLLOBJECTTYPE_POLICE,				//Œx@
-	COLLOBJECTTYPE_MAX					//‚±‚Ì—ñ‹“Œ^‚Ì‘”
-}COLLOBJECTTYPE;
-
-//**********************************************************************************************************************
 //	Œx@Ô—¼‚Ì‹È‚ª‚èŠp
 //**********************************************************************************************************************
 typedef struct
@@ -96,7 +86,6 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest);		// Œx@‚
 void HitPolice(Police *pPolice, int nDamage);												// Œx@‚Ìƒ_ƒ[ƒW”»’è
 void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// Œx@‚Æ‚Ì“–‚½‚è”»’è
 Police *GetPoliceData(void);																// Œx@‚Ìæ“¾ˆ—
-void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// Ô‚Ì’â~ˆ—
 
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾ (ƒfƒoƒbƒO—p)

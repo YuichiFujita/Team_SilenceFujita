@@ -26,8 +26,10 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	COLLISIONTYPE_NONE = 0,				// 当たらない種類
-	COLLISIONTYPE_ON,					// 当たる種類
+	COLLISIONTYPE_NONE = 0,				// 当たり判定無し
+	COLLISIONTYPE_MODEL,				// モデル頂点の当たり判定
+	COLLISIONTYPE_CREATE,				// 作成した当たり判定 (汎用)
+	//COLLISIONTYPE_ONLY,					// 作成した当たり判定 (それぞれ)
 	COLLISIONTYPE_MAX,					// この列挙型の総数
 } COLLISIONTYPE;
 
@@ -40,6 +42,32 @@ typedef enum
 	BREAKTYPE_ON,						// 壊れる種類
 	BREAKTYPE_MAX,						// この列挙型の総数
 } BREAKTYPE;
+
+//**********************************************************************************************************************
+//	列挙型定義 (ROTSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	ROTSTATE_0 = 0,						// 向き 0度 (360度)
+	ROTSTATE_90,						// 向き 90度
+	ROTSTATE_180,						// 向き 180度
+	ROTSTATE_270,						// 向き 270度
+	ROTSTATE_MAX,						// この列挙型の総数
+} ROTSTATE;
+
+//**********************************************************************************************************************
+//	構造体定義 (Collision)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3 pos;					// 位置
+	D3DXVECTOR3 vecPos;					// 位置ベクトル
+	D3DXVECTOR3 rot;					// 向き
+	ROTSTATE    stateRot;				// 向き状態
+	D3DXVECTOR3 scale;					// 拡大率
+	float       fWidth;					// 横幅
+	float       fDepth;					// 奥行
+}Collision;
 
 //**********************************************************************************************************************
 //	構造体定義 (Object)
@@ -76,10 +104,11 @@ void UpdateObject(void);				// オブジェクトの更新処理
 void DrawObject(void);					// オブジェクトの描画処理
 
 void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType);	// オブジェクトの設定処理
+void HitObject(Object *pObject, int nDamage);																	// オブジェクトのダメージ判定
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
 
-void HitObject(Object *pObject, int nDamage);												// オブジェクトのダメージ判定
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth);	// オブジェクトとの当たり判定
-Object *GetObjectData(void);																// オブジェクトの取得処理
+Object *GetObjectData(void);			// オブジェクトの取得処理
+Collision *GetCollision(void);			// 当たり判定の取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

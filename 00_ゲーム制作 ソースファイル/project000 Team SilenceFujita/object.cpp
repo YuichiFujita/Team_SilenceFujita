@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
+#include "calculation.h"
 #include "input.h"
 #include "model.h"
 
@@ -31,7 +32,12 @@
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Object g_aObject[MAX_OBJECT];	// オブジェクトの情報
+Object    g_aObject[MAX_OBJECT];		// オブジェクトの情報
+Collision g_aCollision[MODEL_OBJ_MAX];	// 当たり判定の情報
+
+
+void a(int nCntObject, D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos);
+
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -45,9 +51,10 @@ void InitObject(void)
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
+		// 基本情報の初期化
 		g_aObject[nCntObject].pos            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
 		g_aObject[nCntObject].rot            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
-		g_aObject[nCntObject].scale          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
+		g_aObject[nCntObject].scale          = D3DXVECTOR3(1.0f, 1.0f, 1.0f);		// 拡大率
 		g_aObject[nCntObject].state          = ACTIONSTATE_NONE;					// 状態
 		g_aObject[nCntObject].nLife          = 0;									// 体力
 		g_aObject[nCntObject].nCollisionType = COLLISIONTYPE_NONE;					// 当たり判定の種類
@@ -63,10 +70,9 @@ void InitObject(void)
 		g_aObject[nCntObject].modelData.pTexture = NULL;							// テクスチャへのポインタ
 		g_aObject[nCntObject].modelData.pMesh    = NULL;							// メッシュ (頂点情報) へのポインタ
 		g_aObject[nCntObject].modelData.pBuffMat = NULL;							// マテリアルへのポインタ
-		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
 		g_aObject[nCntObject].modelData.vtxMin   = INIT_VTX_MIN;					// 最小の頂点座標
 		g_aObject[nCntObject].modelData.vtxMax   = INIT_VTX_MAX;					// 最大の頂点座標
-		g_aObject[nCntObject].modelData.fHeight  = 0.0f;							// 縦幅
+		g_aObject[nCntObject].modelData.size     = INIT_SIZE;						// 大きさ
 		g_aObject[nCntObject].modelData.fRadius  = 0.0f;							// 半径
 
 		// マテリアルのコピーを初期化
@@ -76,6 +82,19 @@ void InitObject(void)
 		// エディット時の状態
 		g_aObject[nCntObject].editState = OBJECTSTATE_NONE;
 #endif
+	}
+
+	// 当たり判定の情報の初期化
+	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
+	{ // オブジェクトの種類の総数分繰り返す
+
+		g_aCollision[nCntObject].pos      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCollision[nCntObject].vecPos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+		g_aCollision[nCntObject].rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aCollision[nCntObject].stateRot = ROTSTATE_0;						// 向き状態
+		g_aCollision[nCntObject].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
+		g_aCollision[nCntObject].fWidth   = 0.0f;							// 横幅
+		g_aCollision[nCntObject].fDepth   = 0.0f;							// 奥行
 	}
 }
 
@@ -431,7 +450,7 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 //	オブジェクトとの当たり判定
 //======================================================================================================================
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth)
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth)
 {
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -441,14 +460,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, floa
 
 			switch (g_aObject[nCntObject].nCollisionType)
 			{ // 当たり判定の種類ごとの処理
-			case COLLISIONTYPE_NONE:
+			case COLLISIONTYPE_NONE:	// 当たり判定無し
 
 				// 無し
 
 				// 処理を抜ける
 				break;
 
-			case COLLISIONTYPE_ON:
+			case COLLISIONTYPE_MODEL:	// モデル頂点の当たり判定
 
 				// 前後の当たり判定
 				if (pPos->x + fWidth > g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x
@@ -461,6 +480,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, floa
 
 						// 位置を補正
 						pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z - fDepth - 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
 					}
 					else if (pPos->z    - fDepth <  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z
 					     &&  pOldPos->z - fDepth >= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
@@ -468,6 +490,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, floa
 
 						// 位置を補正
 						pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z + fDepth + 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
 					}
 				}
 
@@ -482,6 +507,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, floa
 
 						// 位置を補正
 						pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x - fWidth - 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
 					}
 					else if (pPos->x    - fWidth <  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x
 					     &&  pOldPos->x - fWidth >= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
@@ -489,6 +517,70 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, floa
 						
 						// 位置を補正
 						pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x + fWidth + 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+				}
+
+				// 処理を抜ける
+				break;
+
+			case COLLISIONTYPE_CREATE:	// 作成した当たり判定 (汎用)
+
+				D3DXVECTOR3 pos = g_aObject[nCntObject].pos - g_aCollision[g_aObject[nCntObject].nType].vecPos;
+
+				// 前後の当たり判定
+				if (pPos->x + fWidth > pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
+				&&  pPos->x - fWidth < pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth)
+				{ // ブロックの左右の範囲内の場合
+
+					if (pPos->z    + fDepth >  pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth
+					&&  pOldPos->z + fDepth <= pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth)
+					{ // 前からの当たり判定
+
+						// 位置を補正
+						pPos->z = pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth - fDepth - 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+					else if (pPos->z    - fDepth <  pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth
+					     &&  pOldPos->z - fDepth >= pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth)
+					{ // 後ろからの当たり判定
+
+						// 位置を補正
+						pPos->z = pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth + fDepth + 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+				}
+
+				// 左右の当たり判定
+				if (pPos->z + fDepth > pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth
+				&&  pPos->z - fDepth < pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth)
+				{ // ブロックの前後の範囲内の場合
+
+					if (pPos->x    + fWidth >  pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
+					&&  pOldPos->x + fWidth <= pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth)
+					{ // 左からの当たり判定
+
+						// 位置を補正
+						pPos->x = pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth - fWidth - 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+					}
+					else if (pPos->x    - fWidth <  pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth
+					     &&  pOldPos->x - fWidth >= pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth)
+					{ // 右からの当たり判定
+						
+						// 位置を補正
+						pPos->x = pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth + fWidth + 0.01f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
 					}
 				}
 
@@ -507,6 +599,16 @@ Object *GetObjectData(void)
 	// オブジェクトの情報の先頭アドレスを返す
 	return &g_aObject[0];
 }
+
+//======================================================================================================================
+//	当たり判定の取得処理
+//======================================================================================================================
+Collision *GetCollision(void)
+{
+	// 当たり判定の情報の先頭アドレスを返す
+	return &g_aCollision[0];
+}
+
 
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================

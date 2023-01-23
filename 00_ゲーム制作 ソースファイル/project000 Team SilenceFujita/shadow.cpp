@@ -101,7 +101,7 @@ void InitShadow(void)
 		g_aShadow[nCntShadow].modelDataParent.dwNumMat = 0;				// マテリアルの数
 		g_aShadow[nCntShadow].modelDataParent.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
 		g_aShadow[nCntShadow].modelDataParent.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
-		g_aShadow[nCntShadow].modelDataParent.fHeight  = 0.0f;			// 縦幅
+		g_aShadow[nCntShadow].modelDataParent.size     = INIT_SIZE;		// 大きさ
 		g_aShadow[nCntShadow].modelDataParent.fRadius  = 0.0f;			// 半径
 	}
 
@@ -233,7 +233,7 @@ void DrawShadow(void)
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);			// Zバッファ更新の有効 / 無効の設定
 
 	// ライトの位置を設定
-	pDevice->GetLight(1, &light);
+	pDevice->GetLight(0, &light);
 	posLight = D3DXVECTOR4(-light.Direction.x, -light.Direction.y, -light.Direction.z, 0.0f);
 
 	for (int nCntShadow = 0; nCntShadow < MAX_SHADOW; nCntShadow++)
@@ -289,7 +289,7 @@ void DrawShadow(void)
 
 				// 平面情報を生成
 				pos    = g_aShadow[nCntShadow].pos;
-				normal = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+				normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 				D3DXPlaneFromPointNormal(&plane, &pos, &normal);
 
 				// シャドウマトリックスの初期化

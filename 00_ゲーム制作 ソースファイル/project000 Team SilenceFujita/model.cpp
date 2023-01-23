@@ -25,11 +25,19 @@ const char *apModelData[] =		// モデルの相対パス
 	//"data\\MODEL_OBJECT\\Apart001.x",	//アパート
 	"data\\MODEL_OBJECT\\House001.x",	//家
 	"data\\MODEL_OBJECT\\CurryShop.x",	//カレー屋
-	"data\\MODEL_OBJECT\\bill001.x",	//ビル001
-	//"data\\MODEL_OBJECT\\KariPolice.x",	// 仮の警察
+	"data\\MODEL_OBJECT\\bill001.x",	//ビルver1
+	"data\\MODEL_OBJECT\\bill002.x",	//ビルver2
+	"data\\MODEL_OBJECT\\ARCS.x",		//スーパー
+	"data\\MODEL_OBJECT\\Bakery.x",		//パン屋
+	"data\\MODEL_OBJECT\\farecar.x",	//消防車
+	"data\\MODEL_OBJECT\\policecar.x",	//パトカー
+	"data\\MODEL_OBJECT\\CityOffice.x",	//市役所
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",		// 車
+
+	// エディットモデル
+	"data\\MODEL_EDIT\\collision000.x",	// 当たり判定
 };
 
 //************************************************************
@@ -59,7 +67,7 @@ HRESULT InitModel(void)
 		g_aModel[nCntModel].dwNumMat = 0;				// マテリアルの数
 		g_aModel[nCntModel].vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
 		g_aModel[nCntModel].vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
-		g_aModel[nCntModel].fHeight  = 0.0f;			// 縦幅
+		g_aModel[nCntModel].size     = INIT_SIZE;		// 大きさ
 		g_aModel[nCntModel].fRadius  = 0.0f;			// 半径
 	}
 
@@ -207,7 +215,6 @@ void SetCollisionModel(void)
 	DWORD       dwSizeFVF;		// モデルの頂点フォーマットのサイズ
 	BYTE        *pVtxBuff;		// モデルの頂点バッファへのポインタ
 	D3DXVECTOR3 vtx;			// モデルの頂点座標
-	D3DXVECTOR3 size;			// モデルの大きさ
 
 	// 当たり判定の作成
 	for (int nCntModel = 0; nCntModel < MODELTYPE_MAX; nCntModel++)
@@ -278,13 +285,10 @@ void SetCollisionModel(void)
 		g_aModel[nCntModel].pMesh->UnlockVertexBuffer();
 
 		// モデルサイズを求める
-		size = g_aModel[nCntModel].vtxMax - g_aModel[nCntModel].vtxMin;
-
-		// モデルの縦幅を代入
-		g_aModel[nCntModel].fHeight = size.y;
+		g_aModel[nCntModel].size = g_aModel[nCntModel].vtxMax - g_aModel[nCntModel].vtxMin;
 
 		// モデルの円の当たり判定を作成
-		g_aModel[nCntModel].fRadius = ((size.x * 0.5f) + (size.z * 0.5f)) * 0.5f;
+		g_aModel[nCntModel].fRadius = ((g_aModel[nCntModel].size.x * 0.5f) + (g_aModel[nCntModel].size.z * 0.5f)) * 0.5f;
 	}
 }
 
