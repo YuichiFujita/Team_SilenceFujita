@@ -12,17 +12,17 @@
 #include "object.h"
 
 //プロトタイプ宣言
-void CollisionMoveEdit(void);				// 移動処理
-void CollisionRotationEdit(void);			// 回転処理
-void CollisionScaleObjectX(void);			// オブジェクトの拡大縮小処理(X軸)
-void CollisionScaleObjectY(void);			// オブジェクトの拡大縮小処理(Y軸)
-void CollisionScaleObjectZ(void);			// オブジェクトの拡大縮小処理(Z軸)
-void CollisionScaleObject(void);			// オブジェクトの拡大縮小処理
-void CollisionResetEdit(void);				// オブジェクトの情報リセット処理
-void CollisionUpDownEditCollision(void);	// オブジェクトの上下移動処理
+void CollisionMoveEdit(void);		// 移動処理
+void CollisionRotationEdit(void);	// 回転処理
+void CollisionScaleObjectX(void);	// オブジェクトの拡大縮小処理(X軸)
+void CollisionScaleObjectY(void);	// オブジェクトの拡大縮小処理(Y軸)
+void CollisionScaleObjectZ(void);	// オブジェクトの拡大縮小処理(Z軸)
+void CollisionScaleObject(void);	// オブジェクトの拡大縮小処理
+void CollisionResetEdit(void);		// オブジェクトの情報リセット処理
+void CollisionUpDownEdit(void);		// オブジェクトの上下移動処理
 
 //グローバル変数
-EditCollision g_EditCollision;	// エディット当たり判定の情報
+EditCollision g_EditCollision;		// エディット当たり判定の情報
 
 //==========================================
 //モデルの初期化処理
@@ -89,7 +89,7 @@ void UpdateEditCollision(void)
 				CollisionResetEdit();
 
 				//オブジェクトの上下移動処理
-				CollisionUpDownEditCollision();
+				CollisionUpDownEdit();
 			}
 		}
 	}
@@ -254,7 +254,7 @@ void CollisionRotationEdit(void)
 		g_EditCollision.collision.vecPos = D3DXVECTOR3(-g_EditCollision.collision.vecPos.z, g_EditCollision.collision.vecPos.y, g_EditCollision.collision.vecPos.x);
 
 		//位置を反映 (ベクトルの方向)
-		g_EditCollision.pos = pEditObject->pos + g_EditCollision.collision.vecPos;
+		g_EditCollision.pos = pEditObject->pos - g_EditCollision.collision.vecPos;
 	}
 	else if (GetKeyboardTrigger(DIK_E) == true)
 	{//Eキーを押した場合
@@ -268,7 +268,7 @@ void CollisionRotationEdit(void)
 		g_EditCollision.collision.vecPos = D3DXVECTOR3(g_EditCollision.collision.vecPos.z, g_EditCollision.collision.vecPos.y, -g_EditCollision.collision.vecPos.x);
 
 		//位置を反映 (ベクトルの方向)
-		g_EditCollision.pos = pEditObject->pos + g_EditCollision.collision.vecPos;
+		g_EditCollision.pos = pEditObject->pos - g_EditCollision.collision.vecPos;
 	}
 
 	if (g_EditCollision.rot.y > D3DX_PI)
@@ -363,15 +363,28 @@ void CollisionResetEdit(void)
 	// ポインタを宣言
 	EditObject *pEditObject = GetEditObject();
 
-	//if (GetKeyboardTrigger(DIK_2) == true)
-	//{//2キーを押した場合
-	//	//角度を初期化する
-	//	g_EditCollision.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	//}
-	if (GetKeyboardTrigger(DIK_2) == true)
-	{//2キーを押した場合
+	if (GetKeyboardTrigger(DIK_1) == true)
+	{//1キーを押した場合
 		//位置をオブジェクトに合わせる
 		g_EditCollision.pos = pEditObject->pos;
+	}
+	if (GetKeyboardTrigger(DIK_2) == true)
+	{//2キーを押した場合
+		//角度を初期化する
+		g_EditCollision.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+		for (int nCntRot = g_EditCollision.stateRot; nCntRot > ROTSTATE_0; nCntRot--)
+		{ // 向きが0度になるまで繰り返す
+
+			//向き状態を変更
+			g_EditCollision.stateRot = (ROTSTATE)((g_EditCollision.stateRot + (ROTSTATE_MAX - 1)) % ROTSTATE_MAX);
+
+			//位置ベクトルを90度回転
+			g_EditCollision.collision.vecPos = D3DXVECTOR3(g_EditCollision.collision.vecPos.z, g_EditCollision.collision.vecPos.y, -g_EditCollision.collision.vecPos.x);
+		}
+
+		//位置を反映 (ベクトルの方向)
+		g_EditCollision.pos = pEditObject->pos - g_EditCollision.collision.vecPos;
 	}
 	if (GetKeyboardTrigger(DIK_3) == true)
 	{//3キーを押した場合
@@ -383,7 +396,7 @@ void CollisionResetEdit(void)
 //=======================================
 //オブジェクトの上下移動処理
 //=======================================
-void CollisionUpDownEditCollision(void)
+void CollisionUpDownEdit(void)
 {
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{//左SHIFTキーを押している場合

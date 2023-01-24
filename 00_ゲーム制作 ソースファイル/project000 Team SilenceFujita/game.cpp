@@ -18,7 +18,6 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
-#include "Human.h"
 #include "life.h"
 #include "light.h"
 #include "meshfield.h"
@@ -82,11 +81,8 @@ void InitGame(void)
 	// オブジェクトの初期化
 	InitObject();
 
-	// 車の初期化処理
+	//車の初期化処理
 	InitCar();
-
-	// 人間の初期化処理
-	InitHuman();
 
 	// カメラの初期化
 	InitCamera();
@@ -154,11 +150,8 @@ void UninitGame(void)
 	// オブジェクトの終了
 	UninitObject();
 
-	// 車の終了処理
+	//車の終了処理
 	UninitCar();
-
-	// 人間の終了処理
-	UninitHuman();
 
 	// カメラの終了
 	UninitCamera();
@@ -265,6 +258,9 @@ void UpdateGame(void)
 
 		// エディットメインの更新
 		UpdateEditmain();
+
+		// カメラの更新
+		UpdateCamera();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -287,11 +283,8 @@ void UpdateGame(void)
 			// オブジェクトの更新
 			UpdateObject();
 
-			// 車の更新
+			//車の更新処理
 			UpdateCar();
-
-			// 人間の更新
-			UpdateHuman();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -364,12 +357,6 @@ void UpdateGame(void)
 		// ステージの保存
 		TxtSaveStage();
 	}
-	if (GetKeyboardTrigger(DIK_F9) == true)
-	{ // [F9] が押された場合
-
-		// 当たり判定の保存処理
-		TxtSaveCollision();
-	}
 #else
 	if (g_bPause == false)
 	{ // ポーズ状態ではない場合
@@ -394,12 +381,6 @@ void UpdateGame(void)
 
 		// オブジェクトの更新
 		UpdateObject();
-
-		//車の更新
-		UpdateCar();
-
-		//人間の更新
-		UpdateHuman();
 
 		// ビルボードの更新
 		UpdateBillboard();
@@ -443,8 +424,14 @@ void UpdateGame(void)
 //======================================================================================================================
 void DrawGame(void)
 {
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	メインカメラの描画
+	//------------------------------------------------------------------------------------------------------------------
 	// カメラの設定
-	SetCamera();
+	SetCamera(CAMERATYPE_MAIN);
 
 	// メッシュフィールドの描画
 	DrawMeshField();
@@ -461,11 +448,8 @@ void DrawGame(void)
 	// 警察の描画
 	DrawPolice();
 
-	// 車の描画
+	//車の描画処理
 	DrawCar();
-
-	// 人間の描画
-	DrawHuman();
 
 	// オブジェクトの描画
 	DrawObject();
@@ -479,12 +463,38 @@ void DrawGame(void)
 	// パーティクルの描画
 	DrawParticle();
 
+	// 爆弾の描画
+	DrawBomb();
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	マップカメラの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// カメラの設定
+	SetCamera(CAMERATYPE_MAP);
+
+	// Zテストを無効にする
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// Zテストの設定
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zバッファ更新の有効 / 無効の設定
+
+	// メッシュフィールドの描画
+	DrawMeshField();
+
+	// Zテストを有効にする
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);	// Zテストの設定
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);		// Zバッファ更新の有効 / 無効の設定
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	UIの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// カメラの設定
+	SetCamera(CAMERATYPE_UI);
+
 	// 体力バーの描画
 	DrawLife();
 
 	// タイマーの描画
 	DrawTimer();
-	
+
 	// 速度バーの描画
 	DrawVelocity();
 
@@ -506,10 +516,6 @@ void DrawGame(void)
 		DrawEditmain();
 	}
 #endif
-
-
-	// 爆弾の描画
-	DrawBomb();
 }
 
 //======================================================================================================================

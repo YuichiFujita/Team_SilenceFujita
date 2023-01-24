@@ -558,6 +558,9 @@ void Update(void)
 //============================================================
 void Draw(void)
 {
+	// 変数を宣言
+	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
+
 	// 画面クリア (バックバッファと Zバッファのクリア)
 	g_pD3DDevice->Clear
 	( // 引数
@@ -572,6 +575,9 @@ void Draw(void)
 	// 描画開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{ // 描画開始が成功した場合
+
+		// 現在のビューポートを取得
+		g_pD3DDevice->GetViewport(&viewportDef);
 
 		switch (g_mode)
 		{ // 選択処理
@@ -591,6 +597,9 @@ void Draw(void)
 			// 処理から抜ける
 			break;
 		}
+
+		// ビューポートを元に戻す
+		g_pD3DDevice->SetViewport(&viewportDef);
 
 		// フェードの描画
 		DrawFade();
@@ -1592,7 +1601,6 @@ void DrawDebugPolice(void)
 {
 
 }
-
 #endif
 
 #endif
