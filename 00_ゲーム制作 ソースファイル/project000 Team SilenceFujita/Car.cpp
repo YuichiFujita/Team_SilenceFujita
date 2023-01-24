@@ -692,17 +692,17 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 	float fLength;										// 長さの変数
 
 	{// 警察との当たり判定
-		Police *pCar = GetPoliceData();					// 警察の情報を取得する
+		Police *pPolice = GetPoliceData();					// 警察の情報を取得する
 
-		for (int nCntPoli = 0; nCntPoli < MAX_POLICE; nCntPoli++, pCar++)
+		for (int nCntPoli = 0; nCntPoli < MAX_POLICE; nCntPoli++, pPolice++)
 		{
-			if (pCar->bUse == true)
+			if (pPolice->bUse == true)
 			{ // 使用している場合
-			  // 長さを測る
-				fLength = (pCar->pos.x - stopCarpos.x) * (pCar->pos.x - stopCarpos.x)
-					+ (pCar->pos.z - stopCarpos.z) * (pCar->pos.z - stopCarpos.z);
+				// 長さを測る
+				fLength = (pPolice->pos.x - stopCarpos.x) * (pPolice->pos.x - stopCarpos.x)
+					+ (pPolice->pos.z - stopCarpos.z) * (pPolice->pos.z - stopCarpos.z);
 
-				if (fLength <= (pCar->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
+				if (fLength <= (pPolice->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
 				{ // オブジェクトが当たっている
 					switch (collObject)
 					{
@@ -733,7 +733,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 	}
 
 	{//プレイヤーとの当たり判定
-		Player *pPlayer = GetPlayer();
+		Player *pPlayer = GetPlayer();				//プレイヤーの情報を取得する
 
 		if (pPlayer->bUse == true)
 		{ // 使用している場合
@@ -766,6 +766,47 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					move->x = 0.0f;
 
 					break;						//抜け出す
+				}
+			}
+		}
+	}
+
+	{//車との当たり判定
+		Car *pCar = GetCarData();				//車の情報を取得する
+
+		for (int nCntPoli = 0; nCntPoli < MAX_CAR; nCntPoli++, pCar++)
+		{
+			if (pCar->bUse == true)
+			{ // 使用している場合
+				// 長さを測る
+				fLength = (pCar->pos.x - stopCarpos.x) * (pCar->pos.x - stopCarpos.x)
+					+ (pCar->pos.z - stopCarpos.z) * (pCar->pos.z - stopCarpos.z);
+
+				if (fLength <= (pCar->modelData.fRadius + 50.0f) * (fTargetRadius + 50.0f))
+				{ // オブジェクトが当たっている
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
+
+						// 移動量を設定する
+						move->x = sinf(targetrot.y) * -3.0f;
+
+						break;						//抜け出す
+
+					case COLLOBJECTTYPE_POLICE:		//車の場合
+
+						// 目標の移動量をセーブする
+						move->x += (0.0f - move->x) * 0.5f;
+
+						break;						//抜け出す
+
+					case COLLOBJECTTYPE_CAR:		//車の場合
+
+						// 目標の移動量をセーブする
+						move->x = 0.0f;
+
+						break;						//抜け出す
+					}
 				}
 			}
 		}

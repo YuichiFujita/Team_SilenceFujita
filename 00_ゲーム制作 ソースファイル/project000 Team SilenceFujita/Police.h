@@ -59,20 +59,21 @@ typedef struct
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3  pos;					// 現在の位置
-	D3DXVECTOR3  posOld;				// 前回の位置
-	D3DXVECTOR3  move;					// 移動量
-	D3DXVECTOR3  rot;					// 向き
-	D3DXVECTOR3  rotDest;				// 目標の向き
-	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
-	Model        modelData;				// モデル情報
-	POLICESTATE  state;					// 警察車両の状態
-	int			 nShadowID;				// 影のインデックス
-	int			 nLife;					// 寿命
-	bool		 bMove;					// 移動しているかどうか
-	bool		 bUse;					// 使用しているか
-	POLICEDEST   poliDest;				// 警察の行先
-	POLICECURVE  poliCurve;				// 警察のカーブ位置
+	D3DXVECTOR3 pos;					// 現在の位置
+	D3DXVECTOR3 posOld;					// 前回の位置
+	D3DXVECTOR3 posCopy;				// 初期位置
+	D3DXVECTOR3 move;					// 移動量
+	D3DXVECTOR3 rot;					// 向き
+	D3DXVECTOR3 rotDest;				// 目標の向き
+	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
+	Model       modelData;				// モデル情報
+	POLICESTATE state;					// 警察車両の状態
+	int			nShadowID;				// 影のインデックス
+	int			nLife;					// 寿命
+	bool		bMove;					// 移動しているかどうか
+	bool		bUse;					// 使用しているか
+	POLICEDEST  poliDest;				// 警察の行先
+	POLICECURVE poliCurve;				// 警察のカーブ位置
 }Police;
 
 //**********************************************************************************************************************

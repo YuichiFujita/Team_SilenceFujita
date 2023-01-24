@@ -46,5 +46,6 @@ typedef struct
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void SetCurvePoint(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);
+void SetCurvePointHuman(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);
 
 #endif

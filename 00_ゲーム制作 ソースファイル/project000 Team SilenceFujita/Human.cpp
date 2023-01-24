@@ -44,8 +44,10 @@
 //**********************************************************************************************************************
 void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);		// 人間の位置の更新処理
 void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 人間の補正の更新処理
-void CurveHuman(Human *pHuman);							// 人間のカーブ処理
-void CurveRotHuman(Human *pHuman);						// 人間の角度更新処理
+void CurveHuman(Human *pHuman);						// 人間のカーブ処理
+void CurveRotHuman(Human *pHuman);					// 人間の角度更新処理
+void StopHuman(Human *pHuman);						// 人間の停止処理
+void ReactionHuman(Human *pHuman);					//人間のリアクション処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -234,8 +236,9 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].nShadowID = NONE_SHADOW;				// 影のインデックス
 		g_aHuman[nCntHuman].bMove = false;							// 移動しているか
 		g_aHuman[nCntHuman].bUse = false;							// 使用状況
+		g_aHuman[nCntHuman].state = HUMANSTATE_WALK;				// 状態
 
-																//曲がり角の情報を初期化
+		//曲がり角の情報を初期化
 		for (int nCntCurve = 0; nCntCurve < MAX_CURVE; nCntCurve++)
 		{
 			g_aHuman[nCntHuman].carCurve.curveAngle[nCntCurve] = CURVE_RIGHT;						// 曲がる方向
@@ -247,7 +250,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].carCurve.nCurveTime = 0;				// 曲がる回数
 		g_aHuman[nCntHuman].carCurve.nNowCurve = 0;					// 現在のルート
 
-																// モデル情報の初期化
+		// モデル情報の初期化
 		g_aHuman[nCntHuman].modelData.dwNumMat = 0;					// マテリアルの数
 		g_aHuman[nCntHuman].modelData.pTexture = NULL;				// テクスチャへのポインタ
 		g_aHuman[nCntHuman].modelData.pMesh = NULL;					// メッシュ (頂点情報) へのポインタ
@@ -280,7 +283,7 @@ void UpdateHuman(void)
 		if (g_aHuman[nCntHuman].bUse == true)
 		{ // オブジェクトが使用されている場合
 
-		  // 前回位置の更新
+			// 前回位置の更新
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;
 
 			//----------------------------------------------------
@@ -295,8 +298,25 @@ void UpdateHuman(void)
 				NONE_SCALE							// 拡大率
 			);
 
-			//人間のカーブ処理
-			CurveHuman(&g_aHuman[nCntHuman]);
+			//人間のリアクション処理
+			ReactionHuman(&g_aHuman[nCntHuman]);
+
+			switch (g_aHuman[nCntHuman].state)
+			{
+			case HUMANSTATE_WALK:		//歩き状態
+
+				//人間のカーブ処理
+				CurveHuman(&g_aHuman[nCntHuman]);
+
+				break;					//抜け出す
+
+			case HUMANSTATE_STOP:		//止まった状態
+
+				// 人間の停止処理
+				StopHuman(&g_aHuman[nCntHuman]);
+
+				break;					//抜け出す
+			}
 
 			// プレイヤーの位置の更新
 			PosHuman(&g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].rot, g_aHuman[nCntHuman].bMove);
@@ -328,6 +348,7 @@ void DrawHuman(void)
 												// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+	D3DXMATERIAL	  blueMat;					// 青ざめマテリアルポインタ
 
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -357,8 +378,30 @@ void DrawHuman(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aHuman[nCntHuman].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				switch (g_aHuman[nCntHuman].state)
+				{
+				case HUMANSTATE_WALK:		//歩き状態
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+					break;					//抜け出す
+
+				case HUMANSTATE_STOP:		//停止状態
+
+					// 構造体の要素をクリア
+					ZeroMemory(&blueMat, sizeof(D3DXMATERIAL));
+
+					// 拡散光・環境光・自己発光を赤にする
+					blueMat.MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+					blueMat.MatD3D.Ambient = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+					blueMat.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&blueMat.MatD3D);			// 青
+
+					break;					//抜け出す
+				}
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aHuman[nCntHuman].modelData.pTexture[nCntMat]);
@@ -385,9 +428,10 @@ void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 		{ // オブジェクトが使用されていない場合
 		  // 引数を代入
 			g_aHuman[nCntHuman].pos = pos;								// 現在の位置
-			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;			// 前回の位置
+			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;		// 前回の位置
 			g_aHuman[nCntHuman].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aHuman[nCntHuman].bMove = false;							// 移動していない
+			g_aHuman[nCntHuman].state = HUMANSTATE_WALK;				//歩き状態
 
 			// 使用している状態にする
 			g_aHuman[nCntHuman].bUse = true;
@@ -416,7 +460,7 @@ void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 			g_aHuman[nCntHuman].carCurve.nCurveTime = humanCurve.nCurveTime;							// 曲がる回数
 
 			//カーブの設定処理
-			SetCurvePoint(&g_aHuman[nCntHuman].carCurve, &g_aHuman[nCntHuman].rot, &g_aHuman[nCntHuman].pos);
+			SetCurvePointHuman(&g_aHuman[nCntHuman].carCurve, &g_aHuman[nCntHuman].rot, &g_aHuman[nCntHuman].pos);
 
 			// 処理を抜ける
 			break;
@@ -830,6 +874,43 @@ void CurveRotHuman(Human *pHuman)
 
 			// 警察の行先を設定する
 			pHuman->carCurve.nNowCurve = (pHuman->carCurve.nNowCurve + 1) % pHuman->carCurve.nCurveTime;
+		}
+	}
+}
+
+//============================================================
+// 人間の停止処理
+//============================================================
+void StopHuman(Human *pHuman)
+{
+	//移動量を0にする
+	pHuman->move.x = 0.0f;
+}
+
+//============================================================
+//人間のリアクション処理
+//============================================================
+void ReactionHuman(Human *pHuman)
+{
+	float fLength;										// 長さの変数
+
+	Player *pPlayer = GetPlayer();
+
+	if (pPlayer->bUse == true)
+	{ // 使用している場合
+		// 長さを測る
+		fLength = (pPlayer->pos.x - pHuman->pos.x) * (pPlayer->pos.x - pHuman->pos.x)
+			+ (pPlayer->pos.z - pHuman->pos.z) * (pPlayer->pos.z - pHuman->pos.z);
+
+		if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * 170.0f)
+		{ // プレイヤーが近くに来た場合
+			//停止処理に移行
+			pHuman->state = HUMANSTATE_STOP;
+		}
+		else
+		{ // プレイヤーに近くにいない場合
+			//停止処理に移行
+			pHuman->state = HUMANSTATE_WALK;
 		}
 	}
 }
