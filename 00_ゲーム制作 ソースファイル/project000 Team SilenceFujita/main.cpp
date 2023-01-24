@@ -20,6 +20,8 @@
 #include "billboard.h"
 #include "object.h"
 #include "Car.h"
+#include "Police.h"
+#include "Human.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "camera.h"
@@ -29,7 +31,6 @@
 #include "EditObject.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
-#include "Police.h"
 #endif
 
 //************************************************************
@@ -1013,6 +1014,57 @@ void TxtSetStage(void)
 						SetCar(carSetInfo.pos, carSetInfo.Curve);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
+			}
+
+			//------------------------------------------------
+			//	人間の設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_HUMAN") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_HUMAN の場合
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+
+				  // ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_HUMAN") == 0)
+					{ // 読み込んだ文字列が SET_HUMAN の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &HumanSetInfo.pos.x, &HumanSetInfo.pos.y, &HumanSetInfo.pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVETIME") == 0)
+							{ // 読み込んだ文字列が CURVETIME の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%d", &HumanSetInfo.Curve.nCurveTime);			// 曲がる回数を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVEPOINT") == 0)
+							{ // 読み込んだ文字列がCURVEPOINTだった場合
+								for (int nCnt = 0; nCnt < HumanSetInfo.Curve.nCurveTime; nCnt++)
+								{ // 回数分読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEPOINT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &HumanSetInfo.Curve.curvePoint[nCnt].x, &HumanSetInfo.Curve.curvePoint[nCnt].y, &HumanSetInfo.Curve.curvePoint[nCnt].z);		// 曲がる回数を読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEROT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%d", &HumanSetInfo.Curve.fCurveRot[nCnt]);	//曲がる方向を読み込む
+								}
+							}
+
+						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);	// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+						// 人間の設定
+						SetHuman(HumanSetInfo.pos, HumanSetInfo.Curve);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}
 		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
 		

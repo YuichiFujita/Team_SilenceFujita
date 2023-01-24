@@ -348,7 +348,7 @@ void DrawHuman(void)
 												// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
-	D3DXMATERIAL	 blueMat;					//青ざめマテリアルポインタ
+	D3DXMATERIAL	  blueMat;					// 青ざめマテリアルポインタ
 
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -389,16 +389,16 @@ void DrawHuman(void)
 
 				case HUMANSTATE_STOP:		//停止状態
 
-					//色を青ざめる
-					blueMat.MatD3D.Diffuse.r = 0.0f;
-					blueMat.MatD3D.Diffuse.g = 0.0f;
-					blueMat.MatD3D.Ambient.r = 0.0f;
-					blueMat.MatD3D.Ambient.g = 0.0f;
-					blueMat.MatD3D.Emissive.r = 0.0f;
-					blueMat.MatD3D.Emissive.g = 0.0f;
+					// 構造体の要素をクリア
+					ZeroMemory(&blueMat, sizeof(D3DXMATERIAL));
+
+					// 拡散光・環境光・自己発光を赤にする
+					blueMat.MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+					blueMat.MatD3D.Ambient = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+					blueMat.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
 
 					// マテリアルの設定
-					pDevice->SetMaterial(&blueMat.MatD3D);
+					pDevice->SetMaterial(&blueMat.MatD3D);			// 青
 
 					break;					//抜け出す
 				}
@@ -902,7 +902,7 @@ void ReactionHuman(Human *pHuman)
 		fLength = (pPlayer->pos.x - pHuman->pos.x) * (pPlayer->pos.x - pHuman->pos.x)
 			+ (pPlayer->pos.z - pHuman->pos.z) * (pPlayer->pos.z - pHuman->pos.z);
 
-		if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * 10.0f)
+		if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * 170.0f)
 		{ // プレイヤーが近くに来た場合
 			//停止処理に移行
 			pHuman->state = HUMANSTATE_STOP;
