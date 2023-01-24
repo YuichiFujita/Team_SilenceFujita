@@ -443,3 +443,62 @@ void SetCurvePointHuman(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 		}
 	}
 }
+
+//============================================================
+// 車の角度更新・補正処理
+//============================================================
+void CurveRotCar(CURVE *pCurve,D3DXVECTOR3 *rot,D3DXVECTOR3 *move)
+{
+	if (pCurve->curveAngle[pCurve->nNowCurve] == CURVE_LEFT)
+	{ // 曲がる方向が左だった場合
+		// 向きを更新
+		rot->y -= 0.05f * (move->x * 0.1f);
+
+		if (rot->y <= (float)D3DXToRadian(pCurve->fCurveRot[pCurve->nNowCurve]))
+		{ // 一定の向きに達した場合
+			// 向きを補正
+			rot->y = (float)D3DXToRadian(pCurve->fCurveRot[pCurve->nNowCurve]);
+
+			if (pCurve->curveAngle[(pCurve->nNowCurve + 1) % pCurve->nCurveTime] == CURVE_LEFT)
+			{//次の曲がり角が左だった場合
+				if (pCurve->fCurveRot[(pCurve->nNowCurve + 1) % pCurve->nCurveTime] == 90)
+				{//次の曲がり角がマイナス方向に曲がる場合
+					//向きをプラスに戻す
+					rot->y = (float)D3DXToRadian(180);
+				}
+			}
+
+			//// 車の補正の更新処理
+			//RevCar(&pCar->rot, &pCar->pos);
+
+			// 警察の行先を設定する
+			pCurve->nNowCurve = (pCurve->nNowCurve + 1) % pCurve->nCurveTime;
+		}
+	}
+	else if (pCurve->curveAngle[pCurve->nNowCurve] == CURVE_RIGHT)
+	{ // 曲がる方向が右だった場合
+		// 向きを更新
+		rot->y += 0.05f * (move->x * 0.1f);
+
+		if (rot->y >= (float)D3DXToRadian(pCurve->fCurveRot[pCurve->nNowCurve]))
+		{ // 一定の向きに達した場合
+			// 向きを補正
+			rot->y = (float)D3DXToRadian(pCurve->fCurveRot[pCurve->nNowCurve]);
+
+			if (pCurve->curveAngle[(pCurve->nNowCurve + 1) % pCurve->nCurveTime] == CURVE_RIGHT)
+			{//次の曲がり角が右だった場合
+				if (pCurve->fCurveRot[(pCurve->nNowCurve + 1) % pCurve->nCurveTime] == -90)
+				{//次の曲がり角がマイナス方向に曲がる場合
+					//向きをマイナスに戻す
+					rot->y = (float)D3DXToRadian(-180);
+				}
+			}
+
+			//// 車の補正の更新処理
+			//RevCar(&pCar->rot, &pCar->pos);
+
+			// 警察の行先を設定する
+			pCurve->nNowCurve = (pCurve->nNowCurve + 1) % pCurve->nCurveTime;
+		}
+	}
+}
