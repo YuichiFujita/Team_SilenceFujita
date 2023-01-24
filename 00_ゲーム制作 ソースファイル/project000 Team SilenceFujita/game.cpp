@@ -355,6 +355,12 @@ void UpdateGame(void)
 		// ステージの保存
 		TxtSaveStage();
 	}
+	if (GetKeyboardTrigger(DIK_F9) == true)
+	{ // [F9] が押された場合
+
+		// 当たり判定の保存処理
+		TxtSaveCollision();
+	}
 #else
 	if (g_bPause == false)
 	{ // ポーズ状態ではない場合

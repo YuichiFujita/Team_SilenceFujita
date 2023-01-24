@@ -49,7 +49,6 @@ void PatrolPoliceAct(Police *pPolice);					// 警察のパトロール行動処理
 void PatrolCarSearch(Police *pPolice);					// 警察車両の探知処理
 void ChasePoliceAct(Police *pPolice);					// 警察の追跡処理
 void PatrolBackPoliceAct(Police *pPolice);				// 警察のパトロールに戻るときの処理
-void PatorolCarFileLoad(void);							// パトカーのロード処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -61,9 +60,6 @@ Police g_aPolice[MAX_POLICE];	// オブジェクトの情報
 //======================================================================================================================
 void InitPolice(void)
 {
-	// パトカーのロード処理
-	PatorolCarFileLoad();
-
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
@@ -101,7 +97,7 @@ void InitPolice(void)
 	}
 
 	//警察の設定処理
-	//SetPolice(D3DXVECTOR3(-4000.0f, 0.0f, 6000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(-4000.0f, 0.0f, 6000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
 	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -953,14 +949,6 @@ void PatrolBackPoliceAct(Police *pPolice)
 		// セーブポイントにする
 		pPolice->poliDest = (POLICEDEST)nSavePoint;
 	}
-}
-
-//============================================================
-// パトカーのロード処理
-//============================================================
-void PatorolCarFileLoad(void)
-{
-
 }
 
 #ifdef _DEBUG	// デバッグ処理
