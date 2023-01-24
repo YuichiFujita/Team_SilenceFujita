@@ -19,7 +19,6 @@
 
 #include "billboard.h"
 #include "object.h"
-#include "Car.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "camera.h"
@@ -30,6 +29,7 @@
 #include "EditBillboard.h"
 #include "SoundDJ.h"
 #include "Police.h"
+#include "Car.h"
 #endif
 
 //************************************************************
@@ -65,7 +65,7 @@ void DrawDebugEditObject(void);			// エディットオブジェクトモードのデバッグ表示
 void DrawDebugEditBillboard(void);		// エディットビルボードモードのデバッグ表示
 void DrawDebugControlObject(void);		// エディットオブジェクト操作説明
 void DrawDebugControlBillboard(void);	// エディットビルボード操作説明
-void DrawDebugPolice(void);				// 警察のデバッグ表記
+void DrawDebugPolice(void);				//警察のデバッグ表記
 #endif
 
 //************************************************************
@@ -557,6 +557,9 @@ void Update(void)
 //============================================================
 void Draw(void)
 {
+	// 変数を宣言
+	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
+
 	// 画面クリア (バックバッファと Zバッファのクリア)
 	g_pD3DDevice->Clear
 	( // 引数
@@ -571,6 +574,9 @@ void Draw(void)
 	// 描画開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{ // 描画開始が成功した場合
+
+		// 現在のビューポートを取得
+		g_pD3DDevice->GetViewport(&viewportDef);
 
 		switch (g_mode)
 		{ // 選択処理
@@ -590,6 +596,9 @@ void Draw(void)
 			// 処理から抜ける
 			break;
 		}
+
+		// ビューポートを元に戻す
+		g_pD3DDevice->SetViewport(&viewportDef);
 
 		// フェードの描画
 		DrawFade();
@@ -723,8 +732,6 @@ void TxtSetStage(void)
 	int         nAnim;			// アニメーションの ON / OFF の設定用
 	bool        bAnim;			// アニメーションの ON / OFF の代入用
 	bool        bShadow;		// 影の ON / OFF の代入
-	SetInfo		carSetInfo;		// 車の設定用
-	SetInfo		HumanSetInfo;	// 人間の設定用
 
 	// 変数配列を宣言
 	char         aString[MAX_STRING];	// テキストの文字列の代入用
@@ -963,58 +970,7 @@ void TxtSetStage(void)
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_BILLBOARD") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
-
-			//------------------------------------------------
-			//	車の設定
-			//------------------------------------------------
-			else if (strcmp(&aString[0], "SETSTAGE_CAR") == 0)
-			{ // 読み込んだ文字列が SETSTAGE_CAR の場合
-				do
-				{ // 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
-
-					// ファイルから文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (strcmp(&aString[0], "SET_CAR") == 0)
-					{ // 読み込んだ文字列が SET_CAR の場合
-
-						do
-						{ // 読み込んだ文字列が END_SET_CAR ではない場合ループ
-
-							// ファイルから文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
-
-							if (strcmp(&aString[0], "POS") == 0)
-							{ // 読み込んだ文字列が POS の場合
-								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-								fscanf(pFile, "%f%f%f", &carSetInfo.pos.x, &carSetInfo.pos.y, &carSetInfo.pos.z);			// 位置を読み込む
-							}
-							else if (strcmp(&aString[0], "CURVETIME") == 0)
-							{ // 読み込んだ文字列が CURVETIME の場合
-								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-								fscanf(pFile, "%d", &carSetInfo.Curve.nCurveTime);			// 曲がる回数を読み込む
-							}
-							else if (strcmp(&aString[0], "CURVEPOINT") == 0)
-							{ // 読み込んだ文字列がCURVEPOINTだった場合
-								for (int nCnt = 0; nCnt < carSetInfo.Curve.nCurveTime; nCnt++)
-								{ // 回数分読み込む
-									fscanf(pFile, "%s", &aString[0]);							// CURVEPOINT を読み込む (不要)
-									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-									fscanf(pFile, "%f%f%f", &carSetInfo.Curve.curvePoint[nCnt].x, &carSetInfo.Curve.curvePoint[nCnt].y, &carSetInfo.Curve.curvePoint[nCnt].z);		// 曲がる回数を読み込む
-									fscanf(pFile, "%s", &aString[0]);							// CURVEROT を読み込む (不要)
-									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-									fscanf(pFile, "%d", &carSetInfo.Curve.fCurveRot[nCnt]);		//曲がる方向を読み込む
-								}
-							}
-
-						} while (strcmp(&aString[0], "END_SET_CAR") != 0);// 読み込んだ文字列が END_SET_CAR ではない場合ループ
-
-						 // 車の設定
-						SetCar(carSetInfo.pos, carSetInfo.Curve);
-					}
-				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
-			}
-		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
+		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
 		
 		// ファイルを閉じる
 		fclose(pFile);
@@ -1535,7 +1491,6 @@ void DrawDebugPolice(void)
 {
 
 }
-
 #endif
 
 #endif
