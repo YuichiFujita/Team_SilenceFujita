@@ -48,7 +48,8 @@ void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);		// プレイヤーの補正の更新処
 void PatrolPoliceAct(Police *pPolice);					// 警察のパトロール行動処理
 void PatrolCarSearch(Police *pPolice);					// 警察車両の探知処理
 void ChasePoliceAct(Police *pPolice);					// 警察の追跡処理
-void PatrolBackPoliceAct(Police *pPolice);				// 警察のパトロールに戻るときの処理
+void PatrolBackAct(Police *pPolice);					// パトロールに戻る処理
+void ReturnPoliceRot(Police *pPolice);					// 警察の向きを直す処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -60,6 +61,19 @@ Police g_aPolice[MAX_POLICE];	// オブジェクトの情報
 //======================================================================================================================
 void InitPolice(void)
 {
+	CURVE curveInfo;
+
+	//曲がり角を初期化する(75.0fずらす)
+	curveInfo.nCurveTime = 4;
+	curveInfo.curvePoint[0] = D3DXVECTOR3(6500.0f, 0.0f, 2000.0f);
+	curveInfo.fCurveRot[0] = -90;
+	curveInfo.curvePoint[1] = D3DXVECTOR3(3000.0f, 0.0f, 2000.0f);
+	curveInfo.fCurveRot[1] = -180;
+	curveInfo.curvePoint[2] = D3DXVECTOR3(3000.0f, 0.0f, -2000.0f);
+	curveInfo.fCurveRot[2] = 90;
+	curveInfo.curvePoint[3] = D3DXVECTOR3(6500.0f, 0.0f, -2000.0f);
+	curveInfo.fCurveRot[3] = 0;
+
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
@@ -68,7 +82,8 @@ void InitPolice(void)
 	{ // オブジェクトの最大表示数分繰り返す
 
 		g_aPolice[nCntPolice].pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;			// 前回の位置
+		g_aPolice[nCntPolice].posOld	= g_aPolice[nCntPolice].pos;		// 前回の位置
+		g_aPolice[nCntPolice].posCopy	= g_aPolice[nCntPolice].pos;		// 最初の位置
 		g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aPolice[nCntPolice].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
@@ -76,7 +91,6 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].nLife		= 0;								// 体力
 		g_aPolice[nCntPolice].nShadowID = NONE_SHADOW;						// 影のインデックス
 		g_aPolice[nCntPolice].bUse		= false;							// 使用状況
-		g_aPolice[nCntPolice].poliDest = POLICEDESTINATION_RIGHT;			// 警察の行先
 
 		// モデル情報の初期化
 		g_aPolice[nCntPolice].modelData.dwNumMat = 0;						// マテリアルの数
@@ -90,14 +104,20 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].modelData.fRadius  = 0.0f;					// 半径
 
 		// 曲がり角の位置の初期化
-		g_aPolice[nCntPolice].poliCurve.Far	 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 奥の曲がり角
-		g_aPolice[nCntPolice].poliCurve.Left	 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 左の曲がり角
-		g_aPolice[nCntPolice].poliCurve.Near	 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 手前の曲がり角
-		g_aPolice[nCntPolice].poliCurve.Right	 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 右の曲がり角
+		for (int nCnt = 0; nCnt < MAX_CURVE; nCnt++)
+		{
+			g_aPolice[nCntPolice].policeCurve.bCurvePlus[nCnt] = false;			// ＋方向に走るか
+			g_aPolice[nCntPolice].policeCurve.bCurveX[nCnt] = false;			// X軸を走るか
+			g_aPolice[nCntPolice].policeCurve.curveAngle[nCnt] = CURVE_LEFT;	// どっちに曲がるか
+			g_aPolice[nCntPolice].policeCurve.curvePoint[nCnt] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// どこで曲がるか
+			g_aPolice[nCntPolice].policeCurve.fCurveRot[nCnt] = 0;				// 次向く角度
+		}
+		g_aPolice[nCntPolice].policeCurve.nCurveTime = 0;						// 曲がり角の回数
+		g_aPolice[nCntPolice].policeCurve.nNowCurve = 0;						// 現在の曲がり角
 	}
 
 	//警察の設定処理
-	SetPolice(D3DXVECTOR3(-4000.0f, 0.0f, 6000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
+	SetPolice(D3DXVECTOR3(4000.0f, 0.0f, 0.0f), curveInfo);
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
 	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
 	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -149,16 +169,6 @@ void UpdatePolice(void)
 				// 警察のパトロール行動処理
 				PatrolPoliceAct(&g_aPolice[nCntPolice]);
 
-				// 車の停止処理
-				CollisionStopCar
-				( // 引数
-					g_aPolice[nCntPolice].pos,		//位置
-					g_aPolice[nCntPolice].rot,		//向き
-					&g_aPolice[nCntPolice].move,	//移動量
-					g_aPolice[nCntPolice].modelData.fRadius,	//半径
-					COLLOBJECTTYPE_POLICE			//対象のサイズ
-				);
-
 				break;						//抜け出す
 
 			case POLICESTATE_CHASE:			//追跡処理
@@ -168,20 +178,24 @@ void UpdatePolice(void)
 
 				break;						//抜け出す
 
-			case POLICESTATE_PATBACK:		//パトロールへ戻る処理
-
-				// 警察のパトロールに戻るときの処理
-				PatrolBackPoliceAct(&g_aPolice[nCntPolice]);				
+			case POLICESTATE_PATBACK:		//パトロールへ戻る処理			
 
 				break;						//抜け出す
 
-			case POLICESTATE_STOP:			//足止め処理
+			case POLICESTATE_POSBACK:		//最初の座標に戻る処理
 
 				break;						//抜け出す
 			}
 
-			// プレイヤーの位置の更新
-			PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
+			// 車の停止処理
+			CollisionStopCar
+			( // 引数
+				g_aPolice[nCntPolice].pos,		//位置
+				g_aPolice[nCntPolice].rot,		//向き
+				&g_aPolice[nCntPolice].move,	//移動量
+				g_aPolice[nCntPolice].modelData.fRadius,	//半径
+				COLLOBJECTTYPE_POLICE			//対象のサイズ
+			);
 
 			//----------------------------------------------------
 			//	当たり判定
@@ -206,6 +220,9 @@ void UpdatePolice(void)
 
 			// プレイヤーの補正の更新処理
 			RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
+
+			// プレイヤーの位置の更新
+			PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
 		}
 	}
 }
@@ -246,10 +263,66 @@ void DrawPolice(void)
 			pDevice->GetMaterial(&matDef);
 
 			// マテリアルデータへのポインタを取得
-			pMat = (D3DXMATERIAL*)g_aPolice[nCntPolice].modelData.pBuffMat->GetBufferPointer();
+			pMat = &g_aPolice[nCntPolice].MatCopy[0];
 
 			for (int nCntMat = 0; nCntMat < (int)g_aPolice[nCntPolice].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
+
+				switch (g_aPolice[nCntPolice].state)
+				{
+				case POLICESTATE_PATBACK:	//パトロールに戻っている状態
+
+					// 透明度を下げる
+					pMat[nCntMat].MatD3D.Diffuse.a -= 0.005f;
+					pMat[nCntMat].MatD3D.Ambient.a -= 0.005f;
+					pMat[nCntMat].MatD3D.Emissive.a -= 0.005f;
+
+					if (pMat->MatD3D.Emissive.a <= 0.0f)
+					{ // 透明度が0.0f以下になった場合
+						// 透明度を下げる
+						pMat[nCntMat].MatD3D.Diffuse.a = 0.0f;
+						pMat[nCntMat].MatD3D.Ambient.a = 0.0f;
+						pMat[nCntMat].MatD3D.Emissive.a = 0.0f;
+
+						// パトロールに戻る処理
+						PatrolBackAct(&g_aPolice[nCntPolice]);
+
+						//最初の位置に戻す処理
+						g_aPolice[nCntPolice].state = POLICESTATE_POSBACK;
+					}
+
+					break;					//抜け出す
+
+				case POLICESTATE_POSBACK:	//最初の位置に戻る状態
+
+					// 透明度を下げる
+					pMat[nCntMat].MatD3D.Diffuse.a += 0.005f;
+					pMat[nCntMat].MatD3D.Ambient.a += 0.005f;
+					pMat[nCntMat].MatD3D.Emissive.a += 0.005f;
+
+					if (pMat->MatD3D.Emissive.a >= 1.0f)
+					{ // 透明度が0.0f以下になった場合
+					  // 透明度を下げる
+						pMat[nCntMat].MatD3D.Diffuse.a = 1.0f;
+						pMat[nCntMat].MatD3D.Ambient.a = 1.0f;
+						pMat[nCntMat].MatD3D.Emissive.a = 1.0f;
+
+						// 最初の移動量を元に戻す
+						g_aPolice[nCntPolice].move.x = 0.0f;
+
+						//最初の位置に戻す処理
+						g_aPolice[nCntPolice].state = POLICESTATE_PATROL;
+					}
+
+					break;					//抜け出す
+
+				default:					//上記以外
+
+					//元々のマテリアルを代入する
+					pMat = (D3DXMATERIAL*)g_aPolice[nCntPolice].modelData.pBuffMat->GetBufferPointer();
+
+					break;					//抜け出す
+				}
 
 				// マテリアルの設定
 				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
@@ -270,8 +343,10 @@ void DrawPolice(void)
 //======================================================================================================================
 //	警察の設定処理
 //======================================================================================================================
-void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest)
+void SetPolice(D3DXVECTOR3 pos, CURVE poliCurve)
 {
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -279,14 +354,13 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
 			g_aPolice[nCntPolice].pos		= pos;								// 現在の位置
+			g_aPolice[nCntPolice].posCopy   = g_aPolice[nCntPolice].pos;		// 最初の位置
 			g_aPolice[nCntPolice].posOld	= g_aPolice[nCntPolice].pos;		// 前回の位置
-			g_aPolice[nCntPolice].rot		= rot;								// 向き
 			g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
 			g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aPolice[nCntPolice].state		= POLICESTATE_STOP;					// パトロール状態にする
+			g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// パトロール状態にする
 			g_aPolice[nCntPolice].nLife		= POLI_LIFE;						// 体力
 			g_aPolice[nCntPolice].bMove		= false;							// 移動していない
-			g_aPolice[nCntPolice].poliDest = poliDest;							// 警察の向き
 
 			// 使用している状態にする
 			g_aPolice[nCntPolice].bUse = true;
@@ -305,11 +379,42 @@ void SetPolice(D3DXVECTOR3 pos, D3DXVECTOR3 rot, POLICEDEST poliDest)
 			// 影の位置設定
 			SetPositionShadow(g_aPolice[nCntPolice].nShadowID, g_aPolice[nCntPolice].pos, g_aPolice[nCntPolice].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			//曲がり角を初期化する(75.0fずらす)
-			g_aPolice[nCntPolice].poliCurve.Far = D3DXVECTOR3(2925.0f, 0.0f, -2075.0f);
-			g_aPolice[nCntPolice].poliCurve.Left = D3DXVECTOR3(2925.0f, 0.0f, 2075.0f);
-			g_aPolice[nCntPolice].poliCurve.Near = D3DXVECTOR3(6575.0f, 0.0f, 2075.0f);
-			g_aPolice[nCntPolice].poliCurve.Right = D3DXVECTOR3(6575.0f, 0.0f, -2075.0f);
+			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
+
+			//マテリアル情報に対するポインタを取得
+			pMat = (D3DXMATERIAL*)g_aPolice[nCntPolice].modelData.pBuffMat->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_aPolice[nCntPolice].modelData.dwNumMat; nCntMat++)
+			{
+				//マテリアルの情報を取得する
+				g_aPolice[nCntPolice].MatCopy[nCntMat] = pMat[nCntMat];
+			}
+
+			g_aPolice[nCntPolice].policeCurve.nCurveTime = poliCurve.nCurveTime;				// 曲がる回数
+
+			for (int nCnt = 0; nCnt < g_aPolice[nCntPolice].policeCurve.nCurveTime; nCnt++)
+			{
+				g_aPolice[nCntPolice].policeCurve.curvePoint[nCnt] = poliCurve.curvePoint[nCnt];	// 曲がるポイント
+				g_aPolice[nCntPolice].policeCurve.fCurveRot[nCnt] = poliCurve.fCurveRot[nCnt];		// 次曲がる角度
+			}
+
+			g_aPolice[nCntPolice].policeCurve.nNowCurve = 0;									// 現在の曲がり角
+
+			// 曲がる位置の設定処理
+			SetCurvePoint(&g_aPolice[nCntPolice].policeCurve, &g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
+
+			if (g_aPolice[nCntPolice].policeCurve.bCurveX[0] == true)
+			{ // 最初X軸を走っている場合
+				// 位置を補正する
+				g_aPolice[nCntPolice].pos.z = g_aPolice[nCntPolice].policeCurve.curvePoint[0].z;
+				g_aPolice[nCntPolice].posCopy = g_aPolice[nCntPolice].pos;
+			}
+			else
+			{ // 最初Z軸を走っている場合
+				// 位置を補正する
+				g_aPolice[nCntPolice].pos.x = g_aPolice[nCntPolice].policeCurve.curvePoint[0].x;
+				g_aPolice[nCntPolice].posCopy = g_aPolice[nCntPolice].pos;
+			}
 
 			// 処理を抜ける
 			break;
@@ -558,141 +663,200 @@ void PatrolPoliceAct(Police *pPolice)
 	// 移動している状態にする
 	pPolice->bMove = true;
 
-	if (/*pPolice->pos.x >= GetLimitStage().fRight + (POLICAR_WIDTH * 2) || */pPolice->poliDest == POLICEDESTINATION_RIGHT)
-	{ // 右の壁が警察より左側にある場合
-		if (pPolice->pos.z >= pPolice->poliCurve.Near.z + (POLICAR_WIDTH * 2))
-		{ // 左にある壁が途切れたら
+	if (pPolice->policeCurve.bCurveX[pPolice->policeCurve.nNowCurve] == true)
+	{//X軸を走っていた場合
+		if (pPolice->policeCurve.bCurvePlus[pPolice->policeCurve.nNowCurve] == true)
+		{ // 右に走っている場合
+			if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_RIGHT)
+			{//右に曲がる場合
+				if (pPolice->pos.x >= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x - (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
 
-			// 向きを更新
-			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
 
-			if (pPolice->rot.y <= D3DXToRadian(-90))
-			{//一定の向きに達した場合
-				// 向きを補正
-				pPolice->rot.y = D3DXToRadian(-90);
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
 
-				//警察の行先を設定する
-				pPolice->poliDest = POLICEDESTINATION_NEAR;
+					// 右の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x - (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 左の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z - (POLICAR_WIDTH * 2);
+				}
 			}
+			else if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_LEFT)
+			{//左に曲がる場合
+				if (pPolice->pos.x >= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x + (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
 
-			// 移動量を減速
-			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
 
-			// 手前の壁に這わせる
-			pPolice->pos.z = pPolice->poliCurve.Near.z + (POLICAR_WIDTH * 2);
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+					// 右の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x + (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 左の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z - (POLICAR_WIDTH * 2);
+				}
+			}
 		}
 		else
-		{ // 左にある壁がまだあったら
-			// 右の壁に這わせる
-			pPolice->pos.x = pPolice->poliCurve.Near.x + (POLICAR_WIDTH * 2);
+		{ // 左に走っている場合
+			if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_RIGHT)
+			{//右に曲がる場合
+				if (pPolice->pos.x <= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x + (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
+
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
+
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+					// 左の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x + (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 手前の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z + (POLICAR_WIDTH * 2);
+				}
+			}
+			else if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_LEFT)
+			{//左に曲がる場合
+				if (pPolice->pos.x <= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x - (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
+
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
+
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+					// 左の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x - (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 手前の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z + (POLICAR_WIDTH * 2);
+				}
+			}
 		}
 	}
+	else
+	{//Z軸を走っていた場合
+		if (pPolice->policeCurve.bCurvePlus[pPolice->policeCurve.nNowCurve] == true)
+		{ // 右の壁が警察より左側にある場合
+			if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_RIGHT)
+			{//右に曲がる場合
+				if (pPolice->pos.z >= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z - (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
 
-	if (/*pPolice->pos.z >= GetLimitStage().fNear + (POLICAR_WIDTH * 2) || */pPolice->poliDest == POLICEDESTINATION_NEAR)
-	{ // 手前の壁が警察より奥にある場合
-		if (pPolice->pos.x <= pPolice->poliCurve.Left.x - (POLICAR_WIDTH * 2))
-		{ // 左にある壁が途切れたら
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
 
-			// 向きを更新
-			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
 
-			if (pPolice->rot.y <= D3DXToRadian(-180))
-			{ // 一定の向きに達した場合
-				// 向きを補正
-				pPolice->rot.y = D3DXToRadian(180);
-
-				//警察の行先を設定する
-				pPolice->poliDest = POLICEDESTINATION_LEFT;
+					// 手前の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z - (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 右の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x + (POLICAR_WIDTH * 2);
+				}
 			}
+			else if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_LEFT)
+			{ // 左に曲がる場合
+				if (pPolice->pos.z >= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z + (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
 
-			// 移動量を減速
-			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
 
-			// 左の壁に這わせる
-			pPolice->pos.x = pPolice->poliCurve.Left.x - (POLICAR_WIDTH * 2);
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+
+					// 手前の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z + (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 右の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x + (POLICAR_WIDTH * 2);
+				}
+			}
 		}
 		else
-		{ // 左にある壁がまだあったら
-			// 手前の壁に這わせる
-			pPolice->pos.z = pPolice->poliCurve.Left.z + (POLICAR_WIDTH * 2);
-		}
-	}
+		{//左の壁が警察より右にある場合
+			if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_RIGHT)
+			{//右に曲がる場合
+				if (pPolice->pos.z <= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z + (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
 
-	if (/*pPolice->pos.x <= GetLimitStage().fLeft - (POLICAR_WIDTH * 2) || */pPolice->poliDest == POLICEDESTINATION_LEFT)
-	{//左の壁が警察より右にある場合
-		if (pPolice->pos.z <= pPolice->poliCurve.Far.z - (POLICAR_WIDTH * 2))
-		{ // 左にある壁が途切れたら
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
 
-			// 向きを更新
-			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
 
-			if (pPolice->rot.y <= D3DXToRadian(90))
-			{ // 一定の向きに達した場合
-				// 向きを補正
-				pPolice->rot.y = D3DXToRadian(90);
-
-				//警察の行先を設定する
-				pPolice->poliDest = POLICEDESTINATION_FAR;
+					// 左の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z + (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 左の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x - (POLICAR_WIDTH * 2);
+				}
 			}
+			else if (pPolice->policeCurve.curveAngle[pPolice->policeCurve.nNowCurve] == CURVE_LEFT)
+			{
+				if (pPolice->pos.z <= pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z - (POLICAR_WIDTH * 2))
+				{ // 左にある壁が途切れたら
 
-			// 移動量を減速
-			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
+					// 車の角度更新・補正処理
+					CurveRotCar(&pPolice->policeCurve, &pPolice->rot, &pPolice->move);
 
-			// 左の壁に這わせる
-			pPolice->pos.z = pPolice->poliCurve.Far.z - (POLICAR_WIDTH * 2);
-		}
-		else
-		{ // 左にある壁がまだあったら
-			// 左の壁に這わせる
-			pPolice->pos.x = pPolice->poliCurve.Far.x - (POLICAR_WIDTH * 2);
-		}
-	}
+					// 移動量を減速
+					pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
 
-	if (/*pPolice->pos.z <= GetLimitStage().fFar - (POLICAR_WIDTH * 2) || */pPolice->poliDest == POLICEDESTINATION_FAR)
-	{//奥の壁が警察より手前にある場合
-		if (pPolice->pos.x >= pPolice->poliCurve.Right.x + (POLICAR_WIDTH * 2))
-		{ // 左にある壁が途切れたら
-
-			// 向きを更新
-			pPolice->rot.y -= 0.05f * (pPolice->move.x * 0.1f);
-
-			if (pPolice->rot.y <= D3DXToRadian(0))
-			{ // 一定の向きに達した場合
-				// 向きを補正
-				pPolice->rot.y = D3DXToRadian(0);
-
-				//警察の行先を設定する
-				pPolice->poliDest = POLICEDESTINATION_RIGHT;
+					// 左の壁に這わせる
+					pPolice->pos.z = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].z - (POLICAR_WIDTH * 2);
+				}
+				else
+				{ // 左にある壁がまだあったら
+				  // 左の壁に這わせる
+					pPolice->pos.x = pPolice->policeCurve.curvePoint[pPolice->policeCurve.nNowCurve].x - (POLICAR_WIDTH * 2);
+				}
 			}
-
-			// 移動量を減速
-			pPolice->move.x += (0.0f - pPolice->move.x) * REV_POLI_MOVE_SUB;
-
-			// 右の壁に這わせる
-			pPolice->pos.x = pPolice->poliCurve.Right.x + (POLICAR_WIDTH * 2);
-		}
-		else
-		{ // 左にある壁がまだあったら
-			// 左の壁に這わせる
-			pPolice->pos.z = pPolice->poliCurve.Right.z - (POLICAR_WIDTH * 2);
 		}
 	}
 
 	if (pPolice->move.x > MAX_POLI_FORWARD_PATROL)
 	{ // プレイヤーの移動量 (x) が一定値以上の場合
 
-		// プレイヤーの移動量 (x) を補正
+	  // プレイヤーの移動量 (x) を補正
 		pPolice->move.x = MAX_POLI_FORWARD_PATROL;
 	}
 
-	////目的の距離を設定する
-	//fDist = fabsf(sqrtf((pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x) + (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z)));
+	//目的の距離を設定する
+	fDist = fabsf(sqrtf((pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x) + (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z)));
 
-	//if (fDist <= 700.0f)
-	//{ // 目的の距離が一定以内に入ったら
-	//	// 追跡状態に移行する
-	//	pPolice->State = POLICESTATE_CHASE;
-	//}
+	if (fDist <= 1000.0f)
+	{ // 目的の距離が一定以内に入ったら
+		// 追跡状態に移行する
+		pPolice->state = POLICESTATE_CHASE;
+	}
 
 	//if (GetLimitStage().fFar > pPolice->pos.z)
 	//{ // 右の壁に当たりそうな場合
@@ -758,7 +922,7 @@ void PatrolCarSearch(Police *pPolice)
 	// 目的の向きを設定する
 	fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
 
-	if (fDist <= 700.0f)
+	if (fDist <= 3000.0f)
 	{ // 目的の距離が一定以内に入ったら
 		// 追跡状態に移行する
 		pPolice->state = POLICESTATE_CHASE;
@@ -803,151 +967,73 @@ void PatrolCarSearch(Police *pPolice)
 //============================================================
 void ChasePoliceAct(Police *pPolice)
 {
+	// 移動量を更新
+	pPolice->move.x += POLI_MOVE_FORWARD;
+
+	// 移動している状態にする
+	pPolice->bMove = true;
+
 	//警察車両の探知処理
 	PatrolCarSearch(pPolice);
 
-	if (pPolice->move.x >= 28.0f)
+	if (pPolice->move.x >= 25.0f)
 	{ // 移動量が一定値以上の場合
 		// 移動量を更新
-		pPolice->move.x -= 0.05f;
+		pPolice->move.x = 25.0f;
 	}
 }
 
 //============================================================
-//警察のパトロールに戻るときの処理
+// パトロールに戻る処理
 //============================================================
-void PatrolBackPoliceAct(Police *pPolice)
+void PatrolBackAct(Police *pPolice)
 {
-	float fDist, fSave;					//現在の位置からの距離、距離を保存する変数
-	int nSavePoint;						//どこの曲がり角かを保存する変数
+	//最初の位置と向きと移動量、今進むべき方向をリセットする
+	pPolice->pos = pPolice->posCopy;
+	ReturnPoliceRot(pPolice);				//移動量の設定処理
+	pPolice->move.x = 0.0f;
+	pPolice->policeCurve.nNowCurve = 0;
+}
 
-	for (int nCnt = 0; nCnt < 4; nCnt++)
-	{
-		switch (nCnt)
-		{
-		case POLICEDESTINATION_NEAR:	// 奥の比較
-
-			// 距離を測る
-			fDist = fabsf(sqrtf((pPolice->poliCurve.Near.x - pPolice->pos.x) * (pPolice->poliCurve.Near.x - pPolice->pos.x) + (pPolice->poliCurve.Near.z - pPolice->pos.z) * (pPolice->poliCurve.Near.z - pPolice->pos.z)));
-
-			// セーブする
-			fSave = fDist;
-
-			break;						// 抜け出す
-
-		case POLICEDESTINATION_FAR:		// 手前の比較
-
-			// 距離を測る
-			fDist = fabsf(sqrtf((pPolice->poliCurve.Far.x - pPolice->pos.x) * (pPolice->poliCurve.Far.x - pPolice->pos.x) + (pPolice->poliCurve.Far.z - pPolice->pos.z) * (pPolice->poliCurve.Far.z - pPolice->pos.z)));
-
-			break;						// 抜け出す
-
-		case POLICEDESTINATION_RIGHT:	// 右との比較
-
-			//距離を測る
-			fDist = fabsf(sqrtf((pPolice->poliCurve.Right.x - pPolice->pos.x) * (pPolice->poliCurve.Right.x - pPolice->pos.x) + (pPolice->poliCurve.Right.z - pPolice->pos.z) * (pPolice->poliCurve.Right.z - pPolice->pos.z)));
-
-			break;						// 抜け出す
-
-		case POLICEDESTINATION_LEFT:	// 左との比較
-
-			//距離を測る
-			fDist = fabsf(sqrtf((pPolice->poliCurve.Left.x - pPolice->pos.x) * (pPolice->poliCurve.Left.x - pPolice->pos.x) + (pPolice->poliCurve.Left.z - pPolice->pos.z) * (pPolice->poliCurve.Left.z - pPolice->pos.z)));
-
-			break;						// 抜け出す
+//============================================================
+// 警察の向きを直す処理
+//============================================================
+void ReturnPoliceRot(Police *pPolice)
+{
+	if (pPolice->policeCurve.bCurveX[0] == true)
+	{ // X軸を移動していた場合
+		if (pPolice->policeCurve.bCurvePlus[0] == true)
+		{ // 右方向に移動していた場合
+			// 向きを90度に設定する
+			pPolice->rot.y = D3DXToRadian(90);
 		}
-
-		if (fSave > fDist)
-		{//セーブした距離よりも計算した距離の方が長かった場合
-			//セーブを更新する
-			fSave = fDist;
-
-			//セーブポイントを保存する
-			nSavePoint = nCnt;
+		else
+		{ // 左方向に移動していた場合
+			// 向きを-90度に設定する
+			pPolice->rot.y = D3DXToRadian(-90);
 		}
 	}
-
-	switch (nSavePoint)
-	{
-	case POLICEDESTINATION_NEAR:	// 手前の場合
-
-		// 角度を設定する
-		pPolice->rot.y = atan2f(pPolice->poliCurve.Near.x - pPolice->pos.x, pPolice->poliCurve.Near.z - pPolice->pos.z);
-
-		break;						// 抜け出す
-
-	case POLICEDESTINATION_FAR:		// 奥の場合
-
-		// 角度を設定する
-		pPolice->rot.y = atan2f(pPolice->poliCurve.Far.x - pPolice->pos.x, pPolice->poliCurve.Far.z - pPolice->pos.z);
-
-		break;						// 抜け出す
-
-	case POLICEDESTINATION_RIGHT:	// 右の場合
-
-		// 角度を設定する
-		pPolice->rot.y = atan2f(pPolice->poliCurve.Right.x - pPolice->pos.x, pPolice->poliCurve.Right.z - pPolice->pos.z);
-
-		break;						// 抜け出す
-
-	case POLICEDESTINATION_LEFT:	//左の場合
-
-		// 角度を設定する
-		pPolice->rot.y = atan2f(pPolice->poliCurve.Left.x - pPolice->pos.x, pPolice->poliCurve.Left.z - pPolice->pos.z);
-
-		break;						//抜け出す
-	}
-
-	if (fDist <= 30.0f)
-	{//距離が20.0f以下になった場合
-		// 移動量を更新
-		pPolice->move.x -= (pPolice->move.x - fDist);
-	}
-
-	// 移動量を更新
-	pPolice->move.x += 0.1f;
-
-	//移動している状態にする
-	pPolice->bMove = true;
-
-	if (fDist <= 1.0f)
-	{ // 距離が1.0f以下になった場合
-		// パトロール状態に変える
-		pPolice->state = POLICESTATE_PATROL;
-
-		switch (nSavePoint)
-		{
-		case POLICEDESTINATION_NEAR:		//手前の場合
-
-			//セーブ地点を補正する
-			nSavePoint = POLICEDESTINATION_RIGHT;
-
-			break;							//抜け出す
-
-		case POLICEDESTINATION_FAR:			//奥の場合
-
-			//セーブ地点を補正する
-			nSavePoint = POLICEDESTINATION_LEFT;
-
-			break;							//抜け出す
-
-		case POLICEDESTINATION_RIGHT:		//右の場合
-
-			//セーブ地点を補正する
-			nSavePoint = POLICEDESTINATION_FAR;
-
-			break;							//抜け出す
-
-		case POLICEDESTINATION_LEFT:		//左の場合
-
-			//セーブ地点を補正する
-			nSavePoint = POLICEDESTINATION_NEAR;
-
-			break;							//抜け出す
+	else
+	{ // Z軸を移動していた場合
+		if (pPolice->policeCurve.bCurvePlus[0] == true)
+		{ // 奥方向に移動していた場合
+			// 向きを0度に設定する
+			pPolice->rot.y = D3DXToRadian(0);
 		}
+		else
+		{ // 手前方向に移動していた場合
+			if (pPolice->policeCurve.curveAngle[0] == CURVE_RIGHT)
+			{ // 右に曲がる場合
+				// 向きを-180度に設定する
+				pPolice->rot.y = D3DXToRadian(-180);
+			}
+			else if (pPolice->policeCurve.curveAngle[0] == CURVE_LEFT)
+			{ // 左に曲がる場合
+				// 向きを180度に設定する
+				pPolice->rot.y = D3DXToRadian(180);
 
-		// セーブポイントにする
-		pPolice->poliDest = (POLICEDEST)nSavePoint;
+			}
+		}
 	}
 }
 

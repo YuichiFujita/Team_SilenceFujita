@@ -1238,6 +1238,7 @@ void DrawDebug(void)
 	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
 	Car *pCar = GetCarData();						// 車の情報を取得する
+	Police *pPolice = GetPoliceData();
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1268,7 +1269,9 @@ void DrawDebug(void)
 		"   ---------------------------------------------　\n"
 		"   車の向き：[%d]\n"
 		"   車の位置：[%.3f,%.3f,%.3f]\n"
-		"   車のスピード：[%.3f,%.3f,%.3f]",
+		"   車のスピード：[%.3f,%.3f,%.3f]\n"
+		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
+		" 　警察のスピード：[%.3f]\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1284,7 +1287,9 @@ void DrawDebug(void)
 		nNumParticle,		// パーティクルの総数
 		(int)D3DXToDegree(pCar->rot.y),
 		pCar->pos.x, pCar->pos.y, pCar->pos.z,
-		pCar->move.x, pCar->move.y, pCar->move.z
+		pCar->move.x, pCar->move.y, pCar->move.z,
+		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
+		pPolice->move.x
 	);
 
 	//--------------------------------------------------------

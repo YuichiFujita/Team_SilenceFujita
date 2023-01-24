@@ -47,5 +47,6 @@ typedef struct
 //**********************************************************************************************************************
 void SetCurvePoint(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);
 void SetCurvePointHuman(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);
+void CurveRotCar(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move);						// é‘ÇÃäpìxçXêVèàóù
 
 #endif
