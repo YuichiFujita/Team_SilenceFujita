@@ -22,6 +22,18 @@
 #define MAX_OBJECT			(256)		// 使用するモデル数 (オブジェクトの最大数)
 
 //**********************************************************************************************************************
+//	列挙型定義 (ROTSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	ROTSTATE_0 = 0,						// 向き 0度 (360度)
+	ROTSTATE_90,						// 向き 90度
+	ROTSTATE_180,						// 向き 180度
+	ROTSTATE_270,						// 向き 270度
+	ROTSTATE_MAX,						// この列挙型の総数
+} ROTSTATE;
+
+//**********************************************************************************************************************
 //	列挙型定義 (COLLISIONTYPE)
 //**********************************************************************************************************************
 typedef enum
@@ -49,9 +61,18 @@ typedef enum
 typedef struct
 {
 	D3DXVECTOR3 vecPos;					// 位置ベクトル
+	D3DXVECTOR3 scale;					// 拡大率
 	float       fWidth;					// 横幅
 	float       fDepth;					// 奥行
 }Collision;
+
+//**********************************************************************************************************************
+//	構造体定義 (Coll_Info)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3 vecPos;					// 位置ベクトル
+}Coll_Info;
 
 //**********************************************************************************************************************
 //	構造体定義 (Object)
@@ -65,6 +86,7 @@ typedef struct
 	Model        modelData;				// モデル情報
 	D3DXMATERIAL matCopy[MAX_MATERIAL];	// マテリアルのコピー
 	ACTIONSTATE  state;					// 状態
+	Coll_Info    collInfo;				// 当たり判定情報
 	int          nLife;					// 体力
 	int          nCollisionType;		// 当たり判定の種類
 	int          nShadowType;			// 影の種類
@@ -87,7 +109,7 @@ void UninitObject(void);				// オブジェクトの終了処理
 void UpdateObject(void);				// オブジェクトの更新処理
 void DrawObject(void);					// オブジェクトの描画処理
 
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType);	// オブジェクトの設定処理
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, D3DXVECTOR3 vecPos);	// オブジェクトの設定処理
 void HitObject(Object *pObject, int nDamage);																	// オブジェクトのダメージ判定
 void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
 
