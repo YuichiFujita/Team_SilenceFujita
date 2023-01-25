@@ -61,19 +61,6 @@ Police g_aPolice[MAX_POLICE];	// オブジェクトの情報
 //======================================================================================================================
 void InitPolice(void)
 {
-	CURVE curveInfo;
-
-	//曲がり角を初期化する(75.0fずらす)
-	curveInfo.nCurveTime = 4;
-	curveInfo.curvePoint[0] = D3DXVECTOR3(6500.0f, 0.0f, 2000.0f);
-	curveInfo.fCurveRot[0] = -90;
-	curveInfo.curvePoint[1] = D3DXVECTOR3(3000.0f, 0.0f, 2000.0f);
-	curveInfo.fCurveRot[1] = -180;
-	curveInfo.curvePoint[2] = D3DXVECTOR3(3000.0f, 0.0f, -2000.0f);
-	curveInfo.fCurveRot[2] = 90;
-	curveInfo.curvePoint[3] = D3DXVECTOR3(6500.0f, 0.0f, -2000.0f);
-	curveInfo.fCurveRot[3] = 0;
-
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
@@ -115,13 +102,6 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].policeCurve.nCurveTime = 0;						// 曲がり角の回数
 		g_aPolice[nCntPolice].policeCurve.nNowCurve = 0;						// 現在の曲がり角
 	}
-
-	//警察の設定処理
-	SetPolice(D3DXVECTOR3(4000.0f, 0.0f, 0.0f), curveInfo);
-	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), POLICEDESTINATION_RIGHT);
-	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), POLICEDESTINATION_LEFT);
-	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	//SetPolice(D3DXVECTOR3(7000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //======================================================================================================================
