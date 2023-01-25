@@ -287,15 +287,31 @@ void CollisionRotationEdit(void)
 //=======================================
 void CollisionScaleObjectX(void)
 {
+	// 変数を宣言
+	float fScale = 0.0f;
+
 	if (GetKeyboardPress(DIK_U) == true)
 	{//Uキーを押した場合
-		//X軸を拡大する
-		g_EditCollision.collision.scale.x += 0.02f;
+		//拡大量を保存する
+		fScale += 0.02f;
 	}
 	else if (GetKeyboardPress(DIK_J) == true)
 	{//Jキーを押した場合
-		//X軸を縮小する
-		g_EditCollision.collision.scale.x -= 0.02f;
+		//縮小量を保存する
+		fScale -= 0.02f;
+	}
+
+	// 横幅と縦幅を計算
+	if (g_EditCollision.stateRot == ROTSTATE_0
+	||  g_EditCollision.stateRot == ROTSTATE_180)
+	{ // 角度が0度、または180度の場合
+		//X軸を拡縮する
+		g_EditCollision.collision.scale.x += fScale;
+	}
+	else
+	{ // 角度90度、または270度の場合
+		//Z軸を拡縮する
+		g_EditCollision.collision.scale.z += fScale;
 	}
 }
 
@@ -321,15 +337,31 @@ void CollisionScaleObjectY(void)
 //=======================================
 void CollisionScaleObjectZ(void)
 {
+	// 変数を宣言
+	float fScale = 0.0f;
+
 	if (GetKeyboardPress(DIK_O) == true)
 	{//Oキーを押した場合
-		//Z軸を拡大する
-		g_EditCollision.collision.scale.z += 0.02f;
+		//拡大量を保存する
+		fScale += 0.02f;
 	}
 	else if (GetKeyboardPress(DIK_L) == true)
 	{//Lキーを押した場合
-		//Z軸を縮小する
-		g_EditCollision.collision.scale.z -= 0.02f;
+		//縮小量を保存する
+		fScale -= 0.02f;
+	}
+
+	// 横幅と縦幅を計算
+	if (g_EditCollision.stateRot == ROTSTATE_0
+	||  g_EditCollision.stateRot == ROTSTATE_180)
+	{ // 角度が0度、または180度の場合
+		//Z軸を拡縮する
+		g_EditCollision.collision.scale.z += fScale;
+	}
+	else
+	{ // 角度90度、または270度の場合
+		//X軸を拡縮する
+		g_EditCollision.collision.scale.x += fScale;
 	}
 }
 

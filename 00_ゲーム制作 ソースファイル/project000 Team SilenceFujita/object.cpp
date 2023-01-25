@@ -68,7 +68,8 @@ void InitObject(void)
 		g_aObject[nCntObject].bUse           = false;								// 使用状況
 
 		// 当たり判定情報の初期化
-		g_aObject[nCntObject].collInfo.vecPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置ベクトル
+		g_aObject[nCntObject].collInfo.vecPos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+		g_aObject[nCntObject].collInfo.stateRot = ROTSTATE_0;						// 向き状態
 
 		// モデル情報の初期化
 		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
@@ -294,7 +295,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, D3DXVECTOR3 vecPos)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
@@ -314,9 +315,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].nShadowType    = nShadowType;			// 影の種類
 			g_aObject[nCntObject].nCollisionType = nCollisionType;		// 当たり判定の種類
 
-			// 当たり判定情報の引数を代入
-			g_aObject[nCntObject].collInfo.vecPos = vecPos;				// 位置ベクトル
-
 			// オブジェクトの情報を初期化
 			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態
 			g_aObject[nCntObject].nLife         = OBJ_LIFE;				// 体力
@@ -324,6 +322,22 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 			// 使用している状態にする
 			g_aObject[nCntObject].bUse = true;
+
+			// 当たり判定情報を設定
+			g_aObject[nCntObject].collInfo.vecPos   = g_aCollision[nType].vecPos;	// 位置ベクトル
+			g_aObject[nCntObject].collInfo.stateRot = stateRot;						// 向き状態
+
+			for (int nCntRot = ROTSTATE_0; nCntRot < stateRot; nCntRot++)
+			{ // 設定された向きになるまで繰り返す
+
+				// 位置ベクトルを90度回転
+				g_aObject[nCntObject].collInfo.vecPos = D3DXVECTOR3
+				( // 引数
+					-g_aObject[nCntObject].collInfo.vecPos.z,
+					g_aObject[nCntObject].collInfo.vecPos.y,
+					g_aObject[nCntObject].collInfo.vecPos.x
+				);
+			}
 
 			// モデル情報を設定
 			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
