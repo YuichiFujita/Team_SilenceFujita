@@ -18,6 +18,7 @@
 #include "Police.h"
 #include "curve.h"
 #include "object.h"
+#include "wind.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -222,7 +223,6 @@ void InitHuman(void)
 			break;				//抜け出す
 		}
 	}
-
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
@@ -299,8 +299,22 @@ void UpdateHuman(void)
 				NONE_SCALE							// 拡大率
 			);
 
+			// プレイヤーの位置の更新
+			PosHuman(&g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].rot, g_aHuman[nCntHuman].bMove);
+
 			//人間のリアクション処理
 			ReactionHuman(&g_aHuman[nCntHuman]);
+
+			// 風の当たり判定
+			CollisionWind
+			(
+				&g_aHuman[nCntHuman].pos,		//位置
+				&g_aHuman[nCntHuman].posOld,	//前回の位置
+				&g_aHuman[nCntHuman].move,		//移動量
+				30.0f,							//縦幅
+				30.0f,							//奥行
+				&g_aHuman[nCntHuman].state		//状態
+			);
 
 			switch (g_aHuman[nCntHuman].state)
 			{
@@ -318,9 +332,6 @@ void UpdateHuman(void)
 
 				break;					//抜け出す
 			}
-
-			// プレイヤーの位置の更新
-			PosHuman(&g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].rot, g_aHuman[nCntHuman].bMove);
 
 			if (g_aHuman[nCntHuman].pos.y < 0.0f)
 			{//Y軸の位置が0.0fだった場合
