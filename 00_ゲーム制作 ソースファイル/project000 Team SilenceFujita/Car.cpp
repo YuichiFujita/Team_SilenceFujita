@@ -722,9 +722,6 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 				{
 				case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
 
-					// 移動量を設定する
-					move->x = sinf(targetrot.y) * -3.0f;
-
 					break;						//抜け出す
 
 				case COLLOBJECTTYPE_POLICE:		//車の場合
@@ -737,7 +734,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 				case COLLOBJECTTYPE_CAR:		//車の場合
 
 					// 目標の移動量をセーブする
-					move->x = 0.0f;
+					move->x = sinf(targetrot.y) * -8.0f;
 
 					break;						//抜け出す
 				}
@@ -762,9 +759,6 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					{
 					case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
 
-						// 移動量を設定する
-						move->x = sinf(targetrot.y) * -3.0f;
-
 						break;						//抜け出す
 
 					case COLLOBJECTTYPE_POLICE:		//車の場合
@@ -777,7 +771,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					case COLLOBJECTTYPE_CAR:		//車の場合
 
 						// 目標の移動量をセーブする
-						move->x = 0.0f;
+						move->x = sinf(-targetrot.y) * 8.0f;
 
 						break;						//抜け出す
 					}

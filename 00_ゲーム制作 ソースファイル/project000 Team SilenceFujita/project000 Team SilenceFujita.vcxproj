@@ -188,6 +188,7 @@
     <ClCompile Include="title.cpp" />
     <ClCompile Include="value.cpp" />
     <ClCompile Include="velocity.cpp" />
+    <ClCompile Include="wind.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="billboard.h" />
@@ -224,6 +225,7 @@
     <ClInclude Include="title.h" />
     <ClInclude Include="value.h" />
     <ClInclude Include="velocity.h" />
+    <ClInclude Include="wind.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -17,6 +17,7 @@
 #include "player.h"
 #include "shadow.h"
 #include "sound.h"
+#include "wind.h"
 
 #include "meshfield.h"
 #include "Police.h"
@@ -43,6 +44,7 @@ void PosPlayer(void);				// プレイヤーの位置の更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
 void LandPlayer(void);				// プレイヤーの着地の更新処理
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
+void FlyAwayPlayer(void);			// プレイヤーの送風処理
 
 //************************************************************
 //	グローバル変数
@@ -83,6 +85,12 @@ void InitPlayer(void)
 	g_player.modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
 	g_player.modelData.size     = INIT_SIZE;	// 大きさ
 	g_player.modelData.fRadius  = 0.0f;			// 半径
+
+	//風の情報の初期化
+	g_player.wind.bUseWind = false;				// 風の使用状況
+	g_player.wind.nCircleCount = 0;				// どこに出すか
+	g_player.wind.nCount = 0;					// 風を出すカウント
+	g_player.wind.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
 
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -143,6 +151,9 @@ void UpdatePlayer(void)
 
 		//プレイヤーのカメラの状態変化処理
 		CameraChangePlayer();
+
+		// プレイヤーの送風処理
+		FlyAwayPlayer();
 #else
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
 		{ // 奥移動の操作が行われた場合
@@ -200,7 +211,45 @@ void UpdatePlayer(void)
 			g_player.rot,		// 向き
 			NONE_SCALE			// 拡大率
 		);
+
+		if (g_player.wind.bUseWind == true)
+		{ // 送風機を使用した場合
+			//風を出すカウントを加算する
+			g_player.wind.nCount++;
+
+			if (g_player.wind.nCount % 3 == 0)
+			{ // 風のカウントが一定数になったら
+				// 風の位置を設定する
+				g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 50.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 50.0f);
+
+				//風の向きを設定する
+				g_player.wind.rot = D3DXVECTOR3(g_player.rot.x + D3DXToRadian(g_player.wind.nCircleCount), g_player.rot.y + D3DX_PI * 0.5f, g_player.rot.z + D3DXToRadian(g_player.wind.nCircleCount));
+
+				// 風の設定処理
+				SetWind(g_player.wind.pos, g_player.wind.rot);
+
+				// 風の位置を設定する
+				g_player.wind.pos = D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 50.0f, g_player.pos.y + 50.0f, g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 50.0f);
+
+				//風の向きを設定する
+				g_player.wind.rot = D3DXVECTOR3(g_player.rot.x - D3DXToRadian(g_player.wind.nCircleCount), g_player.rot.y - D3DX_PI * 0.5f, g_player.rot.z - D3DXToRadian(g_player.wind.nCircleCount));
+
+				// 風の設定処理
+				SetWind(g_player.wind.pos, g_player.wind.rot);
+
+				//向きを設定する
+				g_player.wind.nCircleCount = (g_player.wind.nCircleCount + (int)(360 * 0.05f)) % 360;
+			}
+		}
+		else
+		{ // 送風機を使用していない場合
+			// カウントを初期化する
+			g_player.wind.nCount = 0;
+		}
 	}
+
+	//送風機を使用しない
+	g_player.wind.bUseWind = false;
 }
 
 //============================================================
@@ -608,6 +657,18 @@ void CameraChangePlayer(void)
 
 		// 一人称カメラの状況を変える
 		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
+	}
+}
+
+//============================================================
+// プレイヤーの送風処理
+//============================================================
+void FlyAwayPlayer(void)
+{
+	if (GetKeyboardPress(DIK_U) == true)
+	{ // Uキーを押している場合
+		// 送風機を使用する
+		g_player.wind.bUseWind = true;
 	}
 }
 

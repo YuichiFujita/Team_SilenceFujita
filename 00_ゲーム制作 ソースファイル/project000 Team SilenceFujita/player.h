@@ -36,6 +36,18 @@ typedef enum
 }PLAYCAMESTATE;
 
 //************************************************************
+//	構造体定義 (PlayerWind)
+//************************************************************
+typedef struct
+{
+	D3DXVECTOR3 pos;				// 風を出す位置
+	D3DXVECTOR3	rot;				// 飛ばす方向
+	int			nCount;				// 風を出すカウント
+	int			nCircleCount;		// 風を出す位置のカウント
+	bool		bUseWind;			// 風の使用状況
+}PlayerWind;
+
+//************************************************************
 //	構造体定義 (Player)
 //************************************************************
 typedef struct
@@ -48,6 +60,7 @@ typedef struct
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	ACTIONSTATE state;				// プレイヤーの状態
 	Model       modelData;			// モデル情報
+	PlayerWind	wind;				// 風の情報
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター
 	int         nShadowID;			// 影のインデックス
@@ -67,8 +80,8 @@ void UpdatePlayer(void);	// プレイヤーの更新処理
 void DrawPlayer(void);		// プレイヤーの描画処理
 
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// プレイヤーの位置・向きの設定処理
-void HealPlayer(Player *pPlayer, int nHeal);				// プレイヤーの回復判定
-void HitPlayer(Player *pPlayer, int nDamage);				// プレイヤーのダメージ判定
+//void HealPlayer(Player *pPlayer, int nHeal);				// プレイヤーの回復判定
+//void HitPlayer(Player *pPlayer, int nDamage);				// プレイヤーのダメージ判定
 Player *GetPlayer(void);									// プレイヤーの取得処理
 
 //************************************************************
