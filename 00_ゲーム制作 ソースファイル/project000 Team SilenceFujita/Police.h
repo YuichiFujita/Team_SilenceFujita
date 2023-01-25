@@ -63,7 +63,6 @@ void UpdatePolice(void);				// Œx@‚ÌXVˆ—
 void DrawPolice(void);					// Œx@‚Ì•`‰æˆ—
 void SetPolice(D3DXVECTOR3 pos, CURVE poliCurve);		// Œx@‚Ìİ’èˆ—
 void HitPolice(Police *pPolice, int nDamage);												// Œx@‚Ìƒ_ƒ[ƒW”»’è
-void CollisionPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// Œx@‚Æ‚Ì“–‚½‚è”»’è
 Police *GetPoliceData(void);																// Œx@‚Ìæ“¾ˆ—
 
 //**********************************************************************************************************************

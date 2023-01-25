@@ -736,6 +736,7 @@ void TxtSetStage(void)
 	ROTSTATE    stateRot;		// 向き状態
 	SetInfo		carSetInfo;		// 車の設定用
 	SetInfo		HumanSetInfo;	// 人間の設定用
+	SetInfo		PoliSetInfo;	// 警察の設定用
 
 	// 変数配列を宣言
 	char         aString[MAX_STRING];	// テキストの文字列の代入用
@@ -1081,6 +1082,57 @@ void TxtSetStage(void)
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}
+
+			//------------------------------------------------
+			//	警察の設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_POLICE") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_POLICE の場合
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_POLICE ではない場合ループ
+
+				  // ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_POLICE") == 0)
+					{ // 読み込んだ文字列が SET_POLICE の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_POLICE ではない場合ループ
+
+						  // ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &PoliSetInfo.pos.x, &PoliSetInfo.pos.y, &PoliSetInfo.pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVETIME") == 0)
+							{ // 読み込んだ文字列が CURVETIME の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%d", &PoliSetInfo.Curve.nCurveTime);			// 曲がる回数を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVEPOINT") == 0)
+							{ // 読み込んだ文字列がCURVEPOINTだった場合
+								for (int nCnt = 0; nCnt < PoliSetInfo.Curve.nCurveTime; nCnt++)
+								{ // 回数分読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEPOINT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &PoliSetInfo.Curve.curvePoint[nCnt].x, &PoliSetInfo.Curve.curvePoint[nCnt].y, &PoliSetInfo.Curve.curvePoint[nCnt].z);		// 曲がる回数を読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEROT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%d", &PoliSetInfo.Curve.fCurveRot[nCnt]);	//曲がる方向を読み込む
+								}
+							}
+
+						} while (strcmp(&aString[0], "END_SET_POLICE") != 0);	// 読み込んだ文字列が END_SET_POLICE ではない場合ループ
+
+						// 警察の設定
+						SetPolice(PoliSetInfo.pos, PoliSetInfo.Curve);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_POLICE") != 0);		// 読み込んだ文字列が END_SETSTAGE_POLICE ではない場合ループ
+			}
 		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
 		
 		// ファイルを閉じる
@@ -1285,6 +1337,7 @@ void DrawDebug(void)
 		"   車の向き：[%d]\n"
 		"   車の位置：[%.3f,%.3f,%.3f]\n"
 		"   車のスピード：[%.3f,%.3f,%.3f]\n"
+		"   警察の向き：[%d]\n"
 		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
 		" 　警察のスピード：[%.3f]\n",
 		g_nCountFPS,		// FPS
@@ -1303,6 +1356,7 @@ void DrawDebug(void)
 		(int)D3DXToDegree(pCar->rot.y),
 		pCar->pos.x, pCar->pos.y, pCar->pos.z,
 		pCar->move.x, pCar->move.y, pCar->move.z,
+		(int)D3DXToDegree(pPolice->rot.y),
 		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
 		pPolice->move.x
 	);
