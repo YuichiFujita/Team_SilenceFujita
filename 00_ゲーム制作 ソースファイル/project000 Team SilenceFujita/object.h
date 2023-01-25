@@ -72,6 +72,7 @@ typedef struct
 typedef struct
 {
 	D3DXVECTOR3 vecPos;					// 位置ベクトル
+	ROTSTATE    stateRot;				// 向き状態
 }Coll_Info;
 
 //**********************************************************************************************************************
@@ -109,7 +110,7 @@ void UninitObject(void);				// オブジェクトの終了処理
 void UpdateObject(void);				// オブジェクトの更新処理
 void DrawObject(void);					// オブジェクトの描画処理
 
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, D3DXVECTOR3 vecPos);	// オブジェクトの設定処理
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot);	// オブジェクトの設定処理
 void HitObject(Object *pObject, int nDamage);																	// オブジェクトのダメージ判定
 void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
 

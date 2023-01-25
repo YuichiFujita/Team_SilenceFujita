@@ -719,7 +719,6 @@ void TxtSetStage(void)
 	int         nEnd;			// テキスト読み込み終了の確認用
 	StageLimit  stageLimit;		// ステージの移動範囲の代入用
 	D3DXVECTOR3 pos;			// 位置の代入用
-	D3DXVECTOR3 vecPos;			// 位置ベクトルの代入用
 	D3DXVECTOR3 rot;			// 向きの代入用
 	D3DXVECTOR3 scale;			// 拡大率の代入用
 	D3DXCOLOR   col;			// 色の代入用
@@ -734,6 +733,7 @@ void TxtSetStage(void)
 	int         nAnim;			// アニメーションの ON / OFF の設定用
 	bool        bAnim;			// アニメーションの ON / OFF の代入用
 	bool        bShadow;		// 影の ON / OFF の代入
+	ROTSTATE    stateRot;		// 向き状態
 	SetInfo		carSetInfo;		// 車の設定用
 	SetInfo		HumanSetInfo;	// 人間の設定用
 	SetInfo		PoliSetInfo;	// 警察の設定用
@@ -856,10 +856,10 @@ void TxtSetStage(void)
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
 								fscanf(pFile, "%d", &nCollisionType);	// 当たり判定の種類を読み込む
 							}
-							else if (strcmp(&aString[0], "VECPOS") == 0)
-							{ // 読み込んだ文字列が VECPOS の場合
-								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-								fscanf(pFile, "%f%f%f", &vecPos.x, &vecPos.y, &vecPos.z);	// 位置ベクトルを読み込む
+							else if (strcmp(&aString[0], "COLLISIONROT") == 0)
+							{ // 読み込んだ文字列が COLLISIONROT の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &stateRot);			// 向き状態を読み込む
 							}
 							else if (strcmp(&aString[0], "NUMMAT") == 0)
 							{ // 読み込んだ文字列が NUMMAT の場合
@@ -896,7 +896,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, vecPos);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
