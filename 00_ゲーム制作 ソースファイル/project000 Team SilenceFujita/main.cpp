@@ -1306,6 +1306,7 @@ void DrawDebug(void)
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
 	Car *pCar = GetCarData();						// 車の情報を取得する
 	Police *pPolice = GetPoliceData();
+	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1339,7 +1340,8 @@ void DrawDebug(void)
 		"   車のスピード：[%.3f,%.3f,%.3f]\n"
 		"   警察の向き：[%d]\n"
 		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
-		" 　警察のスピード：[%.3f]\n",
+		" 　警察のスピード：[%.3f]\n"
+		" 　人間の位置：[%.3f,%.3f,%.3f]",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1358,7 +1360,8 @@ void DrawDebug(void)
 		pCar->move.x, pCar->move.y, pCar->move.z,
 		(int)D3DXToDegree(pPolice->rot.y),
 		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
-		pPolice->move.x
+		pPolice->move.x,
+		HumanPos.x, HumanPos.y, HumanPos.z
 	);
 
 	//--------------------------------------------------------

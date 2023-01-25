@@ -22,7 +22,7 @@ void UninitWind(void);		// 送風機の終了処理
 void UpdateWind(void);		// 送風機の更新処理
 void DrawWind(void);		// 送風機の描画処理
 void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot);			// 送風機の設定処理
-void CollisionWind(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, HUMANSTATE *state);		// 風の当たり判定
+void CollisionWind(Human *pHuman);						// 風の当たり判定
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

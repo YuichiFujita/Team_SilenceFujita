@@ -28,7 +28,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define HUMAN_LIFE					(50)		// 人の体力
-#define HUMAN_GRAVITY				(0.75f)		// 人にかかる重力
+#define HUMAN_GRAVITY				(1.0f)		// 人にかかる重力
 #define HUMAN_MOVE_FORWARD			(0.1f)		// 人前進時の移動量
 #define HUMAN_MOVE_BACKWARD			(0.2f)		// 人後退時の移動量
 #define HUMAN_MOVE_ROT				(0.012f)	// 人の向き変更量
@@ -49,7 +49,7 @@ void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 人間の補正の更新処理
 void CurveHuman(Human *pHuman);						// 人間のカーブ処理
 void CurveRotHuman(Human *pHuman);					// 人間の角度更新処理
 void StopHuman(Human *pHuman);						// 人間の停止処理
-void ReactionHuman(Human *pHuman);					//人間のリアクション処理
+void ReactionHuman(Human *pHuman);					// 人間のリアクション処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -303,18 +303,10 @@ void UpdateHuman(void)
 			PosHuman(&g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].rot, g_aHuman[nCntHuman].bMove);
 
 			//人間のリアクション処理
-			ReactionHuman(&g_aHuman[nCntHuman]);
+			/*ReactionHuman(&g_aHuman[nCntHuman]);*/
 
 			// 風の当たり判定
-			CollisionWind
-			(
-				&g_aHuman[nCntHuman].pos,		//位置
-				&g_aHuman[nCntHuman].posOld,	//前回の位置
-				&g_aHuman[nCntHuman].move,		//移動量
-				30.0f,							//縦幅
-				30.0f,							//奥行
-				&g_aHuman[nCntHuman].state		//状態
-			);
+			CollisionWind(&g_aHuman[nCntHuman]);
 
 			switch (g_aHuman[nCntHuman].state)
 			{
@@ -323,6 +315,15 @@ void UpdateHuman(void)
 				//人間のカーブ処理
 				CurveHuman(&g_aHuman[nCntHuman]);
 
+				if (g_aHuman[nCntHuman].pos.y < 0.0f)
+				{//Y軸の位置が0.0fだった場合
+					//縦への移動量を0.0fにする
+					g_aHuman[nCntHuman].move.y = 0.0f;
+
+					//位置を0.0fに戻す
+					g_aHuman[nCntHuman].pos.y = 0.0f;
+				}
+
 				break;					//抜け出す
 
 			case HUMANSTATE_STOP:		//止まった状態
@@ -330,16 +331,30 @@ void UpdateHuman(void)
 				// 人間の停止処理
 				StopHuman(&g_aHuman[nCntHuman]);
 
+				if (g_aHuman[nCntHuman].pos.y < 0.0f)
+				{//Y軸の位置が0.0fだった場合
+					//縦への移動量を0.0fにする
+					g_aHuman[nCntHuman].move.y = 0.0f;
+
+					//位置を0.0fに戻す
+					g_aHuman[nCntHuman].pos.y = 0.0f;
+				}
+
 				break;					//抜け出す
-			}
 
-			if (g_aHuman[nCntHuman].pos.y < 0.0f)
-			{//Y軸の位置が0.0fだった場合
-				//縦への移動量を0.0fにする
-				g_aHuman[nCntHuman].move.y = 0.0f;
+			case HUMANSTATE_FLY:		//吹き飛んだ状態
 
-				//位置を0.0fに戻す
-				g_aHuman[nCntHuman].pos.y = 0.0f;
+				// 飛ばす
+				g_aHuman[nCntHuman].pos.x += g_aHuman[nCntHuman].move.x;
+				g_aHuman[nCntHuman].pos.z += g_aHuman[nCntHuman].move.z;
+
+				if (g_aHuman[nCntHuman].pos.y <= 0.0f)
+				{ // 位置が0.0f以下になった場合
+					//使用していない
+					g_aHuman[nCntHuman].bUse = false;
+				}
+
+				break;					//抜け出す
 			}
 
 			//----------------------------------------------------
@@ -405,13 +420,6 @@ void DrawHuman(void)
 
 				switch (g_aHuman[nCntHuman].state)
 				{
-				case HUMANSTATE_WALK:		//歩き状態
-
-					// マテリアルの設定
-					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
-
-					break;					//抜け出す
-
 				case HUMANSTATE_STOP:		//停止状態
 
 					// 構造体の要素をクリア
@@ -424,6 +432,13 @@ void DrawHuman(void)
 
 					// マテリアルの設定
 					pDevice->SetMaterial(&blueMat.MatD3D);			// 青
+
+					break;					//抜け出す
+
+				default:		//上記以外
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
 					break;					//抜け出す
 				}
@@ -948,21 +963,24 @@ void ReactionHuman(Human *pHuman)
 
 	Player *pPlayer = GetPlayer();
 
-	if (pPlayer->bUse == true)
-	{ // 使用している場合
-		// 長さを測る
-		fLength = (pPlayer->pos.x - pHuman->pos.x) * (pPlayer->pos.x - pHuman->pos.x)
-			+ (pPlayer->pos.z - pHuman->pos.z) * (pPlayer->pos.z - pHuman->pos.z);
+	if (pHuman->state != HUMANSTATE_FLY)
+	{ // 吹き飛び状態じゃない場合
+		if (pPlayer->bUse == true)
+		{ // 使用している場合
+			// 長さを測る
+			fLength = (pPlayer->pos.x - pHuman->pos.x) * (pPlayer->pos.x - pHuman->pos.x)
+				+ (pPlayer->pos.z - pHuman->pos.z) * (pPlayer->pos.z - pHuman->pos.z);
 
-		if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * 170.0f)
-		{ // プレイヤーが近くに来た場合
-			//停止処理に移行
-			pHuman->state = HUMANSTATE_STOP;
-		}
-		else
-		{ // プレイヤーに近くにいない場合
-			//停止処理に移行
-			pHuman->state = HUMANSTATE_WALK;
+			if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * 170.0f)
+			{ // プレイヤーが近くに来た場合
+				//停止処理に移行
+				pHuman->state = HUMANSTATE_STOP;
+			}
+			else
+			{ // プレイヤーに近くにいない場合
+				//停止処理に移行
+				pHuman->state = HUMANSTATE_WALK;
+			}
 		}
 	}
 }

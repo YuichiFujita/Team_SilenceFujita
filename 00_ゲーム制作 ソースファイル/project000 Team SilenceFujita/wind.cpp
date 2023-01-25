@@ -39,6 +39,7 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
+void FlyAwayHuman(Human *pHuman, Player player);					// 人間が吹き飛ばされる処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -324,49 +325,79 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 //======================================================================================================================
 // 風の当たり判定
 //======================================================================================================================
-void CollisionWind(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, HUMANSTATE *state)
+void CollisionWind(Human *pHuman)
 {
 	Player *pPlayer = GetPlayer();			//プレイヤーの情報を取得する
 
-	// 前後の当たり判定
-	if (pPos->x + fWidth > pPlayer->pos.x + (pPlayer->modelData.vtxMin.x + 50.0f)
-		&&  pPos->x - fWidth < pPlayer->pos.x + (pPlayer->modelData.vtxMax.x + 50.0f))
-	{ // ブロックの左右の範囲内の場合
+	if (pHuman->pos.y <= 50.0f)
+	{ // 300.0f以下にいる場合
+		// 前後の当たり判定
+		if (pHuman->pos.x + pHuman->modelData.fRadius > pPlayer->pos.x + (pPlayer->modelData.vtxMin.x - 50.0f)
+			&& pHuman->pos.x - pHuman->modelData.fRadius < pPlayer->pos.x + (pPlayer->modelData.vtxMax.x + 50.0f))
+		{ // ブロックの左右の範囲内の場合
 
-		if (pPos->z + fDepth >  pPlayer->pos.z + (pPlayer->modelData.vtxMax.z + 50.0f)
-			&&  pOldPos->z + fDepth <= pPlayer->pos.z + (pPlayer->modelData.vtxMax.z + 50.0f))
-		{ // 前からの当たり判定
-			// 青ざめ状態
-			*state = HUMANSTATE_STOP;
-		}
-		else if (pPos->z - fDepth <  pPlayer->pos.z + (pPlayer->modelData.vtxMin.z + 50.0f)
-			&&  pOldPos->z - fDepth >= pPlayer->pos.z + (pPlayer->modelData.vtxMin.z + 50.0f))
-		{ // 後ろからの当たり判定
-			// 青ざめ状態
-			*state = HUMANSTATE_STOP;
-		}
-	}
+			if (pHuman->pos.z + pHuman->modelData.fRadius >  pPlayer->pos.z + (pPlayer->modelData.vtxMin.z - 50.0f)
+				&& pHuman->posOld.z + pHuman->modelData.fRadius <= pPlayer->oldPos.z + (pPlayer->modelData.vtxMin.z - 50.0f))
+			{ // 前からの当たり判定
+			  // 吹き飛び状態
+				pHuman->state = HUMANSTATE_FLY;
 
-	// 左右の当たり判定
-	if (pPos->z + fDepth > pPlayer->pos.z + (pPlayer->modelData.vtxMin.z + 50.0f)
-		&&  pPos->z - fDepth < pPlayer->pos.z + (pPlayer->modelData.vtxMin.z + 50.0f))
-	{ // ブロックの前後の範囲内の場合
+				// 人間が吹き飛ばされる処理
+				FlyAwayHuman(pHuman, *pPlayer);
+			}
+			else if (pHuman->pos.z - pHuman->modelData.fRadius <  pPlayer->pos.z + (pPlayer->modelData.vtxMax.z + 50.0f)
+				&& pHuman->posOld.z - pHuman->modelData.fRadius >= pPlayer->oldPos.z + (pPlayer->modelData.vtxMax.z + 50.0f))
+			{ // 後ろからの当たり判定
+			  // 吹き飛び状態
+				pHuman->state = HUMANSTATE_FLY;
 
-		if (pPos->x + fWidth >  pPlayer->pos.x + (pPlayer->modelData.vtxMin.x + 50.0f)
-			&&  pOldPos->x + fWidth <= pPlayer->pos.x + (pPlayer->modelData.vtxMin.x + 50.0f))
-		{ // 左からの当たり判定
-			// 青ざめ状態
-			*state = HUMANSTATE_STOP;
+				// 人間が吹き飛ばされる処理
+				FlyAwayHuman(pHuman, *pPlayer);
+			}
 		}
-		else if (pPos->x - fWidth <  pPlayer->pos.x + (pPlayer->modelData.vtxMax.x + 50.0f)
-			&&  pOldPos->x - fWidth >= pPlayer->pos.x + (pPlayer->modelData.vtxMax.x + 50.0f))
-		{ // 右からの当たり判定
-			// 青ざめ状態
-			*state = HUMANSTATE_STOP;
+
+		// 左右の当たり判定
+		if (pHuman->pos.z + pHuman->modelData.fRadius > pPlayer->pos.z + (pPlayer->modelData.vtxMin.z - 50.0f)
+			&& pHuman->pos.z - pHuman->modelData.fRadius < pPlayer->pos.z + (pPlayer->modelData.vtxMax.z + 50.0f))
+		{ // ブロックの前後の範囲内の場合
+
+			if (pHuman->pos.x + pHuman->modelData.fRadius >  pPlayer->pos.x + (pPlayer->modelData.vtxMin.x - 50.0f)
+				&& pHuman->posOld.x + pHuman->modelData.fRadius <= pPlayer->oldPos.x + (pPlayer->modelData.vtxMin.x - 50.0f))
+			{ // 左からの当たり判定
+			  // 吹き飛び状態
+				pHuman->state = HUMANSTATE_FLY;
+
+				// 人間が吹き飛ばされる処理
+				FlyAwayHuman(pHuman, *pPlayer);
+			}
+			else if (pHuman->pos.x - pHuman->modelData.fRadius <  pPlayer->pos.x + (pPlayer->modelData.vtxMax.x + 50.0f)
+				&& pHuman->posOld.x - pHuman->modelData.fRadius >= pPlayer->oldPos.x + (pPlayer->modelData.vtxMax.x + 50.0f))
+			{ // 右からの当たり判定
+			  // 吹き飛び状態
+				pHuman->state = HUMANSTATE_FLY;
+
+				// 人間が吹き飛ばされる処理
+				FlyAwayHuman(pHuman, *pPlayer);
+			}
 		}
 	}
 }
 
+//============================================================
+// 人間が吹き飛ばされる処理
+//============================================================
+void FlyAwayHuman(Human *pHuman, Player player)
+{
+	float FlyAngle = atan2f(pHuman->pos.x - player.pos.x, pHuman->pos.z - player.pos.z);
+
+	// 移動量を設定する
+	pHuman->move.x = sinf(FlyAngle) * 100.0f;
+	pHuman->move.y = 20.0f;
+	pHuman->move.z = cosf(FlyAngle) * 100.0f;
+
+	// 飛ばす
+	pHuman->pos += pHuman->move;
+}
 
 #ifdef _DEBUG	// デバッグ処理
 #endif
