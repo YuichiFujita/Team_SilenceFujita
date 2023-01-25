@@ -55,7 +55,6 @@ void UninitCar(void);				// Ô‚ÌI—¹ˆ—
 void UpdateCar(void);				// Ô‚ÌXVˆ—
 void DrawCar(void);					// Ô‚Ì•`‰æˆ—
 void SetCar(D3DXVECTOR3 pos, CURVE carCurve);		// Ô‚Ìİ’èˆ—
-void CollisionCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth); 	// Ô‚Æ‚Ì“–‚½‚è”»’è
 Car *GetCarData(void);																		// Ô‚Ìæ“¾ˆ—
 void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// Ô‚Ì’â~ˆ—
 

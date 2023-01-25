@@ -17,6 +17,7 @@
 #include "player.h"
 #include "Police.h"
 #include "curve.h"
+#include "object.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -37,7 +38,7 @@
 #define MAX_HUMAN_BACKWARD			(8.0f)		// 後退時の最高速度
 #define REV_HUMAN_MOVE_SUB			(0.04f)		// 移動量の減速係数
 #define HUMAN_WIDTH					(10.0f)		// 人の縦幅
-#define HUMAN_HEIGHT				(10.0f)		// 人の奥行
+#define HUMAN_DEPTH					(10.0f)		// 人の奥行
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -241,14 +242,14 @@ void InitHuman(void)
 		//曲がり角の情報を初期化
 		for (int nCntCurve = 0; nCntCurve < MAX_CURVE; nCntCurve++)
 		{
-			g_aHuman[nCntHuman].carCurve.curveAngle[nCntCurve] = CURVE_RIGHT;						// 曲がる方向
-			g_aHuman[nCntHuman].carCurve.curvePoint[nCntCurve] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 曲がるポイント
-			g_aHuman[nCntHuman].carCurve.nNowCurve = 0;												// 現在の曲がり角
-			g_aHuman[nCntHuman].carCurve.bCurveX[nCntCurve] = false;								// X軸を走っているか
-			g_aHuman[nCntHuman].carCurve.fCurveRot[nCntCurve] = 0;									// 目標の向き
+			g_aHuman[nCntHuman].humanCurve.curveAngle[nCntCurve] = CURVE_RIGHT;						// 曲がる方向
+			g_aHuman[nCntHuman].humanCurve.curvePoint[nCntCurve] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 曲がるポイント
+			g_aHuman[nCntHuman].humanCurve.nNowCurve = 0;												// 現在の曲がり角
+			g_aHuman[nCntHuman].humanCurve.bCurveX[nCntCurve] = false;								// X軸を走っているか
+			g_aHuman[nCntHuman].humanCurve.fCurveRot[nCntCurve] = 0;									// 目標の向き
 		}
-		g_aHuman[nCntHuman].carCurve.nCurveTime = 0;				// 曲がる回数
-		g_aHuman[nCntHuman].carCurve.nNowCurve = 0;					// 現在のルート
+		g_aHuman[nCntHuman].humanCurve.nCurveTime = 0;				// 曲がる回数
+		g_aHuman[nCntHuman].humanCurve.nNowCurve = 0;					// 現在のルート
 
 		// モデル情報の初期化
 		g_aHuman[nCntHuman].modelData.dwNumMat = 0;					// マテリアルの数
@@ -329,6 +330,19 @@ void UpdateHuman(void)
 				//位置を0.0fに戻す
 				g_aHuman[nCntHuman].pos.y = 0.0f;
 			}
+
+			//----------------------------------------------------
+			//	当たり判定
+			//----------------------------------------------------
+			// オブジェクトとの当たり判定
+			CollisionObject
+			( // 引数
+				&g_aHuman[nCntHuman].pos,		// 現在の位置
+				&g_aHuman[nCntHuman].posOld,	// 前回の位置
+				&g_aHuman[nCntHuman].move,		// 移動量
+				HUMAN_WIDTH,					// 横幅
+				HUMAN_DEPTH						// 奥行
+			);
 
 			// プレイヤーの補正の更新処理
 			RevHuman(&g_aHuman[nCntHuman].rot, &g_aHuman[nCntHuman].pos);
@@ -453,14 +467,41 @@ void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 			//曲がり角関係の設定
 			for (int nCntCurve = 0; nCntCurve < humanCurve.nCurveTime; nCntCurve++)
 			{
-				g_aHuman[nCntHuman].carCurve.fCurveRot[nCntCurve] = humanCurve.fCurveRot[nCntCurve];	// 次曲がる向き
-				g_aHuman[nCntHuman].carCurve.curvePoint[nCntCurve] = humanCurve.curvePoint[nCntCurve];	// 次曲がるポイント
+				g_aHuman[nCntHuman].humanCurve.fCurveRot[nCntCurve] = humanCurve.fCurveRot[nCntCurve];	// 次曲がる向き
+				g_aHuman[nCntHuman].humanCurve.curvePoint[nCntCurve] = humanCurve.curvePoint[nCntCurve];	// 次曲がるポイント
 			}
-			g_aHuman[nCntHuman].carCurve.nNowCurve = 0;													// 現在のルート
-			g_aHuman[nCntHuman].carCurve.nCurveTime = humanCurve.nCurveTime;							// 曲がる回数
+			g_aHuman[nCntHuman].humanCurve.nNowCurve = 0;													// 現在のルート
+			g_aHuman[nCntHuman].humanCurve.nCurveTime = humanCurve.nCurveTime;							// 曲がる回数
 
 			//カーブの設定処理
-			SetCurvePointHuman(&g_aHuman[nCntHuman].carCurve, &g_aHuman[nCntHuman].rot, &g_aHuman[nCntHuman].pos);
+			SetCurvePointHuman(&g_aHuman[nCntHuman].humanCurve, &g_aHuman[nCntHuman].rot, &g_aHuman[nCntHuman].pos);
+
+			if (g_aHuman[nCntHuman].humanCurve.bCurveX[0] == true)
+			{ // 最初X軸を走っている場合
+				if (g_aHuman[nCntHuman].humanCurve.bCurvePlus[0] == true)
+				{ // 右に走っている場合
+					// 位置を補正する
+					g_aHuman[nCntHuman].pos.z = g_aHuman[nCntHuman].humanCurve.curvePoint[0].z - (HUMAN_WIDTH * 2);
+				}
+				else
+				{ // 左に走っている場合
+					// 位置を補正する
+					g_aHuman[nCntHuman].pos.z = g_aHuman[nCntHuman].humanCurve.curvePoint[0].z + (HUMAN_WIDTH * 2);
+				}
+			}
+			else
+			{ // 最初Z軸を走っている場合
+				if (g_aHuman[nCntHuman].humanCurve.bCurvePlus[0] == true)
+				{ // 奥に走っている場合
+				  // 位置を補正する
+					g_aHuman[nCntHuman].pos.x = g_aHuman[nCntHuman].humanCurve.curvePoint[0].x + (HUMAN_WIDTH * 2);
+				}
+				else
+				{ // 手前に走っている場合
+				  // 位置を補正する
+					g_aHuman[nCntHuman].pos.x = g_aHuman[nCntHuman].humanCurve.curvePoint[0].x - (HUMAN_WIDTH * 2);
+				}
+			}
 
 			// 処理を抜ける
 			break;
@@ -592,33 +633,33 @@ void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 	if (rot->y > D3DX_PI) { rot->y -= D3DX_PI * 2; }
 	else if (rot->y < -D3DX_PI) { rot->y += D3DX_PI * 2; }
 
-	////--------------------------------------------------------
-	////	移動範囲の補正
-	////--------------------------------------------------------
-	//if (pos->z > GetLimitStage().fNear - (30.0f * 2))
-	//{ // 範囲外の場合 (手前)
+	//--------------------------------------------------------
+	//	移動範囲の補正
+	//--------------------------------------------------------
+	if (pos->z > GetLimitStage().fNear - (30.0f * 2))
+	{ // 範囲外の場合 (手前)
 
-	//	// 手前に位置を補正
-	//	pos->z = GetLimitStage().fNear - (30.0f * 2);
-	//}
-	//if (pos->z < GetLimitStage().fFar + (30.0f * 2))
-	//{ // 範囲外の場合 (奥)
+		// 手前に位置を補正
+		pos->z = GetLimitStage().fNear - (30.0f * 2);
+	}
+	if (pos->z < GetLimitStage().fFar + (30.0f * 2))
+	{ // 範囲外の場合 (奥)
 
-	//	// 奥に位置を補正
-	//	pos->z = GetLimitStage().fFar + (30.0f * 2);
-	//}
-	//if (pos->x > GetLimitStage().fRight - (30.0f * 2))
-	//{ // 範囲外の場合 (右)
+		// 奥に位置を補正
+		pos->z = GetLimitStage().fFar + (30.0f * 2);
+	}
+	if (pos->x > GetLimitStage().fRight - (30.0f * 2))
+	{ // 範囲外の場合 (右)
 
-	//	// 右に位置を補正
-	//	pos->x = GetLimitStage().fRight - (30.0f * 2);
-	//}
-	//if (pos->x < GetLimitStage().fLeft + (30.0f * 2))
-	//{ // 範囲外の場合 (左)
+		// 右に位置を補正
+		pos->x = GetLimitStage().fRight - (30.0f * 2);
+	}
+	if (pos->x < GetLimitStage().fLeft + (30.0f * 2))
+	{ // 範囲外の場合 (左)
 
-	//	// 左に位置を補正
-	//	pos->x = GetLimitStage().fLeft + (30.0f * 2);
-	//}
+		// 左に位置を補正
+		pos->x = GetLimitStage().fLeft + (30.0f * 2);
+	}
 }
 
 //============================================================
@@ -632,13 +673,13 @@ void CurveHuman(Human *pHuman)
 	// 移動している状態にする
 	pHuman->bMove = true;
 
-	if (pHuman->carCurve.bCurveX[pHuman->carCurve.nNowCurve] == true)
+	if (pHuman->humanCurve.bCurveX[pHuman->humanCurve.nNowCurve] == true)
 	{//X軸を走っていた場合
-		if (pHuman->carCurve.bCurvePlus[pHuman->carCurve.nNowCurve] == true)
+		if (pHuman->humanCurve.bCurvePlus[pHuman->humanCurve.nNowCurve] == true)
 		{ // 右に走っている場合
-			if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_RIGHT)
+			if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_RIGHT)
 			{//右に曲がる場合
-				if (pHuman->pos.x >= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x - (HUMAN_WIDTH * 2))
+				if (pHuman->pos.x >= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x - (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -648,17 +689,17 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 右の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 左の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
 				}
 			}
-			else if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_LEFT)
+			else if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_LEFT)
 			{//左に曲がる場合
-				if (pHuman->pos.x >= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x + (HUMAN_WIDTH * 2))
+				if (pHuman->pos.x >= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x + (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -668,20 +709,20 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 右の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 左の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
 				}
 			}
 		}
 		else
 		{ // 左に走っている場合
-			if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_RIGHT)
+			if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_RIGHT)
 			{//右に曲がる場合
-				if (pHuman->pos.x <= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x + (HUMAN_WIDTH * 2))
+				if (pHuman->pos.x <= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x + (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -691,17 +732,17 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 左の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 手前の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
 				}
 			}
-			else if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_LEFT)
+			else if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_LEFT)
 			{//左に曲がる場合
-				if (pHuman->pos.x <= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x - (HUMAN_WIDTH * 2))
+				if (pHuman->pos.x <= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x - (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -711,23 +752,23 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 左の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 手前の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
 				}
 			}
 		}
 	}
 	else
 	{//Z軸を走っていた場合
-		if (pHuman->carCurve.bCurvePlus[pHuman->carCurve.nNowCurve] == true)
+		if (pHuman->humanCurve.bCurvePlus[pHuman->humanCurve.nNowCurve] == true)
 		{ // 右の壁が警察より左側にある場合
-			if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_RIGHT)
+			if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_RIGHT)
 			{//右に曲がる場合
-				if (pHuman->pos.z >= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z - (HUMAN_WIDTH * 2))
+				if (pHuman->pos.z >= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z - (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -737,17 +778,17 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 手前の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 右の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
 				}
 			}
-			else if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_LEFT)
+			else if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_LEFT)
 			{ // 左に曲がる場合
-				if (pHuman->pos.z >= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z + (HUMAN_WIDTH * 2))
+				if (pHuman->pos.z >= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z + (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -757,20 +798,20 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 手前の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 右の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x + (HUMAN_WIDTH * 2);
 				}
 			}
 		}
 		else
 		{//左の壁が警察より右にある場合
-			if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_RIGHT)
+			if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_RIGHT)
 			{//右に曲がる場合
-				if (pHuman->pos.z <= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z + (HUMAN_WIDTH * 2))
+				if (pHuman->pos.z <= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z + (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -780,17 +821,17 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 左の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z + (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 左の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
 				}
 			}
-			else if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_LEFT)
+			else if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_LEFT)
 			{
-				if (pHuman->pos.z <= pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z - (HUMAN_WIDTH * 2))
+				if (pHuman->pos.z <= pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z - (HUMAN_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
 				  // 人間の角度更新・補正処理
@@ -800,12 +841,12 @@ void CurveHuman(Human *pHuman)
 					pHuman->move.x += (0.0f - pHuman->move.x) * REV_HUMAN_MOVE_SUB;
 
 					// 左の壁に這わせる
-					pHuman->pos.z = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
+					pHuman->pos.z = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].z - (HUMAN_WIDTH * 2);
 				}
 				else
 				{ // 左にある壁がまだあったら
 				  // 左の壁に這わせる
-					pHuman->pos.x = pHuman->carCurve.curvePoint[pHuman->carCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
+					pHuman->pos.x = pHuman->humanCurve.curvePoint[pHuman->humanCurve.nNowCurve].x - (HUMAN_WIDTH * 2);
 				}
 			}
 		}
@@ -824,19 +865,19 @@ void CurveHuman(Human *pHuman)
 //============================================================
 void CurveRotHuman(Human *pHuman)
 {
-	if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_LEFT)
+	if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_LEFT)
 	{ // 曲がる方向が左だった場合
 	  // 向きを更新
 		pHuman->rot.y -= 0.05f * (pHuman->move.x * 0.1f);
 
-		if (pHuman->rot.y <= (float)D3DXToRadian(pHuman->carCurve.fCurveRot[pHuman->carCurve.nNowCurve]))
+		if (pHuman->rot.y <= (float)D3DXToRadian(pHuman->humanCurve.fCurveRot[pHuman->humanCurve.nNowCurve]))
 		{ // 一定の向きに達した場合
 		  // 向きを補正
-			pHuman->rot.y = (float)D3DXToRadian(pHuman->carCurve.fCurveRot[pHuman->carCurve.nNowCurve]);
+			pHuman->rot.y = (float)D3DXToRadian(pHuman->humanCurve.fCurveRot[pHuman->humanCurve.nNowCurve]);
 
-			if (pHuman->carCurve.curveAngle[(pHuman->carCurve.nNowCurve + 1) % pHuman->carCurve.nCurveTime] == CURVE_LEFT)
+			if (pHuman->humanCurve.curveAngle[(pHuman->humanCurve.nNowCurve + 1) % pHuman->humanCurve.nCurveTime] == CURVE_LEFT)
 			{//次の曲がり角が左だった場合
-				if (pHuman->carCurve.fCurveRot[(pHuman->carCurve.nNowCurve + 1) % pHuman->carCurve.nCurveTime] == 90)
+				if (pHuman->humanCurve.fCurveRot[(pHuman->humanCurve.nNowCurve + 1) % pHuman->humanCurve.nCurveTime] == 90)
 				{//次の曲がり角がマイナス方向に曲がる場合
 				 //向きをプラスに戻す
 					pHuman->rot.y = (float)D3DXToRadian(180);
@@ -847,22 +888,22 @@ void CurveRotHuman(Human *pHuman)
 			//RevHuman(&pHuman->rot, &pHuman->pos);
 
 			// 警察の行先を設定する
-			pHuman->carCurve.nNowCurve = (pHuman->carCurve.nNowCurve + 1) % pHuman->carCurve.nCurveTime;
+			pHuman->humanCurve.nNowCurve = (pHuman->humanCurve.nNowCurve + 1) % pHuman->humanCurve.nCurveTime;
 		}
 	}
-	else if (pHuman->carCurve.curveAngle[pHuman->carCurve.nNowCurve] == CURVE_RIGHT)
+	else if (pHuman->humanCurve.curveAngle[pHuman->humanCurve.nNowCurve] == CURVE_RIGHT)
 	{ // 曲がる方向が右だった場合
 	  // 向きを更新
 		pHuman->rot.y += 0.05f * (pHuman->move.x * 0.1f);
 
-		if (pHuman->rot.y >= (float)D3DXToRadian(pHuman->carCurve.fCurveRot[pHuman->carCurve.nNowCurve]))
+		if (pHuman->rot.y >= (float)D3DXToRadian(pHuman->humanCurve.fCurveRot[pHuman->humanCurve.nNowCurve]))
 		{ // 一定の向きに達した場合
 		  // 向きを補正
-			pHuman->rot.y = (float)D3DXToRadian(pHuman->carCurve.fCurveRot[pHuman->carCurve.nNowCurve]);
+			pHuman->rot.y = (float)D3DXToRadian(pHuman->humanCurve.fCurveRot[pHuman->humanCurve.nNowCurve]);
 
-			if (pHuman->carCurve.curveAngle[(pHuman->carCurve.nNowCurve + 1) % pHuman->carCurve.nCurveTime] == CURVE_RIGHT)
+			if (pHuman->humanCurve.curveAngle[(pHuman->humanCurve.nNowCurve + 1) % pHuman->humanCurve.nCurveTime] == CURVE_RIGHT)
 			{//次の曲がり角が右だった場合
-				if (pHuman->carCurve.fCurveRot[(pHuman->carCurve.nNowCurve + 1) % pHuman->carCurve.nCurveTime] == -90)
+				if (pHuman->humanCurve.fCurveRot[(pHuman->humanCurve.nNowCurve + 1) % pHuman->humanCurve.nCurveTime] == -90)
 				{//次の曲がり角がマイナス方向に曲がる場合
 				 //向きをプラスに戻す
 					pHuman->rot.y = (float)D3DXToRadian(-180);
@@ -873,7 +914,7 @@ void CurveRotHuman(Human *pHuman)
 			//RevHuman(&pHuman->rot, &pHuman->pos);
 
 			// 警察の行先を設定する
-			pHuman->carCurve.nNowCurve = (pHuman->carCurve.nNowCurve + 1) % pHuman->carCurve.nCurveTime;
+			pHuman->humanCurve.nNowCurve = (pHuman->humanCurve.nNowCurve + 1) % pHuman->humanCurve.nCurveTime;
 		}
 	}
 }
