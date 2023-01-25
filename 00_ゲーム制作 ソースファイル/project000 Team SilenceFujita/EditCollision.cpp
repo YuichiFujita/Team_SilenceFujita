@@ -120,6 +120,8 @@ void DrawEditCollision(void)
 	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 	D3DXMATERIAL *pMat;							// マテリアルデータへのポインタ
+	D3DXMATERIAL blueMat;						// マテリアルデータ (青)
+
 
 	if (GetEditObject()->Collisiontype.Collisiontype == COLLISIONTYPE_CREATE
 	/*||  GetEditObject()->Collisiontype.Collisiontype == COLLISIONTYPE_ONLY*/)
@@ -154,8 +156,26 @@ void DrawEditCollision(void)
 
 			for (int nCntMat = 0; nCntMat < (int)g_EditCollision.modelData.dwNumMat; nCntMat++)
 			{
-				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+				if (g_EditCollision.nSelectColl == nCntColl
+				&&  GetCollisionStyle() == COLLISIONSTYLE_COLLISION)
+				{ // 現在選択中の当たり判定且つ、当たり判定エディット状態の場合
+
+					// 構造体の要素をクリア
+					ZeroMemory(&blueMat, sizeof(D3DXMATERIAL));
+
+					// 拡散光・環境光・自己発光を赤にする
+					blueMat.MatD3D.Diffuse  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f);
+					blueMat.MatD3D.Ambient  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f);
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&blueMat.MatD3D);			// 青
+				}
+				else
+				{ // それ以外の当たり判定の場合
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+				}
 
 				//テクスチャの設定
 				pDevice->SetTexture(0, g_EditCollision.modelData.pTexture[nCntMat]);

@@ -1534,9 +1534,9 @@ void DrawDebugEditCollision(void)
 		"\n　 距離　 [%.4f, %.4f, %.4f]"
 		"\n　 拡大率 [%.4f, %.4f, %.4f]"
 		"\n　 向き　 [%d]"
-		"\n　 判定数 [%d]"
-		"\n　 選択中 [%d]"
 		"\n　 サイズ [横幅：%.4f] [奥行：%.4f]"
+		"\n　 当たり判定の数　　 [%d 個]"
+		"\n　 選択中の当たり判定 [%d 番]"
 		"\n\n",
 		EditCollision->pos[EditCollision->nSelectColl].x,
 		EditCollision->pos[EditCollision->nSelectColl].y,
@@ -1548,10 +1548,10 @@ void DrawDebugEditCollision(void)
 		EditCollision->collision.scale[EditCollision->nSelectColl].y,
 		EditCollision->collision.scale[EditCollision->nSelectColl].z,
 		(int)D3DXToDegree(EditCollision->rot.y),
-		EditCollision->collision.nNumColl,
-		EditCollision->nSelectColl,
 		EditCollision->collision.fWidth[EditCollision->nSelectColl],
-		EditCollision->collision.fDepth[EditCollision->nSelectColl]
+		EditCollision->collision.fDepth[EditCollision->nSelectColl],
+		EditCollision->collision.nNumColl,
+		EditCollision->nSelectColl + 1
 	);
 
 	// テキストの描画
@@ -1694,18 +1694,20 @@ void DrawDebugControlCollision(void)
 		"\n全体の拡大：[4] 　"
 		"\n全体の縮小：[5] 　"
 		"\n設置スタイルの変更：[6] 　"
+		"\n当たり判定の総数：[↑/↓] 　"
+		"\n選択中の当たり判定の変更：[SPACE] 　"
 		"\nオブジェクトの調整：[ENTER] 　"
 		"\n--------------------------------------------- 　"
-		"\nオブジェクトの移動：[W/A/S/D] 　"
-		"\nオブジェクトの平面移動微調整：[LCTRL+W/A/S/D] 　"
-		"\nオブジェクトの向き変更：[Q/E] 　"
-		"\nオブジェクトのX軸の拡大縮小：[U/J] 　"
-		"\nオブジェクトのY軸の拡大縮小：[I/K] 　"
-		"\nオブジェクトのZ軸の拡大縮小：[O/L] 　"
+		"\n当たり判定の移動：[W/A/S/D] 　"
+		"\n当たり判定の平面移動微調整：[LCTRL+W/A/S/D] 　"
+		"\n当たり判定の向き変更：[Q/E] 　"
+		"\n当たり判定のX軸の拡大縮小：[U/J] 　"
+		"\n当たり判定のY軸の拡大縮小：[I/K] 　"
+		"\n当たり判定のZ軸の拡大縮小：[O/L] 　"
 		"\n--------------------------------------------- 　"
-		"\nオブジェクトの縦の移動：[LSHIFT+W/S] 　"
-		"\nオブジェクトの縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
-		"\nオブジェクトの縦の位置の初期化：[LSHIFT+A/D] 　"
+		"\n当たり判定の縦の移動：[LSHIFT+W/S] 　"
+		"\n当たり判定の縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
+		"\n当たり判定の縦の位置の初期化：[LSHIFT+A/D] 　"
 	);
 
 	// テキストの描画
