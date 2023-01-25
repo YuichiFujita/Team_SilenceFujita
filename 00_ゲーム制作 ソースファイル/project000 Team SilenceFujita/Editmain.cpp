@@ -234,6 +234,20 @@ void TxtSaveStage(void)
 				fprintf(pFile, "		SHADOWTYPE = %d\n",   pObject->nShadowType);	// 影の種類
 				fprintf(pFile, "		COLLTYPE   = %d\n\n", pObject->nCollisionType);	// 当たり判定の種類
 
+				// 位置ベクトルの書き出し
+				if (pObject->nCollisionType == COLLISIONTYPE_CREATE)
+				{ // 当たり判定の種類が作成の場合
+
+					// 位置ベクトルを書き出し
+					fprintf(pFile, "		VECPOS     = %.1f %.1f %.1f\n", pObject->collInfo.vecPos.x, pObject->collInfo.vecPos.y, pObject->collInfo.vecPos.z);
+				}
+				else
+				{ //　それ以外の種類の場合
+
+					// 0.0fを書き出し
+					fprintf(pFile, "		VECPOS     = 0.0f 0.0f 0.0f\n");
+				}
+
 				// マテリアル数の書き出し
 				fprintf(pFile, "		NUMMAT     = %d\n", pObject->modelData.dwNumMat);
 
@@ -351,7 +365,8 @@ void TxtSaveCollision(void)
 			fprintf(pFile, "	SET_COLLISION\n");
 
 			fprintf(pFile, "		TYPE   = %d\n", nCntCollision);																	// 種類
-			fprintf(pFile, "		VECPOS = %.1f %.1f %.1f\n", pCollision->vecPos.x, pCollision->vecPos.y, pCollision->vecPos.z);	// 位置
+			fprintf(pFile, "		VECPOS = %.1f %.1f %.1f\n", pCollision->vecPos.x, pCollision->vecPos.y, pCollision->vecPos.z);	// 位置ベクトル
+			fprintf(pFile, "		SCALE  = %.1f %.1f %.1f\n", pCollision->scale.x, pCollision->scale.y, pCollision->scale.z);		// 拡大率
 			fprintf(pFile, "		WIDTH  = %.1f\n", pCollision->fWidth);	// 横幅
 			fprintf(pFile, "		DEPTH  = %.1f\n", pCollision->fDepth);	// 奥行
 

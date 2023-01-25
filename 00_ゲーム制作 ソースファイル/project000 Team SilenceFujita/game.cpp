@@ -297,30 +297,6 @@ void UpdateGame(void)
 	// カメラの更新
 	UpdateCamera();
 
-	if (GetKeyboardTrigger(DIK_F5) == true)
-	{ // [F5] が押された場合
-
-		// サウンドの停止
-		StopSoundDJ();
-
-		// サウンドを流す
-		PlaySound(g_nSoundDJ, true);
-	}
-
-	if (GetKeyboardTrigger(DIK_F4) == true)
-	{ // [F4] が押された場合
-
-		// サウンドを変える
-		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
-	}
-
-	if (GetKeyboardTrigger(DIK_F6) == true)
-	{ // [F6]が押された場合
-
-		// サウンドの停止
-		StopSoundDJ((SOUND_DJ_LABEL)g_nSoundDJ);
-	}
-
 	// ビルボードの更新
 	UpdateBillboard();
 
@@ -356,6 +332,33 @@ void UpdateGame(void)
 
 		// ステージの保存
 		TxtSaveStage();
+	}
+	if (GetKeyboardTrigger(DIK_F4) == true)
+	{ // [F4] が押された場合
+
+		// サウンドを変える
+		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
+	}
+	if (GetKeyboardTrigger(DIK_F5) == true)
+	{ // [F5] が押された場合
+
+		// サウンドの停止
+		StopSoundDJ();
+
+		// サウンドを流す
+		PlaySound(g_nSoundDJ, true);
+	}
+	if (GetKeyboardTrigger(DIK_F6) == true)
+	{ // [F6]が押された場合
+
+		// サウンドの停止
+		StopSoundDJ((SOUND_DJ_LABEL)g_nSoundDJ);
+	}
+	if (GetKeyboardTrigger(DIK_F9) == true)
+	{ // [F9] が押された場合
+
+		// 当たり判定の保存
+		TxtSaveCollision();
 	}
 #else
 	if (g_bPause == false)
@@ -463,6 +466,16 @@ void DrawGame(void)
 	// パーティクルの描画
 	DrawParticle();
 
+#ifdef _DEBUG	// デバッグ処理
+	if (g_nGameMode == GAMEMODE_EDIT)
+	{ // エディットモードの場合
+
+		// エディットメインの描画処理
+		DrawEditmain();
+	}
+#endif
+
+
 	// 爆弾の描画
 	DrawBomb();
 
@@ -507,15 +520,6 @@ void DrawGame(void)
 		// ポーズの描画
 		DrawPause();
 	}
-
-#ifdef _DEBUG	// デバッグ処理
-	if (g_nGameMode == GAMEMODE_EDIT)
-	{ // エディットモードの場合
-
-		// エディットメインの描画処理
-		DrawEditmain();
-	}
-#endif
 }
 
 //======================================================================================================================

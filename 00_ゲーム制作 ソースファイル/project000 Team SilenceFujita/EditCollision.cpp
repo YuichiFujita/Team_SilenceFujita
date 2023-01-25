@@ -30,18 +30,17 @@ EditCollision g_EditCollision;		// エディット当たり判定の情報
 void InitEditCollision(void)
 {
 	//ポインタを宣言
-	//Collision *pCollision = GetCollision();
+	Collision *pCollision = GetCollision();
 
 	// 基本情報の初期化
 	g_EditCollision.pos       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
 	g_EditCollision.rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	g_EditCollision.stateRot  = ROTSTATE_0;								// 向き状態
-	g_EditCollision.scale     = D3DXVECTOR3(1.0f, 1.0f, 1.0f);			// 拡大率
 	g_EditCollision.modelData = GetModelData(MODELTYPE_EDIT_COLLISION);	// モデル情報
 	g_EditCollision.nType     = GetEditObject()->nType;					// オブジェクトの種類
 
 	// エディット当たり判定の情報を初期化
-	//g_EditCollision.collision = *pCollision;
+	g_EditCollision.collision = *pCollision;
 }
 
 //========================================
@@ -115,7 +114,7 @@ void DrawEditCollision(void)
 		D3DXMatrixIdentity(&g_EditCollision.mtxWorld);
 
 		//拡大率を反映
-		D3DXMatrixScaling(&mtxScale, g_EditCollision.scale.x, g_EditCollision.scale.y, g_EditCollision.scale.z);
+		D3DXMatrixScaling(&mtxScale, g_EditCollision.collision.scale.x, g_EditCollision.collision.scale.y, g_EditCollision.collision.scale.z);
 		D3DXMatrixMultiply(&g_EditCollision.mtxWorld, &g_EditCollision.mtxWorld, &mtxScale);
 
 		//向きを反映
@@ -291,12 +290,12 @@ void CollisionScaleObjectX(void)
 	if (GetKeyboardPress(DIK_U) == true)
 	{//Uキーを押した場合
 		//X軸を拡大する
-		g_EditCollision.scale.x += 0.02f;
+		g_EditCollision.collision.scale.x += 0.02f;
 	}
 	else if (GetKeyboardPress(DIK_J) == true)
 	{//Jキーを押した場合
 		//X軸を縮小する
-		g_EditCollision.scale.x -= 0.02f;
+		g_EditCollision.collision.scale.x -= 0.02f;
 	}
 }
 
@@ -308,12 +307,12 @@ void CollisionScaleObjectY(void)
 	if (GetKeyboardPress(DIK_I) == true)
 	{//Iキーを押した場合
 		//Y軸を拡大する
-		g_EditCollision.scale.y += 0.02f;
+		g_EditCollision.collision.scale.y += 0.02f;
 	}
 	else if (GetKeyboardPress(DIK_K) == true)
 	{//Kキーを押した場合
 		//Y軸を縮小する
-		g_EditCollision.scale.y -= 0.02f;
+		g_EditCollision.collision.scale.y -= 0.02f;
 	}
 }
 
@@ -325,12 +324,12 @@ void CollisionScaleObjectZ(void)
 	if (GetKeyboardPress(DIK_O) == true)
 	{//Oキーを押した場合
 		//Z軸を拡大する
-		g_EditCollision.scale.z += 0.02f;
+		g_EditCollision.collision.scale.z += 0.02f;
 	}
 	else if (GetKeyboardPress(DIK_L) == true)
 	{//Lキーを押した場合
 		//Z軸を縮小する
-		g_EditCollision.scale.z -= 0.02f;
+		g_EditCollision.collision.scale.z -= 0.02f;
 	}
 }
 
@@ -342,16 +341,16 @@ void CollisionScaleObject(void)
 	if (GetKeyboardPress(DIK_4) == true)
 	{//4キーを押した場合
 		//拡大する
-		g_EditCollision.scale.x += 0.02f;
-		g_EditCollision.scale.y += 0.02f;
-		g_EditCollision.scale.z += 0.02f;
+		g_EditCollision.collision.scale.x += 0.02f;
+		g_EditCollision.collision.scale.y += 0.02f;
+		g_EditCollision.collision.scale.z += 0.02f;
 	}
 	else if (GetKeyboardPress(DIK_5) == true)
 	{//5キーを押した場合
 		//縮小する
-		g_EditCollision.scale.x -= 0.02f;
-		g_EditCollision.scale.y -= 0.02f;
-		g_EditCollision.scale.z -= 0.02f;
+		g_EditCollision.collision.scale.x -= 0.02f;
+		g_EditCollision.collision.scale.y -= 0.02f;
+		g_EditCollision.collision.scale.z -= 0.02f;
 	}
 }
 
@@ -389,7 +388,7 @@ void CollisionResetEdit(void)
 	if (GetKeyboardTrigger(DIK_3) == true)
 	{//3キーを押した場合
 		//拡大率を初期化する
-		g_EditCollision.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+		g_EditCollision.collision.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	}
 }
 
