@@ -13,19 +13,31 @@
 #define CNT_ROT_FOLLOW	(50)		// 追従時の回り込みが始まるカウンターの値
 
 //**********************************************************************************************************************
+//	列挙型定義 (CAMERATYPE)
+//**********************************************************************************************************************
+typedef enum
+{
+	CAMERATYPE_MAIN = 0,			// メインカメラ
+	CAMERATYPE_MAP,					// ミニマップカメラ
+	CAMERATYPE_UI,					// UIカメラ
+	CAMERATYPE_MAX,					// この列挙型の総数
+} CAMERATYPE;
+
+//**********************************************************************************************************************
 //	構造体定義 (Camera)
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 posV;				// 現在の視点
-	D3DXVECTOR3 posR;				// 現在の注視点
-	D3DXVECTOR3 destPosV;			// 目標の視点
-	D3DXVECTOR3 destPosR;			// 目標の注視点
-	D3DXVECTOR3 vecU;				// 上方向ベクトル
-	D3DXVECTOR3 rot;				// 向き
-	float       fDis;				// 視点と注視点の距離
-	D3DXMATRIX  mtxProjection;		// プロジェクションマトリックス
-	D3DXMATRIX  mtxView;			// ビューマトリックス
+	D3DXVECTOR3  posV;				// 現在の視点
+	D3DXVECTOR3  posR;				// 現在の注視点
+	D3DXVECTOR3  destPosV;			// 目標の視点
+	D3DXVECTOR3  destPosR;			// 目標の注視点
+	D3DXVECTOR3  vecU;				// 上方向ベクトル
+	D3DXVECTOR3  rot;				// 向き
+	float        fDis;				// 視点と注視点の距離
+	D3DXMATRIX   mtxProjection;		// プロジェクションマトリックス
+	D3DXMATRIX   mtxView;			// ビューマトリックス
+	D3DVIEWPORT9 viewport;			// ビューポート
 } Camera;
 
 //**********************************************************************************************************************
@@ -34,7 +46,7 @@ typedef struct
 void InitCamera(void);				// カメラの初期化処理
 void UninitCamera(void);			// カメラの終了処理
 void UpdateCamera(void);			// カメラの更新処理
-void SetCamera(void);				// カメラの設定処理
+void SetCamera(int nID);			// カメラの設定処理
 Camera *GetCamera(void);			// カメラの取得処理
 
 //**********************************************************************************************************************

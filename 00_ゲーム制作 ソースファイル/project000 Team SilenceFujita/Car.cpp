@@ -16,6 +16,7 @@
 #include "sound.h"
 #include "player.h"
 #include "Police.h"
+#include "object.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -36,8 +37,8 @@
 #define MAX_CAR_FORWARD_PATROL  (15.0f)		// パトロール中の前進時の最高速度
 #define MAX_CAR_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_CAR_MOVE_SUB		(0.04f)		// 移動量の減速係数
-#define CAR_WIDTH				(30.0f)		// パトカーの縦幅
-#define CAR_HEIGHT				(30.0f)		// パトカーの奥行
+#define CAR_WIDTH				(45.0f)		// 車の縦幅
+#define CAR_DEPTH				(45.0f)		// 車の奥行
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -45,7 +46,6 @@
 void PosCar(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);		// 車の位置の更新処理
 void RevCar(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 車の補正の更新処理
 void CurveCar(Car *pCar);							// 車のカーブ処理
-void CurveRotCar(Car *pCar);						// 車の角度更新処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -132,30 +132,8 @@ void UpdateCar(void)
 			//車のカーブ処理
 			CurveCar(&g_aCar[nCntCar]);
 
-			// 車の停止処理
-			CollisionStopCar
-			( // 引数
-				g_aCar[nCntCar].pos,		//位置
-				g_aCar[nCntCar].rot,		//向き
-				&g_aCar[nCntCar].move,		//移動量
-				g_aCar[nCntCar].modelData.fRadius,	//半径
-				COLLOBJECTTYPE_CAR			//対象のサイズ
-			);
-
 			// プレイヤーの位置の更新
 			PosCar(&g_aCar[nCntCar].move, &g_aCar[nCntCar].pos, &g_aCar[nCntCar].rot, g_aCar[nCntCar].bMove);
-
-			//----------------------------------------------------
-			//	当たり判定
-			//----------------------------------------------------
-			// オブジェクトとの当たり判定
-			CollisionCar
-			( // 引数
-				&g_aCar[nCntCar].pos,		// 現在の位置
-				&g_aCar[nCntCar].posOld,	// 前回の位置
-				CAR_WIDTH,					// 横幅
-				CAR_HEIGHT					// 奥行	
-			);
 
 			if (g_aCar[nCntCar].pos.y < 0.0f)
 			{//Y軸の位置が0.0fだった場合
@@ -168,6 +146,29 @@ void UpdateCar(void)
 
 			// プレイヤーの補正の更新処理
 			RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
+
+			//----------------------------------------------------
+			//	当たり判定
+			//----------------------------------------------------
+			// オブジェクトとの当たり判定
+			CollisionObject
+			( // 引数
+				&g_aCar[nCntCar].pos,		// 現在の位置
+				&g_aCar[nCntCar].posOld,	// 前回の位置
+				&g_aCar[nCntCar].move,		// 移動量
+				CAR_WIDTH,					// 横幅
+				CAR_DEPTH					// 奥行
+			);
+
+			// 車の停止処理
+			CollisionStopCar
+			( // 引数
+				g_aCar[nCntCar].pos,		//位置
+				g_aCar[nCntCar].rot,		//向き
+				&g_aCar[nCntCar].move,		//移動量
+				g_aCar[nCntCar].modelData.fRadius,	//半径
+				COLLOBJECTTYPE_CAR			//対象のサイズ
+			);
 		}
 	}
 }
@@ -274,6 +275,33 @@ void SetCar(D3DXVECTOR3 pos, CURVE carCurve)
 			//カーブポイントの設定処理
 			SetCurvePoint(&g_aCar[nCntCar].carCurve, &g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 
+			if (g_aCar[nCntCar].carCurve.bCurveX[0] == true)
+			{ // 最初X軸を走っている場合
+				if (g_aCar[nCntCar].carCurve.bCurvePlus[0] == true)
+				{ // 右に走っている場合
+					// 位置を補正する
+					g_aCar[nCntCar].pos.z = g_aCar[nCntCar].carCurve.curvePoint[0].z - (CAR_WIDTH * 2);
+				}
+				else
+				{ // 左に走っている場合
+					// 位置を補正する
+					g_aCar[nCntCar].pos.z = g_aCar[nCntCar].carCurve.curvePoint[0].z + (CAR_WIDTH * 2);
+				}
+			}
+			else
+			{ // 最初Z軸を走っている場合
+				if (g_aCar[nCntCar].carCurve.bCurvePlus[0] == true)
+				{ // 奥に走っている場合
+					// 位置を補正する
+					g_aCar[nCntCar].pos.x = g_aCar[nCntCar].carCurve.curvePoint[0].x + (CAR_WIDTH * 2);
+				}
+				else
+				{ // 手前に走っている場合
+					// 位置を補正する
+					g_aCar[nCntCar].pos.x = g_aCar[nCntCar].carCurve.curvePoint[0].x - (CAR_WIDTH * 2);
+				}
+			}
+
 			// 処理を抜ける
 			break;
 		}
@@ -341,57 +369,6 @@ void HitCar(Car *pCar, int nDamage)
 #endif
 
 //======================================================================================================================
-//	オブジェクトとの当たり判定
-//======================================================================================================================
-void CollisionCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, float fWidth, float fDepth)
-{
-	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
-	{ // オブジェクトの最大表示数分繰り返す
-		if (g_aCar[nCntCar].bUse == true)
-		{ // オブジェクトが使用されている場合
-
-		  // 前後の当たり判定
-			if (pPos->x + fWidth > g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMin.x
-				&&  pPos->x - fWidth < g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMax.x)
-			{ // ブロックの左右の範囲内の場合
-
-				if (pPos->z + fDepth > g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMin.z
-					&&  pOldPos->z + fDepth <= g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMin.z)
-				{ // 前からの当たり判定
-				  // 位置を補正
-					pPos->z = g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMin.z - fDepth - 0.01f;
-				}
-				else if (pPos->z - fDepth < g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMax.z
-					&&  pOldPos->z - fDepth >= g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMax.z)
-				{ // 後ろからの当たり判定
-				  // 位置を補正
-					pPos->z = g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMax.z + fDepth + 0.01f;
-				}
-			}
-
-			// 左右の当たり判定
-			if (pPos->z + fDepth > g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMin.z
-				&&  pPos->z - fDepth < g_aCar[nCntCar].pos.z + g_aCar[nCntCar].modelData.vtxMax.z)
-			{ // ブロックの前後の範囲内の場合
-
-				if (pPos->x + fWidth > g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMin.x
-					&&  pOldPos->x + fWidth <= g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMin.x)
-				{ // 左からの当たり判定
-				  // 位置を補正
-					pPos->x = g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMin.x - fWidth - 0.01f;
-				}
-				else if (pPos->x - fWidth < g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMax.x
-					&&  pOldPos->x - fWidth >= g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMax.x)
-				{ // 右からの当たり判定
-				  // 位置を補正
-					pPos->x = g_aCar[nCntCar].pos.x + g_aCar[nCntCar].modelData.vtxMax.x + fWidth + 0.01f;
-				}
-			}
-		}
-	}
-}
-
-//======================================================================================================================
 //	オブジェクトの取得処理
 //======================================================================================================================
 Car *GetCarData(void)
@@ -455,33 +432,33 @@ void RevCar(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 	if (rot->y > D3DX_PI) { rot->y -= D3DX_PI * 2; }
 	else if (rot->y < -D3DX_PI) { rot->y += D3DX_PI * 2; }
 
-	////--------------------------------------------------------
-	////	移動範囲の補正
-	////--------------------------------------------------------
-	//if (pos->z > GetLimitStage().fNear - (30.0f * 2))
-	//{ // 範囲外の場合 (手前)
+	//--------------------------------------------------------
+	//	移動範囲の補正
+	//--------------------------------------------------------
+	if (pos->z > GetLimitStage().fNear - (30.0f * 2))
+	{ // 範囲外の場合 (手前)
 
-	//	// 手前に位置を補正
-	//	pos->z = GetLimitStage().fNear - (30.0f * 2);
-	//}
-	//if (pos->z < GetLimitStage().fFar + (30.0f * 2))
-	//{ // 範囲外の場合 (奥)
+		// 手前に位置を補正
+		pos->z = GetLimitStage().fNear - (30.0f * 2);
+	}
+	if (pos->z < GetLimitStage().fFar + (30.0f * 2))
+	{ // 範囲外の場合 (奥)
 
-	//	// 奥に位置を補正
-	//	pos->z = GetLimitStage().fFar + (30.0f * 2);
-	//}
-	//if (pos->x > GetLimitStage().fRight - (30.0f * 2))
-	//{ // 範囲外の場合 (右)
+		// 奥に位置を補正
+		pos->z = GetLimitStage().fFar + (30.0f * 2);
+	}
+	if (pos->x > GetLimitStage().fRight - (30.0f * 2))
+	{ // 範囲外の場合 (右)
 
-	//	// 右に位置を補正
-	//	pos->x = GetLimitStage().fRight - (30.0f * 2);
-	//}
-	//if (pos->x < GetLimitStage().fLeft + (30.0f * 2))
-	//{ // 範囲外の場合 (左)
+		// 右に位置を補正
+		pos->x = GetLimitStage().fRight - (30.0f * 2);
+	}
+	if (pos->x < GetLimitStage().fLeft + (30.0f * 2))
+	{ // 範囲外の場合 (左)
 
-	//	// 左に位置を補正
-	//	pos->x = GetLimitStage().fLeft + (30.0f * 2);
-	//}
+		// 左に位置を補正
+		pos->x = GetLimitStage().fLeft + (30.0f * 2);
+	}
 }
 
 //============================================================
@@ -505,7 +482,7 @@ void CurveCar(Car *pCar)
 				{ // 左にある壁が途切れたら
 
 					// 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -525,7 +502,7 @@ void CurveCar(Car *pCar)
 				{ // 左にある壁が途切れたら
 
 					// 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -548,7 +525,7 @@ void CurveCar(Car *pCar)
 				{ // 左にある壁が途切れたら
 
 					// 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -568,7 +545,7 @@ void CurveCar(Car *pCar)
 				{ // 左にある壁が途切れたら
 
 					// 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -594,7 +571,7 @@ void CurveCar(Car *pCar)
 				{ // 左にある壁が途切れたら
 
 					// 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -614,7 +591,7 @@ void CurveCar(Car *pCar)
 				{ // 左にある壁が途切れたら
 
 					// 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -636,8 +613,8 @@ void CurveCar(Car *pCar)
 				if (pCar->pos.z <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
-				  // 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					// 車の角度更新・補正処理
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -656,8 +633,8 @@ void CurveCar(Car *pCar)
 				if (pCar->pos.z <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2))
 				{ // 左にある壁が途切れたら
 
-				  // 車の角度更新・補正処理
-					CurveRotCar(pCar);
+					// 車の角度更新・補正処理
+					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
 					// 移動量を減速
 					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
@@ -708,9 +685,6 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					{
 					case COLLOBJECTTYPE_PLAYER:		//プレイヤーの場合
 
-						// 移動量を設定する
-						move->x = sinf(targetrot.y) * -3.0f;
-
 						break;						//抜け出す
 
 					case COLLOBJECTTYPE_POLICE:		//車の場合
@@ -755,8 +729,8 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 
 				case COLLOBJECTTYPE_POLICE:		//車の場合
 
-					// 目標の移動量をセーブする
-					move->x += (0.0f - move->x) * 0.5f;
+					//// 目標の移動量をセーブする
+					//move->x += (0.0f - move->x) * 0.5f;
 
 					break;						//抜け出す
 
@@ -809,65 +783,6 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					}
 				}
 			}
-		}
-	}
-}
-
-//============================================================
-// 車の角度更新・補正処理
-//============================================================
-void CurveRotCar(Car *pCar)
-{
-	if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
-	{ // 曲がる方向が左だった場合
-		// 向きを更新
-		pCar->rot.y -= 0.05f * (pCar->move.x * 0.1f);
-
-		if (pCar->rot.y <= (float)D3DXToRadian(pCar->carCurve.fCurveRot[pCar->carCurve.nNowCurve]))
-		{ // 一定の向きに達した場合
-			// 向きを補正
-			pCar->rot.y = (float)D3DXToRadian(pCar->carCurve.fCurveRot[pCar->carCurve.nNowCurve]);
-
-			if (pCar->carCurve.curveAngle[(pCar->carCurve.nNowCurve + 1) % pCar->carCurve.nCurveTime] == CURVE_LEFT)
-			{//次の曲がり角が左だった場合
-				if (pCar->carCurve.fCurveRot[(pCar->carCurve.nNowCurve + 1) % pCar->carCurve.nCurveTime] == 90)
-				{//次の曲がり角がマイナス方向に曲がる場合
-					//向きをプラスに戻す
-					pCar->rot.y = (float)D3DXToRadian(180);
-				}
-			}
-
-			//// 車の補正の更新処理
-			//RevCar(&pCar->rot, &pCar->pos);
-
-			// 警察の行先を設定する
-			pCar->carCurve.nNowCurve = (pCar->carCurve.nNowCurve + 1) % pCar->carCurve.nCurveTime;
-		}
-	}
-	else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
-	{ // 曲がる方向が右だった場合
-		// 向きを更新
-		pCar->rot.y += 0.05f * (pCar->move.x * 0.1f);
-
-		if (pCar->rot.y >= (float)D3DXToRadian(pCar->carCurve.fCurveRot[pCar->carCurve.nNowCurve]))
-		{ // 一定の向きに達した場合
-		  // 向きを補正
-			pCar->rot.y = (float)D3DXToRadian(pCar->carCurve.fCurveRot[pCar->carCurve.nNowCurve]);
-
-			if (pCar->carCurve.curveAngle[(pCar->carCurve.nNowCurve + 1) % pCar->carCurve.nCurveTime] == CURVE_RIGHT)
-			{//次の曲がり角が右だった場合
-				if (pCar->carCurve.fCurveRot[(pCar->carCurve.nNowCurve + 1) % pCar->carCurve.nCurveTime] == -90)
-				{//次の曲がり角がマイナス方向に曲がる場合
-					//向きをマイナスに戻す
-					pCar->rot.y = (float)D3DXToRadian(-180);
-				}
-			}
-
-			//// 車の補正の更新処理
-			//RevCar(&pCar->rot, &pCar->pos);
-
-			// 警察の行先を設定する
-			pCar->carCurve.nNowCurve = (pCar->carCurve.nNowCurve + 1) % pCar->carCurve.nCurveTime;
 		}
 	}
 }

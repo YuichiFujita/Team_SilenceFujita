@@ -67,6 +67,9 @@ void InitObject(void)
 		g_aObject[nCntObject].nShadowID      = NONE_SHADOW;							// 影のインデックス
 		g_aObject[nCntObject].bUse           = false;								// 使用状況
 
+		// 当たり判定情報の初期化
+		g_aObject[nCntObject].collInfo.vecPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置ベクトル
+
 		// モデル情報の初期化
 		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
 		g_aObject[nCntObject].modelData.pTexture = NULL;							// テクスチャへのポインタ
@@ -91,6 +94,7 @@ void InitObject(void)
 	{ // オブジェクトの種類の総数分繰り返す
 
 		g_aCollision[nCntObject].vecPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+		g_aCollision[nCntObject].scale  = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
 		g_aCollision[nCntObject].fWidth = 0.0f;								// 横幅
 		g_aCollision[nCntObject].fDepth = 0.0f;								// 奥行
 	}
@@ -290,7 +294,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, D3DXVECTOR3 vecPos)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
@@ -309,6 +313,9 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].nBreakType     = nBreakType;			// 壊れ方の種類
 			g_aObject[nCntObject].nShadowType    = nShadowType;			// 影の種類
 			g_aObject[nCntObject].nCollisionType = nCollisionType;		// 当たり判定の種類
+
+			// 当たり判定情報の引数を代入
+			g_aObject[nCntObject].collInfo.vecPos = vecPos;				// 位置ベクトル
 
 			// オブジェクトの情報を初期化
 			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態
@@ -530,7 +537,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 			case COLLISIONTYPE_CREATE:	// 作成した当たり判定 (汎用)
 
 				// 変数を宣言
-				D3DXVECTOR3 pos = g_aObject[nCntObject].pos - g_aCollision[g_aObject[nCntObject].nType].vecPos;	// 当たり判定の中心座標
+				D3DXVECTOR3 pos = g_aObject[nCntObject].pos - g_aObject[nCntObject].collInfo.vecPos;	// 当たり判定の中心座標
 
 				// 前後の当たり判定
 				if (pPos->x + fWidth > pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
@@ -611,9 +618,9 @@ Collision *GetCollision(void)
 	return &g_aCollision[0];
 }
 
-//============================================================
+//======================================================================================================================
 //	当たり判定のセットアップ処理
-//============================================================
+//======================================================================================================================
 void TxtSetCollision(void)
 {
 	// 変数を宣言
@@ -670,6 +677,17 @@ void TxtSetCollision(void)
 									&g_aCollision[nType].vecPos.x,	// 位置ベクトル (x) を読み込む
 									&g_aCollision[nType].vecPos.y,	// 位置ベクトル (y) を読み込む
 									&g_aCollision[nType].vecPos.z	// 位置ベクトル (z) を読み込む
+								);
+							}
+							else if (strcmp(&aString[0], "SCALE") == 0)
+							{ // 読み込んだ文字列が SCALE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf
+								( // 引数
+									pFile, "%f%f%f",
+									&g_aCollision[nType].scale.x,	// 拡大率 (x) を読み込む
+									&g_aCollision[nType].scale.y,	// 拡大率 (y) を読み込む
+									&g_aCollision[nType].scale.z	// 拡大率 (z) を読み込む
 								);
 							}
 							else if (strcmp(&aString[0], "WIDTH") == 0)

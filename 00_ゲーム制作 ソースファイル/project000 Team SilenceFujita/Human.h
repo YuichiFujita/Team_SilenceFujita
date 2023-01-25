@@ -43,7 +43,7 @@ typedef struct
 	int			 nShadowID;				// 影のインデックス
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
-	CURVE		 carCurve;				// 曲がり角関係
+	CURVE		 humanCurve;			// 曲がり角関係
 	HUMANSTATE	 state;					// 状態
 }Human;
 

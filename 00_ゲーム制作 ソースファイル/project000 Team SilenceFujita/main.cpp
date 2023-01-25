@@ -558,6 +558,9 @@ void Update(void)
 //============================================================
 void Draw(void)
 {
+	// 変数を宣言
+	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
+
 	// 画面クリア (バックバッファと Zバッファのクリア)
 	g_pD3DDevice->Clear
 	( // 引数
@@ -572,6 +575,9 @@ void Draw(void)
 	// 描画開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{ // 描画開始が成功した場合
+
+		// 現在のビューポートを取得
+		g_pD3DDevice->GetViewport(&viewportDef);
 
 		switch (g_mode)
 		{ // 選択処理
@@ -591,6 +597,9 @@ void Draw(void)
 			// 処理から抜ける
 			break;
 		}
+
+		// ビューポートを元に戻す
+		g_pD3DDevice->SetViewport(&viewportDef);
 
 		// フェードの描画
 		DrawFade();
@@ -710,6 +719,7 @@ void TxtSetStage(void)
 	int         nEnd;			// テキスト読み込み終了の確認用
 	StageLimit  stageLimit;		// ステージの移動範囲の代入用
 	D3DXVECTOR3 pos;			// 位置の代入用
+	D3DXVECTOR3 vecPos;			// 位置ベクトルの代入用
 	D3DXVECTOR3 rot;			// 向きの代入用
 	D3DXVECTOR3 scale;			// 拡大率の代入用
 	D3DXCOLOR   col;			// 色の代入用
@@ -845,6 +855,11 @@ void TxtSetStage(void)
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
 								fscanf(pFile, "%d", &nCollisionType);	// 当たり判定の種類を読み込む
 							}
+							else if (strcmp(&aString[0], "VECPOS") == 0)
+							{ // 読み込んだ文字列が VECPOS の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &vecPos.x, &vecPos.y, &vecPos.z);	// 位置ベクトルを読み込む
+							}
 							else if (strcmp(&aString[0], "NUMMAT") == 0)
 							{ // 読み込んだ文字列が NUMMAT の場合
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
@@ -880,7 +895,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, vecPos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
@@ -1238,6 +1253,7 @@ void DrawDebug(void)
 	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
 	Car *pCar = GetCarData();						// 車の情報を取得する
+	Police *pPolice = GetPoliceData();
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1268,7 +1284,9 @@ void DrawDebug(void)
 		"   ---------------------------------------------　\n"
 		"   車の向き：[%d]\n"
 		"   車の位置：[%.3f,%.3f,%.3f]\n"
-		"   車のスピード：[%.3f,%.3f,%.3f]",
+		"   車のスピード：[%.3f,%.3f,%.3f]\n"
+		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
+		" 　警察のスピード：[%.3f]\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1284,7 +1302,9 @@ void DrawDebug(void)
 		nNumParticle,		// パーティクルの総数
 		(int)D3DXToDegree(pCar->rot.y),
 		pCar->pos.x, pCar->pos.y, pCar->pos.z,
-		pCar->move.x, pCar->move.y, pCar->move.z
+		pCar->move.x, pCar->move.y, pCar->move.z,
+		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
+		pPolice->move.x
 	);
 
 	//--------------------------------------------------------
@@ -1587,7 +1607,6 @@ void DrawDebugPolice(void)
 {
 
 }
-
 #endif
 
 #endif
