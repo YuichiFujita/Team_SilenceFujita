@@ -45,6 +45,7 @@ int  GetCollisionStyle(void);		//当たり判定スタイルの取得処理
 void StyleChange(void);				//スタイル変更処理
 void CollisionStyleChange(void);	//当たり判定スタイル変更処理
 void TxtSaveStage(void);			//ステージの保存処理
+void TxtSaveCollision(void);		//当たり判定の保存処理
 
 #endif
 

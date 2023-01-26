@@ -18,7 +18,6 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
-#include "Human.h"
 #include "life.h"
 #include "light.h"
 #include "meshfield.h"
@@ -32,6 +31,7 @@
 #include "score.h"
 #include "timer.h"
 #include "velocity.h"
+#include "wind.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -82,10 +82,10 @@ void InitGame(void)
 	// オブジェクトの初期化
 	InitObject();
 
-	// 車の初期化処理
+	//車の初期化
 	InitCar();
 
-	// 人間の初期化処理
+	// 人間の初期化
 	InitHuman();
 
 	// カメラの初期化
@@ -102,6 +102,9 @@ void InitGame(void)
 
 	// ビルボードの初期化
 	InitBillboard();
+
+	// 送風機の初期化
+	InitWind();
 
 	// エフェクトの初期化
 	InitEffect();
@@ -154,10 +157,10 @@ void UninitGame(void)
 	// オブジェクトの終了
 	UninitObject();
 
-	// 車の終了処理
+	// 車の終了
 	UninitCar();
 
-	// 人間の終了処理
+	// 人間の終了
 	UninitHuman();
 
 	// カメラの終了
@@ -174,6 +177,9 @@ void UninitGame(void)
 
 	// ビルボードの終了
 	UninitBillboard();
+
+	// 送風機の終了
+	UninitWind();
 
 	// エフェクトの終了
 	UninitEffect();
@@ -265,6 +271,9 @@ void UpdateGame(void)
 
 		// エディットメインの更新
 		UpdateEditmain();
+
+		// カメラの更新
+		UpdateCamera();
 	}
 	else
 	{ // ゲームモードだった場合
@@ -278,6 +287,9 @@ void UpdateGame(void)
 			// メッシュウォールの更新
 			UpdateMeshWall();
 
+			// 風の更新
+			UpdateWind();
+
 			// プレイヤーの更新
 			UpdatePlayer();
 
@@ -287,7 +299,7 @@ void UpdateGame(void)
 			// オブジェクトの更新
 			UpdateObject();
 
-			// 車の更新
+			//車の更新処理
 			UpdateCar();
 
 			// 人間の更新
@@ -303,30 +315,6 @@ void UpdateGame(void)
 
 	// カメラの更新
 	UpdateCamera();
-
-	if (GetKeyboardTrigger(DIK_F5) == true)
-	{ // [F5] が押された場合
-
-		// サウンドの停止
-		StopSoundDJ();
-
-		// サウンドを流す
-		PlaySound(g_nSoundDJ, true);
-	}
-
-	if (GetKeyboardTrigger(DIK_F4) == true)
-	{ // [F4] が押された場合
-
-		// サウンドを変える
-		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
-	}
-
-	if (GetKeyboardTrigger(DIK_F6) == true)
-	{ // [F6]が押された場合
-
-		// サウンドの停止
-		StopSoundDJ((SOUND_DJ_LABEL)g_nSoundDJ);
-	}
 
 	// ビルボードの更新
 	UpdateBillboard();
@@ -364,6 +352,33 @@ void UpdateGame(void)
 		// ステージの保存
 		TxtSaveStage();
 	}
+	if (GetKeyboardTrigger(DIK_F4) == true)
+	{ // [F4] が押された場合
+
+		// サウンドを変える
+		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
+	}
+	if (GetKeyboardTrigger(DIK_F5) == true)
+	{ // [F5] が押された場合
+
+		// サウンドの停止
+		StopSoundDJ();
+
+		// サウンドを流す
+		PlaySound(g_nSoundDJ, true);
+	}
+	if (GetKeyboardTrigger(DIK_F6) == true)
+	{ // [F6]が押された場合
+
+		// サウンドの停止
+		StopSoundDJ((SOUND_DJ_LABEL)g_nSoundDJ);
+	}
+	if (GetKeyboardTrigger(DIK_F9) == true)
+	{ // [F9] が押された場合
+
+		// 当たり判定の保存
+		TxtSaveCollision();
+	}
 #else
 	if (g_bPause == false)
 	{ // ポーズ状態ではない場合
@@ -386,17 +401,17 @@ void UpdateGame(void)
 		// 警察の更新
 		UpdatePolice();
 
+		// 人間の更新
+		UpdateHuman();
+
 		// オブジェクトの更新
 		UpdateObject();
 
-		//車の更新
-		UpdateCar();
-
-		//人間の更新
-		UpdateHuman();
-
 		// ビルボードの更新
 		UpdateBillboard();
+
+		// 風の更新
+		UpdateWind();
 
 		// エフェクトの更新
 		UpdateEffect();
@@ -437,8 +452,14 @@ void UpdateGame(void)
 //======================================================================================================================
 void DrawGame(void)
 {
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	メインカメラの描画
+	//------------------------------------------------------------------------------------------------------------------
 	// カメラの設定
-	SetCamera();
+	SetCamera(CAMERATYPE_MAIN);
 
 	// メッシュフィールドの描画
 	DrawMeshField();
@@ -455,42 +476,26 @@ void DrawGame(void)
 	// 警察の描画
 	DrawPolice();
 
-	// 車の描画
+	//車の描画処理
 	DrawCar();
-
-	// 人間の描画
-	DrawHuman();
 
 	// オブジェクトの描画
 	DrawObject();
 
+	// 人間の描画
+	DrawHuman();
+
 	// ビルボードの描画
 	DrawBillboard();
+
+	// 風の描画
+	DrawWind();
 
 	// エフェクトの描画
 	DrawEffect();
 
 	// パーティクルの描画
 	DrawParticle();
-
-	// 体力バーの描画
-	DrawLife();
-
-	// タイマーの描画
-	DrawTimer();
-	
-	// 速度バーの描画
-	DrawVelocity();
-
-	// スコアの描画
-	DrawScore();
-
-	if (g_bPause == true)
-	{ // ポーズ状態の場合
-
-		// ポーズの描画
-		DrawPause();
-	}
 
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
@@ -504,6 +509,48 @@ void DrawGame(void)
 
 	// 爆弾の描画
 	DrawBomb();
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	マップカメラの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// カメラの設定
+	SetCamera(CAMERATYPE_MAP);
+
+	// Zテストを無効にする
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// Zテストの設定
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zバッファ更新の有効 / 無効の設定
+
+	// メッシュフィールドの描画
+	DrawMeshField();
+
+	// Zテストを有効にする
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);	// Zテストの設定
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);		// Zバッファ更新の有効 / 無効の設定
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	UIの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// カメラの設定
+	SetCamera(CAMERATYPE_UI);
+
+	// 体力バーの描画
+	DrawLife();
+
+	// タイマーの描画
+	DrawTimer();
+
+	// 速度バーの描画
+	DrawVelocity();
+
+	// スコアの描画
+	DrawScore();
+
+	if (g_bPause == true)
+	{ // ポーズ状態の場合
+
+		// ポーズの描画
+		DrawPause();
+	}
 }
 
 //======================================================================================================================

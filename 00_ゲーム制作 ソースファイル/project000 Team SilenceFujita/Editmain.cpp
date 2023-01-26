@@ -16,7 +16,8 @@
 #include "object.h"
 
 //マクロ定義
-#define SAVE_STAGE_TXT	"data\\TXT\\save_stage.txt"		// ステージ保存の外部ファイルの相対パス
+#define SAVE_STAGE_TXT		"data\\TXT\\save_stage.txt"			// ステージ保存の外部ファイルの相対パス
+#define SAVE_COLLISION_TXT	"data\\TXT\\save_collision.txt"		// 当たり判定保存の外部ファイルの相対パス
 
 //プロトタイプ宣言
 void DrawDebugEditObject(void);			//エディットオブジェクトモードのデバッグ表示
@@ -228,10 +229,24 @@ void TxtSaveStage(void)
 				fprintf(pFile, "		POS        = %.1f %.1f %.1f\n", pObject->pos.x,   pObject->pos.y,   pObject->pos.z);	// 位置
 				fprintf(pFile, "		ROT        = %.1f %.1f %.1f\n", pObject->rot.x,   pObject->rot.y,   pObject->rot.z);	// 向き
 				fprintf(pFile, "		SCALE      = %.1f %.1f %.1f\n", pObject->scale.x, pObject->scale.y, pObject->scale.z);	// 拡大率
-				fprintf(pFile, "		TYPE       = %d\n",   pObject->nType);			// オブジェクトの種類
-				fprintf(pFile, "		BREAKTYPE  = %d\n",   pObject->nBreakType);		// 壊れ方の種類
-				fprintf(pFile, "		SHADOWTYPE = %d\n",   pObject->nShadowType);	// 影の種類
-				fprintf(pFile, "		COLLTYPE   = %d\n\n", pObject->nCollisionType);	// 当たり判定の種類
+				fprintf(pFile, "		TYPE       = %d\n", pObject->nType);			// オブジェクトの種類
+				fprintf(pFile, "		BREAKTYPE  = %d\n", pObject->nBreakType);		// 壊れ方の種類
+				fprintf(pFile, "		SHADOWTYPE = %d\n", pObject->nShadowType);		// 影の種類
+				fprintf(pFile, "		COLLTYPE   = %d\n", pObject->nCollisionType);	// 当たり判定の種類
+
+				// 向き状態の書き出し
+				if (pObject->nCollisionType == COLLISIONTYPE_CREATE)
+				{ // 当たり判定の種類が作成の場合
+
+					// 向き状態を書き出し
+					fprintf(pFile, "		COLLROT    = %d\n\n", pObject->collInfo.stateRot);
+				}
+				else
+				{ // それ以外の種類の場合
+
+					// 0を書き出し
+					fprintf(pFile, "		COLLROT    = 0\n\n");
+				}
 
 				// マテリアル数の書き出し
 				fprintf(pFile, "		NUMMAT     = %d\n", pObject->modelData.dwNumMat);
@@ -311,22 +326,21 @@ void TxtSaveStage(void)
 	{ // ファイルが開けなかった場合
 
 		// エラーメッセージボックス
-		MessageBox(NULL, "ステージファイルの書き出しに失敗！", "警告！", MB_ICONWARNING);
+		MessageBox(NULL, "ステージ保存ファイルの書き出しに失敗！", "警告！", MB_ICONWARNING);
 	}
 }
 
-#if 0
 //=======================================
-//	ステージの保存処理
+//	当たり判定の保存処理
 //=======================================
-void TxtSaveStage(void)
+void TxtSaveCollision(void)
 {
 	// ポインタを宣言
 	FILE      *pFile;						// ファイルポインタ
-	Collision *pCollision = GetCollision();	// オブジェクトの情報ポインタ
+	Collision *pCollision = GetCollision();	// 当たり判定の情報ポインタ
 
 	// ファイルを書き出し方式で開く
-	pFile = fopen(SAVE_STAGE_TXT, "w");
+	pFile = fopen(SAVE_COLLISION_TXT, "w");
 
 	if (pFile != NULL)
 	{ // ファイルが開けた場合
@@ -334,7 +348,7 @@ void TxtSaveStage(void)
 		// 見出し
 		fprintf(pFile, "#===========================================================\n");
 		fprintf(pFile, "#\n");
-		fprintf(pFile, "#	エディットの保存当たり判定 [save_collision.txt]\n");
+		fprintf(pFile, "#	当たり判定の保存 [save_collision.txt]\n");
 		fprintf(pFile, "#	Author：藤田 勇一 & you\n");
 		fprintf(pFile, "#\n");
 		fprintf(pFile, "#===========================================================\n");
@@ -344,16 +358,25 @@ void TxtSaveStage(void)
 		// 当たり判定の設定の開始地点をテキストに書き出し
 		fprintf(pFile, "SETCOLL_OBJECT\n\n");
 
-		for (int nCntCollision = 0; nCntCollision < MAX_BILLBOARD; nCntCollision++, pCollision++)
-		{ // 当たり判定の最大表示数分繰り返す
+		for (int nCntCollision = 0; nCntCollision < MODEL_OBJ_MAX; nCntCollision++, pCollision++)
+		{ // オブジェクトの種類の総数分繰り返す
 
 			// 当たり判定の情報の開始地点テキストに書き出し
 			fprintf(pFile, "	SET_COLLISION\n");
 
-			fprintf(pFile, "		TYPE       = %d\n", nCntCollision);															// 種類
-			fprintf(pFile, "		POS        = %.1f %.1f %.1f\n", pCollision->pos.x, pCollision->pos.y, pCollision->pos.z);	// 位置
-			fprintf(pFile, "		VECPOS     = %.1f %.1f %.1f\n", pCollision->pos.x, pCollision->pos.y, pCollision->pos.z);	// 位置
-			fprintf(pFile, "		ROT        = %.1f %.1f %.1f\n", pCollision->rot.x, pCollision->rot.y, pCollision->rot.z);	// 向き
+			// 基本情報の書き出し
+			fprintf(pFile, "		TYPE    = %d\n",   nCntCollision);			// 種類
+			fprintf(pFile, "		NUMCOLL = %d\n\n", pCollision->nNumColl);	// 当たり判定数
+
+			// 当たり判定情報の書き出し
+			for (int nCntColl = 0; nCntColl < pCollision->nNumColl; nCntColl++)
+			{ // 当たり判定の数分繰り返す
+
+				fprintf(pFile, "		%02d_VECPOS = %.1f %.1f %.1f\n", nCntColl, pCollision->vecPos[nCntColl].x, pCollision->vecPos[nCntColl].y, pCollision->vecPos[nCntColl].z);	// 位置ベクトル
+				fprintf(pFile, "		%02d_SCALE  = %.1f %.1f %.1f\n", nCntColl, pCollision->scale[nCntColl].x, pCollision->scale[nCntColl].y, pCollision->scale[nCntColl].z);	// 拡大率
+				fprintf(pFile, "		%02d_WIDTH  = %.1f\n", nCntColl, pCollision->fWidth[nCntColl]);	// 横幅
+				fprintf(pFile, "		%02d_DEPTH  = %.1f\n", nCntColl, pCollision->fDepth[nCntColl]);	// 奥行
+			}
 
 			// 当たり判定の情報の終了地点テキストに書き出し
 			fprintf(pFile, "	END_SET_COLLISION\n\n");
@@ -369,8 +392,7 @@ void TxtSaveStage(void)
 	{ // ファイルが開けなかった場合
 
 		// エラーメッセージボックス
-		MessageBox(NULL, "ステージファイルの書き出しに失敗！", "警告！", MB_ICONWARNING);
+		MessageBox(NULL, "当たり判定保存ファイルの書き出しに失敗！", "警告！", MB_ICONWARNING);
 	}
 }
-#endif
 #endif

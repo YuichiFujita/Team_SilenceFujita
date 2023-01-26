@@ -24,20 +24,22 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define OBJ_LIFE	(50)		// オブジェクトの体力
+#define COLLISION_SETUP_TXT	"data\\TXT\\collision.txt"	// ステージセットアップ用のテキストファイルの相対パス
 
-#define DAMAGE_TIME_OBJ		(20)					// ダメージ状態を保つ時間
-#define UNR_TIME_OBJ		(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
+#define OBJ_LIFE			(50)						// オブジェクトの体力
+#define DAMAGE_TIME_OBJ		(20)						// ダメージ状態を保つ時間
+#define UNR_TIME_OBJ		(DAMAGE_TIME_OBJ - 10)		// 無敵状態に変更する時間
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void TxtSetCollision(void);						// 当たり判定のセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Object    g_aObject[MAX_OBJECT];		// オブジェクトの情報
-Collision g_aCollision[MODEL_OBJ_MAX];	// 当たり判定の情報
-
-
-void a(int nCntObject, D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos);
-
+Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
+Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -65,6 +67,17 @@ void InitObject(void)
 		g_aObject[nCntObject].nShadowID      = NONE_SHADOW;							// 影のインデックス
 		g_aObject[nCntObject].bUse           = false;								// 使用状況
 
+		// 当たり判定情報の初期化
+		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+		{ // 当たり判定の最大数分繰り返す
+
+			// 位置ベクトルを初期化
+			g_aObject[nCntObject].collInfo.vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		}
+
+		// 向き状態を初期化
+		g_aObject[nCntObject].collInfo.stateRot = ROTSTATE_0;
+
 		// モデル情報の初期化
 		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
 		g_aObject[nCntObject].modelData.pTexture = NULL;							// テクスチャへのポインタ
@@ -88,14 +101,21 @@ void InitObject(void)
 	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
 	{ // オブジェクトの種類の総数分繰り返す
 
-		g_aCollision[nCntObject].pos      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCollision[nCntObject].vecPos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
-		g_aCollision[nCntObject].rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCollision[nCntObject].stateRot = ROTSTATE_0;						// 向き状態
-		g_aCollision[nCntObject].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
-		g_aCollision[nCntObject].fWidth   = 0.0f;							// 横幅
-		g_aCollision[nCntObject].fDepth   = 0.0f;							// 奥行
+		// 当たり判定の総数を初期化
+		g_aCollision[nCntObject].nNumColl = 1;
+
+		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+		{ // 当たり判定の最大数分繰り返す
+
+			g_aCollision[nCntObject].vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+			g_aCollision[nCntObject].scale[nCntColl]  = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
+			g_aCollision[nCntObject].fWidth[nCntColl] = 0.0f;							// 横幅
+			g_aCollision[nCntObject].fDepth[nCntColl] = 0.0f;							// 奥行
+		}
 	}
+
+	// 当たり判定のセットアップ
+	TxtSetCollision();
 }
 
 //======================================================================================================================
@@ -289,7 +309,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
@@ -316,6 +336,28 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 			// 使用している状態にする
 			g_aObject[nCntObject].bUse = true;
+
+			// 当たり判定情報を設定
+			g_aObject[nCntObject].collInfo.stateRot = stateRot;			// 向き状態
+
+			for (int nCntColl = 0; nCntColl < g_aCollision[g_aObject[nCntObject].nType].nNumColl; nCntColl++)
+			{ // 当たり判定の総数分繰り返す
+
+				// 位置ベクトルを設定
+				g_aObject[nCntObject].collInfo.vecPos[nCntColl] = g_aCollision[nType].vecPos[nCntColl];
+
+				for (int nCntRot = ROTSTATE_0; nCntRot < stateRot; nCntRot++)
+				{ // 設定された向きになるまで繰り返す
+
+					// 位置ベクトルを90度回転
+					g_aObject[nCntObject].collInfo.vecPos[nCntColl] = D3DXVECTOR3
+					( // 引数
+						-g_aObject[nCntObject].collInfo.vecPos[nCntColl].z,
+						 g_aObject[nCntObject].collInfo.vecPos[nCntColl].y,
+						 g_aObject[nCntObject].collInfo.vecPos[nCntColl].x
+					);
+				}
+			}
 
 			// モデル情報を設定
 			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
@@ -452,6 +494,9 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth)
 {
+	// 変数を宣言
+	D3DXVECTOR3 collPos;	// 当たり判定の中心座標
+
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -528,59 +573,64 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 			case COLLISIONTYPE_CREATE:	// 作成した当たり判定 (汎用)
 
-				D3DXVECTOR3 pos = g_aObject[nCntObject].pos - g_aCollision[g_aObject[nCntObject].nType].vecPos;
+				for (int nCntColl = 0; nCntColl < g_aCollision[g_aObject[nCntObject].nType].nNumColl; nCntColl++)
+				{ // 当たり判定数分繰り返す
 
-				// 前後の当たり判定
-				if (pPos->x + fWidth > pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
-				&&  pPos->x - fWidth < pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth)
-				{ // ブロックの左右の範囲内の場合
+					// 当たり判定の中心座標を設定
+					collPos = g_aObject[nCntObject].pos - g_aObject[nCntObject].collInfo.vecPos[nCntColl];
 
-					if (pPos->z    + fDepth >  pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth
-					&&  pOldPos->z + fDepth <= pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth)
-					{ // 前からの当たり判定
+					// 前後の当たり判定
+					if (pPos->x + fWidth > collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl]
+					&&  pPos->x - fWidth < collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl])
+					{ // ブロックの左右の範囲内の場合
 
-						// 位置を補正
-						pPos->z = pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth - fDepth - 0.01f;
+						if (pPos->z    + fDepth >  collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl]
+						&&  pOldPos->z + fDepth <= collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl])
+						{ // 前からの当たり判定
 
-						// 移動量を削除
-						pMove->x *= 0.95f;
+							// 位置を補正
+							pPos->z = collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl] - fDepth - 0.01f;
+
+							// 移動量を削除
+							pMove->x *= 0.95f;
+						}
+						else if (pPos->z    - fDepth <  collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl]
+						     &&  pOldPos->z - fDepth >= collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl])
+						{ // 後ろからの当たり判定
+
+							// 位置を補正
+							pPos->z = collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl] + fDepth + 0.01f;
+
+							// 移動量を削除
+							pMove->x *= 0.95f;
+						}
 					}
-					else if (pPos->z    - fDepth <  pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth
-					     &&  pOldPos->z - fDepth >= pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth)
-					{ // 後ろからの当たり判定
 
-						// 位置を補正
-						pPos->z = pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth + fDepth + 0.01f;
+					// 左右の当たり判定
+					if (pPos->z + fDepth > collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl]
+					&&  pPos->z - fDepth < collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl])
+					{ // ブロックの前後の範囲内の場合
 
-						// 移動量を削除
-						pMove->x *= 0.95f;
-					}
-				}
+						if (pPos->x    + fWidth >  collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl]
+						&&  pOldPos->x + fWidth <= collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl])
+						{ // 左からの当たり判定
 
-				// 左右の当たり判定
-				if (pPos->z + fDepth > pos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth
-				&&  pPos->z - fDepth < pos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth)
-				{ // ブロックの前後の範囲内の場合
+							// 位置を補正
+							pPos->x = collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl] - fWidth - 0.01f;
 
-					if (pPos->x    + fWidth >  pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth
-					&&  pOldPos->x + fWidth <= pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth)
-					{ // 左からの当たり判定
+							// 移動量を削除
+							pMove->x *= 0.95f;
+						}
+						else if (pPos->x    - fWidth <  collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl]
+						     &&  pOldPos->x - fWidth >= collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl])
+						{ // 右からの当たり判定
+							
+							// 位置を補正
+							pPos->x = collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl] + fWidth + 0.01f;
 
-						// 位置を補正
-						pPos->x = pos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth - fWidth - 0.01f;
-
-						// 移動量を削除
-						pMove->x *= 0.95f;
-					}
-					else if (pPos->x    - fWidth <  pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth
-					     &&  pOldPos->x - fWidth >= pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth)
-					{ // 右からの当たり判定
-						
-						// 位置を補正
-						pPos->x = pos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth + fWidth + 0.01f;
-
-						// 移動量を削除
-						pMove->x *= 0.95f;
+							// 移動量を削除
+							pMove->x *= 0.95f;
+						}
 					}
 				}
 
@@ -609,6 +659,107 @@ Collision *GetCollision(void)
 	return &g_aCollision[0];
 }
 
+//======================================================================================================================
+//	当たり判定のセットアップ処理
+//======================================================================================================================
+void TxtSetCollision(void)
+{
+	// 変数を宣言
+	int nEnd;					// テキスト読み込み終了の確認用
+	int nType;					// 種類の代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE *pFile;				// ファイルポインタ
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(COLLISION_SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
+
+			if (strcmp(&aString[0], "SETCOLL_OBJECT") == 0)
+			{ // 読み込んだ文字列が SETCOLL_OBJECT の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETCOLL_OBJECT ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_COLLISION") == 0)
+					{ // 読み込んだ文字列が SET_COLLISION の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_COLLISION ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// 種類を読み込む
+							}
+							else if (strcmp(&aString[0], "NUMCOLL") == 0)
+							{ // 読み込んだ文字列が NUMCOLL の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &g_aCollision[nType].nNumColl);	// 当たり判定数を読み込む
+
+								for (int nCntColl = 0; nCntColl < g_aCollision[nType].nNumColl; nCntColl++)
+								{ // 当たり判定数分繰り返す
+
+									fscanf(pFile, "%s", &aString[0]);			// 当たり判定の番号・要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);			// = を読み込む (不要)
+
+									fscanf(pFile, "%f%f%f",
+									&g_aCollision[nType].vecPos[nCntColl].x,	// 位置ベクトル (x) を読み込む
+									&g_aCollision[nType].vecPos[nCntColl].y,	// 位置ベクトル (y) を読み込む
+									&g_aCollision[nType].vecPos[nCntColl].z);	// 位置ベクトル (z) を読み込む
+									
+									fscanf(pFile, "%s", &aString[0]);			// 当たり判定の番号・要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);			// = を読み込む (不要)
+
+									fscanf(pFile, "%f%f%f",
+									&g_aCollision[nType].scale[nCntColl].x,		// 拡大率 (x) を読み込む
+									&g_aCollision[nType].scale[nCntColl].y,		// 拡大率 (y) を読み込む
+									&g_aCollision[nType].scale[nCntColl].z);	// 拡大率 (z) を読み込む
+
+									fscanf(pFile, "%s", &aString[0]);							// 当たり判定の番号・要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+
+									fscanf(pFile, "%f", &g_aCollision[nType].fWidth[nCntColl]);	// 横幅を読み込む
+
+									fscanf(pFile, "%s", &aString[0]);							// 当たり判定の番号・要素を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+
+									fscanf(pFile, "%f", &g_aCollision[nType].fDepth[nCntColl]);	// 奥行を読み込む
+								}
+							}
+						} while (strcmp(&aString[0], "END_SET_COLLISION") != 0);	// 読み込んだ文字列が END_SET_COLLISION ではない場合ループ
+					}
+				} while (strcmp(&aString[0], "END_SETCOLL_OBJECT") != 0);			// 読み込んだ文字列が END_SETCOLL_OBJECT ではない場合ループ
+			}
+		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "当たり判定ファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
 
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================

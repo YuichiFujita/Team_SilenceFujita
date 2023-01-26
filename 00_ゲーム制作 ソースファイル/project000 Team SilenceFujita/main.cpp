@@ -20,6 +20,8 @@
 #include "billboard.h"
 #include "object.h"
 #include "Car.h"
+#include "Police.h"
+#include "Human.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "camera.h"
@@ -27,9 +29,9 @@
 #include "particle.h"
 #include "Editmain.h"
 #include "EditObject.h"
+#include "EditCollision.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
-#include "Police.h"
 #endif
 
 //************************************************************
@@ -62,10 +64,11 @@ void UpdateDebug(void);	// デバッグの更新処理
 void DrawDebug(void);	// デバッグの描画処理
 
 void DrawDebugEditObject(void);			// エディットオブジェクトモードのデバッグ表示
+void DrawDebugEditCollision(void);		// エディット当たり判定モードのデバッグ表示
 void DrawDebugEditBillboard(void);		// エディットビルボードモードのデバッグ表示
 void DrawDebugControlObject(void);		// エディットオブジェクト操作説明
+void DrawDebugControlCollision(void);	// エディット当たり判定操作説明
 void DrawDebugControlBillboard(void);	// エディットビルボード操作説明
-void DrawDebugPolice(void);				// 警察のデバッグ表記
 #endif
 
 //************************************************************
@@ -557,6 +560,9 @@ void Update(void)
 //============================================================
 void Draw(void)
 {
+	// 変数を宣言
+	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
+
 	// 画面クリア (バックバッファと Zバッファのクリア)
 	g_pD3DDevice->Clear
 	( // 引数
@@ -571,6 +577,9 @@ void Draw(void)
 	// 描画開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{ // 描画開始が成功した場合
+
+		// 現在のビューポートを取得
+		g_pD3DDevice->GetViewport(&viewportDef);
 
 		switch (g_mode)
 		{ // 選択処理
@@ -590,6 +599,9 @@ void Draw(void)
 			// 処理から抜ける
 			break;
 		}
+
+		// ビューポートを元に戻す
+		g_pD3DDevice->SetViewport(&viewportDef);
 
 		// フェードの描画
 		DrawFade();
@@ -723,8 +735,10 @@ void TxtSetStage(void)
 	int         nAnim;			// アニメーションの ON / OFF の設定用
 	bool        bAnim;			// アニメーションの ON / OFF の代入用
 	bool        bShadow;		// 影の ON / OFF の代入
+	ROTSTATE    stateRot;		// 向き状態
 	SetInfo		carSetInfo;		// 車の設定用
 	SetInfo		HumanSetInfo;	// 人間の設定用
+	SetInfo		PoliSetInfo;	// 警察の設定用
 
 	// 変数配列を宣言
 	char         aString[MAX_STRING];	// テキストの文字列の代入用
@@ -844,6 +858,11 @@ void TxtSetStage(void)
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
 								fscanf(pFile, "%d", &nCollisionType);	// 当たり判定の種類を読み込む
 							}
+							else if (strcmp(&aString[0], "COLLROT") == 0)
+							{ // 読み込んだ文字列が COLLROT の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &stateRot);			// 向き状態を読み込む
+							}
 							else if (strcmp(&aString[0], "NUMMAT") == 0)
 							{ // 読み込んだ文字列が NUMMAT の場合
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
@@ -879,7 +898,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
@@ -1013,6 +1032,108 @@ void TxtSetStage(void)
 						SetCar(carSetInfo.pos, carSetInfo.Curve);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
+			}
+
+			//------------------------------------------------
+			//	人間の設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_HUMAN") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_HUMAN の場合
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+
+				  // ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_HUMAN") == 0)
+					{ // 読み込んだ文字列が SET_HUMAN の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &HumanSetInfo.pos.x, &HumanSetInfo.pos.y, &HumanSetInfo.pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVETIME") == 0)
+							{ // 読み込んだ文字列が CURVETIME の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%d", &HumanSetInfo.Curve.nCurveTime);			// 曲がる回数を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVEPOINT") == 0)
+							{ // 読み込んだ文字列がCURVEPOINTだった場合
+								for (int nCnt = 0; nCnt < HumanSetInfo.Curve.nCurveTime; nCnt++)
+								{ // 回数分読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEPOINT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &HumanSetInfo.Curve.curvePoint[nCnt].x, &HumanSetInfo.Curve.curvePoint[nCnt].y, &HumanSetInfo.Curve.curvePoint[nCnt].z);		// 曲がる回数を読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEROT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%d", &HumanSetInfo.Curve.fCurveRot[nCnt]);	//曲がる方向を読み込む
+								}
+							}
+
+						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);	// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+						// 人間の設定
+						SetHuman(HumanSetInfo.pos, HumanSetInfo.Curve);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+			}
+
+			//------------------------------------------------
+			//	警察の設定
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_POLICE") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_POLICE の場合
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_POLICE ではない場合ループ
+
+				  // ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_POLICE") == 0)
+					{ // 読み込んだ文字列が SET_POLICE の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_POLICE ではない場合ループ
+
+						  // ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &PoliSetInfo.pos.x, &PoliSetInfo.pos.y, &PoliSetInfo.pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVETIME") == 0)
+							{ // 読み込んだ文字列が CURVETIME の場合
+								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+								fscanf(pFile, "%d", &PoliSetInfo.Curve.nCurveTime);			// 曲がる回数を読み込む
+							}
+							else if (strcmp(&aString[0], "CURVEPOINT") == 0)
+							{ // 読み込んだ文字列がCURVEPOINTだった場合
+								for (int nCnt = 0; nCnt < PoliSetInfo.Curve.nCurveTime; nCnt++)
+								{ // 回数分読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEPOINT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &PoliSetInfo.Curve.curvePoint[nCnt].x, &PoliSetInfo.Curve.curvePoint[nCnt].y, &PoliSetInfo.Curve.curvePoint[nCnt].z);		// 曲がる回数を読み込む
+									fscanf(pFile, "%s", &aString[0]);							// CURVEROT を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+									fscanf(pFile, "%d", &PoliSetInfo.Curve.fCurveRot[nCnt]);	//曲がる方向を読み込む
+								}
+							}
+
+						} while (strcmp(&aString[0], "END_SET_POLICE") != 0);	// 読み込んだ文字列が END_SET_POLICE ではない場合ループ
+
+						// 警察の設定
+						SetPolice(PoliSetInfo.pos, PoliSetInfo.Curve);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_POLICE") != 0);		// 読み込んだ文字列が END_SETSTAGE_POLICE ではない場合ループ
 			}
 		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
 		
@@ -1186,6 +1307,8 @@ void DrawDebug(void)
 	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
 	Car *pCar = GetCarData();						// 車の情報を取得する
+	Police *pPolice = GetPoliceData();
+	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1206,6 +1329,7 @@ void DrawDebug(void)
 		"　 [F6] 曲の停止\n"
 		"　 [F7] 左背景の ON / OFF\n"
 		"　 [F8] 右背景の ON / OFF\n"
+		"　 [F9] 当たり判定のセーブ\n"
 		"　 ---------------------------------------------　\n"
 		"　 [FPS] %d\n"
 		"　 [ カメラ視点 ] %.1f, %.1f, %.1f\n"
@@ -1216,7 +1340,11 @@ void DrawDebug(void)
 		"   ---------------------------------------------　\n"
 		"   車の向き：[%d]\n"
 		"   車の位置：[%.3f,%.3f,%.3f]\n"
-		"   車のスピード：[%.3f,%.3f,%.3f]",
+		"   車のスピード：[%.3f,%.3f,%.3f]\n"
+		"   警察の向き：[%d]\n"
+		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
+		" 　警察のスピード：[%.3f]\n"
+		" 　人間の位置：[%.3f,%.3f,%.3f]",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1232,7 +1360,11 @@ void DrawDebug(void)
 		nNumParticle,		// パーティクルの総数
 		(int)D3DXToDegree(pCar->rot.y),
 		pCar->pos.x, pCar->pos.y, pCar->pos.z,
-		pCar->move.x, pCar->move.y, pCar->move.z
+		pCar->move.x, pCar->move.y, pCar->move.z,
+		(int)D3DXToDegree(pPolice->rot.y),
+		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
+		pPolice->move.x,
+		HumanPos.x, HumanPos.y, HumanPos.z
 	);
 
 	//--------------------------------------------------------
@@ -1294,11 +1426,24 @@ void DrawDebug(void)
 			if (GetStyle() == EDITSTYLE_OBJECT)
 			{ // オブジェクトスタイルだった場合
 
-				// オブジェクトの操作説明
-				DrawDebugControlObject();
+				if (GetCollisionStyle() == COLLISIONSTYLE_OBJECT)
+				{ // オブジェクト操作状態の場合
 
-				// エディットモードのデバッグ表示
-				DrawDebugEditObject();
+					// オブジェクトの操作説明
+					DrawDebugControlObject();
+
+					// エディットモードのデバッグ表示
+					DrawDebugEditObject();
+				}
+				else if (GetCollisionStyle() == COLLISIONSTYLE_COLLISION)
+				{ // 当たり判定操作状態の場合
+
+					// 当たり判定の操作説明
+					DrawDebugControlCollision();
+
+					// エディットモードのデバッグ表示
+					DrawDebugEditCollision();
+				}
 			}
 			else if (GetStyle() == EDITSTYLE_BILLBOARD)
 			{ // ビルボードスタイルだった場合
@@ -1310,9 +1455,6 @@ void DrawDebug(void)
 				DrawDebugEditBillboard();
 			}
 		}
-
-		//警察のデバッグ表記
-		//DrawDebugPolice();				
 	}
 }
 
@@ -1334,7 +1476,7 @@ void DrawDebugEditObject(void)
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
 
 	// ポインタを宣言
-	EditObject *edit = GetEditObject();		// エディットオブジェクトの情報を取得する
+	EditObject *EditObject = GetEditObject();		// エディットオブジェクトの情報を取得する
 
 	// 文字列に代入
 	sprintf
@@ -1349,15 +1491,67 @@ void DrawDebugEditObject(void)
 		"\n   壊れ方 [%s]"
 		"\n   判定　 [%s]"
 		"\n\n",
-		edit->pos.x, edit->pos.y, edit->pos.z,
-		edit->scale.x, edit->scale.y, edit->scale.z,
-		(int)D3DXToDegree(edit->rot.y), edit->nType,
-		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.r,
-		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.g,
-		edit->EditMaterial[edit->nType][edit->nCntMaterial].MatD3D.Diffuse.b,
-		edit->Shadowtype.pShadowMode[edit->Shadowtype.Shadowtype],
-		edit->Break.pBreakMode[edit->Break.Breaktype],
-		edit->Collisiontype.pCollisionMode[edit->Collisiontype.Collisiontype]
+		EditObject->pos.x, EditObject->pos.y, EditObject->pos.z,
+		EditObject->scale.x, EditObject->scale.y, EditObject->scale.z,
+		(int)D3DXToDegree(EditObject->rot.y), EditObject->nType,
+		EditObject->EditMaterial[EditObject->nType][EditObject->nCntMaterial].MatD3D.Diffuse.r,
+		EditObject->EditMaterial[EditObject->nType][EditObject->nCntMaterial].MatD3D.Diffuse.g,
+		EditObject->EditMaterial[EditObject->nType][EditObject->nCntMaterial].MatD3D.Diffuse.b,
+		EditObject->Shadowtype.pShadowMode[EditObject->Shadowtype.Shadowtype],
+		EditObject->Break.pBreakMode[EditObject->Break.Breaktype],
+		EditObject->Collisiontype.pCollisionMode[EditObject->Collisiontype.Collisiontype]
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_BOTTOM, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+
+//==============================================
+//	エディット当たり判定モードのデバッグ表示
+//==============================================
+void DrawDebugEditCollision(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	// ポインタを宣言
+	EditCollision *EditCollision = GetEditCollision();		// エディット当たり判定の情報を取得する
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n　 位置　 [%.4f, %.4f, %.4f]"
+		"\n　 距離　 [%.4f, %.4f, %.4f]"
+		"\n　 拡大率 [%.4f, %.4f, %.4f]"
+		"\n　 向き　 [%d]"
+		"\n　 サイズ [横幅：%.4f] [奥行：%.4f]"
+		"\n　 当たり判定の数　　 [%d 個]"
+		"\n　 選択中の当たり判定 [%d 番]"
+		"\n\n",
+		EditCollision->pos[EditCollision->nSelectColl].x,
+		EditCollision->pos[EditCollision->nSelectColl].y,
+		EditCollision->pos[EditCollision->nSelectColl].z,
+		EditCollision->collision.vecPos[EditCollision->nSelectColl].x,
+		EditCollision->collision.vecPos[EditCollision->nSelectColl].y,
+		EditCollision->collision.vecPos[EditCollision->nSelectColl].z,
+		EditCollision->collision.scale[EditCollision->nSelectColl].x,
+		EditCollision->collision.scale[EditCollision->nSelectColl].y,
+		EditCollision->collision.scale[EditCollision->nSelectColl].z,
+		(int)D3DXToDegree(EditCollision->rot.y),
+		EditCollision->collision.fWidth[EditCollision->nSelectColl],
+		EditCollision->collision.fDepth[EditCollision->nSelectColl],
+		EditCollision->collision.nNumColl,
+		EditCollision->nSelectColl + 1
 	);
 
 	// テキストの描画
@@ -1448,6 +1642,7 @@ void DrawDebugControlObject(void)
 		"\nオブジェクトの設置：[0] 　"
 		"\nマテリアルの変更：[SPACE] 　"
 		"\n当たり判定の種類の変更：[BACKSPACE] 　"
+		"\n当たり判定の調整：[ENTER] 　"
 		"\n--------------------------------------------- 　"
 		"\nオブジェクトの移動：[W/A/S/D] 　"
 		"\nオブジェクトの平面移動微調整：[LCTRL+W/A/S/D] 　"
@@ -1466,6 +1661,53 @@ void DrawDebugControlObject(void)
 		"\nオブジェクトの縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
 		"\nオブジェクトの縦の位置の初期化：[LSHIFT+A/D] 　"
 		"\nオブジェクトの15度回転：[LSHIFT+Q/E] 　"
+	);
+
+	// テキストの描画
+	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
+}
+
+//==============================================
+//	エディット当たり判定操作説明
+//==============================================
+void DrawDebugControlCollision(void)
+{
+	// 変数を宣言
+	RECT rect =
+	{ // 初期値
+		0,					// ウインドウの左上 X座標
+		0,					// ウインドウの左上 Y座標
+		SCREEN_WIDTH,		// ウインドウの幅
+		SCREEN_HEIGHT		// ウインドウの高さ
+	};
+
+	// 変数配列を宣言
+	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
+
+	// 文字列に代入
+	sprintf
+	( // 引数
+		&aDeb[0],
+		"\n位置のリセット：[1] 　"
+		"\n向きのリセット：[2] 　"
+		"\n拡大率のリセット：[3] 　"
+		"\n全体の拡大：[4] 　"
+		"\n全体の縮小：[5] 　"
+		"\n設置スタイルの変更：[6] 　"
+		"\n当たり判定の総数：[↑/↓] 　"
+		"\n選択中の当たり判定の変更：[SPACE] 　"
+		"\nオブジェクトの調整：[ENTER] 　"
+		"\n--------------------------------------------- 　"
+		"\n当たり判定の移動：[W/A/S/D] 　"
+		"\n当たり判定の平面移動微調整：[LCTRL+W/A/S/D] 　"
+		"\n当たり判定の向き変更：[Q/E] 　"
+		"\n当たり判定のX軸の拡大縮小：[U/J] 　"
+		"\n当たり判定のY軸の拡大縮小：[I/K] 　"
+		"\n当たり判定のZ軸の拡大縮小：[O/L] 　"
+		"\n--------------------------------------------- 　"
+		"\n当たり判定の縦の移動：[LSHIFT+W/S] 　"
+		"\n当たり判定の縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
+		"\n当たり判定の縦の位置の初期化：[LSHIFT+A/D] 　"
 	);
 
 	// テキストの描画
@@ -1535,7 +1777,6 @@ void DrawDebugPolice(void)
 {
 
 }
-
 #endif
 
 #endif

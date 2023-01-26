@@ -26,6 +26,7 @@ typedef enum
 	PARTICLETYPE_NONE = 0,		// パーティクル (何もしない)
 	PARTICLETYPE_EXPLOSION,		// パーティクル (爆発)
 	PARTICLETYPE_DAMAGE,		// パーティクル (ダメージ)
+	PARTICLETYPE_WIND,			// パーティクル	(風)
 	PARTICLETYPE_MAX,			// この列挙型の総数
 } PARTICLETYPE;
 

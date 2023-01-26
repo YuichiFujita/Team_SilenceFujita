@@ -17,6 +17,7 @@
 #include "player.h"
 #include "shadow.h"
 #include "sound.h"
+#include "wind.h"
 
 #include "meshfield.h"
 #include "Police.h"
@@ -43,6 +44,7 @@ void PosPlayer(void);				// プレイヤーの位置の更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
 void LandPlayer(void);				// プレイヤーの着地の更新処理
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
+void FlyAwayPlayer(void);			// プレイヤーの送風処理
 
 //************************************************************
 //	グローバル変数
@@ -84,6 +86,12 @@ void InitPlayer(void)
 	g_player.modelData.size     = INIT_SIZE;	// 大きさ
 	g_player.modelData.fRadius  = 0.0f;			// 半径
 
+	//風の情報の初期化
+	g_player.wind.bUseWind = false;				// 風の使用状況
+	g_player.wind.nCircleCount = 0;				// どこに出すか
+	g_player.wind.nCount = 0;					// 風を出すカウント
+	g_player.wind.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
+
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
@@ -106,7 +114,7 @@ void UpdatePlayer(void)
 
 		// 前回位置の更新
 		g_player.oldPos = g_player.pos;
-		
+
 		// 状態の更新
 		if (g_player.nCounterState > 0)
 		{ // カウンターが 0より大きい場合
@@ -143,6 +151,9 @@ void UpdatePlayer(void)
 
 		//プレイヤーのカメラの状態変化処理
 		CameraChangePlayer();
+
+		// プレイヤーの送風処理
+		FlyAwayPlayer();
 #else
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
 		{ // 奥移動の操作が行われた場合
@@ -189,15 +200,6 @@ void UpdatePlayer(void)
 			PLAY_DEPTH			// 奥行
 		);
 
-		// 警察との当たり判定
-		CollisionPolice
-		( // 引数
-			&g_player.pos,		// 現在の位置
-			&g_player.oldPos,	// 前回の位置
-			PLAY_WIDTH,			// 横幅
-			PLAY_DEPTH			// 奥行
-		);
-
 		//----------------------------------------------------
 		//	影の更新
 		//----------------------------------------------------
@@ -209,6 +211,56 @@ void UpdatePlayer(void)
 			g_player.rot,		// 向き
 			NONE_SCALE			// 拡大率
 		);
+
+		if (g_player.wind.bUseWind == true)
+		{ // 送風機を使用した場合
+
+			// 風を出すカウントを加算する
+			g_player.wind.nCount++;
+
+			if (g_player.wind.nCount % 3 == 0)
+			{ // 風のカウントが一定数になったら
+
+				float fRotAdd;							// 向きの追加分
+
+				for (int nCnt = 0; nCnt < 10; nCnt++)
+				{
+					{ // 右の分
+						// 向きの追加分を算出する
+						fRotAdd = -(float)((rand() % 240 + 52) - 157) / 100;
+
+						// 風の位置を設定する
+						g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
+
+						//風の向きを設定する
+						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y + D3DX_PI * 0.5f + fRotAdd, 0.0f);
+
+						// 風の設定処理
+						SetWind(g_player.wind.pos, g_player.wind.rot);
+					}
+
+					{ // 左の分
+						// 向きの追加分を算出する
+						fRotAdd = (float)((rand() % 240 + 52) - 157) / 100;
+
+						// 風の位置を設定する
+						g_player.wind.pos = D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
+
+						//風の向きを設定する
+						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y - D3DX_PI * 0.5f + fRotAdd, 0.0f);
+
+						// 風の設定処理
+						SetWind(g_player.wind.pos, g_player.wind.rot);
+					}
+				}
+			}
+		}
+		else
+		{ // 送風機を使用していない場合
+
+			// カウントを初期化する
+			g_player.wind.nCount = 0;
+		}
 	}
 }
 
@@ -543,24 +595,36 @@ void RevPlayer(void)
 
 		// 手前に位置を補正
 		g_player.pos.z = GetLimitStage().fNear - (PLAY_DEPTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 	if (g_player.pos.z < GetLimitStage().fFar + (PLAY_DEPTH * 2))
 	{ // 範囲外の場合 (奥)
 
 		// 奥に位置を補正
 		g_player.pos.z = GetLimitStage().fFar + (PLAY_DEPTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 	if (g_player.pos.x > GetLimitStage().fRight - (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (右)
 
 		// 右に位置を補正
 		g_player.pos.x = GetLimitStage().fRight - (PLAY_WIDTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 	if (g_player.pos.x < GetLimitStage().fLeft + (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (左)
 
 		// 左に位置を補正
 		g_player.pos.x = GetLimitStage().fLeft + (PLAY_WIDTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 }
 
@@ -617,6 +681,24 @@ void CameraChangePlayer(void)
 
 		// 一人称カメラの状況を変える
 		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
+	}
+}
+
+//============================================================
+// プレイヤーの送風処理
+//============================================================
+void FlyAwayPlayer(void)
+{
+	if (GetKeyboardPress(DIK_U) == true)
+	{ // Uキーを押している場合
+
+		// 送風機を使用する
+		g_player.wind.bUseWind = true;
+	}
+	else
+	{ // Uキーを押していない場合
+		// 送風機を使用しない
+		g_player.wind.bUseWind = false;
 	}
 }
 
