@@ -782,7 +782,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					case COLLOBJECTTYPE_CAR:		//車の場合
 
 						// 目標の移動量をセーブする
-						move->x = sinf(-targetrot.y) * 8.0f;
+						move->x = 0.0f;
 
 						break;						//抜け出す
 					}
@@ -1099,9 +1099,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 							// 位置をずらす
 							pPos->z = pPosOld->z;
 
-							// 移動量を削除
-							pMove->x *= 0.95f;
-
 							break;						// 抜け出す
 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
@@ -1134,9 +1131,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 							// 位置をずらす
 							pPos->z = pPosOld->z;
-
-							// 移動量を削除
-							pMove->x *= 0.95f;
 
 							break;						// 抜け出す
 
@@ -1176,9 +1170,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 							// 位置をずらす
 							pPos->x = pPosOld->x;
 
-							// 移動量を削除
-							pMove->x *= 0.95f;
-
 							break;						// 抜け出す
 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
@@ -1211,9 +1202,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 							// 位置をずらす
 							pPos->x = pPosOld->x;
-
-							// 移動量を削除
-							pMove->x *= 0.95f;
 
 							break;						// 抜け出す
 

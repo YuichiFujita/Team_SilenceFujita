@@ -515,7 +515,7 @@ void MovePlayer(void)
 		if (g_player.drift.bDrift == true)
 		{ // ドリフト中だった場合
 			// 向きを更新
-			g_player.rot.y -= 0.03f;
+			g_player.rot.y -= 0.04f;
 		}
 		else
 		{ // ドリフト中じゃ無かった場合
@@ -543,7 +543,7 @@ void MovePlayer(void)
 		if (g_player.drift.bDrift == true)
 		{ // ドリフト中だった場合
 			// 向きを更新
-			g_player.rot.y += 0.03f;
+			g_player.rot.y += 0.04f;
 		}
 		else
 		{ // ドリフト中じゃなかった場合
@@ -757,7 +757,7 @@ void DriftPlayer(void)
 	if (g_player.drift.bDrift == true)
 	{ // ドリフトしている場合
 		// 移動量を少し下げる
-		g_player.move.x += (0.0f - g_player.move.x) * 0.01f;
+		g_player.move.x += (0.0f - g_player.move.x) * 0.04f;
 	}
 }
 

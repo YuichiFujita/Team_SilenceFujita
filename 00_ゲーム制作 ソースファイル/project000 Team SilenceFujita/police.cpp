@@ -866,7 +866,7 @@ void PatrolCarSearch(Police *pPolice)
 		pPolice->state = POLICESTATE_CHASE;
 
 		// Œü‚«‚Ì·•ª‚ð‹‚ß‚é
-		fRotDiff = fRotDest - pPolice->rot.y * 0.8f;
+		fRotDiff = fRotDest - pPolice->rot.y;
 
 		if (fRotDiff > D3DX_PI)
 		{ // Šp“x‚ª3.14f‚æ‚è‘å‚«‚©‚Á‚½ê‡
@@ -880,7 +880,7 @@ void PatrolCarSearch(Police *pPolice)
 		}
 
 		// Šp“x‚ð•â³‚·‚é
-		pPolice->rot.y += fRotDiff;
+		pPolice->rot.y += fRotDiff * 0.1f;
 
 		if (pPolice->rot.y > D3DX_PI)
 		{ // Šp“x‚ª3.14f‚æ‚è‘å‚«‚©‚Á‚½ê‡
@@ -914,10 +914,10 @@ void ChasePoliceAct(Police *pPolice)
 	//ŒxŽ@ŽÔ—¼‚Ì’T’mˆ—
 	PatrolCarSearch(pPolice);
 
-	if (pPolice->move.x >= 25.0f)
+	if (pPolice->move.x >= 20.0f)
 	{ // ˆÚ“®—Ê‚ªˆê’è’lˆÈã‚Ìê‡
 		// ˆÚ“®—Ê‚ðXV
-		pPolice->move.x = 25.0f;
+		pPolice->move.x = 20.0f;
 	}
 }
 
