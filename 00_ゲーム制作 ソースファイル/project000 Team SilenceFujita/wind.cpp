@@ -355,8 +355,8 @@ void CollisionWind(Human *pHuman)
 			&vecPos[0],
 			pPlayer->pos,	// â‘ÎÀ•W
 			pPlayer->rot,	// Œü‚«
-			350.0f,			// ‰¡•
-			80.0f			// c•
+			400.0f,			// ‰¡•
+			100.0f			// c•
 		);
 
 		if (LineOuterProduct(vecPos[0], vecPos[1], pHuman->pos) < 0

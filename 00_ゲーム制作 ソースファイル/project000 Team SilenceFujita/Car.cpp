@@ -797,6 +797,8 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, Model ModelData, COLLOBJECTTYPE collObject)
 {
+	//float fAngle;			// 角度の処理
+
 	{ // 車の当たり判定
 		Car *pCar = GetCarData();					// 車の情報を取得する
 
@@ -804,17 +806,22 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 		{
 			if (pCar[nCntCar].bUse == true)
 			{ // 車が使用されていた場合
-				if (pPos->x + ModelData.vtxMin.x <= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMax.x && pPos->x + ModelData.vtxMax.x >= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMin.x)
+
+				//// 角度を算出する
+				//fAngle = atan2f()
+
+				if (pPos->x - CAR_WIDTH <= pCar[nCntCar].pos.x + CAR_WIDTH
+					&& pPos->x + CAR_WIDTH >= pCar[nCntCar].pos.x - CAR_WIDTH)
 				{ // 車のX幅の中にいた場合
-					if (pPosOld->z + ModelData.vtxMax.z <= pCar[nCntCar].posOld.z + pCar[nCntCar].modelData.vtxMin.z
-						&& pPos->z + ModelData.vtxMax.z >= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMin.z)
+					if (pPosOld->z + CAR_DEPTH <= pCar[nCntCar].posOld.z - CAR_DEPTH
+						&& pPos->z + CAR_DEPTH >= pCar[nCntCar].pos.z - CAR_DEPTH)
 					{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
 						switch (collObject)
 						{
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pCar[nCntCar].pos.z - (CAR_DEPTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -842,15 +849,15 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 							break;						// 抜け出す
 						}
 					}							//手前で止められる処理
-					else if (pPosOld->z + ModelData.vtxMin.z >= pCar[nCntCar].posOld.z + pCar[nCntCar].modelData.vtxMax.z
-						&& pPos->z + ModelData.vtxMin.z <= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMax.z)
+					else if (pPosOld->z - CAR_DEPTH >= pCar[nCntCar].posOld.z + CAR_DEPTH
+						&& pPos->z - CAR_DEPTH <= pCar[nCntCar].pos.z + CAR_DEPTH)
 					{//前回の位置が塔の位置よりも奥かつ、現在の位置が塔の位置よりも手前だった場合(奥で止められる処理)
 						switch (collObject)
 						{
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pCar[nCntCar].pos.z + (CAR_DEPTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -880,18 +887,18 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					}							//奥で止められる処理
 				}
 
-				if (pPos->z + ModelData.vtxMin.z <= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMax.z
-					&& pPos->z + ModelData.vtxMax.z >= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMin.z)
+				if (pPos->z - CAR_DEPTH <= pCar[nCntCar].pos.z + CAR_DEPTH
+					&& pPos->z + CAR_DEPTH >= pCar[nCntCar].pos.z - CAR_DEPTH)
 				{//塔のZ幅の中にいた場合
-					if (pPosOld->x + ModelData.vtxMax.x <= pCar[nCntCar].posOld.x + pCar[nCntCar].modelData.vtxMin.x
-						&& pPos->x + ModelData.vtxMax.x >= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMin.x)
+					if (pPosOld->x + CAR_WIDTH <= pCar[nCntCar].posOld.x - CAR_WIDTH
+						&& pPos->x + CAR_WIDTH >= pCar[nCntCar].pos.x - CAR_WIDTH)
 					{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
 						switch (collObject)
 						{
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pCar[nCntCar].pos.x - (CAR_WIDTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -919,15 +926,15 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 							break;						// 抜け出す
 						}
 					}							//左端の処理
-					else if (pPosOld->x + ModelData.vtxMin.x >= pCar[nCntCar].posOld.x + pCar[nCntCar].modelData.vtxMax.x
-						&& pPos->x + ModelData.vtxMin.x <= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMax.x)
+					else if (pPosOld->x - CAR_WIDTH >= pCar[nCntCar].posOld.x + CAR_WIDTH
+						&& pPos->x - CAR_WIDTH <= pCar[nCntCar].pos.x + CAR_WIDTH)
 					{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
 						switch (collObject)
 						{
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pCar[nCntCar].pos.x + (CAR_WIDTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -965,10 +972,11 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 		if (pPlayer->bUse == true)
 		{ // 車が使用されていた場合
-			if (pPos->x + ModelData.vtxMin.x <= pPlayer->pos.x + pPlayer->modelData.vtxMax.x && pPos->x + ModelData.vtxMax.x >= pPlayer->pos.x + pPlayer->modelData.vtxMin.x)
+			if (pPos->x - CAR_WIDTH <= pPlayer->pos.x + CAR_WIDTH
+				&& pPos->x + CAR_WIDTH >= pPlayer->pos.x - CAR_WIDTH)
 			{ // 車のX幅の中にいた場合
-				if (pPosOld->z + ModelData.vtxMax.z <= pPlayer->oldPos.z + pPlayer->modelData.vtxMin.z
-					&& pPos->z + ModelData.vtxMax.z >= pPlayer->pos.z + pPlayer->modelData.vtxMin.z)
+				if (pPosOld->z + CAR_DEPTH <= pPlayer->oldPos.z - CAR_DEPTH
+					&& pPos->z + CAR_DEPTH >= pPlayer->pos.z - CAR_DEPTH)
 				{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
 					switch (collObject)
 					{
@@ -993,8 +1001,8 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						break;						// 抜け出す
 					}
 				}							//手前で止められる処理
-				else if (pPosOld->z + ModelData.vtxMin.z >= pPlayer->oldPos.z + pPlayer->modelData.vtxMax.z
-					&& pPos->z + ModelData.vtxMin.z <= pPlayer->pos.z + pPlayer->modelData.vtxMax.z)
+				else if (pPosOld->z - CAR_DEPTH >= pPlayer->oldPos.z + CAR_DEPTH
+					&& pPos->z - CAR_DEPTH <= pPlayer->pos.z + CAR_DEPTH)
 				{//前回の位置が塔の位置よりも奥かつ、現在の位置が塔の位置よりも手前だった場合(奥で止められる処理)
 					switch (collObject)
 					{
@@ -1021,11 +1029,11 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 				}							//奥で止められる処理
 			}
 
-			if (pPos->z + ModelData.vtxMin.z <= pPlayer->oldPos.z + pPlayer->modelData.vtxMax.z
-				&& pPos->z + ModelData.vtxMax.z >= pPlayer->pos.z + pPlayer->modelData.vtxMin.z)
+			if (pPos->z - CAR_DEPTH <= pPlayer->oldPos.z + CAR_DEPTH
+				&& pPos->z + CAR_DEPTH >= pPlayer->pos.z - CAR_DEPTH)
 			{//塔のZ幅の中にいた場合
-				if (pPosOld->x + ModelData.vtxMax.x <= pPlayer->oldPos.x + pPlayer->modelData.vtxMin.x
-					&& pPos->x + ModelData.vtxMax.x >= pPlayer->pos.x + pPlayer->modelData.vtxMin.x)
+				if (pPosOld->x + CAR_WIDTH <= pPlayer->oldPos.x - CAR_WIDTH
+					&& pPos->x + CAR_WIDTH >= pPlayer->pos.x - CAR_WIDTH)
 				{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
 					switch (collObject)
 					{
@@ -1050,8 +1058,8 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						break;						// 抜け出す
 					}
 				}							//左端の処理
-				else if (pPosOld->x + ModelData.vtxMin.x >= pPlayer->oldPos.x + pPlayer->modelData.vtxMax.x
-					&& pPos->x + ModelData.vtxMin.x <= pPlayer->pos.x + pPlayer->modelData.vtxMax.x)
+				else if (pPosOld->x - CAR_WIDTH >= pPlayer->oldPos.x + CAR_WIDTH
+					&& pPos->x - CAR_WIDTH <= pPlayer->pos.x + CAR_WIDTH)
 				{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
 					switch (collObject)
 					{
@@ -1087,10 +1095,11 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 		{
 			if (pPolice[nCntPolice].bUse == true)
 			{ // 車が使用されていた場合
-				if (pPos->x + ModelData.vtxMin.x <= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMax.x && pPos->x + ModelData.vtxMax.x >= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMin.x)
+				if (pPos->x - CAR_WIDTH <= pPolice[nCntPolice].pos.x + CAR_WIDTH
+					&& pPos->x + CAR_WIDTH >= pPolice[nCntPolice].pos.x - CAR_WIDTH)
 				{ // 車のX幅の中にいた場合
-					if (pPosOld->z + ModelData.vtxMax.z <= pPolice[nCntPolice].posOld.z + pPolice[nCntPolice].modelData.vtxMin.z
-						&& pPos->z + ModelData.vtxMax.z >= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMin.z)
+					if (pPosOld->z + CAR_DEPTH <= pPolice[nCntPolice].posOld.z - CAR_DEPTH
+						&& pPos->z + CAR_DEPTH >= pPolice[nCntPolice].pos.z - CAR_DEPTH)
 					{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
 						switch (collObject)
 						{
@@ -1122,8 +1131,8 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 							break;						// 抜け出す
 						}
 					}							//手前で止められる処理
-					else if (pPosOld->z + ModelData.vtxMin.z >= pPolice[nCntPolice].posOld.z + pPolice[nCntPolice].modelData.vtxMax.z
-						&& pPos->z + ModelData.vtxMin.z <= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMax.z)
+					else if (pPosOld->z - CAR_DEPTH >= pPolice[nCntPolice].posOld.z + CAR_DEPTH
+						&& pPos->z - CAR_DEPTH <= pPolice[nCntPolice].pos.z + CAR_DEPTH)
 					{//前回の位置が塔の位置よりも奥かつ、現在の位置が塔の位置よりも手前だった場合(奥で止められる処理)
 						switch (collObject)
 						{
@@ -1157,11 +1166,11 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					}							//奥で止められる処理
 				}
 
-				if (pPos->z + ModelData.vtxMin.z <= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMax.z
-					&& pPos->z + ModelData.vtxMax.z >= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMin.z)
+				if (pPos->z - CAR_DEPTH <= pPolice[nCntPolice].pos.z + CAR_DEPTH
+					&& pPos->z + CAR_DEPTH >= pPolice[nCntPolice].pos.z - CAR_DEPTH)
 				{//塔のZ幅の中にいた場合
-					if (pPosOld->x + ModelData.vtxMax.x <= pPolice[nCntPolice].posOld.x + pPolice[nCntPolice].modelData.vtxMin.x
-						&& pPos->x + ModelData.vtxMax.x >= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMin.x)
+					if (pPosOld->x + CAR_WIDTH <= pPolice[nCntPolice].posOld.x - CAR_WIDTH
+						&& pPos->x + CAR_WIDTH >= pPolice[nCntPolice].pos.x - CAR_WIDTH)
 					{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
 						switch (collObject)
 						{
@@ -1193,8 +1202,8 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 							break;						// 抜け出す
 						}
 					}							//左端の処理
-					else if (pPosOld->x + ModelData.vtxMin.x >= pPolice[nCntPolice].posOld.x + pPolice[nCntPolice].modelData.vtxMax.x
-						&& pPos->x + ModelData.vtxMin.x <= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMax.x)
+					else if (pPosOld->x - CAR_WIDTH >= pPolice[nCntPolice].posOld.x + CAR_WIDTH
+						&& pPos->x - CAR_WIDTH <= pPolice[nCntPolice].pos.x + CAR_WIDTH)
 					{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
 						switch (collObject)
 						{
