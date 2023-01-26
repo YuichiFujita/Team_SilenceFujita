@@ -299,12 +299,12 @@ void UpdateGame(void)
 			// オブジェクトの更新
 			UpdateObject();
 
-			//車の更新処理
+			// 車の更新処理
 			UpdateCar();
 
 			// 人間の更新
 			UpdateHuman();
-
+			
 			// エフェクトの更新
 			UpdateEffect();
 
@@ -397,7 +397,6 @@ void UpdateGame(void)
 
 		// プレイヤーの更新
 		UpdatePlayer();
-
 		// 警察の更新
 		UpdatePolice();
 

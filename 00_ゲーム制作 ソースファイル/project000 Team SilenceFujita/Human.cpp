@@ -19,6 +19,7 @@
 #include "curve.h"
 #include "object.h"
 #include "wind.h"
+#include "Car.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -50,6 +51,7 @@ void CurveHuman(Human *pHuman);						// 人間のカーブ処理
 void CurveRotHuman(Human *pHuman);					// 人間の角度更新処理
 void StopHuman(Human *pHuman);						// 人間の停止処理
 void ReactionHuman(Human *pHuman);					// 人間のリアクション処理
+void CollisionCarHuman(Human *pHuman);				// 人間と車の当たり判定
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -303,7 +305,7 @@ void UpdateHuman(void)
 			PosHuman(&g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].rot, g_aHuman[nCntHuman].bMove);
 
 			//人間のリアクション処理
-			/*ReactionHuman(&g_aHuman[nCntHuman]);*/
+			ReactionHuman(&g_aHuman[nCntHuman]);
 
 			// 風の当たり判定
 			CollisionWind(&g_aHuman[nCntHuman]);
@@ -980,6 +982,116 @@ void ReactionHuman(Human *pHuman)
 			{ // プレイヤーに近くにいない場合
 				//停止処理に移行
 				pHuman->state = HUMANSTATE_WALK;
+			}
+		}
+	}
+}
+
+//============================================================
+// 人間と車の当たり判定
+//============================================================
+void CollisionCarHuman(Human *pHuman)
+{
+	{ // 車の当たり判定
+		Car *pCar = GetCarData();					// 車の情報を取得する
+
+		for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
+		{
+			if (pCar[nCntCar].bUse == true)
+			{ // 車が使用されていた場合
+				if (pHuman->pos.x + pHuman->modelData.vtxMin.x <= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMax.x 
+					&& pHuman->pos.x + pHuman->modelData.vtxMax.x >= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMin.x)
+				{ // 車のX幅の中にいた場合
+					if (pHuman->posOld.z + pHuman->modelData.vtxMax.z <= pCar[nCntCar].posOld.z + pCar[nCntCar].modelData.vtxMin.z
+						&& pHuman->pos.z + pHuman->modelData.vtxMax.z >= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMin.z)
+					{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
+
+						// 移動量を0にする
+						pCar[nCntCar].move.x = 0.0f;
+
+					}							//手前で止められる処理
+					else if (pHuman->posOld.z + pHuman->modelData.vtxMin.z >= pCar[nCntCar].posOld.z + pCar[nCntCar].modelData.vtxMax.z
+						&& pHuman->pos.z + pHuman->modelData.vtxMin.z <= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMax.z)
+					{//前回の位置が塔の位置よりも奥かつ、現在の位置が塔の位置よりも手前だった場合(奥で止められる処理)
+					
+						// 移動量を0にする
+						pCar[nCntCar].move.x = 0.0f;
+
+					}							//奥で止められる処理
+				}
+
+				if (pHuman->pos.z + pHuman->modelData.vtxMin.z <= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMax.z
+					&& pHuman->pos.z + pHuman->modelData.vtxMax.z >= pCar[nCntCar].pos.z + pCar[nCntCar].modelData.vtxMin.z)
+				{//塔のZ幅の中にいた場合
+					if (pHuman->posOld.x + pHuman->modelData.vtxMax.x <= pCar[nCntCar].posOld.x + pCar[nCntCar].modelData.vtxMin.x
+						&& pHuman->pos.x + pHuman->modelData.vtxMax.x >= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMin.x)
+					{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
+						
+						//移動量を0にする
+						pCar[nCntCar].move.x = 0.0f;
+
+					}							//左端の処理
+					else if (pHuman->posOld.x + pHuman->modelData.vtxMin.x >= pCar[nCntCar].posOld.x + pCar[nCntCar].modelData.vtxMax.x
+						&& pHuman->pos.x + pHuman->modelData.vtxMin.x <= pCar[nCntCar].pos.x + pCar[nCntCar].modelData.vtxMax.x)
+					{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
+						
+						// 移動量を0にする
+						pCar[nCntCar].move.x = 0.0f;
+
+					}							//右端の処理
+				}
+			}
+		}
+	}
+
+	{ // 警察の当たり判定
+		Police *pPolice = GetPoliceData();					// 警察の情報を取得する
+
+		for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
+		{
+			if (pPolice[nCntPolice].bUse == true)
+			{ // 車が使用されていた場合
+				if (pHuman->pos.x + pHuman->modelData.vtxMin.x <= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMax.x 
+					&& pHuman->pos.x + pHuman->modelData.vtxMax.x >= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMin.x)
+				{ // 車のX幅の中にいた場合
+					if (pHuman->posOld.z + pHuman->modelData.vtxMax.z <= pPolice[nCntPolice].posOld.z + pPolice[nCntPolice].modelData.vtxMin.z
+						&& pHuman->pos.z + pHuman->modelData.vtxMax.z >= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMin.z)
+					{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
+
+						// 移動量を0.0fにする
+						pPolice[nCntPolice].move.x = 0.0f;
+
+					}							//手前で止められる処理
+					else if (pHuman->posOld.z + pHuman->modelData.vtxMin.z >= pPolice[nCntPolice].posOld.z + pPolice[nCntPolice].modelData.vtxMax.z
+						&& pHuman->pos.z + pHuman->modelData.vtxMin.z <= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMax.z)
+					{//前回の位置が塔の位置よりも奥かつ、現在の位置が塔の位置よりも手前だった場合(奥で止められる処理)
+
+						// 移動量を0.0fにする
+						pPolice[nCntPolice].move.x = 0.0f;
+
+					}							//奥で止められる処理
+				}
+
+				if (pHuman->pos.z + pHuman->modelData.vtxMin.z <= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMax.z
+					&& pHuman->pos.z + pHuman->modelData.vtxMax.z >= pPolice[nCntPolice].pos.z + pPolice[nCntPolice].modelData.vtxMin.z)
+				{//塔のZ幅の中にいた場合
+					if (pHuman->posOld.x + pHuman->modelData.vtxMax.x <= pPolice[nCntPolice].posOld.x + pPolice[nCntPolice].modelData.vtxMin.x
+						&& pHuman->pos.x + pHuman->modelData.vtxMax.x >= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMin.x)
+					{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
+						
+						// 移動量を0.0fにする
+						pPolice[nCntPolice].move.x = 0.0f;
+
+					}							//左端の処理
+					else if (pHuman->posOld.x + pHuman->modelData.vtxMin.x >= pPolice[nCntPolice].posOld.x + pPolice[nCntPolice].modelData.vtxMax.x
+						&& pHuman->pos.x + pHuman->modelData.vtxMin.x <= pPolice[nCntPolice].pos.x + pPolice[nCntPolice].modelData.vtxMax.x)
+					{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
+						
+						// 移動量を0.0fにする
+						pPolice[nCntPolice].move.x = 0.0f;
+
+					}							//右端の処理
+				}
 			}
 		}
 	}

@@ -72,6 +72,14 @@ typedef struct
 }PlayerWind;
 
 //************************************************************
+//	構造体定義 (PlayerDrift)
+//************************************************************
+typedef struct
+{
+	bool bDrift;					// ドリフトの状況
+}PlayerDrift;
+
+//************************************************************
 //	構造体定義 (Player)
 //************************************************************
 typedef struct
@@ -86,6 +94,7 @@ typedef struct
 	Model       modelData;			// モデル情報
 	PlayerBoost boost;				// ブーストの情報
 	PlayerWind	wind;				// 風の情報
+	PlayerDrift drift;				// ドリフトの状況
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター
 	int         nShadowID;			// 影のインデックス

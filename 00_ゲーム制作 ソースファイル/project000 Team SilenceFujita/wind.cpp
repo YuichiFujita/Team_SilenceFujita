@@ -10,6 +10,7 @@
 #include "main.h"
 #include "wind.h"
 #include "player.h"
+#include "calculation.h"
 
 #include "input.h"
 #include "particle.h"
@@ -19,7 +20,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_WIND			(128)			//風の最大数
+#define MAX_WIND			(1024)			//風の最大数
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -163,7 +164,8 @@ void UpdateWind(void)
 		{ // 使用した場合
 			//移動させる
 			g_aWind[nCntWind].pos += g_aWind[nCntWind].move;
-			g_aWind[nCntWind].pos += pPlayer->move;
+			g_aWind[nCntWind].pos.x += (sinf(pPlayer->rot.y) * pPlayer->move.x);
+			g_aWind[nCntWind].pos.z += (cosf(pPlayer->rot.y) * pPlayer->move.x);
 
 			//寿命を減算させる
 			g_aWind[nCntWind].nLife--;
@@ -280,6 +282,10 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
 	VERTEX_3D *pVtx;							// 頂点情報へのポインタ
 
+	float fMoveMagni;							// 移動量の倍率
+	float fRadius;								// 半径
+	int	  nLife;								// 寿命
+
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffWind->Lock(0, 0, (void**)&pVtx, 0);
 
@@ -290,22 +296,31 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			// 位置を設置する
 			g_aWind[nCntWind].pos = pos;
 
+			//移動量の倍率を設定する
+			fMoveMagni = (float)(rand() % 100) / 20;
+
 			// 移動量を設定する
-			g_aWind[nCntWind].move.x = sinf(rot.x) * 1.0f;
-			g_aWind[nCntWind].move.y = /*cosf(rot.y) * 1.0f*/0.0f;
-			g_aWind[nCntWind].move.z = cosf(rot.z) * 1.0f;
+			g_aWind[nCntWind].move.x = sinf(rot.y) * fMoveMagni;
+			g_aWind[nCntWind].move.y = 0.0f;
+			g_aWind[nCntWind].move.z = cosf(rot.y) * fMoveMagni;
 
 			// 色を設定する
 			g_aWind[nCntWind].col = D3DXCOLOR(0.4f, 1.0f, 0.4f, 1.0f);
 
+			//寿命を算出する
+			nLife = (rand() % 20) + 40;
+
 			// 寿命を設定する
-			g_aWind[nCntWind].nLife = 100;
+			g_aWind[nCntWind].nLife = nLife;
 
 			// 透明度を設定する
-			g_aWind[nCntWind].fAlpha = 0.0f;
+			g_aWind[nCntWind].fAlpha = 1.0f / nLife;
+
+			//半径を算出する
+			fRadius = (float)((rand() % 300) / 10);
 
 			// 半径を設定する
-			g_aWind[nCntWind].fRadius = 5.0f;
+			g_aWind[nCntWind].fRadius = fRadius;
 
 			// 使用する
 			g_aWind[nCntWind].bUse = true;
@@ -329,51 +344,29 @@ void CollisionWind(Human *pHuman)
 {
 	Player *pPlayer = GetPlayer();			//プレイヤーの情報を取得する
 
+	// 変数配列を宣言
+	D3DXVECTOR3 vecPos[4];	// 頂点位置 ([※] 0：右上　1：左上　2：左下　3：右下)
+
 	if (pHuman->pos.y <= 50.0f)
 	{ // 300.0f以下にいる場合
-		// 前後の当たり判定
-		if (pHuman->pos.x + pHuman->modelData.fRadius > pPlayer->pos.x + (pPlayer->modelData.vtxMin.x - 50.0f)
-			&& pHuman->pos.x - pHuman->modelData.fRadius < pPlayer->pos.x + (pPlayer->modelData.vtxMax.x + 50.0f))
-		{ // ブロックの左右の範囲内の場合
+		// 四頂点の位置の計算
+		VecSizePos
+		( // 引数
+			&vecPos[0],
+			pPlayer->pos,	// 絶対座標
+			pPlayer->rot,	// 向き
+			350.0f,			// 横幅
+			80.0f			// 縦幅
+		);
 
-			if (pHuman->pos.z + pHuman->modelData.fRadius >  pPlayer->pos.z + (pPlayer->modelData.vtxMin.z - 50.0f)
-				&& pHuman->posOld.z + pHuman->modelData.fRadius <= pPlayer->oldPos.z + (pPlayer->modelData.vtxMin.z - 50.0f))
-			{ // 前からの当たり判定
-			  // 吹き飛び状態
-				pHuman->state = HUMANSTATE_FLY;
-
-				// 人間が吹き飛ばされる処理
-				FlyAwayHuman(pHuman, *pPlayer);
-			}
-			else if (pHuman->pos.z - pHuman->modelData.fRadius <  pPlayer->pos.z + (pPlayer->modelData.vtxMax.z + 50.0f)
-				&& pHuman->posOld.z - pHuman->modelData.fRadius >= pPlayer->oldPos.z + (pPlayer->modelData.vtxMax.z + 50.0f))
-			{ // 後ろからの当たり判定
-			  // 吹き飛び状態
-				pHuman->state = HUMANSTATE_FLY;
-
-				// 人間が吹き飛ばされる処理
-				FlyAwayHuman(pHuman, *pPlayer);
-			}
-		}
-
-		// 左右の当たり判定
-		if (pHuman->pos.z + pHuman->modelData.fRadius > pPlayer->pos.z + (pPlayer->modelData.vtxMin.z - 50.0f)
-			&& pHuman->pos.z - pHuman->modelData.fRadius < pPlayer->pos.z + (pPlayer->modelData.vtxMax.z + 50.0f))
-		{ // ブロックの前後の範囲内の場合
-
-			if (pHuman->pos.x + pHuman->modelData.fRadius >  pPlayer->pos.x + (pPlayer->modelData.vtxMin.x - 50.0f)
-				&& pHuman->posOld.x + pHuman->modelData.fRadius <= pPlayer->oldPos.x + (pPlayer->modelData.vtxMin.x - 50.0f))
-			{ // 左からの当たり判定
-			  // 吹き飛び状態
-				pHuman->state = HUMANSTATE_FLY;
-
-				// 人間が吹き飛ばされる処理
-				FlyAwayHuman(pHuman, *pPlayer);
-			}
-			else if (pHuman->pos.x - pHuman->modelData.fRadius <  pPlayer->pos.x + (pPlayer->modelData.vtxMax.x + 50.0f)
-				&& pHuman->posOld.x - pHuman->modelData.fRadius >= pPlayer->oldPos.x + (pPlayer->modelData.vtxMax.x + 50.0f))
-			{ // 右からの当たり判定
-			  // 吹き飛び状態
+		if (LineOuterProduct(vecPos[0], vecPos[1], pHuman->pos) < 0
+			&& LineOuterProduct(vecPos[1], vecPos[2], pHuman->pos) < 0
+			&& LineOuterProduct(vecPos[2], vecPos[3], pHuman->pos) < 0
+			&& LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
+		{ // 四辺の内側にいる場合 (当たっている場合)
+			if (pPlayer->wind.bUseWind == true)
+			{ // 風を使用している場合
+				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;
 
 				// 人間が吹き飛ばされる処理
@@ -392,7 +385,7 @@ void FlyAwayHuman(Human *pHuman, Player player)
 
 	// 移動量を設定する
 	pHuman->move.x = sinf(FlyAngle) * 100.0f;
-	pHuman->move.y = 20.0f;
+	pHuman->move.y = 25.0f;
 	pHuman->move.z = cosf(FlyAngle) * 100.0f;
 
 	// 飛ばす
