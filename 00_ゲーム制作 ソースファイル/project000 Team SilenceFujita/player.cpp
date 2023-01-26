@@ -114,7 +114,7 @@ void UpdatePlayer(void)
 
 		// 前回位置の更新
 		g_player.oldPos = g_player.pos;
-		
+
 		// 状態の更新
 		if (g_player.nCounterState > 0)
 		{ // カウンターが 0より大きい場合
@@ -220,17 +220,8 @@ void UpdatePlayer(void)
 
 			if (g_player.wind.nCount % 3 == 0)
 			{ // 風のカウントが一定数になったら
-<<<<<<< HEAD
 
 				float fRotAdd;							// 向きの追加分
-=======
-
-				// 風の位置を設定する
-				g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 50.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 50.0f);
-
-				// 風の向きを設定する
-				g_player.wind.rot = D3DXVECTOR3(g_player.rot.x + D3DXToRadian(g_player.wind.nCircleCount), g_player.rot.y + D3DX_PI * 0.5f, g_player.rot.z + D3DXToRadian(g_player.wind.nCircleCount));
->>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 
 				for (int nCnt = 0; nCnt < 10; nCnt++)
 				{
@@ -241,19 +232,13 @@ void UpdatePlayer(void)
 						// 風の位置を設定する
 						g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
 
-<<<<<<< HEAD
 						//風の向きを設定する
 						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y + D3DX_PI * 0.5f + fRotAdd, 0.0f);
-=======
-				// 風の向きを設定する
-				g_player.wind.rot = D3DXVECTOR3(g_player.rot.x - D3DXToRadian(g_player.wind.nCircleCount), g_player.rot.y - D3DX_PI * 0.5f, g_player.rot.z - D3DXToRadian(g_player.wind.nCircleCount));
->>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 
 						// 風の設定処理
 						SetWind(g_player.wind.pos, g_player.wind.rot);
 					}
 
-<<<<<<< HEAD
 					{ // 左の分
 						// 向きの追加分を算出する
 						fRotAdd = (float)((rand() % 240 + 52) - 157) / 100;
@@ -268,10 +253,6 @@ void UpdatePlayer(void)
 						SetWind(g_player.wind.pos, g_player.wind.rot);
 					}
 				}
-=======
-				// 向きを設定する
-				g_player.wind.nCircleCount = (g_player.wind.nCircleCount + (int)(360 * 0.05f)) % 360;
->>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 			}
 		}
 		else
@@ -281,12 +262,6 @@ void UpdatePlayer(void)
 			g_player.wind.nCount = 0;
 		}
 	}
-<<<<<<< HEAD
-=======
-
-	// 送風機を使用しない
-	g_player.wind.bUseWind = false;
->>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 }
 
 //============================================================
