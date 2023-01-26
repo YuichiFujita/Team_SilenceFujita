@@ -205,6 +205,17 @@ void UpdatePolice(void)
 				g_aPolice[nCntPolice].modelData.fRadius,	//”¼Œa
 				COLLOBJECTTYPE_POLICE			//‘ÎÛ‚ÌƒTƒCƒY
 			);
+
+			// Ô“¯m‚Ì“–‚½‚è”»’è
+			CollisionCarBody
+			( // ˆø”
+				&g_aPolice[nCntPolice].pos,
+				&g_aPolice[nCntPolice].posOld,
+				g_aPolice[nCntPolice].rot,
+				&g_aPolice[nCntPolice].move,
+				g_aPolice[nCntPolice].modelData,
+				COLLOBJECTTYPE_POLICE
+			);
 		}
 	}
 }

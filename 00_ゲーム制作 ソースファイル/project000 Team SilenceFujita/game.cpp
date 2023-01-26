@@ -290,9 +290,6 @@ void UpdateGame(void)
 			// 風の更新
 			UpdateWind();
 
-			// プレイヤーの更新
-			UpdatePlayer();
-
 			// 警察の更新
 			UpdatePolice();
 
@@ -304,6 +301,9 @@ void UpdateGame(void)
 
 			// 人間の更新
 			UpdateHuman();
+
+			// プレイヤーの更新
+			UpdatePlayer();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -395,9 +395,6 @@ void UpdateGame(void)
 		// メッシュウォールの更新
 		UpdateMeshWall();
 
-		// プレイヤーの更新
-		UpdatePlayer();
-
 		// 警察の更新
 		UpdatePolice();
 
@@ -406,6 +403,9 @@ void UpdateGame(void)
 
 		// オブジェクトの更新
 		UpdateObject();
+
+		// プレイヤーの更新
+		UpdatePlayer();
 
 		// ビルボードの更新
 		UpdateBillboard();

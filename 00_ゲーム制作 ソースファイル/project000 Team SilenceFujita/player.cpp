@@ -45,6 +45,7 @@ void RevPlayer(void);				// プレイヤーの補正の更新処理
 void LandPlayer(void);				// プレイヤーの着地の更新処理
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
 void FlyAwayPlayer(void);			// プレイヤーの送風処理
+void DriftPlayer(void);				// プレイヤーのドリフト処理
 
 //************************************************************
 //	グローバル変数
@@ -91,6 +92,9 @@ void InitPlayer(void)
 	g_player.wind.nCircleCount = 0;				// どこに出すか
 	g_player.wind.nCount = 0;					// 風を出すカウント
 	g_player.wind.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
+
+	//ドリフトしていない
+	g_player.drift.bDrift = false;
 
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -154,6 +158,9 @@ void UpdatePlayer(void)
 
 		// プレイヤーの送風処理
 		FlyAwayPlayer();
+
+		// プレイヤーのドリフト処理
+		DriftPlayer();
 #else
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
 		{ // 奥移動の操作が行われた場合
@@ -177,16 +184,6 @@ void UpdatePlayer(void)
 		}
 #endif
 
-		// 車の停止処理
-		CollisionStopCar
-		( // 引数
-			g_player.pos,				//位置
-			g_player.rot,				//向き
-			&g_player.move,				//移動量
-			g_player.modelData.fRadius,	//半径
-			COLLOBJECTTYPE_PLAYER		//対象のタイプ
-		);
-
 		//----------------------------------------------------
 		//	当たり判定
 		//----------------------------------------------------
@@ -198,6 +195,27 @@ void UpdatePlayer(void)
 			&g_player.move,		// 移動量
 			PLAY_WIDTH,			// 横幅
 			PLAY_DEPTH			// 奥行
+		);
+
+		// 車の停止処理
+		CollisionStopCar
+		( // 引数
+			g_player.pos,				//位置
+			g_player.rot,				//向き
+			&g_player.move,				//移動量
+			g_player.modelData.fRadius,	//半径
+			COLLOBJECTTYPE_PLAYER		//対象のタイプ
+		);
+
+		// 車同士の当たり判定
+		CollisionCarBody
+		( // 引数
+			&g_player.pos,
+			&g_player.oldPos,
+			g_player.rot,
+			&g_player.move,
+			g_player.modelData,
+			COLLOBJECTTYPE_PLAYER
 		);
 
 		//----------------------------------------------------
@@ -470,11 +488,19 @@ void MovePlayer(void)
 	else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true || GetJoyStickPressLY(0) < 0)
 	{ // 後退の操作が行われた場合
 
-		// 移動量を更新
-		g_player.move.x -= MOVE_BACKWARD;
+		if (g_player.move.x >= 5.0f)
+		{ // 移動量が一定以上だった場合
+			// ドリフトする
+			g_player.drift.bDrift = true;
+		}
+		else
+		{ // 移動量が一定以下だった場合
+			// 移動量を更新
+			g_player.move.x -= MOVE_BACKWARD;
 
-		// 移動している状態にする
-		g_player.bMove = true;
+			// 移動している状態にする
+			g_player.bMove = true;
+		}
 	}
 	else
 	{ // 移動していない場合
@@ -486,42 +512,63 @@ void MovePlayer(void)
 	if (GetKeyboardPress(DIK_A) == true)
 	{ // 左方向の操作が行われた場合
 
-		// 向きを更新
-		g_player.rot.y -= MOVE_ROT * (g_player.move.x * REV_MOVE_ROT);
+		if (g_player.drift.bDrift == true)
+		{ // ドリフト中だった場合
+			// 向きを更新
+			g_player.rot.y -= 0.03f;
+		}
+		else
+		{ // ドリフト中じゃ無かった場合
+			// 向きを更新
+			g_player.rot.y -= MOVE_ROT * (g_player.move.x * REV_MOVE_ROT);
 
-		if (g_player.move.x >= SUB_MOVE_VALUE)
-		{ // 移動量が一定値以上の場合
+			if (g_player.move.x >= SUB_MOVE_VALUE)
+			{ // 移動量が一定値以上の場合
 
-			// 移動量を更新
-			g_player.move.x -= SUB_MOVE;
+				// 移動量を更新
+				g_player.move.x -= SUB_MOVE;
 
-			if (g_player.move.x < SUB_MOVE_VALUE)
-			{ // 移動量が一定値より小さい場合
+				if (g_player.move.x < SUB_MOVE_VALUE)
+				{ // 移動量が一定値より小さい場合
 
-				// 最低限の移動量を代入
-				g_player.move.x = SUB_MOVE_VALUE;
+					// 最低限の移動量を代入
+					g_player.move.x = SUB_MOVE_VALUE;
+				}
 			}
 		}
 	}
 	else if (GetKeyboardPress(DIK_D) == true)
 	{ // 右方向の操作が行われた場合
 
-		// 向きを更新
-		g_player.rot.y += MOVE_ROT * (g_player.move.x * REV_MOVE_ROT);
+		if (g_player.drift.bDrift == true)
+		{ // ドリフト中だった場合
+			// 向きを更新
+			g_player.rot.y += 0.03f;
+		}
+		else
+		{ // ドリフト中じゃなかった場合
+			// 向きを更新
+			g_player.rot.y += MOVE_ROT * (g_player.move.x * REV_MOVE_ROT);
 
-		if (g_player.move.x >= SUB_MOVE_VALUE)
-		{ // 移動量が一定値以上の場合
+			if (g_player.move.x >= SUB_MOVE_VALUE)
+			{ // 移動量が一定値以上の場合
 
-			// 移動量を更新
-			g_player.move.x -= SUB_MOVE;
+			  // 移動量を更新
+				g_player.move.x -= SUB_MOVE;
 
-			if (g_player.move.x < SUB_MOVE_VALUE)
-			{ // 移動量が一定値より小さい場合
+				if (g_player.move.x < SUB_MOVE_VALUE)
+				{ // 移動量が一定値より小さい場合
 
-				// 最低限の移動量を代入
-				g_player.move.x = SUB_MOVE_VALUE;
+				  // 最低限の移動量を代入
+					g_player.move.x = SUB_MOVE_VALUE;
+				}
 			}
 		}
+	}
+	else
+	{ // A・Dキーを押していない場合
+		// ドリフトしない
+		g_player.drift.bDrift = false;
 	}
 
 	//if (GetKeyboardPress(DIK_SPACE) == true)
@@ -699,6 +746,18 @@ void FlyAwayPlayer(void)
 	{ // Uキーを押していない場合
 		// 送風機を使用しない
 		g_player.wind.bUseWind = false;
+	}
+}
+
+//============================================================
+// プレイヤーのドリフト処理
+//============================================================
+void DriftPlayer(void)
+{
+	if (g_player.drift.bDrift == true)
+	{ // ドリフトしている場合
+		// 移動量を少し下げる
+		g_player.move.x += (0.0f - g_player.move.x) * 0.01f;
 	}
 }
 
