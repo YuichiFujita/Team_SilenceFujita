@@ -16,6 +16,7 @@
 #include "shadow.h"
 #include "sound.h"
 #include "player.h"
+#include "object.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"

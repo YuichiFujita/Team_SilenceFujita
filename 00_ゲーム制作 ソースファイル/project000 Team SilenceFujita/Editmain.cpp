@@ -364,11 +364,19 @@ void TxtSaveCollision(void)
 			// 当たり判定の情報の開始地点テキストに書き出し
 			fprintf(pFile, "	SET_COLLISION\n");
 
-			fprintf(pFile, "		TYPE   = %d\n", nCntCollision);																	// 種類
-			fprintf(pFile, "		VECPOS = %.1f %.1f %.1f\n", pCollision->vecPos.x, pCollision->vecPos.y, pCollision->vecPos.z);	// 位置ベクトル
-			fprintf(pFile, "		SCALE  = %.1f %.1f %.1f\n", pCollision->scale.x, pCollision->scale.y, pCollision->scale.z);		// 拡大率
-			fprintf(pFile, "		WIDTH  = %.1f\n", pCollision->fWidth);	// 横幅
-			fprintf(pFile, "		DEPTH  = %.1f\n", pCollision->fDepth);	// 奥行
+			// 基本情報の書き出し
+			fprintf(pFile, "		TYPE    = %d\n",   nCntCollision);			// 種類
+			fprintf(pFile, "		NUMCOLL = %d\n\n", pCollision->nNumColl);	// 当たり判定数
+
+			// 当たり判定情報の書き出し
+			for (int nCntColl = 0; nCntColl < pCollision->nNumColl; nCntColl++)
+			{ // 当たり判定の数分繰り返す
+
+				fprintf(pFile, "		%02d_VECPOS = %.1f %.1f %.1f\n", nCntColl, pCollision->vecPos[nCntColl].x, pCollision->vecPos[nCntColl].y, pCollision->vecPos[nCntColl].z);	// 位置ベクトル
+				fprintf(pFile, "		%02d_SCALE  = %.1f %.1f %.1f\n", nCntColl, pCollision->scale[nCntColl].x, pCollision->scale[nCntColl].y, pCollision->scale[nCntColl].z);	// 拡大率
+				fprintf(pFile, "		%02d_WIDTH  = %.1f\n", nCntColl, pCollision->fWidth[nCntColl]);	// 横幅
+				fprintf(pFile, "		%02d_DEPTH  = %.1f\n", nCntColl, pCollision->fDepth[nCntColl]);	// 奥行
+			}
 
 			// 当たり判定の情報の終了地点テキストに書き出し
 			fprintf(pFile, "	END_SET_COLLISION\n\n");

@@ -62,6 +62,7 @@ const char *c_apCollisionmodename[COLLISIONTYPE_MAX] =
 
 //グローバル変数
 EditObject  g_EditObject;								//オブジェクトの情報
+D3DXVECTOR3 g_aRotObject[MODEL_OBJ_MAX];				//オブジェクトの向きの情報
 D3DXVECTOR3 g_aScaleObject[MODEL_OBJ_MAX];				//オブジェクトの拡大率の情報
 int g_nStyleObject;										//スタイルの変数
 
@@ -150,7 +151,7 @@ void InitEditObject(void)
 	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
 	{ // オブジェクトの種類の総数分繰り返す
 
-		// 拡大率の初期化
+		g_aRotObject[nCntObject]   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		//オブジェクトの向きの情報
 		g_aScaleObject[nCntObject] = D3DXVECTOR3(1.0f, 1.0f, 1.0f);		//オブジェクトの拡大率情報
 	}
 }
@@ -384,17 +385,21 @@ void SaveCurrentEdit(void)
 	Collision     *pCollision     = GetCollision();
 	EditCollision *pEditCollision = GetEditCollision();
 
-	// 横幅と縦幅を計算
-	if (pEditCollision->stateRot == ROTSTATE_0
-	||  pEditCollision->stateRot == ROTSTATE_180)
-	{ // 角度が0度、または180度の場合
-		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
-		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
-	}
-	else
-	{ // 角度90度、または270度の場合
-		pEditCollision->collision.fWidth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale.z) * 0.5f;
-		pEditCollision->collision.fDepth = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale.x) * 0.5f;
+	for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+	{ // 当たり判定の最大数分繰り返す
+
+		// 横幅と縦幅を計算
+		if (pEditCollision->stateRot == ROTSTATE_0
+		||  pEditCollision->stateRot == ROTSTATE_180)
+		{ // 角度が0度、または180度の場合
+			pEditCollision->collision.fWidth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale[nCntColl].x) * 0.5f;
+			pEditCollision->collision.fDepth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale[nCntColl].z) * 0.5f;
+		}
+		else
+		{ // 角度90度、または270度の場合
+			pEditCollision->collision.fWidth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale[nCntColl].z) * 0.5f;
+			pEditCollision->collision.fDepth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale[nCntColl].x) * 0.5f;
+		}
 	}
 
 	//現在の作成した当たり判定をセーブ
@@ -403,9 +408,16 @@ void SaveCurrentEdit(void)
 	for (int nCntRot = pEditCollision->stateRot; nCntRot > ROTSTATE_0; nCntRot--)
 	{ // 向きが0度になるまで繰り返す
 
-		//位置ベクトルを90度回転
-		pCollision[g_EditObject.nType].vecPos = D3DXVECTOR3(pCollision[g_EditObject.nType].vecPos.z, pCollision[g_EditObject.nType].vecPos.y, -pCollision[g_EditObject.nType].vecPos.x);
+		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+		{ // 当たり判定の最大数分繰り返す
+
+			//位置ベクトルを90度回転
+			pCollision[g_EditObject.nType].vecPos[nCntColl] = D3DXVECTOR3(pCollision[g_EditObject.nType].vecPos[nCntColl].z, pCollision[g_EditObject.nType].vecPos[nCntColl].y, -pCollision[g_EditObject.nType].vecPos[nCntColl].x);
+		}
 	}
+
+	//現在のモデル向きをセーブ
+	g_aRotObject[g_EditObject.nType] = g_EditObject.rot;
 
 	//現在のモデル拡大率をセーブ
 	g_aScaleObject[g_EditObject.nType] = g_EditObject.scale;
@@ -435,6 +447,9 @@ void TypeChangeEdit(void)
 
 			//現在の作成した当たり判定をロード
 			pEditCollision->collision = pCollision[g_EditObject.nType];
+
+			//現在のモデル向きをロード
+			g_EditObject.rot = g_aRotObject[g_EditObject.nType];
 
 			//現在のモデル拡大率をロード
 			g_EditObject.scale = g_aScaleObject[g_EditObject.nType];
@@ -515,8 +530,12 @@ void MoveEdit(void)
 		}
 	}
 
-	//当たり判定の位置を反映 (ベクトルの逆方向)
-	pEditCollision->pos = g_EditObject.pos - pEditCollision->collision.vecPos;
+	for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+	{ // 当たり判定の最大数分繰り返す
+
+		//当たり判定の位置を反映 (ベクトルの逆方向)
+		pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->collision.vecPos[nCntColl];
+	}
 }
 
 //=======================================
@@ -986,8 +1005,12 @@ void UpDownEditObject(void)
 		}
 	}
 
-	//当たり判定の位置を反映 (ベクトルの逆方向)
-	pEditCollision->pos = g_EditObject.pos - pEditCollision->collision.vecPos;
+	for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+	{ // 当たり判定の最大数分繰り返す
+
+		//当たり判定の位置を反映 (ベクトルの逆方向)
+		pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->collision.vecPos[nCntColl];
+	}
 }
 
 //=======================================

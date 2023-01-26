@@ -214,13 +214,23 @@ void UpdatePlayer(void)
 
 		if (g_player.wind.bUseWind == true)
 		{ // 送風機を使用した場合
-			//風を出すカウントを加算する
+
+			// 風を出すカウントを加算する
 			g_player.wind.nCount++;
 
 			if (g_player.wind.nCount % 3 == 0)
 			{ // 風のカウントが一定数になったら
+<<<<<<< HEAD
 
 				float fRotAdd;							// 向きの追加分
+=======
+
+				// 風の位置を設定する
+				g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 50.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 50.0f);
+
+				// 風の向きを設定する
+				g_player.wind.rot = D3DXVECTOR3(g_player.rot.x + D3DXToRadian(g_player.wind.nCircleCount), g_player.rot.y + D3DX_PI * 0.5f, g_player.rot.z + D3DXToRadian(g_player.wind.nCircleCount));
+>>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 
 				for (int nCnt = 0; nCnt < 10; nCnt++)
 				{
@@ -231,13 +241,19 @@ void UpdatePlayer(void)
 						// 風の位置を設定する
 						g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
 
+<<<<<<< HEAD
 						//風の向きを設定する
 						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y + D3DX_PI * 0.5f + fRotAdd, 0.0f);
+=======
+				// 風の向きを設定する
+				g_player.wind.rot = D3DXVECTOR3(g_player.rot.x - D3DXToRadian(g_player.wind.nCircleCount), g_player.rot.y - D3DX_PI * 0.5f, g_player.rot.z - D3DXToRadian(g_player.wind.nCircleCount));
+>>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 
 						// 風の設定処理
 						SetWind(g_player.wind.pos, g_player.wind.rot);
 					}
 
+<<<<<<< HEAD
 					{ // 左の分
 						// 向きの追加分を算出する
 						fRotAdd = (float)((rand() % 240 + 52) - 157) / 100;
@@ -252,14 +268,25 @@ void UpdatePlayer(void)
 						SetWind(g_player.wind.pos, g_player.wind.rot);
 					}
 				}
+=======
+				// 向きを設定する
+				g_player.wind.nCircleCount = (g_player.wind.nCircleCount + (int)(360 * 0.05f)) % 360;
+>>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 			}
 		}
 		else
 		{ // 送風機を使用していない場合
+
 			// カウントを初期化する
 			g_player.wind.nCount = 0;
 		}
 	}
+<<<<<<< HEAD
+=======
+
+	// 送風機を使用しない
+	g_player.wind.bUseWind = false;
+>>>>>>> 090e3fd4f70f74b76103699efe67fe068c63eec1
 }
 
 //============================================================
@@ -593,24 +620,36 @@ void RevPlayer(void)
 
 		// 手前に位置を補正
 		g_player.pos.z = GetLimitStage().fNear - (PLAY_DEPTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 	if (g_player.pos.z < GetLimitStage().fFar + (PLAY_DEPTH * 2))
 	{ // 範囲外の場合 (奥)
 
 		// 奥に位置を補正
 		g_player.pos.z = GetLimitStage().fFar + (PLAY_DEPTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 	if (g_player.pos.x > GetLimitStage().fRight - (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (右)
 
 		// 右に位置を補正
 		g_player.pos.x = GetLimitStage().fRight - (PLAY_WIDTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 	if (g_player.pos.x < GetLimitStage().fLeft + (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (左)
 
 		// 左に位置を補正
 		g_player.pos.x = GetLimitStage().fLeft + (PLAY_WIDTH * 2);
+
+		// 移動量を削除
+		g_player.move.x *= 0.95f;
 	}
 }
 
@@ -677,6 +716,7 @@ void FlyAwayPlayer(void)
 {
 	if (GetKeyboardPress(DIK_U) == true)
 	{ // Uキーを押している場合
+
 		// 送風機を使用する
 		g_player.wind.bUseWind = true;
 	}
