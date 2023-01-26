@@ -304,6 +304,12 @@ void UpdateGame(void)
 
 			// 人間の更新
 			UpdateHuman();
+
+			// エフェクトの更新
+			UpdateEffect();
+
+			// パーティクルの更新
+			UpdateParticle();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -318,12 +324,6 @@ void UpdateGame(void)
 
 	// ビルボードの更新
 	UpdateBillboard();
-
-	// エフェクトの更新
-	UpdateEffect();
-
-	// パーティクルの更新
-	UpdateParticle();
 
 	// 体力バーの更新
 	UpdateLife();

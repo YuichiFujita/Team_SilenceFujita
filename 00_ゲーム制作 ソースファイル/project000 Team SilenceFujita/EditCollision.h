@@ -21,7 +21,6 @@ typedef struct
 	Collision   collision;				// 当たり判定情報
 	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
 	Model       modelData;				// モデル情報
-	int         nType;					// オブジェクトの種類
 	int         nSelectColl;			// 選択中の当たり判定
 }EditCollision;
 
