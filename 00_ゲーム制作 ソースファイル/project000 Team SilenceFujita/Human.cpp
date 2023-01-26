@@ -303,7 +303,7 @@ void UpdateHuman(void)
 			PosHuman(&g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].rot, g_aHuman[nCntHuman].bMove);
 
 			//人間のリアクション処理
-			/*ReactionHuman(&g_aHuman[nCntHuman]);*/
+			ReactionHuman(&g_aHuman[nCntHuman]);
 
 			// 風の当たり判定
 			CollisionWind(&g_aHuman[nCntHuman]);
