@@ -38,7 +38,6 @@ void InitEditCollision(void)
 	g_EditCollision.rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	g_EditCollision.stateRot    = ROTSTATE_0;								// 向き状態
 	g_EditCollision.modelData   = GetModelData(MODELTYPE_EDIT_COLLISION);	// モデル情報
-	g_EditCollision.nType       = GetEditObject()->nType;					// オブジェクトの種類
 	g_EditCollision.nSelectColl = 0;										// 選択中の当たり判定
 
 	// 位置情報の初期化
