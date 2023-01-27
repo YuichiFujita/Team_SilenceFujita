@@ -170,9 +170,6 @@ void UpdatePlayer(void)
 		// プレイヤーの位置の更新
 		PosPlayer();
 
-		// プレイヤーの補正の更新処理
-		RevPlayer();
-
 		// プレイヤーの着地の更新処理
 		LandPlayer();
 		
@@ -309,6 +306,9 @@ void UpdatePlayer(void)
 			// カウントを初期化する
 			g_player.wind.nCount = 0;
 		}
+
+		// プレイヤーの補正の更新処理
+		RevPlayer();
 	}
 }
 

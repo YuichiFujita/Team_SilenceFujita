@@ -170,9 +170,6 @@ void UpdatePolice(void)
 				g_aPolice[nCntPolice].pos.y = 0.0f;
 			}
 
-			// プレイヤーの補正の更新処理
-			RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
-
 			// プレイヤーの位置の更新
 			PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
 
@@ -199,16 +196,23 @@ void UpdatePolice(void)
 				COLLOBJECTTYPE_POLICE			//対象のサイズ
 			);
 
-			// 車同士の当たり判定
-			CollisionCarBody
-			( // 引数
-				&g_aPolice[nCntPolice].pos,
-				&g_aPolice[nCntPolice].posOld,
-				g_aPolice[nCntPolice].rot,
-				&g_aPolice[nCntPolice].move,
-				g_aPolice[nCntPolice].modelData,
-				COLLOBJECTTYPE_POLICE
-			);
+
+			if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
+			{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
+				// 車同士の当たり判定
+				CollisionCarBody
+				( // 引数
+					&g_aPolice[nCntPolice].pos,
+					&g_aPolice[nCntPolice].posOld,
+					g_aPolice[nCntPolice].rot,
+					&g_aPolice[nCntPolice].move,
+					g_aPolice[nCntPolice].modelData,
+					COLLOBJECTTYPE_POLICE
+				);
+			}
+
+			// プレイヤーの補正の更新処理
+			RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
 		}
 	}
 }

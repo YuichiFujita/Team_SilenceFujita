@@ -144,9 +144,6 @@ void UpdateCar(void)
 				g_aCar[nCntCar].pos.y = 0.0f;
 			}
 
-			// プレイヤーの補正の更新処理
-			RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
-
 			//----------------------------------------------------
 			//	当たり判定
 			//----------------------------------------------------
@@ -180,6 +177,9 @@ void UpdateCar(void)
 				g_aCar[nCntCar].modelData,
 				COLLOBJECTTYPE_CAR
 			);
+
+			// プレイヤーの補正の更新処理
+			RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 		}
 	}
 }
