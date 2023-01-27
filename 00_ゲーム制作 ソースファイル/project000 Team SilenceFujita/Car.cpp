@@ -797,8 +797,6 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, Model ModelData, COLLOBJECTTYPE collObject)
 {
-	//float fAngle;			// 角度の処理
-
 	{ // 車の当たり判定
 		Car *pCar = GetCarData();					// 車の情報を取得する
 
@@ -806,10 +804,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 		{
 			if (pCar[nCntCar].bUse == true)
 			{ // 車が使用されていた場合
-
-				//// 角度を算出する
-				//fAngle = atan2f()
-
 				if (pPos->x - CAR_WIDTH <= pCar[nCntCar].pos.x + CAR_WIDTH
 					&& pPos->x + CAR_WIDTH >= pCar[nCntCar].pos.x - CAR_WIDTH)
 				{ // 車のX幅の中にいた場合
@@ -1093,8 +1087,8 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 		for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 		{
-			if (pPolice[nCntPolice].bUse == true)
-			{ // 車が使用されていた場合
+			if (pPolice[nCntPolice].bUse == true && pPolice[nCntPolice].state != POLICESTATE_PATBACK)
+			{ // 車が使用されているかつ、パトロールから戻っている状態以外の場合
 				if (pPos->x - CAR_WIDTH <= pPolice[nCntPolice].pos.x + CAR_WIDTH
 					&& pPos->x + CAR_WIDTH >= pPolice[nCntPolice].pos.x - CAR_WIDTH)
 				{ // 車のX幅の中にいた場合

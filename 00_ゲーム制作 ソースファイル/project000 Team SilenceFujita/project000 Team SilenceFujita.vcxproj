@@ -154,7 +154,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ability.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
     <ClCompile Include="calculation.cpp" />
@@ -192,7 +191,6 @@
     <ClCompile Include="wind.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ability.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />
     <ClInclude Include="calculation.h" />
