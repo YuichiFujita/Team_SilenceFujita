@@ -24,11 +24,10 @@
 
 #define VELO_POS_VAL_X	(200.0f)	// スコア (値) の絶対座標 (x)
 #define VELO_POS_VAL_Y	(600.0f)	// スコアの絶対座標 (y)
-#define MAX_SPEED		(180)		// 表示上の最高速度
 
 #define VELO_POS_X		(70.0f)		// 速度バーの絶対座標 (x)
 #define VELO_POS_Y		(655.0f)	// 速度バーの絶対座標 (y)
-#define VELO_WIDTH_MUL	(6.8f)		// 速度バーの横幅のプレイヤー速度乗算量
+#define VELO_WIDTH_MUL	(4.8f)		// 速度バーの横幅のプレイヤー速度乗算量
 #define VELO_HEIGHT		(15.0f)		// 速度バーの縦幅 / 2
 #define VELO_PULS_Y		(65.0f)		// 速度バーの縦幅の追加量
 
@@ -36,6 +35,9 @@
 #define VELO_BG_POS_Y	(620.0f)	// 速度バーの背景の絶対座標 (x)
 #define VELO_BG_WIDTH	(165.0f)	// 速度バーの背景の横幅 / 2
 #define VELO_BG_HEIGHT	(80.0f)		// 速度バーの背景の縦幅 / 2
+
+#define MAX_SPEED		(240)						// 表示上の最高速度
+#define MAX_REAL_SPEED	(MAX_FORWARD + MAX_BOOST)	// 数値上の最高速度
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -130,12 +132,12 @@ void InitVelocity(void)
 	// 頂点座標を設定
 	pVtx[4].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
 
-	pVtx[5].pos.x = VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL);
+	pVtx[5].pos.x = VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL);
 	pVtx[5].pos.y = (VELO_POS_Y - VELO_HEIGHT) - VELO_PULS_Y;
 	pVtx[5].pos.z = 0.0f;
 
-	pVtx[6].pos = D3DXVECTOR3(VELO_POS_X,                                  VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[7].pos = D3DXVECTOR3(VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(VELO_POS_X,                                     VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[4].rhw = 1.0f;
@@ -155,12 +157,12 @@ void InitVelocity(void)
 	// 頂点座標を設定
 	pVtx[8].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
 
-	pVtx[9].pos.x = VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL);
+	pVtx[9].pos.x = VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL);
 	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - VELO_PULS_Y;
 	pVtx[9].pos.z = 0.0f;
 
-	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                  VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (MAX_FORWARD * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                     VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[8].rhw  = 1.0f;
@@ -209,9 +211,15 @@ void UninitVelocity(void)
 //======================================================================================================================
 void UpdateVelocity(void)
 {
+	// 変数を宣言
+	float fCurrentSpeed;	// 現在のプレイヤー速度の絶対値
+
 	// ポインタを宣言
 	VERTEX_2D *pVtx;					// 頂点情報へのポインタ
 	Player    *pPlayer = GetPlayer();	// プレイヤーの情報
+
+	// 現在のプレイヤー速度の絶対値を求める
+	fCurrentSpeed = fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x);
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffVelocity->Lock(0, 0, (void**)&pVtx, 0);
@@ -219,12 +227,12 @@ void UpdateVelocity(void)
 	// 頂点座標を設定
 	pVtx[8].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
 
-	pVtx[9].pos.x = VELO_POS_X + (fabsf(pPlayer->move.x) * VELO_WIDTH_MUL);
-	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - (fabsf(pPlayer->move.x) * (VELO_PULS_Y / MAX_FORWARD));
+	pVtx[9].pos.x = VELO_POS_X + (fCurrentSpeed * VELO_WIDTH_MUL);
+	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - (fCurrentSpeed * (VELO_PULS_Y / MAX_REAL_SPEED));
 	pVtx[9].pos.z = 0.0f;
 
-	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                             VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (fabsf(pPlayer->move.x) * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                    VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (fCurrentSpeed * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffVelocity->Unlock();
@@ -235,6 +243,9 @@ void UpdateVelocity(void)
 //======================================================================================================================
 void DrawVelocity(void)
 {
+	// 変数を宣言
+	int nCurrentSpeed;		// 現在のスピード
+
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
@@ -258,6 +269,9 @@ void DrawVelocity(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	数値の描画
 	//------------------------------------------------------------------------------------------------------------------
+	// 現在のスピードを求める
+	nCurrentSpeed = (int)(fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x) * (MAX_SPEED / MAX_REAL_SPEED));
+
 	// 数値の設定
 	SetValue
 	( // 引数
@@ -267,7 +281,7 @@ void DrawVelocity(void)
 			VELO_POS_VAL_Y,	// 位置 (y)
 			0.0f			// 位置 (z)
 		),
-		(int)(fabsf(pPlayer->move.x) * (MAX_SPEED / MAX_FORWARD)),	// 値
+		nCurrentSpeed,		// 値
 		MAX_SPEED,			// 値の最大値
 		VAL_VELO_WIDTH,		// 横幅
 		VAL_VELO_HEIGHT,	// 縦幅

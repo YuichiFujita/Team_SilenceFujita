@@ -169,7 +169,7 @@ void UninitEffect(void)
 void UpdateEffect(void)
 {
 	// ポインタを宣言
-	VERTEX_3D *pVtx;							// 頂点情報へのポインタ
+	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffEffect->Lock(0, 0, (void**)&pVtx, 0);
@@ -186,7 +186,7 @@ void UpdateEffect(void)
 			// 構造体の要素を減算する
 			g_aEffect[nCntEffect].nLife--;									// 寿命を減算
 			g_aEffect[nCntEffect].fRadius -= g_aEffect[nCntEffect].fSub;	// 半径を減算
-			//g_aEffect[nCntEffect].col.a   -= g_aEffect[nCntEffect].fAlpha;	// α値を減算
+			g_aEffect[nCntEffect].col.a   -= g_aEffect[nCntEffect].fAlpha;	// α値を減算
 
 			// 半径の補正
 			if (g_aEffect[nCntEffect].fRadius < 0.0f)
