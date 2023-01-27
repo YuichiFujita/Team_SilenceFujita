@@ -37,12 +37,12 @@
 #define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
 
 #define BOOST_OK_MOVE	(15.0f)		// ブースト使用に必要なプレイヤーの最低速度
-#define BOOST_ADD_MOVE	(0.6f)		// ブーストの加速量
-#define BOOST_SUB_MOVE	(0.1f)		// ブーストの減速量
+#define BOOST_ADD_MOVE	(0.25f)		// ブーストの加速量
+#define BOOST_SUB_MOVE	(0.08f)		// ブーストの減速量
 #define BOOST_WAIT_CNT	(180)		// ブーストの再使用までの時間
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
 
-#define BOOST_XZ_SUB	(90.0f)	// ブースト噴射位置の xz減算量
+#define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
 #define BOOST_Y_ADD		(40.0f)		// ブースト噴射位置の y加算量
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
 
@@ -592,13 +592,13 @@ void MovePlayer(void)
 			if (g_player.move.x >= SUB_MOVE_VALUE)
 			{ // 移動量が一定値以上の場合
 
-			  	// 移動量を更新
+				// 移動量を更新
 				g_player.move.x -= SUB_MOVE;
 
 				if (g_player.move.x < SUB_MOVE_VALUE)
 				{ // 移動量が一定値より小さい場合
 
-				  	// 最低限の移動量を代入
+					// 最低限の移動量を代入
 					g_player.move.x = SUB_MOVE_VALUE;
 				}
 			}
