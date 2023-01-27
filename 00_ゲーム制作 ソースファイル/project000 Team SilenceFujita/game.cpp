@@ -397,8 +397,12 @@ void UpdateGame(void)
 
 		// プレイヤーの更新
 		UpdatePlayer();
+
 		// 警察の更新
 		UpdatePolice();
+
+		// 車の更新処理
+		UpdateCar();
 
 		// 人間の更新
 		UpdateHuman();
