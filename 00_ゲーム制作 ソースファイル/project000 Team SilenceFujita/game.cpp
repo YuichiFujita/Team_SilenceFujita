@@ -386,9 +386,6 @@ void UpdateGame(void)
 		// ライトの更新
 		UpdateLight();
 
-		// カメラの更新
-		UpdateCamera();
-
 		// メッシュフィールドの更新
 		UpdateMeshField();
 
@@ -397,8 +394,12 @@ void UpdateGame(void)
 
 		// プレイヤーの更新
 		UpdatePlayer();
+
 		// 警察の更新
 		UpdatePolice();
+
+		// 車の更新処理
+		UpdateCar();
 
 		// 人間の更新
 		UpdateHuman();
@@ -411,6 +412,9 @@ void UpdateGame(void)
 
 		// 風の更新
 		UpdateWind();
+
+		// カメラの更新
+		UpdateCamera();
 
 		// エフェクトの更新
 		UpdateEffect();

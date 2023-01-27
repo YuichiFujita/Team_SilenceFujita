@@ -797,8 +797,6 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, Model ModelData, COLLOBJECTTYPE collObject)
 {
-	//float fAngle;			// 角度の処理
-
 	{ // 車の当たり判定
 		Car *pCar = GetCarData();					// 車の情報を取得する
 
@@ -806,10 +804,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 		{
 			if (pCar[nCntCar].bUse == true)
 			{ // 車が使用されていた場合
-
-				//// 角度を算出する
-				//fAngle = atan2f()
-
 				if (pPos->x - CAR_WIDTH <= pCar[nCntCar].pos.x + CAR_WIDTH
 					&& pPos->x + CAR_WIDTH >= pCar[nCntCar].pos.x - CAR_WIDTH)
 				{ // 車のX幅の中にいた場合
@@ -821,7 +815,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->z = pCar[nCntCar].pos.z - (CAR_DEPTH * 2);
+							pPos->z = pCar[nCntCar].pos.z - (CAR_DEPTH + PLAY_DEPTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -831,7 +825,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pCar[nCntCar].pos.z - (CAR_DEPTH + POLICAR_DEPTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -841,7 +835,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pCar[nCntCar].pos.z - (CAR_DEPTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -857,7 +851,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->z = pCar[nCntCar].pos.z + (CAR_DEPTH * 2);
+							pPos->z = pCar[nCntCar].pos.z + (CAR_DEPTH + PLAY_DEPTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -867,7 +861,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pCar[nCntCar].pos.z + (CAR_DEPTH + POLICAR_DEPTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -877,7 +871,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pCar[nCntCar].pos.z + (CAR_DEPTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -898,7 +892,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->x = pCar[nCntCar].pos.x - (CAR_WIDTH * 2);
+							pPos->x = pCar[nCntCar].pos.x - (CAR_WIDTH + PLAY_WIDTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -908,7 +902,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pCar[nCntCar].pos.x - (CAR_WIDTH + POLICAR_WIDTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -918,7 +912,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pCar[nCntCar].pos.x - (CAR_WIDTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -934,7 +928,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->x = pCar[nCntCar].pos.x + (CAR_WIDTH * 2);
+							pPos->x = pCar[nCntCar].pos.x + (CAR_WIDTH + PLAY_WIDTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -944,7 +938,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pCar[nCntCar].pos.x + (CAR_WIDTH + POLICAR_WIDTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -954,7 +948,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pCar[nCntCar].pos.x + (CAR_WIDTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -983,7 +977,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 						//位置をずらす
-						pPos->z = pPosOld->z;
+						pPos->z = pPlayer->pos.z - (PLAY_DEPTH + POLICAR_DEPTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -993,7 +987,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
 						//位置をずらす
-						pPos->z = pPosOld->z;
+						pPos->z = pPlayer->pos.z - (PLAY_DEPTH + CAR_DEPTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -1009,7 +1003,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 						//位置をずらす
-						pPos->z = pPosOld->z;
+						pPos->z = pPlayer->pos.z + (PLAY_DEPTH + POLICAR_DEPTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -1019,7 +1013,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
 						//位置をずらす
-						pPos->z = pPosOld->z;
+						pPos->z = pPlayer->pos.z + (PLAY_DEPTH + CAR_DEPTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -1040,7 +1034,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 						//位置をずらす
-						pPos->x = pPosOld->x;
+						pPos->x = pPlayer->pos.x - (PLAY_WIDTH + POLICAR_WIDTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -1050,7 +1044,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
 						//位置をずらす
-						pPos->x = pPosOld->x;
+						pPos->x = pPlayer->pos.x - (PLAY_WIDTH + CAR_WIDTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -1066,7 +1060,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 						//位置をずらす
-						pPos->x = pPosOld->x;
+						pPos->x = pPlayer->pos.x + (PLAY_WIDTH + POLICAR_WIDTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -1076,7 +1070,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
 						//位置をずらす
-						pPos->x = pPosOld->x;
+						pPos->x = pPlayer->pos.x + (PLAY_WIDTH + CAR_WIDTH);
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
@@ -1093,8 +1087,8 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 		for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 		{
-			if (pPolice[nCntPolice].bUse == true)
-			{ // 車が使用されていた場合
+			if (pPolice[nCntPolice].bUse == true && pPolice[nCntPolice].state != POLICESTATE_PATBACK)
+			{ // 車が使用されているかつ、パトロールから戻っている状態以外の場合
 				if (pPos->x - CAR_WIDTH <= pPolice[nCntPolice].pos.x + CAR_WIDTH
 					&& pPos->x + CAR_WIDTH >= pPolice[nCntPolice].pos.x - CAR_WIDTH)
 				{ // 車のX幅の中にいた場合
@@ -1106,14 +1100,14 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pPolice[nCntPolice].pos.z - (POLICAR_DEPTH + PLAY_DEPTH);
 
 							break;						// 抜け出す
 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pPolice[nCntPolice].pos.z - (POLICAR_DEPTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -1123,7 +1117,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pPolice[nCntPolice].pos.z - (POLICAR_DEPTH + CAR_DEPTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -1139,14 +1133,14 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pPolice[nCntPolice].pos.z + (POLICAR_DEPTH + PLAY_DEPTH);
 
 							break;						// 抜け出す
 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pPolice[nCntPolice].pos.z + (POLICAR_DEPTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -1156,7 +1150,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->z = pPosOld->z;
+							pPos->z = pPolice[nCntPolice].pos.z + (POLICAR_DEPTH + CAR_DEPTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -1177,14 +1171,14 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pPolice[nCntPolice].pos.x - (POLICAR_WIDTH + PLAY_WIDTH);
 
 							break;						// 抜け出す
 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pPolice[nCntPolice].pos.x - (POLICAR_WIDTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -1194,7 +1188,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pPolice[nCntPolice].pos.x - (POLICAR_WIDTH + CAR_WIDTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -1210,14 +1204,14 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
 
 							// 位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pPolice[nCntPolice].pos.x + (POLICAR_WIDTH + PLAY_WIDTH);
 
 							break;						// 抜け出す
 
 						case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pPolice[nCntPolice].pos.x + (POLICAR_WIDTH * 2);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -1227,7 +1221,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 						case COLLOBJECTTYPE_CAR:		// 車の場合
 
 							//位置をずらす
-							pPos->x = pPosOld->x;
+							pPos->x = pPolice[nCntPolice].pos.x + (POLICAR_WIDTH + CAR_WIDTH);
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
