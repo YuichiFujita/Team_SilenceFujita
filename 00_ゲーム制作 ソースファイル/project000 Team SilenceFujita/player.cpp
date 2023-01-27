@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 #include "game.h"
+#include "calculation.h"
 
 #include "camera.h"
 #include "object.h"
@@ -53,7 +54,6 @@
 void MovePlayer(void);				// プレイヤーの移動量の更新処理
 void PosPlayer(void);				// プレイヤーの位置の更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
-void LandPlayer(void);				// プレイヤーの着地の更新処理
 
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
 void DriftPlayer(void);				// プレイヤーのドリフト処理
@@ -174,7 +174,7 @@ void UpdatePlayer(void)
 		PosPlayer();
 
 		// プレイヤーの着地の更新処理
-		LandPlayer();
+		LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 		
 		// プレイヤーのドリフト処理
 		DriftPlayer();
@@ -657,34 +657,6 @@ void RevPlayer(void)
 
 		// 移動量を削除
 		g_player.move.x *= 0.95f;
-	}
-}
-
-//============================================================
-//	プレイヤーの着地の更新処理
-//============================================================
-void LandPlayer(void)
-{
-	// 変数を宣言
-	float fLandPosY = CollisionMeshField(g_player.pos);		// 着地点
-
-	if (g_player.pos.y < fLandPosY)
-	{ // 着地点に当たっている場合
-
-		// ジャンプしていない状態にする
-		g_player.bJump = false;
-
-		// 位置を補正
-		g_player.pos.y = fLandPosY;
-
-		// 移動量を初期化
-		g_player.move.y = 0.0f;
-	}
-	else
-	{ // 着地点に当たっていない場合
-
-		// ジャンプしている状態にする
-		g_player.bJump = true;
 	}
 }
 

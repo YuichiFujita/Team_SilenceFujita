@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 #include "model.h"
+#include "calculation.h"
 
 #include "Human.h"
 #include "shadow.h"
@@ -237,6 +238,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aHuman[nCntHuman].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aHuman[nCntHuman].nShadowID = NONE_SHADOW;				// 影のインデックス
+		g_aHuman[nCntHuman].bJump = false;							// ジャンプしているかどうか
 		g_aHuman[nCntHuman].bMove = false;							// 移動しているか
 		g_aHuman[nCntHuman].bUse = false;							// 使用状況
 		g_aHuman[nCntHuman].state = HUMANSTATE_WALK;				// 状態
@@ -288,6 +290,9 @@ void UpdateHuman(void)
 
 			// 前回位置の更新
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;
+
+			// オブジェクトの着地の更新処理
+			LandObject(&g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].bJump);
 
 			//----------------------------------------------------
 			//	影の更新
@@ -472,6 +477,7 @@ void SetHuman(D3DXVECTOR3 pos, CURVE humanCurve)
 			g_aHuman[nCntHuman].pos = pos;								// 現在の位置
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;		// 前回の位置
 			g_aHuman[nCntHuman].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aHuman[nCntHuman].bJump = false;							// ジャンプしているかどうか
 			g_aHuman[nCntHuman].bMove = false;							// 移動していない
 			g_aHuman[nCntHuman].state = HUMANSTATE_WALK;				//歩き状態
 

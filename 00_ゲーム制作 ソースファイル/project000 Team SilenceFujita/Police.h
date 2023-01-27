@@ -51,6 +51,7 @@ typedef struct
 	int			nShadowID;				// 影のインデックス
 	int			nLife;					// 寿命
 	bool		bMove;					// 移動しているかどうか
+	bool		bJump;					// ジャンプの状況
 	bool		bUse;					// 使用しているか
 	CURVE		policeCurve;			// カーブ処理
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
