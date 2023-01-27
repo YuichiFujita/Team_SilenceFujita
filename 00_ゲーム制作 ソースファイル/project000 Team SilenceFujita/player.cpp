@@ -22,6 +22,7 @@
 #include "meshfield.h"
 #include "Police.h"
 #include "Car.h"
+#include "tiremark.h"
 
 //************************************************************
 //	マクロ定義
@@ -854,6 +855,14 @@ void UpdateBoost(void)
 
 			// カウンターを減算
 			g_player.boost.nCounter--;
+
+			//タイヤ痕を出す
+			SetTireMark(D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
+				g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
+
+			//タイヤ痕を出す
+			SetTireMark(D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
+				g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
 		}
 		else
 		{ // カウンターが 0以下の場合
