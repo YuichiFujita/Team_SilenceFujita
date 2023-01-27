@@ -116,11 +116,6 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
-	if (GetKeyboardTrigger(DIK_RSHIFT) == true)
-	{
-		g_aPolice[0].state = POLICESTATE_PATBACK;
-	}
-
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
@@ -357,7 +352,7 @@ void SetPolice(D3DXVECTOR3 pos, CURVE poliCurve)
 			g_aPolice[nCntPolice].bUse = true;
 
 			// モデル情報を設定
-			g_aPolice[nCntPolice].modelData = GetModelData(MODELTYPE_PLAYER_CAR + FROM_OBJECT);	// モデル情報
+			g_aPolice[nCntPolice].modelData = GetModelData(MODELTYPE_CAR_POLICE);	// モデル情報
 
 			// 影のインデックスを設定
 			g_aPolice[nCntPolice].nShadowID = SetModelShadow

@@ -386,9 +386,6 @@ void UpdateGame(void)
 		// ライトの更新
 		UpdateLight();
 
-		// カメラの更新
-		UpdateCamera();
-
 		// メッシュフィールドの更新
 		UpdateMeshField();
 
@@ -415,6 +412,9 @@ void UpdateGame(void)
 
 		// 風の更新
 		UpdateWind();
+
+		// カメラの更新
+		UpdateCamera();
 
 		// エフェクトの更新
 		UpdateEffect();
