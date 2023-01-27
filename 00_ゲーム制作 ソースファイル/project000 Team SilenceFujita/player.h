@@ -15,12 +15,14 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define PLAY_WIDTH			(45.0f)	// プレイヤーの横幅 / 2
-#define PLAY_HEIGHT			(25.0f)	// プレイヤーの縦幅
-#define PLAY_DEPTH			(45.0f)	// プレイヤーの奥行 / 2
+#define PLAY_WIDTH		(45.0f)		// プレイヤーの横幅 / 2
+#define PLAY_HEIGHT		(25.0f)		// プレイヤーの縦幅
+#define PLAY_DEPTH		(45.0f)		// プレイヤーの奥行 / 2
 
-#define PLAY_LIFE			(100)	// プレイヤーの体力
-#define MAX_FORWARD			(35.0f)	// 前進時の最高速度
+#define PLAY_LIFE		(100)		// プレイヤーの体力
+#define MAX_FORWARD		(35.0f)		// 前進時の最高速度
+#define MAX_BOOST		(15.0f)		// ブーストの最大移動量
+
 
 #define DAMAGE_TIME_PLAY	(30)					// ダメージ状態を保つ時間
 #define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)	// 無敵状態に変更する時間
@@ -36,6 +38,28 @@ typedef enum
 }PLAYCAMESTATE;
 
 //************************************************************
+//	列挙型定義 (BOOSTSTATE)
+//************************************************************
+typedef enum
+{
+	BOOSTSTATE_NONE = 0,			// 何もしない状態
+	BOOSTSTATE_UP,					// 加速状態
+	BOOSTSTATE_DOWN,				// 減速状態
+	BOOSTSTATE_WAIT,				// 使用可能の待機状態
+	BOOSTSTATE_MAX					// この列挙型の総数
+}BOOSTSTATE;
+
+//************************************************************
+//	構造体定義 (PlayerBoost)
+//************************************************************
+typedef struct
+{
+	D3DXVECTOR3 plusMove;			// 追加移動量
+	BOOSTSTATE  state;				// 加速状態
+	int         nCounter;			// 加速管理カウンター
+}PlayerBoost;
+
+//************************************************************
 //	構造体定義 (PlayerWind)
 //************************************************************
 typedef struct
@@ -46,6 +70,14 @@ typedef struct
 	int			nCircleCount;		// 風を出す位置のカウント
 	bool		bUseWind;			// 風の使用状況
 }PlayerWind;
+
+//************************************************************
+//	構造体定義 (PlayerDrift)
+//************************************************************
+typedef struct
+{
+	bool bDrift;					// ドリフトの状況
+}PlayerDrift;
 
 //************************************************************
 //	構造体定義 (Player)
@@ -60,7 +92,9 @@ typedef struct
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	ACTIONSTATE state;				// プレイヤーの状態
 	Model       modelData;			// モデル情報
+	PlayerBoost boost;				// ブーストの情報
 	PlayerWind	wind;				// 風の情報
+	PlayerDrift drift;				// ドリフトの状況
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター
 	int         nShadowID;			// 影のインデックス

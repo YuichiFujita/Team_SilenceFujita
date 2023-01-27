@@ -38,7 +38,7 @@
 //	マクロ定義
 //************************************************************
 #define CLASS_NAME		"WindowClass"		// ウインドウクラスの名前
-#define WINDOW_NAME		"None"				// ウインドウの名前 (キャプションに表示)
+#define WINDOW_NAME		"AnarchyCars"		// ウインドウの名前 (キャプションに表示)
 
 #ifdef _DEBUG	// デバッグ処理
 #define DEBUG_PRINT		(1280)		// デバッグ表示の文字列の最長

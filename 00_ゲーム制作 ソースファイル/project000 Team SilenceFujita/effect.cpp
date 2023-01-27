@@ -186,7 +186,7 @@ void UpdateEffect(void)
 			// \‘¢‘Ì‚Ì—v‘f‚ğŒ¸Z‚·‚é
 			g_aEffect[nCntEffect].nLife--;									// õ–½‚ğŒ¸Z
 			g_aEffect[nCntEffect].fRadius -= g_aEffect[nCntEffect].fSub;	// ”¼Œa‚ğŒ¸Z
-			g_aEffect[nCntEffect].col.a   -= g_aEffect[nCntEffect].fAlpha;	// ƒ¿’l‚ğŒ¸Z
+			//g_aEffect[nCntEffect].col.a   -= g_aEffect[nCntEffect].fAlpha;	// ƒ¿’l‚ğŒ¸Z
 
 			// ”¼Œa‚Ì•â³
 			if (g_aEffect[nCntEffect].fRadius < 0.0f)
