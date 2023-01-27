@@ -38,8 +38,6 @@
 #define MAX_POLI_FORWARD_PATROL (15.0f)		// パトロール中の前進時の最高速度
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
-#define POLICAR_WIDTH			(45.0f)		// パトカーの縦幅
-#define POLICAR_DEPTH			(45.0f)		// パトカーの奥行
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
