@@ -20,6 +20,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define MAX_OBJECT			(256)		// 使用するモデル数 (オブジェクトの最大数)
+#define MAX_COLLISION		(6)			// 当たり判定の最大数
 
 //**********************************************************************************************************************
 //	列挙型定義 (ROTSTATE)
@@ -60,10 +61,11 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 vecPos;					// 位置ベクトル
-	D3DXVECTOR3 scale;					// 拡大率
-	float       fWidth;					// 横幅
-	float       fDepth;					// 奥行
+	int         nNumColl;				// 当たり判定の総数
+	D3DXVECTOR3 vecPos[MAX_COLLISION];	// 位置ベクトル
+	D3DXVECTOR3 scale[MAX_COLLISION];	// 拡大率
+	float       fWidth[MAX_COLLISION];	// 横幅
+	float       fDepth[MAX_COLLISION];	// 奥行
 }Collision;
 
 //**********************************************************************************************************************
@@ -71,7 +73,8 @@ typedef struct
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 vecPos;					// 位置ベクトル
+	D3DXVECTOR3 vecPos[MAX_COLLISION];	// 位置ベクトル
+	ROTSTATE    stateRot;				// 向き状態
 }Coll_Info;
 
 //**********************************************************************************************************************
@@ -109,7 +112,7 @@ void UninitObject(void);				// オブジェクトの終了処理
 void UpdateObject(void);				// オブジェクトの更新処理
 void DrawObject(void);					// オブジェクトの描画処理
 
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, D3DXVECTOR3 vecPos);	// オブジェクトの設定処理
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot);	// オブジェクトの設定処理
 void HitObject(Object *pObject, int nDamage);																	// オブジェクトのダメージ判定
 void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
 

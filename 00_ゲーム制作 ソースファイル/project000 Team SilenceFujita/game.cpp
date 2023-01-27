@@ -31,6 +31,7 @@
 #include "score.h"
 #include "timer.h"
 #include "velocity.h"
+#include "wind.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -81,8 +82,11 @@ void InitGame(void)
 	// オブジェクトの初期化
 	InitObject();
 
-	//車の初期化処理
+	//車の初期化
 	InitCar();
+
+	// 人間の初期化
+	InitHuman();
 
 	// カメラの初期化
 	InitCamera();
@@ -98,6 +102,9 @@ void InitGame(void)
 
 	// ビルボードの初期化
 	InitBillboard();
+
+	// 送風機の初期化
+	InitWind();
 
 	// エフェクトの初期化
 	InitEffect();
@@ -150,8 +157,11 @@ void UninitGame(void)
 	// オブジェクトの終了
 	UninitObject();
 
-	//車の終了処理
+	// 車の終了
 	UninitCar();
+
+	// 人間の終了
+	UninitHuman();
 
 	// カメラの終了
 	UninitCamera();
@@ -167,6 +177,9 @@ void UninitGame(void)
 
 	// ビルボードの終了
 	UninitBillboard();
+
+	// 送風機の終了
+	UninitWind();
 
 	// エフェクトの終了
 	UninitEffect();
@@ -274,6 +287,9 @@ void UpdateGame(void)
 			// メッシュウォールの更新
 			UpdateMeshWall();
 
+			// 風の更新
+			UpdateWind();
+
 			// プレイヤーの更新
 			UpdatePlayer();
 
@@ -283,8 +299,17 @@ void UpdateGame(void)
 			// オブジェクトの更新
 			UpdateObject();
 
-			//車の更新処理
+			// 車の更新処理
 			UpdateCar();
+
+			// 人間の更新
+			UpdateHuman();
+			
+			// エフェクトの更新
+			UpdateEffect();
+
+			// パーティクルの更新
+			UpdateParticle();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -299,12 +324,6 @@ void UpdateGame(void)
 
 	// ビルボードの更新
 	UpdateBillboard();
-
-	// エフェクトの更新
-	UpdateEffect();
-
-	// パーティクルの更新
-	UpdateParticle();
 
 	// 体力バーの更新
 	UpdateLife();
@@ -378,15 +397,20 @@ void UpdateGame(void)
 
 		// プレイヤーの更新
 		UpdatePlayer();
-
 		// 警察の更新
 		UpdatePolice();
+
+		// 人間の更新
+		UpdateHuman();
 
 		// オブジェクトの更新
 		UpdateObject();
 
 		// ビルボードの更新
 		UpdateBillboard();
+
+		// 風の更新
+		UpdateWind();
 
 		// エフェクトの更新
 		UpdateEffect();
@@ -457,8 +481,14 @@ void DrawGame(void)
 	// オブジェクトの描画
 	DrawObject();
 
+	// 人間の描画
+	DrawHuman();
+
 	// ビルボードの描画
 	DrawBillboard();
+
+	// 風の描画
+	DrawWind();
 
 	// エフェクトの描画
 	DrawEffect();

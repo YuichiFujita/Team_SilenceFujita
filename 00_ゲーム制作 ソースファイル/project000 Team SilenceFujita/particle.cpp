@@ -13,25 +13,32 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_PARTICLE	(128)		// 使用するポリゴン数 (パーティクルの最大数)
+#define MAX_PARTICLE	(128)	// パーティクルの最大数
 
 //**********************************************************************************************************************
 //	構造体定義 (Particle)
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3  pos;				// 位置
-	D3DXCOLOR    col;				// 色
-	PARTICLETYPE type;				// 種類
-	int          nSpawn;			// エフェクト数
-	int          nLife;				// 寿命
-	bool         bUse;				// 使用状況
+	D3DXVECTOR3  pos;			// 位置
+	D3DXCOLOR    col;			// 色
+	PARTICLETYPE type;			// 種類
+	int          nSpawn;		// エフェクト数
+	int          nLife;			// 寿命
+	bool         bUse;			// 使用状況
 }Particle;
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void ParticleDamage(Particle *pParticle);		// ダメージエフェクト
+void ParticleExplosion(Particle *pParticle);	// 爆発エフェクト
+void ParticleBoost(Particle *pParticle);		// ブーストエフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Particle g_aParticle[MAX_PARTICLE];	// パーティクルの情報
+Particle g_aParticle[MAX_PARTICLE];				// パーティクルの情報
 
 //======================================================================================================================
 //	パーティクルの初期化処理
@@ -64,79 +71,11 @@ void UninitParticle(void)
 //======================================================================================================================
 void UpdateParticle(void)
 {
-	// 変数を宣言
-	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
-
 	for (int nCntParticle = 0; nCntParticle < MAX_PARTICLE; nCntParticle++)
 	{ // パーティクルの最大表示数分繰り返す
 
 		if (g_aParticle[nCntParticle].bUse == true)
 		{ // パーティクルが使用されている場合
-
-			for (int nCntAppear = 0; nCntAppear < g_aParticle[nCntParticle].nSpawn; nCntAppear++)
-			{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
-
-				switch (g_aParticle[nCntParticle].type)
-				{ // パーティクルの種類ごとの更新
-				case PARTICLETYPE_EXPLOSION:
-
-					// ベクトルをランダムに設定
-					move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
-					move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
-					move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
-
-					// ベクトルを正規化
-					D3DXVec3Normalize(&move, &move);
-
-					// 移動量を乗算
-					move.x *= 4.0f;
-					move.y *= 4.0f;
-					move.z *= 4.0f;
-
-					// エフェクトの設定
-					SetEffect
-					( // 引数
-						g_aParticle[nCntParticle].pos,			// 位置
-						move,									// 移動量
-						g_aParticle[nCntParticle].col,			// 色
-						30,										// 寿命
-						40.0f,									// 半径
-						1.2f									// 減算量 (半径)
-					);
-
-					// 処理を抜ける
-					break;
-
-				case PARTICLETYPE_DAMAGE:
-
-					// ベクトルをランダムに設定
-					move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
-					move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
-					move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
-
-					// ベクトルを正規化
-					D3DXVec3Normalize(&move, &move);
-
-					// 移動量を乗算
-					move.x *= 2.0f;
-					move.y *= 2.0f;
-					move.z *= 2.0f;
-
-					// エフェクトの設定
-					SetEffect
-					( // 引数
-						g_aParticle[nCntParticle].pos,			// 位置
-						move,									// 移動量
-						g_aParticle[nCntParticle].col,			// 色
-						26,										// 寿命
-						20.0f,									// 半径
-						0.5f									// 減算量 (半径)
-					);
-
-					// 処理を抜ける
-					break;
-				}
-			}
 
 			// 寿命を減らす
 			g_aParticle[nCntParticle].nLife--;
@@ -180,11 +119,150 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 			// 使用している状態にする
 			g_aParticle[nCntParticle].bUse = true;
 
+			switch (g_aParticle[nCntParticle].type)
+			{ // パーティクルの種類ごとの設定
+			case PARTICLETYPE_EXPLOSION:
+
+				// ダメージエフェクト
+				ParticleDamage(&g_aParticle[nCntParticle]);
+
+				// 処理を抜ける
+				break;
+
+			case PARTICLETYPE_DAMAGE:
+
+				// 爆発エフェクト
+				ParticleExplosion(&g_aParticle[nCntParticle]);
+
+				// 処理を抜ける
+				break;
+
+			case PARTICLETYPE_BOOST:
+
+				// ブーストエフェクト
+				ParticleBoost(&g_aParticle[nCntParticle]);
+
+				// 処理を抜ける
+				break;
+			}
+
 			// 処理を抜ける
 			break;
 		}
 	}
 }
+
+//======================================================================================================================
+//	ダメージエフェクト
+//======================================================================================================================
+void ParticleDamage(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= 4.0f;
+		move.y *= 4.0f;
+		move.z *= 4.0f;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,	// 位置
+			move,			// 移動量
+			pParticle->col,	// 色
+			30,				// 寿命
+			40.0f,			// 半径
+			1.2f			// 減算量 (半径)
+		);
+	}
+}
+
+//======================================================================================================================
+//	爆発エフェクト
+//======================================================================================================================
+void ParticleExplosion(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= 2.0f;
+		move.y *= 2.0f;
+		move.z *= 2.0f;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,	// 位置
+			move,			// 移動量
+			pParticle->col,	// 色
+			26,				// 寿命
+			20.0f,			// 半径
+			0.5f			// 減算量 (半径)
+		);
+	}
+}
+
+//======================================================================================================================
+//	ブーストエフェクト
+//======================================================================================================================
+void ParticleBoost(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= 5.0f;
+		move.y *= 5.0f;
+		move.z *= 5.0f;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,	// 位置
+			move,			// 移動量
+			pParticle->col,	// 色
+			6,				// 寿命
+			26.0f,			// 半径
+			0.2f			// 減算量 (半径)
+		);
+	}
+}
+
 
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================

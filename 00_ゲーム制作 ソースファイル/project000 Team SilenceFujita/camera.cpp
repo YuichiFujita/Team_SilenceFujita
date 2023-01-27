@@ -30,7 +30,7 @@
 
 #define POS_R_PLUS		(25.0f)		// プレイヤーの位置と注視点の位置の距離 (x, z)
 #define POS_R_PLUS_Y	(110.0f)	// プレイヤーの位置と注視点の位置の距離 (y)
-#define POS_V_Y			(200.0f)	// 追従時の視点の位置 (y)
+#define POS_V_Y			(165.0f)	// 追従時の視点の位置 (y)
 #define REV_ROT_FOLLOW	(0.05f)		// 追従時の回り込みの補正係数
 #define REV_POS_V		(0.225f)	// 視点の位置の補正係数 (x, z)
 #define REV_POS_R		(0.25f)		// 注視点の位置の補正係数 (x, z)
