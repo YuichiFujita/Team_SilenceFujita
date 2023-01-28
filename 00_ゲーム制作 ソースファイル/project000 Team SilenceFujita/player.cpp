@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 #include "game.h"
+#include "calculation.h"
 
 #include "camera.h"
 #include "object.h"
@@ -22,6 +23,7 @@
 #include "meshfield.h"
 #include "Police.h"
 #include "Car.h"
+#include "tiremark.h"
 
 //************************************************************
 //	マクロ定義
@@ -52,7 +54,6 @@
 void MovePlayer(void);				// プレイヤーの移動量の更新処理
 void PosPlayer(void);				// プレイヤーの位置の更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
-void LandPlayer(void);				// プレイヤーの着地の更新処理
 
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
 void DriftPlayer(void);				// プレイヤーのドリフト処理
@@ -61,6 +62,8 @@ void SlumBoostPlayer(void);			// プレイヤーの加速処理
 
 void UpdateBoost(void);				// 加速の更新処理
 void SetBoost(void);				// 加速の設定処理
+
+void UpdateFlyAway(void);			// 送風の更新処理
 
 //************************************************************
 //	グローバル変数
@@ -171,7 +174,7 @@ void UpdatePlayer(void)
 		PosPlayer();
 
 		// プレイヤーの着地の更新処理
-		LandPlayer();
+		LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 		
 		// プレイヤーのドリフト処理
 		DriftPlayer();
@@ -181,6 +184,9 @@ void UpdatePlayer(void)
 
 		// プレイヤーの送風処理
 		FlyAwayPlayer();
+
+		// 送風の更新処理
+		UpdateFlyAway();			
 
 		// プレイヤーのカメラの状態変化処理
 		CameraChangePlayer();
@@ -252,60 +258,6 @@ void UpdatePlayer(void)
 			g_player.rot,		// 向き
 			NONE_SCALE			// 拡大率
 		);
-
-		if (g_player.wind.bUseWind == true)
-		{ // 送風機を使用した場合
-
-			// 風を出すカウントを加算する
-			g_player.wind.nCount++;
-
-			if (g_player.wind.nCount % 3 == 0)
-			{ // 風のカウントが一定数になったら
-
-				// 変数を宣言
-				float fRotAdd;	// 向きの追加分
-
-				for (int nCnt = 0; nCnt < 10; nCnt++)
-				{
-					
-					{ // 右の分
-					
-						// 向きの追加分を算出する
-						fRotAdd = -(float)((rand() % 240 + 52) - 157) / 100;
-
-						// 風の位置を設定する
-						g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
-
-						//風の向きを設定する
-						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y + D3DX_PI * 0.5f + fRotAdd, 0.0f);
-
-						// 風の設定処理
-						SetWind(g_player.wind.pos, g_player.wind.rot);
-					}
-
-					{ // 左の分
-					
-						// 向きの追加分を算出する
-						fRotAdd = (float)((rand() % 240 + 52) - 157) / 100;
-
-						// 風の位置を設定する
-						g_player.wind.pos = D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
-
-						//風の向きを設定する
-						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y - D3DX_PI * 0.5f + fRotAdd, 0.0f);
-
-						// 風の設定処理
-						SetWind(g_player.wind.pos, g_player.wind.rot);
-					}
-				}
-			}
-		}
-		else
-		{ // 送風機を使用していない場合
-
-			// カウントを初期化する
-			g_player.wind.nCount = 0;
-		}
 
 		// プレイヤーの補正の更新処理
 		RevPlayer();
@@ -709,34 +661,6 @@ void RevPlayer(void)
 }
 
 //============================================================
-//	プレイヤーの着地の更新処理
-//============================================================
-void LandPlayer(void)
-{
-	// 変数を宣言
-	float fLandPosY = CollisionMeshField(g_player.pos);		// 着地点
-
-	if (g_player.pos.y < fLandPosY)
-	{ // 着地点に当たっている場合
-
-		// ジャンプしていない状態にする
-		g_player.bJump = false;
-
-		// 位置を補正
-		g_player.pos.y = fLandPosY;
-
-		// 移動量を初期化
-		g_player.move.y = 0.0f;
-	}
-	else
-	{ // 着地点に当たっていない場合
-
-		// ジャンプしている状態にする
-		g_player.bJump = true;
-	}
-}
-
-//============================================================
 //	プレイヤーの取得処理
 //============================================================
 Player *GetPlayer(void)
@@ -786,6 +710,66 @@ void FlyAwayPlayer(void)
 	
 		// 送風機を使用しない
 		g_player.wind.bUseWind = false;
+	}
+}
+
+//============================================================
+// 送風の更新処理
+//============================================================
+void UpdateFlyAway(void)
+{
+	if (g_player.wind.bUseWind == true)
+	{ // 送風機を使用した場合
+
+		// 風を出すカウントを加算する
+		g_player.wind.nCount++;
+
+		if (g_player.wind.nCount % 3 == 0)
+		{ // 風のカウントが一定数になったら
+
+			// 変数を宣言
+			float fRotAdd;	// 向きの追加分
+
+			for (int nCnt = 0; nCnt < 10; nCnt++)
+			{
+
+				{ // 右の分
+
+					// 向きの追加分を算出する
+					fRotAdd = -(float)((rand() % 240 + 52) - 157) / 100;
+
+					// 風の位置を設定する
+					g_player.wind.pos = D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
+
+					//風の向きを設定する
+					g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y + D3DX_PI * 0.5f + fRotAdd, 0.0f);
+
+					// 風の設定処理
+					SetWind(g_player.wind.pos, g_player.wind.rot);
+				}
+
+				{ // 左の分
+
+					// 向きの追加分を算出する
+					fRotAdd = (float)((rand() % 240 + 52) - 157) / 100;
+
+					// 風の位置を設定する
+					g_player.wind.pos = D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f, g_player.pos.y + 50.0f, g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 90.0f);
+
+					//風の向きを設定する
+					g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y - D3DX_PI * 0.5f + fRotAdd, 0.0f);
+
+					// 風の設定処理
+					SetWind(g_player.wind.pos, g_player.wind.rot);
+				}
+			}
+		}
+	}
+	else
+	{ // 送風機を使用していない場合
+
+		// カウントを初期化する
+		g_player.wind.nCount = 0;
 	}
 }
 
@@ -843,6 +827,14 @@ void UpdateBoost(void)
 
 			// カウンターを減算
 			g_player.boost.nCounter--;
+
+			//タイヤ痕を出す
+			SetTireMark(D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
+				g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
+
+			//タイヤ痕を出す
+			SetTireMark(D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
+				g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
 		}
 		else
 		{ // カウンターが 0以下の場合

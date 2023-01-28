@@ -17,5 +17,6 @@
 //*****************************************************************************
 void VecSizePos(D3DXVECTOR3 *sizePos, D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight);	// 四頂点の位置の計算処理
 float LineOuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos);						// 外積の左右判断処理
+void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump);									// モデルの着地の更新処理
 
 #endif

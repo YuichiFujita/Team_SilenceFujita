@@ -30,6 +30,7 @@
 #include "Police.h"
 #include "score.h"
 #include "timer.h"
+#include "tiremark.h"
 #include "velocity.h"
 #include "wind.h"
 
@@ -102,6 +103,9 @@ void InitGame(void)
 
 	// ビルボードの初期化
 	InitBillboard();
+
+	// タイヤ痕の初期化
+	InitTireMark();
 
 	// 送風機の初期化
 	InitWind();
@@ -177,6 +181,9 @@ void UninitGame(void)
 
 	// ビルボードの終了
 	UninitBillboard();
+
+	// タイヤ痕の終了
+	UninitTireMark();
 
 	// 送風機の終了
 	UninitWind();
@@ -292,6 +299,9 @@ void UpdateGame(void)
 
 			// プレイヤーの更新
 			UpdatePlayer();
+
+			// タイヤ痕の更新
+			UpdateTireMark();
 
 			// 警察の更新
 			UpdatePolice();
@@ -475,6 +485,9 @@ void DrawGame(void)
 
 	// プレイヤーの描画
 	DrawPlayer();
+
+	// タイヤ痕の描画
+	DrawTireMark();
 
 	// 警察の描画
 	DrawPolice();
