@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 #include "model.h"
+#include "calculation.h"
  
 #include "Car.h"
 #include "Police.h"
@@ -17,6 +18,7 @@
 #include "sound.h"
 #include "player.h"
 #include "object.h"
+#include "meshfield.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -43,7 +45,7 @@
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	// プレイヤーの位置の更新処理
-void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);		// プレイヤーの補正の更新処理
+void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos,D3DXVECTOR3 *move);				// プレイヤーの補正の更新処理
 void PatrolPoliceAct(Police *pPolice);					// 警察のパトロール行動処理
 void PatrolCarSearch(Police *pPolice);					// 警察車両の探知処理
 void ChasePoliceAct(Police *pPolice);					// 警察の追跡処理
@@ -76,6 +78,7 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// 警察の状態
 		g_aPolice[nCntPolice].nLife		= 0;								// 体力
 		g_aPolice[nCntPolice].nShadowID = NONE_SHADOW;						// 影のインデックス
+		g_aPolice[nCntPolice].bJump		= false;							// ジャンプしていない
 		g_aPolice[nCntPolice].bUse		= false;							// 使用状況
 
 		// モデル情報の初期化
@@ -124,6 +127,9 @@ void UpdatePolice(void)
 			// 前回位置の更新
 			g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
+			// プレイヤーの着地の更新処理
+			LandObject(&g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].bJump);
+
 			//----------------------------------------------------
 			//	影の更新
 			//----------------------------------------------------
@@ -161,18 +167,6 @@ void UpdatePolice(void)
 				break;						//抜け出す
 			}
 
-			if (g_aPolice[nCntPolice].pos.y < 0.0f)
-			{//Y軸の位置が0.0fだった場合
-				//縦への移動量を0.0fにする
-				g_aPolice[nCntPolice].move.y = 0.0f;
-
-				//位置を0.0fに戻す
-				g_aPolice[nCntPolice].pos.y = 0.0f;
-			}
-
-			// プレイヤーの補正の更新処理
-			RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos);
-
 			// プレイヤーの位置の更新
 			PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
 
@@ -189,26 +183,44 @@ void UpdatePolice(void)
 				POLICAR_DEPTH			// 奥行
 			);
 
-			// 車の停止処理
-			CollisionStopCar
-			( // 引数
-				g_aPolice[nCntPolice].pos,		//位置
-				g_aPolice[nCntPolice].rot,		//向き
-				&g_aPolice[nCntPolice].move,	//移動量
-				g_aPolice[nCntPolice].modelData.fRadius,	//半径
-				COLLOBJECTTYPE_POLICE			//対象のサイズ
-			);
+			if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
+			{ // 警察がパトロール状態の場合
+				// 車の停止処理
+				CollisionStopCar
+				( // 引数
+					g_aPolice[nCntPolice].pos,		//位置
+					g_aPolice[nCntPolice].rot,		//向き
+					&g_aPolice[nCntPolice].move,	//移動量
+					g_aPolice[nCntPolice].modelData.fRadius,	//半径
+					COLLOBJECTTYPE_POLICE			//対象のサイズ
+				);
+			}
 
-			// 車同士の当たり判定
-			CollisionCarBody
-			( // 引数
-				&g_aPolice[nCntPolice].pos,
-				&g_aPolice[nCntPolice].posOld,
-				g_aPolice[nCntPolice].rot,
-				&g_aPolice[nCntPolice].move,
-				g_aPolice[nCntPolice].modelData,
-				COLLOBJECTTYPE_POLICE
-			);
+			if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
+			{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
+				// 車同士の当たり判定
+				CollisionCarBody
+				( // 引数
+					&g_aPolice[nCntPolice].pos,
+					&g_aPolice[nCntPolice].posOld,
+					g_aPolice[nCntPolice].rot,
+					&g_aPolice[nCntPolice].move,
+					g_aPolice[nCntPolice].modelData,
+					COLLOBJECTTYPE_POLICE
+				);
+			}
+
+			if (g_aPolice[nCntPolice].pos.y < 0.0f)
+			{//Y軸の位置が0.0fだった場合
+				//縦への移動量を0.0fにする
+				g_aPolice[nCntPolice].move.y = 0.0f;
+
+				//位置を0.0fに戻す
+				g_aPolice[nCntPolice].pos.y = 0.0f;
+			}
+
+			// プレイヤーの補正の更新処理
+			RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 		}
 	}
 }
@@ -346,6 +358,7 @@ void SetPolice(D3DXVECTOR3 pos, CURVE poliCurve)
 			g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// パトロール状態にする
 			g_aPolice[nCntPolice].nLife		= POLI_LIFE;						// 体力
+			g_aPolice[nCntPolice].bJump		= false;							// ジャンプしていない
 			g_aPolice[nCntPolice].bMove		= false;							// 移動していない
 
 			// 使用している状態にする
@@ -542,7 +555,7 @@ void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove
 //============================================================
 //	プレイヤーの補正の更新処理
 //============================================================
-void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
+void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 {
 	//--------------------------------------------------------
 	//	向きの正規化
@@ -558,24 +571,36 @@ void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 
 		// 手前に位置を補正
 		pos->z = GetLimitStage().fNear - (30.0f * 2);
+
+		// 移動量を削除
+		move->x *= 0.95f;
 	}
 	if (pos->z < GetLimitStage().fFar + (30.0f * 2))
 	{ // 範囲外の場合 (奥)
 
 		// 奥に位置を補正
 		pos->z = GetLimitStage().fFar + (30.0f * 2);
+
+		// 移動量を削除
+		move->x *= 0.95f;
 	}
 	if (pos->x > GetLimitStage().fRight - (30.0f * 2))
 	{ // 範囲外の場合 (右)
 
 		// 右に位置を補正
 		pos->x = GetLimitStage().fRight - (30.0f * 2);
+
+		// 移動量を削除
+		move->x *= 0.95f;
 	}
 	if (pos->x < GetLimitStage().fLeft + (30.0f * 2))
 	{ // 範囲外の場合 (左)
 
 		// 左に位置を補正
 		pos->x = GetLimitStage().fLeft + (30.0f * 2);
+
+		// 移動量を削除
+		move->x *= 0.95f;
 	}
 }
 
