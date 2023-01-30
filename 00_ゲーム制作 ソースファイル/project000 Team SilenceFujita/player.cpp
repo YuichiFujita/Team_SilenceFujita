@@ -41,7 +41,6 @@
 #define BOOST_OK_MOVE	(15.0f)		// ブースト使用に必要なプレイヤーの最低速度
 #define BOOST_ADD_MOVE	(0.25f)		// ブーストの加速量
 #define BOOST_SUB_MOVE	(0.08f)		// ブーストの減速量
-#define BOOST_WAIT_CNT	(180)		// ブーストの再使用までの時間
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
 
 #define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
@@ -116,7 +115,7 @@ void InitPlayer(void)
 	g_player.wind.nCount       = 0;								// 風を出すカウント
 	g_player.wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
 
-	//ドリフトの情報の初期化
+	// ドリフトの情報の初期化
 	g_player.drift.bDrift = false;	// ドリフト状況
 
 	// プレイヤーの位置・向きの設定
@@ -854,11 +853,11 @@ void UpdateBoost(void)
 			// カウンターを減算
 			g_player.boost.nCounter--;
 
-			//タイヤ痕を出す
+			// タイヤ痕を出す
 			SetTireMark(D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
 				g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
 
-			//タイヤ痕を出す
+			// タイヤ痕を出す
 			SetTireMark(D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
 				g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
 		}

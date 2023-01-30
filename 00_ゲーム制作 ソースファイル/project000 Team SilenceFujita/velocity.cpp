@@ -42,7 +42,7 @@
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
-const char *apTextureVelocity[] =		// テクスチャの相対パス
+const char *apTextureVelocity[] =	// テクスチャの相対パス
 {
 	"data\\TEXTURE\\ui000.png",		// ライフ背景のテクスチャの相対パス
 	NULL,							// NULL
@@ -85,9 +85,9 @@ void InitVelocity(void)
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
 	( // 引数
-		sizeof(VERTEX_2D) * 4 * MAX_VELO,	// 必要頂点数
+		sizeof(VERTEX_2D) * 4 * MAX_VELO,		// 必要頂点数
 		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_2D,						// 頂点フォーマット
+		FVF_VERTEX_2D,							// 頂点フォーマット
 		D3DPOOL_MANAGED,
 		&g_pVtxBuffVelocity,
 		NULL

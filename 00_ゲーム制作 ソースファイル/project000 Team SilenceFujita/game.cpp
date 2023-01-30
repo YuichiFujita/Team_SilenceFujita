@@ -14,6 +14,7 @@
 
 #include "game.h"
 
+#include "ability.h"
 #include "billboard.h"
 #include "camera.h"
 #include "Car.h"
@@ -87,7 +88,7 @@ void InitGame(void)
 	// オブジェクトの初期化
 	InitObject();
 
-	//車の初期化
+	// 車の初期化
 	InitCar();
 
 	// 人間の初期化
@@ -125,6 +126,9 @@ void InitGame(void)
 
 	// タイマーの初期化
 	InitTimer();
+
+	// 能力バーの初期化
+	InitAbility();
 
 	// 速度バーの初期化
 	InitVelocity();
@@ -203,6 +207,9 @@ void UninitGame(void)
 
 	// タイマーの終了
 	UninitTimer();
+
+	// 能力バーの終了
+	UninitAbility();
 
 	// 速度バーの終了
 	UninitVelocity();
@@ -345,6 +352,9 @@ void UpdateGame(void)
 	// タイマーの更新
 	UpdateTimer();
 
+	// 能力バーの更新
+	UpdateAbility();
+
 	// 速度バーの更新
 	UpdateVelocity();
 
@@ -442,6 +452,9 @@ void UpdateGame(void)
 		// タイマーの更新
 		UpdateTimer();
 
+		// 能力バーの更新
+		UpdateAbility();
+
 		// 速度バーの更新
 		UpdateVelocity();
 
@@ -496,7 +509,7 @@ void DrawGame(void)
 	// 警察の描画
 	DrawPolice();
 
-	//車の描画処理
+	// 車の描画処理
 	DrawCar();
 
 	// オブジェクトの描画
@@ -558,6 +571,9 @@ void DrawGame(void)
 
 	// タイマーの描画
 	DrawTimer();
+
+	// 能力バーの描画
+	DrawAbility();
 
 	// 速度バーの描画
 	DrawVelocity();
