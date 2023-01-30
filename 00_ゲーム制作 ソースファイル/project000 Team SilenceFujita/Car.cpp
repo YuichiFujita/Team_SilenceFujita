@@ -184,7 +184,7 @@ void UpdateCar(void)
 				COLLOBJECTTYPE_CAR
 			);
 
-			// プレイヤーの補正の更新処理
+			// 車の補正の更新処理
 			RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 		}
 	}
@@ -1139,7 +1139,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					pPos->z = pPlayer->pos.z - (PLAY_DEPTH + POLICAR_DEPTH);
 
 					// 移動量を削除
-					pMove->x *= 0.95f;
+					pMove->x = 0.0f;
 
 					break;						// 抜け出す
 
@@ -1156,7 +1156,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 			}							//手前で止められる処理
 			else if (pPosOld->z - CAR_DEPTH >= pPlayer->oldPos.z + CAR_DEPTH
 				&& pPos->z - CAR_DEPTH <= pPlayer->pos.z + CAR_DEPTH)
-			{//前回の位置が塔の位置よりも奥かつ、現在の位置が塔の位置よりも手前だった場合(奥で止められる処理)
+			{//前回の位置がプレイヤーの位置よりも奥かつ、現在の位置がプレイヤーの位置よりも手前だった場合(奥で止められる処理)
 				switch (collObject)
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
@@ -1165,7 +1165,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					pPos->z = pPlayer->pos.z + (PLAY_DEPTH + POLICAR_DEPTH);
 
 					// 移動量を削除
-					pMove->x *= 0.95f;
+					pMove->x = 0.0f;
 
 					break;						// 抜け出す
 
@@ -1196,7 +1196,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					pPos->x = pPlayer->pos.x - (PLAY_WIDTH + POLICAR_WIDTH);
 
 					// 移動量を削除
-					pMove->x *= 0.95f;
+					pMove->x = 0.0f;
 
 					break;						// 抜け出す
 
@@ -1222,7 +1222,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					pPos->x = pPlayer->pos.x + (PLAY_WIDTH + POLICAR_WIDTH);
 
 					// 移動量を削除
-					pMove->x *= 0.95f;
+					pMove->x = 0.0f;
 
 					break;						// 抜け出す
 
