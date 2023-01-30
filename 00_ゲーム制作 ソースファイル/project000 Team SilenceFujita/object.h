@@ -75,6 +75,8 @@ typedef struct
 {
 	D3DXVECTOR3 vecPos[MAX_COLLISION];	// 位置ベクトル
 	ROTSTATE    stateRot;				// 向き状態
+	float       fWidth[MAX_COLLISION];	// 横幅
+	float       fDepth[MAX_COLLISION];	// 奥行
 }Coll_Info;
 
 //**********************************************************************************************************************

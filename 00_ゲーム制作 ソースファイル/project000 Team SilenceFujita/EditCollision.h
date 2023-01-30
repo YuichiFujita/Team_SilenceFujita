@@ -16,9 +16,8 @@
 typedef struct
 {
 	D3DXVECTOR3 pos[MAX_COLLISION];		// 位置
-	D3DXVECTOR3 rot;					// 向き
-	ROTSTATE    stateRot;				// 向き状態
-	Collision   collision;				// 当たり判定情報
+	D3DXVECTOR3 vecPos[MAX_COLLISION];	// 位置ベクトル
+	Collision  *pCollision;				// 当たり判定情報
 	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
 	Model       modelData;				// モデル情報
 	int         nSelectColl;			// 選択中の当たり判定
