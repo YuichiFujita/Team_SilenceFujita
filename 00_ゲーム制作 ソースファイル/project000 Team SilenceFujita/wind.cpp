@@ -47,8 +47,8 @@ void FlyAwayHuman(Human *pHuman, Player player);					// 人間が吹き飛ばされる処理
 //**********************************************************************************************************************
 LPDIRECT3DTEXTURE9		g_pTextureWind = NULL;		// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWind = NULL;		// 頂点バッファへのポインタ
-
-Wind g_aWind[MAX_WIND];								//風の構造体
+Wind g_aWind[MAX_WIND];								// 風の構造体
+WindInfo g_WindInfo;								// 風の情報の構造体
 
 //======================================================================================================================
 //	送風機の初期化処理
@@ -69,6 +69,10 @@ void InitWind(void)
 		g_aWind[nCnt].nLife	  = 0;									// 寿命
 		g_aWind[nCnt].bUse	  = false;								// 使用状況
 	}
+
+	// 風の情報の初期化
+	g_WindInfo.nUseCounter = 0;
+	g_WindInfo.state = WIND_USABLE;									//使用可能状態
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,
@@ -297,7 +301,7 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aWind[nCntWind].pos = pos;
 
 			//移動量の倍率を設定する
-			fMoveMagni = (float)(rand() % 100) / 20;
+			fMoveMagni = (float)(rand() % 100) / 5;
 
 			// 移動量を設定する
 			g_aWind[nCntWind].move.x = sinf(rot.y) * fMoveMagni;
@@ -305,10 +309,10 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aWind[nCntWind].move.z = cosf(rot.y) * fMoveMagni;
 
 			// 色を設定する
-			g_aWind[nCntWind].col = D3DXCOLOR(0.4f, 1.0f, 0.4f, 1.0f);
+			g_aWind[nCntWind].col = D3DXCOLOR(0.6f, 0.7f, 1.0f, 1.0f);
 
 			//寿命を算出する
-			nLife = (rand() % 20) + 40;
+			nLife = (rand() % 10) + 6;
 
 			// 寿命を設定する
 			g_aWind[nCntWind].nLife = nLife;
@@ -317,7 +321,7 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aWind[nCntWind].fAlpha = 1.0f / nLife;
 
 			//半径を算出する
-			fRadius = (float)((rand() % 300) / 10);
+			fRadius = (float)((rand() % 470) / 10);
 
 			// 半径を設定する
 			g_aWind[nCntWind].fRadius = fRadius;
@@ -355,7 +359,7 @@ void CollisionWind(Human *pHuman)
 			&vecPos[0],
 			pPlayer->pos,	// 絶対座標
 			pPlayer->rot,	// 向き
-			400.0f,			// 横幅
+			700.0f,			// 横幅
 			100.0f			// 縦幅
 		);
 
@@ -390,6 +394,15 @@ void FlyAwayHuman(Human *pHuman, Player player)
 
 	// 飛ばす
 	pHuman->pos += pHuman->move;
+}
+
+//============================================================
+//風の情報の取得処理
+//============================================================
+WindInfo *GetWindInfo(void)
+{
+	//風の情報を返す
+	return &g_WindInfo;
 }
 
 #ifdef _DEBUG	// デバッグ処理
