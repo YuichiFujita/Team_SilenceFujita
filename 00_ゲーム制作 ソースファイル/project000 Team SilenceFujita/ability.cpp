@@ -1,6 +1,6 @@
 //======================================================================================================================
 //
-//	速度バー処理 [velocity.cpp]
+//	能力バー処理 [ability.cpp]
 //	Author：藤田勇一
 //
 //======================================================================================================================
@@ -8,41 +8,28 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
-#include "velocity.h"
+#include "ability.h"
 #include "player.h"
-#include "value.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_VELO		(3)			// 使用するポリゴン数
+#define MAX_ABI			(3)			// 使用するポリゴン数
 
-#define VAL_VELO_WIDTH	(30.0f)		// スコアの数値の横幅 / 2
-#define VAL_VELO_HEIGHT	(30.0f)		// スコアの数値の縦幅 / 2
-#define VAL_VELO_SPACE	(47.0f)		// スコアの数値間の幅 (x)
-#define VAL_VELO_DIGIT	(3)			// スコアの数値間の幅 (x)
+#define ABI_POS_X		(60.0f)		// 能力バーの絶対座標 (x)
+#define ABI_POS_Y		(135.0f)	// 能力バーの絶対座標 (y)
+#define ABI_WIDTH_MUL	(1.4f)		// 能力バーの横幅のプレイヤー能力乗算量
+#define ABI_HEIGHT		(15.0f)		// 能力バーの縦幅 / 2
 
-#define VELO_POS_VAL_X	(200.0f)	// スコア (値) の絶対座標 (x)
-#define VELO_POS_VAL_Y	(600.0f)	// スコアの絶対座標 (y)
-
-#define VELO_POS_X		(70.0f)		// 速度バーの絶対座標 (x)
-#define VELO_POS_Y		(655.0f)	// 速度バーの絶対座標 (y)
-#define VELO_WIDTH_MUL	(4.8f)		// 速度バーの横幅のプレイヤー速度乗算量
-#define VELO_HEIGHT		(15.0f)		// 速度バーの縦幅 / 2
-#define VELO_PULS_Y		(65.0f)		// 速度バーの縦幅の追加量
-
-#define VELO_BG_POS_X	(190.0f)	// 速度バーの背景の絶対座標 (x)
-#define VELO_BG_POS_Y	(620.0f)	// 速度バーの背景の絶対座標 (x)
-#define VELO_BG_WIDTH	(165.0f)	// 速度バーの背景の横幅 / 2
-#define VELO_BG_HEIGHT	(80.0f)		// 速度バーの背景の縦幅 / 2
-
-#define MAX_SPEED		(240)						// 表示上の最高速度
-#define MAX_REAL_SPEED	(MAX_FORWARD + MAX_BOOST)	// 数値上の最高速度
+#define ABI_BG_POS_X	(190.0f)	// 能力バーの背景の絶対座標 (x)
+#define ABI_BG_POS_Y	(620.0f)	// 能力バーの背景の絶対座標 (x)
+#define ABI_BG_WIDTH	(165.0f)	// 能力バーの背景の横幅 / 2
+#define ABI_BG_HEIGHT	(80.0f)		// 能力バーの背景の縦幅 / 2
 
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
-const char *apTextureVelocity[] =	// テクスチャの相対パス
+const char *apTextureAbility[] =	// テクスチャの相対パス
 {
 	"data\\TEXTURE\\ui000.png",		// ライフ背景のテクスチャの相対パス
 	NULL,							// NULL
@@ -50,46 +37,46 @@ const char *apTextureVelocity[] =	// テクスチャの相対パス
 };
 
 //**********************************************************************************************************************
-//	列挙型定義 (TEXTURE_VELO)
+//	列挙型定義 (TEXTURE_ABI)
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_VELO_NORMAL = 0,		// ライフの背景
-	TEXTURE_VELO_NULL_00,			// NULL
-	TEXTURE_VELO_NULL_01,			// NULL
-	TEXTURE_VELO_MAX,				// この列挙型の総数
-} TEXTURE_VELO;
+	TEXTURE_ABI_NORMAL = 0,			// ライフの背景
+	TEXTURE_ABI_NULL_00,			// NULL
+	TEXTURE_ABI_NULL_01,			// NULL
+	TEXTURE_ABI_MAX,				// この列挙型の総数
+} TEXTURE_ABI;
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-LPDIRECT3DTEXTURE9      g_apTextureVelocity[TEXTURE_VELO_MAX] = {};	// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffVelocity = NULL;					// 頂点バッファへのポインタ
+LPDIRECT3DTEXTURE9      g_apTextureAbility[TEXTURE_ABI_MAX] = {};	// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffAbility = NULL;					// 頂点バッファへのポインタ
 
 //======================================================================================================================
-//	速度バーの初期化処理
+//	能力バーの初期化処理
 //======================================================================================================================
-void InitVelocity(void)
+void InitAbility(void)
 {
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	VERTEX_2D *pVtx;							// 頂点情報へのポインタ
 
-	for (int nCntVelocity = 0; nCntVelocity < TEXTURE_VELO_MAX; nCntVelocity++)
+	for (int nCntAbility = 0; nCntAbility < TEXTURE_ABI_MAX; nCntAbility++)
 	{ // 使用するテクスチャ数分繰り返す
 
 		// テクスチャの読み込み
-		D3DXCreateTextureFromFile(pDevice, apTextureVelocity[nCntVelocity], &g_apTextureVelocity[nCntVelocity]);
+		D3DXCreateTextureFromFile(pDevice, apTextureAbility[nCntAbility], &g_apTextureAbility[nCntAbility]);
 	}
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
 	( // 引数
-		sizeof(VERTEX_2D) * 4 * MAX_VELO,		// 必要頂点数
+		sizeof(VERTEX_2D) * 4 * MAX_ABI,		// 必要頂点数
 		D3DUSAGE_WRITEONLY,
 		FVF_VERTEX_2D,							// 頂点フォーマット
 		D3DPOOL_MANAGED,
-		&g_pVtxBuffVelocity,
+		&g_pVtxBuffAbility,
 		NULL
 	);
 
@@ -97,16 +84,16 @@ void InitVelocity(void)
 	//	頂点情報の初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffVelocity->Lock(0, 0, (void**)&pVtx, 0);
+	g_pVtxBuffAbility->Lock(0, 0, (void**)&pVtx, 0);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	速度バー (背景)
+	//	能力バー (背景)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[0].pos = D3DXVECTOR3(VELO_BG_POS_X - VELO_BG_WIDTH, VELO_BG_POS_Y - VELO_BG_HEIGHT, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(VELO_BG_POS_X + VELO_BG_WIDTH, VELO_BG_POS_Y - VELO_BG_HEIGHT, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(VELO_BG_POS_X - VELO_BG_WIDTH, VELO_BG_POS_Y + VELO_BG_HEIGHT, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(VELO_BG_POS_X + VELO_BG_WIDTH, VELO_BG_POS_Y + VELO_BG_HEIGHT, 0.0f);
+	pVtx[0].pos = D3DXVECTOR3(ABI_BG_POS_X - ABI_BG_WIDTH, ABI_BG_POS_Y - ABI_BG_HEIGHT, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(ABI_BG_POS_X + ABI_BG_WIDTH, ABI_BG_POS_Y - ABI_BG_HEIGHT, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(ABI_BG_POS_X - ABI_BG_WIDTH, ABI_BG_POS_Y + ABI_BG_HEIGHT, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(ABI_BG_POS_X + ABI_BG_WIDTH, ABI_BG_POS_Y + ABI_BG_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[0].rhw = 1.0f;
@@ -127,17 +114,13 @@ void InitVelocity(void)
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	速度バー (赤)
+	//	能力バー (赤)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[4].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
-
-	pVtx[5].pos.x = VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL);
-	pVtx[5].pos.y = (VELO_POS_Y - VELO_HEIGHT) - VELO_PULS_Y;
-	pVtx[5].pos.z = 0.0f;
-
-	pVtx[6].pos = D3DXVECTOR3(VELO_POS_X,                                     VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[7].pos = D3DXVECTOR3(VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[4].pos = D3DXVECTOR3(ABI_POS_X,                                    ABI_POS_Y - ABI_HEIGHT, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(ABI_POS_X + (BOOST_WAIT_CNT * ABI_WIDTH_MUL), ABI_POS_Y - ABI_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(ABI_POS_X,                                    ABI_POS_Y + ABI_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(ABI_POS_X + (BOOST_WAIT_CNT * ABI_WIDTH_MUL), ABI_POS_Y + ABI_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[4].rhw = 1.0f;
@@ -152,17 +135,13 @@ void InitVelocity(void)
 	pVtx[7].col = D3DCOLOR_RGBA(205,  0,  0, 255);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	速度バー (黄)
+	//	能力バー (黄)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[8].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
-
-	pVtx[9].pos.x = VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL);
-	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - VELO_PULS_Y;
-	pVtx[9].pos.z = 0.0f;
-
-	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                     VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[8].pos  = D3DXVECTOR3(ABI_POS_X,                                    ABI_POS_Y - ABI_HEIGHT, 0.0f);
+	pVtx[9].pos  = D3DXVECTOR3(ABI_POS_X + (BOOST_WAIT_CNT * ABI_WIDTH_MUL), ABI_POS_Y - ABI_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(ABI_POS_X,                                    ABI_POS_Y + ABI_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(ABI_POS_X + (BOOST_WAIT_CNT * ABI_WIDTH_MUL), ABI_POS_Y + ABI_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[8].rhw  = 1.0f;
@@ -177,118 +156,97 @@ void InitVelocity(void)
 	pVtx[11].col = D3DCOLOR_RGBA(205, 160,  0, 255);
 
 	// 頂点バッファをアンロックする
-	g_pVtxBuffVelocity->Unlock();
+	g_pVtxBuffAbility->Unlock();
 }
 
 //======================================================================================================================
-//	速度バーの終了処理
+//	能力バーの終了処理
 //======================================================================================================================
-void UninitVelocity(void)
+void UninitAbility(void)
 {
 	// テクスチャの破棄
-	for (int nCntVelocity = 0; nCntVelocity < TEXTURE_VELO_MAX; nCntVelocity++)
+	for (int nCntAbility = 0; nCntAbility < TEXTURE_ABI_MAX; nCntAbility++)
 	{ // 使用するテクスチャ数分繰り返す
 
-		if (g_apTextureVelocity[nCntVelocity] != NULL)
-		{ // 変数 (g_apTextureVelocity) がNULLではない場合
+		if (g_apTextureAbility[nCntAbility] != NULL)
+		{ // 変数 (g_apTextureAbility) がNULLではない場合
 
-			g_apTextureVelocity[nCntVelocity]->Release();
-			g_apTextureVelocity[nCntVelocity] = NULL;
+			g_apTextureAbility[nCntAbility]->Release();
+			g_apTextureAbility[nCntAbility] = NULL;
 		}
 	}
 
 	// 頂点バッファの破棄
-	if (g_pVtxBuffVelocity != NULL)
-	{ // 変数 (g_pVtxBuffVelocity) がNULLではない場合
+	if (g_pVtxBuffAbility != NULL)
+	{ // 変数 (g_pVtxBuffAbility) がNULLではない場合
 
-		g_pVtxBuffVelocity->Release();
-		g_pVtxBuffVelocity = NULL;
+		g_pVtxBuffAbility->Release();
+		g_pVtxBuffAbility = NULL;
 	}
 }
 
 //======================================================================================================================
-//	速度バーの更新処理
+//	能力バーの更新処理
 //======================================================================================================================
-void UpdateVelocity(void)
+void UpdateAbility(void)
 {
 	// 変数を宣言
-	float fCurrentSpeed;	// 現在のプレイヤー速度の絶対値
+	float fCurrentBoost = 0.0f;			// 現在のブーストの待機、使用時間
 
 	// ポインタを宣言
 	VERTEX_2D *pVtx;					// 頂点情報へのポインタ
 	Player    *pPlayer = GetPlayer();	// プレイヤーの情報
 
-	// 現在のプレイヤー速度の絶対値を求める
-	fCurrentSpeed = fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x);
+	// 現在のブーストの待機、使用時間を求める
+	if (pPlayer->boost.state == BOOSTSTATE_NONE
+	||  pPlayer->boost.state == BOOSTSTATE_WAIT)
+	{ // ブーストが何もしない状態、または待機状態の場合
+
+		// ブーストの待機時間を計算
+		fCurrentBoost = (float)(BOOST_WAIT_CNT - pPlayer->boost.nCounter);
+	}
+	else if (pPlayer->boost.state == BOOSTSTATE_UP)
+	{ // ブーストが加速状態の場合
+
+		// ブーストの使用時間を計算
+		fCurrentBoost = (float)pPlayer->boost.nCounter;
+	}
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffVelocity->Lock(0, 0, (void**)&pVtx, 0);
+	g_pVtxBuffAbility->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点座標を設定
-	pVtx[8].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
-
-	pVtx[9].pos.x = VELO_POS_X + (fCurrentSpeed * VELO_WIDTH_MUL);
-	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - (fCurrentSpeed * (VELO_PULS_Y / MAX_REAL_SPEED));
-	pVtx[9].pos.z = 0.0f;
-
-	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                    VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (fCurrentSpeed * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[8].pos  = D3DXVECTOR3(ABI_POS_X,                                   ABI_POS_Y - ABI_HEIGHT, 0.0f);
+	pVtx[9].pos  = D3DXVECTOR3(ABI_POS_X + (fCurrentBoost * ABI_WIDTH_MUL), ABI_POS_Y - ABI_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(ABI_POS_X,                                   ABI_POS_Y + ABI_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(ABI_POS_X + (fCurrentBoost * ABI_WIDTH_MUL), ABI_POS_Y + ABI_HEIGHT, 0.0f);
 
 	// 頂点バッファをアンロックする
-	g_pVtxBuffVelocity->Unlock();
+	g_pVtxBuffAbility->Unlock();
 }
 
 //======================================================================================================================
-//	速度バーの描画処理
+//	能力バーの描画処理
 //======================================================================================================================
-void DrawVelocity(void)
+void DrawAbility(void)
 {
-	// 変数を宣言
-	int nCurrentSpeed;		// 現在のスピード
-
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
 
 	// 頂点バッファをデータストリームに設定
-	pDevice->SetStreamSource(0, g_pVtxBuffVelocity, 0, sizeof(VERTEX_2D));
+	pDevice->SetStreamSource(0, g_pVtxBuffAbility, 0, sizeof(VERTEX_2D));
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	for (int nCntVelocity = 0; nCntVelocity < MAX_VELO; nCntVelocity++)
+	for (int nCntAbility = 0; nCntAbility < MAX_ABI; nCntAbility++)
 	{ // 使用するポリゴン数分繰り返す
 
 		// テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureVelocity[nCntVelocity]);
+		pDevice->SetTexture(0, g_apTextureAbility[nCntAbility]);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntVelocity * 4, 2);
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntAbility * 4, 2);
 	}
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	数値の描画
-	//------------------------------------------------------------------------------------------------------------------
-	// 現在のスピードを求める
-	nCurrentSpeed = (int)(fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x) * (MAX_SPEED / MAX_REAL_SPEED));
-
-	// 数値の設定
-	SetValue
-	( // 引数
-		D3DXVECTOR3
-		( // 引数
-			VELO_POS_VAL_X,	// 位置 (x)
-			VELO_POS_VAL_Y,	// 位置 (y)
-			0.0f			// 位置 (z)
-		),
-		nCurrentSpeed,		// 値
-		MAX_SPEED,			// 値の最大値
-		VAL_VELO_WIDTH,		// 横幅
-		VAL_VELO_HEIGHT,	// 縦幅
-		VAL_VELO_SPACE,		// 数値間の幅
-		1.0f				// α値
-	);
-
-	// 数値の描画
-	DrawValue(VAL_VELO_DIGIT, VALUETYPE_NORMAL);
 }

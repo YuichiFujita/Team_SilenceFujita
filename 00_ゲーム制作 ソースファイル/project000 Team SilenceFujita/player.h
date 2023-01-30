@@ -19,10 +19,11 @@
 #define PLAY_HEIGHT		(25.0f)		// プレイヤーの縦幅
 #define PLAY_DEPTH		(45.0f)		// プレイヤーの奥行 / 2
 
-#define PLAY_LIFE		(100)		// プレイヤーの体力
 #define MAX_FORWARD		(35.0f)		// 前進時の最高速度
 #define MAX_BOOST		(15.0f)		// ブーストの最大移動量
 
+#define PLAY_LIFE		(100)		// プレイヤーの体力
+#define BOOST_WAIT_CNT	(180)		// ブーストの再使用までの時間
 
 #define DAMAGE_TIME_PLAY	(30)					// ダメージ状態を保つ時間
 #define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)	// 無敵状態に変更する時間
