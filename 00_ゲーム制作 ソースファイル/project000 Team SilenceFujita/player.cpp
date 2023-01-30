@@ -700,9 +700,11 @@ void FlyAwayPlayer(void)
 {
 	if (GetKeyboardPress(DIK_U) == true)
 	{ // Uキーを押している場合
-
-		// 送風機を使用する
-		g_player.wind.bUseWind = true;
+		if (GetWindInfo()->state == WIND_USABLE)
+		{ // 風が使用可能だった場合
+			// 送風機を使用する
+			g_player.wind.bUseWind = true;
+		}
 	}
 	else
 	{ // Uキーを押していない場合
@@ -722,6 +724,18 @@ void UpdateFlyAway(void)
 
 		// 風を出すカウントを加算する
 		g_player.wind.nCount++;
+
+		// カウンターを加算する
+		GetWindInfo()->nUseCounter++;
+
+		if (GetWindInfo()->nUseCounter >= 180)
+		{ // 3秒を超えた場合
+			// 風を使用しない
+			g_player.wind.bUseWind = false;
+
+			// オーバーヒート状態にする
+			GetWindInfo()->state = WIND_OVERHEAT;
+		}
 
 		if (g_player.wind.nCount % 3 == 0)
 		{ // 風のカウントが一定数になったら
@@ -769,6 +783,18 @@ void UpdateFlyAway(void)
 
 		// カウントを初期化する
 		g_player.wind.nCount = 0;
+
+		// カウンターを減算する
+		GetWindInfo()->nUseCounter--;
+
+		if (GetWindInfo()->nUseCounter <= 0)
+		{ // カウンターが0以下になった場合
+			// カウンターを補正する
+			GetWindInfo()->nUseCounter = 0;
+
+			// 使用可能にする
+			GetWindInfo()->state = WIND_USABLE;
+		}
 	}
 }
 
