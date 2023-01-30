@@ -18,23 +18,24 @@
 #include "SoundDJ.h"
 
 //プロトタイプ宣言
-void SaveCurrentEdit(void);								//エディット状況の一時保存処理
-void TypeChangeEdit(void);								//種類変更処理
-void MoveEdit(void);									//移動処理
-void RotationEdit(void);								//回転処理
-void SetEdit(void);										//オブジェクトの設定処理
-void DeleteEditObject(void);							//オブジェクトの消去
-void ScaleObjectX(void);								//オブジェクトの拡大縮小処理(X軸)
-void ScaleObjectY(void);								//オブジェクトの拡大縮小処理(Y軸)
-void ScaleObjectZ(void);								//オブジェクトの拡大縮小処理(Z軸)
-void ScaleObject(void);									//オブジェクトの拡大縮小処理
-void ResetEdit(void);									//オブジェクトの情報リセット処理
-void EditMaterialCustom(void);							//マテリアルのエディット処理
-void BreakEdit(void);									//オブジェクトの破壊エディット処理
-void ShadowEdit(void);									//オブジェクトの影のエディット処理
-void CollisionEdit(void);								//オブジェクトの当たり判定のエディット処理
-void UpDownEditObject(void);							//オブジェクトの上下移動処理
-void RightAngleEditObject(void);						//オブジェクトの直角処理
+void SaveCurrentEdit(void);			//エディット状況の一時保存処理
+void TypeChangeEdit(void);			//種類変更処理
+void MoveEdit(void);				//移動処理
+void RotationEdit(void);			//回転処理
+void SetEdit(void);					//オブジェクトの設定処理
+void DeleteEditObject(void);		//オブジェクトの消去
+void ScaleObjectX(void);			//オブジェクトの拡大縮小処理(X軸)
+void ScaleObjectY(void);			//オブジェクトの拡大縮小処理(Y軸)
+void ScaleObjectZ(void);			//オブジェクトの拡大縮小処理(Z軸)
+void ScaleObject(void);				//オブジェクトの拡大縮小処理
+void ResetEdit(void);				//オブジェクトの情報リセット処理
+void EditMaterialCustom(void);		//マテリアルのエディット処理
+void BreakEdit(void);				//オブジェクトの破壊エディット処理
+void ShadowEdit(void);				//オブジェクトの影のエディット処理
+void CollisionEdit(void);			//オブジェクトの当たり判定のエディット処理
+void UpDownEditObject(void);		//オブジェクトの上下移動処理
+void RightAngleEditObject(void);	//オブジェクトの直角処理
+void CollisionRotationEdit(void);	//当たり判定の回転処理
 
 //破壊モードの表記
 const char *c_apBreakmodename[BREAKTYPE_MAX] =
@@ -129,6 +130,10 @@ void InitEditObject(void)
 		//当たり判定のデバッグ表記を設定
 		g_EditObject.Collisiontype.pCollisionMode[nCntCollision] = (char*)c_apCollisionmodename[nCntCollision];
 	}
+
+	//当たり判定の向き変数
+	g_EditObject.CollInfo.rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	//向き
+	g_EditObject.CollInfo.stateRot = ROTSTATE_0;					//向き状態
 
 	//スタイルを設定する
 	g_nStyleObject = EDITSTYLE_OBJECT;
@@ -262,6 +267,9 @@ void UpdateEditObject(void)
 
 		//オブジェクトの上下移動処理
 		UpDownEditObject();
+
+		//回転処理
+		CollisionRotationEdit();
 	}
 }
 
@@ -389,31 +397,12 @@ void SaveCurrentEdit(void)
 	{ // 当たり判定の最大数分繰り返す
 
 		// 横幅と縦幅を計算
-		if (pEditCollision->stateRot == ROTSTATE_0
-		||  pEditCollision->stateRot == ROTSTATE_180)
-		{ // 角度が0度、または180度の場合
-			pEditCollision->collision.fWidth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale[nCntColl].x) * 0.5f;
-			pEditCollision->collision.fDepth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale[nCntColl].z) * 0.5f;
-		}
-		else
-		{ // 角度90度、または270度の場合
-			pEditCollision->collision.fWidth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->collision.scale[nCntColl].z) * 0.5f;
-			pEditCollision->collision.fDepth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->collision.scale[nCntColl].x) * 0.5f;
-		}
-	}
-
-	//現在の作成した当たり判定をセーブ
-	pCollision[g_EditObject.nType] = pEditCollision->collision;
-
-	for (int nCntRot = pEditCollision->stateRot; nCntRot > ROTSTATE_0; nCntRot--)
-	{ // 向きが0度になるまで繰り返す
-
-		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
-		{ // 当たり判定の最大数分繰り返す
-
-			//位置ベクトルを90度回転
-			pCollision[g_EditObject.nType].vecPos[nCntColl] = D3DXVECTOR3(pCollision[g_EditObject.nType].vecPos[nCntColl].z, pCollision[g_EditObject.nType].vecPos[nCntColl].y, -pCollision[g_EditObject.nType].vecPos[nCntColl].x);
-		}
+		pEditCollision->pCollision->fWidth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.x * pEditCollision->pCollision->scale[nCntColl].x) * 0.5f;
+		pEditCollision->pCollision->fDepth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->pCollision->scale[nCntColl].z) * 0.5f;
+		
+		// 横幅と縦幅を代入
+		pCollision->fWidth[nCntColl] = pEditCollision->pCollision->fWidth[nCntColl];
+		pCollision->fDepth[nCntColl] = pEditCollision->pCollision->fDepth[nCntColl];
 	}
 
 	//現在のモデル向きをセーブ
@@ -442,11 +431,20 @@ void TypeChangeEdit(void)
 			//設定する
 			g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
 
-			//現在の向き状態を初期化
-			pEditCollision->stateRot = ROTSTATE_0;
+			//現在の向きを初期化
+			g_EditObject.CollInfo.rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			g_EditObject.CollInfo.stateRot = ROTSTATE_0;
 
-			//現在の作成した当たり判定をロード
-			pEditCollision->collision = pCollision[g_EditObject.nType];
+			//現在の当たり判定をロード
+			pEditCollision->pCollision = &pCollision[g_EditObject.nType];
+
+			// 位置情報の初期化
+			for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+			{ // 当たり判定の最大数分繰り返す
+
+				pEditCollision->pos[nCntColl]    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 位置
+				pEditCollision->vecPos[nCntColl] = pEditCollision->pCollision->vecPos[nCntColl];	// 位置ベクトル
+			}
 
 			//現在のモデル向きをロード
 			g_EditObject.rot = g_aRotObject[g_EditObject.nType];
@@ -534,7 +532,7 @@ void MoveEdit(void)
 	{ // 当たり判定の最大数分繰り返す
 
 		//当たり判定の位置を反映 (ベクトルの逆方向)
-		pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->collision.vecPos[nCntColl];
+		pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->vecPos[nCntColl];
 	}
 }
 
@@ -584,7 +582,7 @@ void SetEdit(void)
 			}
 
 			//代入する向き状態を設定
-			stateRot = (g_EditObject.Collisiontype.Collisiontype == COLLISIONTYPE_CREATE) ? pEditCollision->stateRot : ROTSTATE_0;
+			stateRot = (g_EditObject.Collisiontype.Collisiontype == COLLISIONTYPE_CREATE) ? g_EditObject.CollInfo.stateRot : ROTSTATE_0;
 
 			//オブジェクトの設定処理
 			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], g_EditObject.nType, g_EditObject.Break.Breaktype, g_EditObject.Shadowtype.Shadowtype, g_EditObject.Collisiontype.Collisiontype, stateRot);
@@ -1009,7 +1007,7 @@ void UpDownEditObject(void)
 	{ // 当たり判定の最大数分繰り返す
 
 		//当たり判定の位置を反映 (ベクトルの逆方向)
-		pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->collision.vecPos[nCntColl];
+		pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->vecPos[nCntColl];
 	}
 }
 
@@ -1030,6 +1028,63 @@ void RightAngleEditObject(void)
 			//向きを変える
 			g_EditObject.rot.y -= D3DXToRadian(15);
 		}
+	}
+}
+
+//=======================================
+//当たり判定回転処理
+//=======================================
+void CollisionRotationEdit(void)
+{
+	// ポインタを宣言
+	EditCollision *pEditCollision = GetEditCollision();
+
+	if (GetKeyboardTrigger(DIK_C) == true)
+	{//Cキーを押した場合
+		//向きを変更
+		g_EditObject.CollInfo.rot.y += D3DX_PI * 0.5f;
+
+		//向き状態を変更
+		g_EditObject.CollInfo.stateRot = (ROTSTATE)((g_EditObject.CollInfo.stateRot + 1) % ROTSTATE_MAX);
+
+		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+		{ // 当たり判定の最大数分繰り返す
+
+			//位置ベクトルを90度回転
+			pEditCollision->vecPos[nCntColl] = D3DXVECTOR3(-pEditCollision->vecPos[nCntColl].z, pEditCollision->vecPos[nCntColl].y, pEditCollision->vecPos[nCntColl].x);
+
+			//位置を反映 (ベクトルの方向)
+			pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->vecPos[nCntColl];
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_Z) == true)
+	{//Zキーを押した場合
+		//向きを変更
+		g_EditObject.CollInfo.rot.y -= D3DX_PI * 0.5f;
+
+		//向き状態を変更
+		g_EditObject.CollInfo.stateRot = (ROTSTATE)((g_EditObject.CollInfo.stateRot + (ROTSTATE_MAX - 1)) % ROTSTATE_MAX);
+
+		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+		{ // 当たり判定の最大数分繰り返す
+
+			//位置ベクトルを90度回転
+			pEditCollision->vecPos[nCntColl] = D3DXVECTOR3(pEditCollision->vecPos[nCntColl].z, pEditCollision->vecPos[nCntColl].y, -pEditCollision->vecPos[nCntColl].x);
+
+			//位置を反映 (ベクトルの方向)
+			pEditCollision->pos[nCntColl] = g_EditObject.pos - pEditCollision->vecPos[nCntColl];
+		}
+	}
+
+	if (g_EditObject.CollInfo.rot.y > D3DX_PI)
+	{//3.14fより大きくなった場合
+		//-3.14fに補正する
+		g_EditObject.CollInfo.rot.y -= D3DX_PI * 2;
+	}
+	else if (g_EditObject.CollInfo.rot.y < -D3DX_PI)
+	{//-3.14fより小さくなった場合
+		//3.14fに補正する
+		g_EditObject.CollInfo.rot.y += D3DX_PI * 2;
 	}
 }
 

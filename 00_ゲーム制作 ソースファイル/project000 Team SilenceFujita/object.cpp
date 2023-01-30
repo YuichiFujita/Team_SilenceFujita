@@ -71,8 +71,9 @@ void InitObject(void)
 		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
 		{ // 当たり判定の最大数分繰り返す
 
-			// 位置ベクトルを初期化
-			g_aObject[nCntObject].collInfo.vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			g_aObject[nCntObject].collInfo.vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+			g_aObject[nCntObject].collInfo.fWidth[nCntColl] = 0.0f;								// 横幅
+			g_aObject[nCntObject].collInfo.fDepth[nCntColl] = 0.0f;								// 奥行
 		}
 
 		// 向き状態を初期化
@@ -340,6 +341,23 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			// 当たり判定情報を設定
 			g_aObject[nCntObject].collInfo.stateRot = stateRot;			// 向き状態
 
+			for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+			{ // 当たり判定の最大数分繰り返す
+
+				// 横幅と縦幅を計算
+				if (stateRot == ROTSTATE_0
+				||  stateRot == ROTSTATE_180)
+				{ // 角度が0度、または180度の場合
+					g_aObject[nCntObject].collInfo.fWidth[nCntColl] = g_aCollision[nType].fWidth[nCntColl];
+					g_aObject[nCntObject].collInfo.fDepth[nCntColl] = g_aCollision[nType].fDepth[nCntColl];
+				}
+				else
+				{ // 角度90度、または270度の場合
+					g_aObject[nCntObject].collInfo.fWidth[nCntColl] = g_aCollision[nType].fDepth[nCntColl];
+					g_aObject[nCntObject].collInfo.fDepth[nCntColl] = g_aCollision[nType].fWidth[nCntColl];
+				}
+			}
+
 			for (int nCntColl = 0; nCntColl < g_aCollision[g_aObject[nCntObject].nType].nNumColl; nCntColl++)
 			{ // 当たり判定の総数分繰り返す
 
@@ -580,26 +598,26 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 					collPos = g_aObject[nCntObject].pos - g_aObject[nCntObject].collInfo.vecPos[nCntColl];
 
 					// 前後の当たり判定
-					if (pPos->x + fWidth > collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl]
-					&&  pPos->x - fWidth < collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl])
+					if (pPos->x + fWidth > collPos.x - g_aObject[nCntObject].collInfo.fWidth[nCntColl]
+					&&  pPos->x - fWidth < collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl])
 					{ // ブロックの左右の範囲内の場合
 
-						if (pPos->z    + fDepth >  collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl]
-						&&  pOldPos->z + fDepth <= collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl])
+						if (pPos->z    + fDepth >  collPos.z - g_aObject[nCntObject].collInfo.fDepth[nCntColl]
+						&&  pOldPos->z + fDepth <= collPos.z - g_aObject[nCntObject].collInfo.fDepth[nCntColl])
 						{ // 前からの当たり判定
 
 							// 位置を補正
-							pPos->z = collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl] - fDepth - 0.01f;
+							pPos->z = collPos.z - g_aObject[nCntObject].collInfo.fDepth[nCntColl] - fDepth - 0.01f;
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
 						}
-						else if (pPos->z    - fDepth <  collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl]
-						     &&  pOldPos->z - fDepth >= collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl])
+						else if (pPos->z    - fDepth <  collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl]
+						     &&  pOldPos->z - fDepth >= collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl])
 						{ // 後ろからの当たり判定
 
 							// 位置を補正
-							pPos->z = collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl] + fDepth + 0.01f;
+							pPos->z = collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl] + fDepth + 0.01f;
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -607,26 +625,26 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 					}
 
 					// 左右の当たり判定
-					if (pPos->z + fDepth > collPos.z - g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl]
-					&&  pPos->z - fDepth < collPos.z + g_aCollision[g_aObject[nCntObject].nType].fDepth[nCntColl])
+					if (pPos->z + fDepth > collPos.z - g_aObject[nCntObject].collInfo.fDepth[nCntColl]
+					&&  pPos->z - fDepth < collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl])
 					{ // ブロックの前後の範囲内の場合
 
-						if (pPos->x    + fWidth >  collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl]
-						&&  pOldPos->x + fWidth <= collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl])
+						if (pPos->x    + fWidth >  collPos.x - g_aObject[nCntObject].collInfo.fWidth[nCntColl]
+						&&  pOldPos->x + fWidth <= collPos.x - g_aObject[nCntObject].collInfo.fWidth[nCntColl])
 						{ // 左からの当たり判定
 
 							// 位置を補正
-							pPos->x = collPos.x - g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl] - fWidth - 0.01f;
+							pPos->x = collPos.x - g_aObject[nCntObject].collInfo.fWidth[nCntColl] - fWidth - 0.01f;
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
 						}
-						else if (pPos->x    - fWidth <  collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl]
-						     &&  pOldPos->x - fWidth >= collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl])
+						else if (pPos->x    - fWidth <  collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl]
+						     &&  pOldPos->x - fWidth >= collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl])
 						{ // 右からの当たり判定
 							
 							// 位置を補正
-							pPos->x = collPos.x + g_aCollision[g_aObject[nCntObject].nType].fWidth[nCntColl] + fWidth + 0.01f;
+							pPos->x = collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl] + fWidth + 0.01f;
 
 							// 移動量を削除
 							pMove->x *= 0.95f;

@@ -1482,14 +1482,15 @@ void DrawDebugEditObject(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n　 位置　 [%.4f, %.4f, %.4f]"
-		"\n　 拡大率 [%.4f, %.4f, %.4f]"
-		"\n　 向き　 [%d]"
-		"\n　 種類　 [%d]"
-		"\n　 色　　 [%.2f, %.2f, %.2f]"
-		"\n   影     [%s]"
-		"\n   壊れ方 [%s]"
-		"\n   判定　 [%s]"
+		"\n　 位置　　 [%.4f, %.4f, %.4f]"
+		"\n　 拡大率　 [%.4f, %.4f, %.4f]"
+		"\n　 向き　　 [%d]"
+		"\n　 種類　　 [%d]"
+		"\n　 色　　　 [%.2f, %.2f, %.2f]"
+		"\n   影    　 [%s]"
+		"\n   壊れ方　 [%s]"
+		"\n   判定　　 [%s]"
+		"\n   判定向き [%d]"
 		"\n\n",
 		EditObject->pos.x, EditObject->pos.y, EditObject->pos.z,
 		EditObject->scale.x, EditObject->scale.y, EditObject->scale.z,
@@ -1499,7 +1500,8 @@ void DrawDebugEditObject(void)
 		EditObject->EditMaterial[EditObject->nType][EditObject->nCntMaterial].MatD3D.Diffuse.b,
 		EditObject->Shadowtype.pShadowMode[EditObject->Shadowtype.Shadowtype],
 		EditObject->Break.pBreakMode[EditObject->Break.Breaktype],
-		EditObject->Collisiontype.pCollisionMode[EditObject->Collisiontype.Collisiontype]
+		EditObject->Collisiontype.pCollisionMode[EditObject->Collisiontype.Collisiontype],
+		(int)D3DXToDegree(EditObject->CollInfo.rot.y)
 	);
 
 	// テキストの描画
@@ -1533,7 +1535,6 @@ void DrawDebugEditCollision(void)
 		"\n　 位置　 [%.4f, %.4f, %.4f]"
 		"\n　 距離　 [%.4f, %.4f, %.4f]"
 		"\n　 拡大率 [%.4f, %.4f, %.4f]"
-		"\n　 向き　 [%d]"
 		"\n　 サイズ [横幅：%.4f] [奥行：%.4f]"
 		"\n　 当たり判定の数　　 [%d 個]"
 		"\n　 選択中の当たり判定 [%d 番]"
@@ -1541,16 +1542,15 @@ void DrawDebugEditCollision(void)
 		EditCollision->pos[EditCollision->nSelectColl].x,
 		EditCollision->pos[EditCollision->nSelectColl].y,
 		EditCollision->pos[EditCollision->nSelectColl].z,
-		EditCollision->collision.vecPos[EditCollision->nSelectColl].x,
-		EditCollision->collision.vecPos[EditCollision->nSelectColl].y,
-		EditCollision->collision.vecPos[EditCollision->nSelectColl].z,
-		EditCollision->collision.scale[EditCollision->nSelectColl].x,
-		EditCollision->collision.scale[EditCollision->nSelectColl].y,
-		EditCollision->collision.scale[EditCollision->nSelectColl].z,
-		(int)D3DXToDegree(EditCollision->rot.y),
-		EditCollision->collision.fWidth[EditCollision->nSelectColl],
-		EditCollision->collision.fDepth[EditCollision->nSelectColl],
-		EditCollision->collision.nNumColl,
+		EditCollision->pCollision->vecPos[EditCollision->nSelectColl].x,
+		EditCollision->pCollision->vecPos[EditCollision->nSelectColl].y,
+		EditCollision->pCollision->vecPos[EditCollision->nSelectColl].z,
+		EditCollision->pCollision->scale[EditCollision->nSelectColl].x,
+		EditCollision->pCollision->scale[EditCollision->nSelectColl].y,
+		EditCollision->pCollision->scale[EditCollision->nSelectColl].z,
+		EditCollision->pCollision->fWidth[EditCollision->nSelectColl],
+		EditCollision->pCollision->fDepth[EditCollision->nSelectColl],
+		EditCollision->pCollision->nNumColl,
 		EditCollision->nSelectColl + 1
 	);
 
