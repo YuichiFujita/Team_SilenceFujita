@@ -22,7 +22,7 @@
 // カメラ全般
 #define VIEW_ANGLE		(D3DXToRadian(65.0f))	// 視野角
 #define VIEW_NEAR		(10.0f)					// モデルが見えるZ軸の最小値
-#define VIEW_FAR		(10000.0f)				// モデルが見えるZ軸の最大値
+#define VIEW_FAR		(30000.0f)				// モデルが見えるZ軸の最大値
 
 // メインカメラ
 #define FIRST_ROT		(1.45f)		// 開始時の視点と注視点の間の向き (x)
