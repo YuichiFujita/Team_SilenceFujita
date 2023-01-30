@@ -42,6 +42,7 @@ typedef struct
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報
 	int			 nShadowID;				// 影のインデックス
+	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
 	CURVE		 humanCurve;			// 曲がり角関係
