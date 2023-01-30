@@ -881,7 +881,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					}							//奥で止められる処理
 				}
 
-				if (pPos->z - CAR_DEPTH <= pCar[nCntCar].pos.z + CAR_DEPTH
+				if (pPosOld->z - CAR_DEPTH <= pCar[nCntCar].posOld.z + CAR_DEPTH
 					&& pPos->z + CAR_DEPTH >= pCar[nCntCar].pos.z - CAR_DEPTH)
 				{//塔のZ幅の中にいた場合
 					if (pPosOld->x + CAR_WIDTH <= pCar[nCntCar].posOld.x - CAR_WIDTH
@@ -966,7 +966,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 		if (pPlayer->bUse == true)
 		{ // 車が使用されていた場合
-			if (pPos->x - CAR_WIDTH <= pPlayer->pos.x + CAR_WIDTH
+			if (pPosOld->x - CAR_WIDTH <= pPlayer->oldPos.x + CAR_WIDTH
 				&& pPos->x + CAR_WIDTH >= pPlayer->pos.x - CAR_WIDTH)
 			{ // 車のX幅の中にいた場合
 				if (pPosOld->z + CAR_DEPTH <= pPlayer->oldPos.z - CAR_DEPTH
@@ -1023,7 +1023,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 				}							//奥で止められる処理
 			}
 
-			if (pPos->z - CAR_DEPTH <= pPlayer->oldPos.z + CAR_DEPTH
+			if (pPosOld->z - CAR_DEPTH <= pPlayer->oldPos.z + CAR_DEPTH
 				&& pPos->z + CAR_DEPTH >= pPlayer->pos.z - CAR_DEPTH)
 			{//塔のZ幅の中にいた場合
 				if (pPosOld->x + CAR_WIDTH <= pPlayer->oldPos.x - CAR_WIDTH
@@ -1089,7 +1089,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 		{
 			if (pPolice[nCntPolice].bUse == true && pPolice[nCntPolice].state != POLICESTATE_PATBACK)
 			{ // 車が使用されているかつ、パトロールから戻っている状態以外の場合
-				if (pPos->x - CAR_WIDTH <= pPolice[nCntPolice].pos.x + CAR_WIDTH
+				if (pPosOld->x - CAR_WIDTH <= pPolice[nCntPolice].posOld.x + CAR_WIDTH
 					&& pPos->x + CAR_WIDTH >= pPolice[nCntPolice].pos.x - CAR_WIDTH)
 				{ // 車のX幅の中にいた場合
 					if (pPosOld->z + CAR_DEPTH <= pPolice[nCntPolice].posOld.z - CAR_DEPTH
@@ -1160,7 +1160,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 					}							//奥で止められる処理
 				}
 
-				if (pPos->z - CAR_DEPTH <= pPolice[nCntPolice].pos.z + CAR_DEPTH
+				if (pPosOld->z - CAR_DEPTH <= pPolice[nCntPolice].posOld.z + CAR_DEPTH
 					&& pPos->z + CAR_DEPTH >= pPolice[nCntPolice].pos.z - CAR_DEPTH)
 				{//塔のZ幅の中にいた場合
 					if (pPosOld->x + CAR_WIDTH <= pPolice[nCntPolice].posOld.x - CAR_WIDTH
