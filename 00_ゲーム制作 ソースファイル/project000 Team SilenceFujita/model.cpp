@@ -16,20 +16,21 @@
 const char *apModelData[] =		// モデルの相対パス
 {
 	// オブジェクトモデル
-	"data\\MODEL_OBJECT\\Tree.x",		// 木
-	"data\\MODEL_OBJECT\\Rock.x",		// 岩
-	"data\\MODEL_OBJECT\\Forest.x",		// 森
-	"data\\MODEL_OBJECT\\BigTree.x",	// 大木
-	"data\\MODEL_OBJECT\\YellowTree.x",	// 黄色い木
-	"data\\MODEL_OBJECT\\Grass.x",		// 草
-	//"data\\MODEL_OBJECT\\Apart001.x",	//アパート
-	"data\\MODEL_OBJECT\\House001.x",	//家
-	"data\\MODEL_OBJECT\\CurryShop.x",	//カレー屋
-	"data\\MODEL_OBJECT\\bill001.x",	//ビルver1
-	"data\\MODEL_OBJECT\\bill002.x",	//ビルver2
-	"data\\MODEL_OBJECT\\ARCS.x",		//スーパー
-	"data\\MODEL_OBJECT\\Bakery.x",		//パン屋
-	"data\\MODEL_OBJECT\\CityOffice.x",	//市役所
+	"data\\MODEL_OBJECT\\Tree.x",			// 木
+	"data\\MODEL_OBJECT\\Rock.x",			// 岩
+	"data\\MODEL_OBJECT\\Forest.x",			// 森
+	"data\\MODEL_OBJECT\\BigTree.x",		// 大木
+	"data\\MODEL_OBJECT\\YellowTree.x",		// 黄色い木
+	"data\\MODEL_OBJECT\\Grass.x",			// 草
+	//"data\\MODEL_OBJECT\\Apart001.x",		//アパート
+	"data\\MODEL_OBJECT\\House001.x",		//家
+	"data\\MODEL_OBJECT\\CurryShop.x",		//カレー屋
+	"data\\MODEL_OBJECT\\bill001.x",		//ビルver1
+	"data\\MODEL_OBJECT\\bill002.x",		//ビルver2
+	"data\\MODEL_OBJECT\\ARCS.x",			//スーパー
+	"data\\MODEL_OBJECT\\Bakery.x",			//パン屋
+	"data\\MODEL_OBJECT\\CityOffice.x",		//市役所
+	"data\\MODEL_OBJECT\\gymnasium.x",		//体育館
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",		// プレイヤー
