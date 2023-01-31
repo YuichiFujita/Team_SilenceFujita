@@ -728,7 +728,7 @@ void UpdateFlyAway(void)
 		// カウンターを加算する
 		GetWindInfo()->nUseCounter++;
 
-		if (GetWindInfo()->nUseCounter >= 180)
+		if (GetWindInfo()->nUseCounter >= WIND_OVERHEAT_CNT)
 		{ // 3秒を超えた場合
 			// 風を使用しない
 			g_player.wind.bUseWind = false;

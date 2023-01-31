@@ -280,7 +280,7 @@ void DrawWind(void)
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 //======================================================================================================================
-// 送風機の設定処理
+//	送風機の設定処理
 //======================================================================================================================
 void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
@@ -300,7 +300,7 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			// 位置を設置する
 			g_aWind[nCntWind].pos = pos;
 
-			//移動量の倍率を設定する
+			// 移動量の倍率を設定する
 			fMoveMagni = (float)(rand() % 100) / 5;
 
 			// 移動量を設定する
@@ -342,7 +342,7 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 }
 
 //======================================================================================================================
-// 風の当たり判定
+//	風の当たり判定
 //======================================================================================================================
 void CollisionWind(Human *pHuman)
 {
@@ -353,23 +353,26 @@ void CollisionWind(Human *pHuman)
 
 	if (pHuman->pos.y <= 50.0f)
 	{ // 300.0f以下にいる場合
+
 		// 四頂点の位置の計算
 		VecSizePos
 		( // 引数
 			&vecPos[0],
 			pPlayer->pos,	// 絶対座標
 			pPlayer->rot,	// 向き
-			700.0f,			// 横幅
+			1000.0f,		// 横幅
 			100.0f			// 縦幅
 		);
 
 		if (LineOuterProduct(vecPos[0], vecPos[1], pHuman->pos) < 0
-			&& LineOuterProduct(vecPos[1], vecPos[2], pHuman->pos) < 0
-			&& LineOuterProduct(vecPos[2], vecPos[3], pHuman->pos) < 0
-			&& LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
+		&&  LineOuterProduct(vecPos[1], vecPos[2], pHuman->pos) < 0
+		&&  LineOuterProduct(vecPos[2], vecPos[3], pHuman->pos) < 0
+		&&  LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
 		{ // 四辺の内側にいる場合 (当たっている場合)
+
 			if (pPlayer->wind.bUseWind == true)
 			{ // 風を使用している場合
+
 				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;
 
@@ -381,7 +384,7 @@ void CollisionWind(Human *pHuman)
 }
 
 //============================================================
-// 人間が吹き飛ばされる処理
+//	人間が吹き飛ばされる処理
 //============================================================
 void FlyAwayHuman(Human *pHuman, Player player)
 {
@@ -397,7 +400,7 @@ void FlyAwayHuman(Human *pHuman, Player player)
 }
 
 //============================================================
-//風の情報の取得処理
+//	風の情報の取得処理
 //============================================================
 WindInfo *GetWindInfo(void)
 {
