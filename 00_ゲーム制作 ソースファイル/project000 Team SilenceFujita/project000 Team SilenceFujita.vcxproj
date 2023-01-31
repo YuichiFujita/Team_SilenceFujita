@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ability.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
     <ClCompile Include="calculation.cpp" />
@@ -172,6 +173,8 @@
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="meshcylinder.cpp" />
+    <ClCompile Include="meshdome.cpp" />
     <ClCompile Include="meshfield.cpp" />
     <ClCompile Include="meshwall.cpp" />
     <ClCompile Include="model.cpp" />
@@ -192,6 +195,7 @@
     <ClCompile Include="wind.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ability.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />
     <ClInclude Include="calculation.h" />
@@ -210,6 +214,8 @@
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="meshcylinder.h" />
+    <ClInclude Include="meshdome.h" />
     <ClInclude Include="meshfield.h" />
     <ClInclude Include="meshwall.h" />
     <ClInclude Include="model.h" />

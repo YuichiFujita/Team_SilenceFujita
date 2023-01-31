@@ -14,12 +14,15 @@
 
 #include "game.h"
 
+#include "ability.h"
 #include "billboard.h"
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
 #include "life.h"
 #include "light.h"
+#include "meshdome.h"
+#include "meshcylinder.h"
 #include "meshfield.h"
 #include "meshwall.h"
 #include "particle.h"
@@ -71,6 +74,9 @@ void InitGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
 	//------------------------------------------------------------------------------------------------------------------
+	// カーブの情報の初期化処理
+	//InitCurveInfo();
+
 	// 影の初期化
 	InitShadow();
 
@@ -83,7 +89,7 @@ void InitGame(void)
 	// オブジェクトの初期化
 	InitObject();
 
-	//車の初期化
+	// 車の初期化
 	InitCar();
 
 	// 人間の初期化
@@ -94,6 +100,12 @@ void InitGame(void)
 
 	// ライトの初期化
 	InitLight();
+
+	// メッシュドームの初期化
+	InitMeshDome();
+
+	// メッシュシリンダーの初期化
+	InitMeshCylinder();
 
 	// メッシュフィールドの初期化
 	InitMeshField();
@@ -121,6 +133,9 @@ void InitGame(void)
 
 	// タイマーの初期化
 	InitTimer();
+
+	// 能力バーの初期化
+	InitAbility();
 
 	// 速度バーの初期化
 	InitVelocity();
@@ -173,6 +188,12 @@ void UninitGame(void)
 	// ライトの終了
 	UninitLight();
 
+	// メッシュドームの終了
+	UninitMeshDome();
+
+	// メッシュシリンダーの終了
+	UninitMeshCylinder();
+
 	// メッシュフィールドの終了
 	UninitMeshField();
 
@@ -199,6 +220,9 @@ void UninitGame(void)
 
 	// タイマーの終了
 	UninitTimer();
+
+	// 能力バーの終了
+	UninitAbility();
 
 	// 速度バーの終了
 	UninitVelocity();
@@ -288,6 +312,12 @@ void UpdateGame(void)
 		if (g_bPause == false)
 		{ // ポーズ状態ではない場合
 
+			// メッシュドームの更新
+			UpdateMeshDome();
+
+			// メッシュシリンダーの更新
+			UpdateMeshCylinder();
+
 			// メッシュフィールドの更新
 			UpdateMeshField();
 
@@ -340,6 +370,9 @@ void UpdateGame(void)
 
 	// タイマーの更新
 	UpdateTimer();
+
+	// 能力バーの更新
+	UpdateAbility();
 
 	// 速度バーの更新
 	UpdateVelocity();
@@ -396,6 +429,12 @@ void UpdateGame(void)
 		// ライトの更新
 		UpdateLight();
 
+		// メッシュドームの更新
+		UpdateMeshDome();
+
+		// メッシュシリンダーの更新
+		UpdateMeshCylinder();
+
 		// メッシュフィールドの更新
 		UpdateMeshField();
 
@@ -438,6 +477,9 @@ void UpdateGame(void)
 		// タイマーの更新
 		UpdateTimer();
 
+		// 能力バーの更新
+		UpdateAbility();
+
 		// 速度バーの更新
 		UpdateVelocity();
 
@@ -474,6 +516,12 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_MAIN);
 
+	// メッシュドームの描画
+	DrawMeshDome();
+
+	// メッシュシリンダーの描画
+	DrawMeshCylinder();
+
 	// メッシュフィールドの描画
 	DrawMeshField();
 
@@ -492,7 +540,7 @@ void DrawGame(void)
 	// 警察の描画
 	DrawPolice();
 
-	//車の描画処理
+	// 車の描画処理
 	DrawCar();
 
 	// オブジェクトの描画
@@ -554,6 +602,9 @@ void DrawGame(void)
 
 	// タイマーの描画
 	DrawTimer();
+
+	// 能力バーの描画
+	DrawAbility();
 
 	// 速度バーの描画
 	DrawVelocity();

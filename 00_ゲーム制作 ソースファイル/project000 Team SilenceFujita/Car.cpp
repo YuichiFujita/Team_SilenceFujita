@@ -59,6 +59,8 @@ Car g_aCar[MAX_CAR];		// 車の情報
 //======================================================================================================================
 void InitCar(void)
 {
+	CURVE Curve;
+
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();		// デバイスへのポインタ
 
@@ -87,6 +89,13 @@ void InitCar(void)
 		g_aCar[nCntCar].carCurve.nCurveTime = 0;				// 曲がる回数
 		g_aCar[nCntCar].carCurve.nNowCurve = 0;					// 現在のルート
 
+		//曲がり角の情報の初期化
+		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle = CURVE_LEFT;	// 左に曲がる
+		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;		// カーブする番地
+		g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;						// スキップする曲がり角の回数
+		g_aCar[nCntCar].carCurveInfo.rotOld = g_aCar[nCntCar].rot;		// 前回の向き
+		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;			// 現在の車の行動
+
 		// モデル情報の初期化
 		g_aCar[nCntCar].modelData.dwNumMat = 0;					// マテリアルの数
 		g_aCar[nCntCar].modelData.pTexture = NULL;				// テクスチャへのポインタ
@@ -97,6 +106,9 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.size = INIT_SIZE;				// 大きさ
 		g_aCar[nCntCar].modelData.fRadius = 0.0f;				// 半径
 	}
+
+	//車の設定処理
+	SetCar(D3DXVECTOR3(-7000.0f, 0.0f, 6000.0f), Curve);
 }
 
 //======================================================================================================================
@@ -135,11 +147,11 @@ void UpdateCar(void)
 				NONE_SCALE							// 拡大率
 			);
 
-			//車のカーブ処理
-			CurveCar(&g_aCar[nCntCar]);
-
 			// プレイヤーの位置の更新
 			PosCar(&g_aCar[nCntCar].move, &g_aCar[nCntCar].pos, &g_aCar[nCntCar].rot, g_aCar[nCntCar].bMove);
+
+			//車のカーブ処理
+			CurveCar(&g_aCar[nCntCar]);
 
 			if (g_aCar[nCntCar].pos.y < 0.0f)
 			{//Y軸の位置が0.0fだった場合
@@ -281,44 +293,50 @@ void SetCar(D3DXVECTOR3 pos, CURVE carCurve)
 			// 影の位置設定
 			SetPositionShadow(g_aCar[nCntCar].nShadowID, g_aCar[nCntCar].pos, g_aCar[nCntCar].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			//曲がり角関係の設定
-			for (int nCntCurve = 0; nCntCurve < carCurve.nCurveTime; nCntCurve++)
-			{
-				g_aCar[nCntCar].carCurve.fCurveRot[nCntCurve] = carCurve.fCurveRot[nCntCurve];		// 次曲がる目標の方向
-				g_aCar[nCntCar].carCurve.curvePoint[nCntCurve] = carCurve.curvePoint[nCntCurve];	// 次曲がる位置
-			}
-			g_aCar[nCntCar].carCurve.nNowCurve = 0;													// 現在のルート
-			g_aCar[nCntCar].carCurve.nCurveTime = carCurve.nCurveTime;								// 曲がる回数
+			g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;																	// 次の曲がり角を設定する
+			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber);					// 曲がり角を設定する
+			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
+			g_aCar[nCntCar].carCurveInfo.rotOld = g_aCar[nCntCar].rot;																	// 前回の向き
+			g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;																		// 走っている状態
 
-			//カーブポイントの設定処理
-			SetCurvePoint(&g_aCar[nCntCar].carCurve, &g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
+			////曲がり角関係の設定
+			//for (int nCntCurve = 0; nCntCurve < carCurve.nCurveTime; nCntCurve++)
+			//{
+			//	g_aCar[nCntCar].carCurve.fCurveRot[nCntCurve] = carCurve.fCurveRot[nCntCurve];		// 次曲がる目標の方向
+			//	g_aCar[nCntCar].carCurve.curvePoint[nCntCurve] = carCurve.curvePoint[nCntCurve];	// 次曲がる位置
+			//}
+			//g_aCar[nCntCar].carCurve.nNowCurve = 0;													// 現在のルート
+			//g_aCar[nCntCar].carCurve.nCurveTime = carCurve.nCurveTime;								// 曲がる回数
 
-			if (g_aCar[nCntCar].carCurve.bCurveX[0] == true)
-			{ // 最初X軸を走っている場合
-				if (g_aCar[nCntCar].carCurve.bCurvePlus[0] == true)
-				{ // 右に走っている場合
-					// 位置を補正する
-					g_aCar[nCntCar].pos.z = g_aCar[nCntCar].carCurve.curvePoint[0].z - (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左に走っている場合
-					// 位置を補正する
-					g_aCar[nCntCar].pos.z = g_aCar[nCntCar].carCurve.curvePoint[0].z + (CAR_WIDTH * 2);
-				}
-			}
-			else
-			{ // 最初Z軸を走っている場合
-				if (g_aCar[nCntCar].carCurve.bCurvePlus[0] == true)
-				{ // 奥に走っている場合
-					// 位置を補正する
-					g_aCar[nCntCar].pos.x = g_aCar[nCntCar].carCurve.curvePoint[0].x + (CAR_WIDTH * 2);
-				}
-				else
-				{ // 手前に走っている場合
-					// 位置を補正する
-					g_aCar[nCntCar].pos.x = g_aCar[nCntCar].carCurve.curvePoint[0].x - (CAR_WIDTH * 2);
-				}
-			}
+			////カーブポイントの設定処理
+			//SetCurvePoint(&g_aCar[nCntCar].carCurve, &g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
+
+			//if (g_aCar[nCntCar].carCurve.bCurveX[0] == true)
+			//{ // 最初X軸を走っている場合
+			//	if (g_aCar[nCntCar].carCurve.bCurvePlus[0] == true)
+			//	{ // 右に走っている場合
+			//		// 位置を補正する
+			//		g_aCar[nCntCar].pos.z = g_aCar[nCntCar].carCurve.curvePoint[0].z - (CAR_WIDTH * 2);
+			//	}
+			//	else
+			//	{ // 左に走っている場合
+			//		// 位置を補正する
+			//		g_aCar[nCntCar].pos.z = g_aCar[nCntCar].carCurve.curvePoint[0].z + (CAR_WIDTH * 2);
+			//	}
+			//}
+			//else
+			//{ // 最初Z軸を走っている場合
+			//	if (g_aCar[nCntCar].carCurve.bCurvePlus[0] == true)
+			//	{ // 奥に走っている場合
+			//		// 位置を補正する
+			//		g_aCar[nCntCar].pos.x = g_aCar[nCntCar].carCurve.curvePoint[0].x + (CAR_WIDTH * 2);
+			//	}
+			//	else
+			//	{ // 手前に走っている場合
+			//		// 位置を補正する
+			//		g_aCar[nCntCar].pos.x = g_aCar[nCntCar].carCurve.curvePoint[0].x - (CAR_WIDTH * 2);
+			//	}
+			//}
 
 			// 処理を抜ける
 			break;
@@ -490,182 +508,374 @@ void CurveCar(Car *pCar)
 	// 移動している状態にする
 	pCar->bMove = true;
 
-	if (pCar->carCurve.bCurveX[pCar->carCurve.nNowCurve] == true)
-	{//X軸を走っていた場合
-		if (pCar->carCurve.bCurvePlus[pCar->carCurve.nNowCurve] == true)
-		{ // 右に走っている場合
-			if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
-			{//右に曲がる場合
-				if (pCar->pos.x >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
+	//if (pCar->carCurve.bCurveX[pCar->carCurve.nNowCurve] == true)
+	//{//X軸を走っていた場合
+	//	if (pCar->carCurve.bCurvePlus[pCar->carCurve.nNowCurve] == true)
+	//	{ // 右に走っている場合
+	//		if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
+	//		{//右に曲がる場合
+	//			if (pCar->pos.x >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
 
-					// 右の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-					// 左の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
+	//				// 右の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//				// 左の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//		else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
+	//		{//左に曲がる場合
+	//			if (pCar->pos.x >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
+
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+
+	//				// 右の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//			  // 左の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{ // 左に走っている場合
+	//		if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
+	//		{//右に曲がる場合
+	//			if (pCar->pos.x <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
+
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+
+	//				// 左の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//				// 手前の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//		else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
+	//		{//左に曲がる場合
+	//			if (pCar->pos.x <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
+
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+
+	//				// 左の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//				// 手前の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//	}
+	//}
+	//else
+	//{//Z軸を走っていた場合
+	//	if (pCar->carCurve.bCurvePlus[pCar->carCurve.nNowCurve] == true)
+	//	{ // 右の壁が警察より左側にある場合
+	//		if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
+	//		{//右に曲がる場合
+	//			if (pCar->pos.z >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
+
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+
+	//				// 手前の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//				// 右の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//		else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
+	//		{ // 左に曲がる場合
+	//			if (pCar->pos.z >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
+
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+
+	//				// 手前の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//				// 右の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{//左の壁が警察より右にある場合
+	//		if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
+	//		{//右に曲がる場合
+	//			if (pCar->pos.z <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
+
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+
+	//				// 左の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//			  // 左の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//		else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
+	//		{
+	//			if (pCar->pos.z <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2))
+	//			{ // 左にある壁が途切れたら
+
+	//				// 車の角度更新・補正処理
+	//				CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+
+	//				// 移動量を減速
+	//				pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+
+	//				// 左の壁に這わせる
+	//				pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
+	//			}
+	//			else
+	//			{ // 左にある壁がまだあったら
+	//			  // 左の壁に這わせる
+	//				pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
+	//			}
+	//		}
+	//	}
+	//}
+
+	for (int nCnt = 0; nCnt < 24; nCnt++)
+	{
+		switch (pCar->carCurveInfo.curveInfo.dashAngle)
+		{
+		case DASH_RIGHT:		//右に走っている場合
+
+			//這わせる
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pCar->pos.z == GetCurveInfo(nCnt).pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pCar->pos.x >= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2) &&
+					pCar->posOld.x <= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
+					{ // 右に走る場合のみ
+						// スキップカウントを減算する
+						pCar->carCurveInfo.nSKipCnt--;
+
+						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になったまたは、行き止まりだった場合
+							// スキップ回数を0にする
+							pCar->carCurveInfo.nSKipCnt = 0;
+
+							// 曲がり角の情報を更新する
+							pCar->carCurveInfo.curveInfo = GetCurveInfo(nCnt);
+						}
+					}
 				}
 			}
-			else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
-			{//左に曲がる場合
-				if (pCar->pos.x >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+			break;				//抜け出す
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+		case DASH_LEFT:			//左を走っている場合
 
-					// 右の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-				  // 左の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
-				}
-			}
-		}
-		else
-		{ // 左に走っている場合
-			if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
-			{//右に曲がる場合
-				if (pCar->pos.x <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
+			//這わせる
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+			if (pCar->pos.z == GetCurveInfo(nCnt).pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pCar->pos.x <= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2) &&
+					pCar->posOld.x >= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
+					{ // 左に走る場合のみ
+						// スキップカウントを減算する
+						pCar->carCurveInfo.nSKipCnt--;
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になった場合
+							// スキップ回数を0にする
+							pCar->carCurveInfo.nSKipCnt = 0;
 
-					// 左の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-					// 手前の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
+							// 曲がり角の情報を更新する
+							pCar->carCurveInfo.curveInfo = GetCurveInfo(nCnt);
+						}
+					}
 				}
 			}
-			else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
-			{//左に曲がる場合
-				if (pCar->pos.x <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+			break;				//抜け出す
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+		case DASH_FAR:			//奥に走っている場合
 
-					// 左の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-					// 手前の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
+			//這わせる
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pCar->pos.x == GetCurveInfo(nCnt).pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pCar->pos.z >= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2) &&
+					pCar->posOld.z <= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
+					{ // 奥に走る場合のみ
+						// スキップカウントを減算する
+						pCar->carCurveInfo.nSKipCnt--;
+
+						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になった場合
+							// スキップ回数を0にする
+							pCar->carCurveInfo.nSKipCnt = 0;
+
+							// 曲がり角の情報を更新する
+							pCar->carCurveInfo.curveInfo = GetCurveInfo(nCnt);
+						}
+					}
 				}
 			}
+
+			break;				//抜け出す
+
+		case DASH_NEAR:			//奥に走っている場合
+
+			//這わせる
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pCar->pos.x == GetCurveInfo(nCnt).pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pCar->pos.z <= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2) &&
+					pCar->posOld.z >= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
+					{ // 手前に走る場合のみ
+						// スキップカウントを減算する
+						pCar->carCurveInfo.nSKipCnt--;
+
+						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になった場合
+							// スキップ回数を0にする
+							pCar->carCurveInfo.nSKipCnt = 0;
+
+							// 曲がり角の情報を更新する
+							pCar->carCurveInfo.curveInfo = GetCurveInfo(nCnt);
+						}
+					}
+				}
+			}
+
+			break;				//抜け出す
 		}
 	}
-	else
-	{//Z軸を走っていた場合
-		if (pCar->carCurve.bCurvePlus[pCar->carCurve.nNowCurve] == true)
-		{ // 右の壁が警察より左側にある場合
-			if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
-			{//右に曲がる場合
-				if (pCar->pos.z >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+	if (pCar->carCurveInfo.nSKipCnt == 0)
+	{ // スキップカウントが0の場合
+		switch (pCar->carCurveInfo.curveInfo.dashAngle)
+		{
+		case DASH_RIGHT:			//右に走っている
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+			//這わせる
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-					// 手前の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-					// 右の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
-				}
+			if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x - (CAR_WIDTH * 2))
+			{ // 車の位置が曲がる位置に達した場合
+				// 位置を補正する
+				pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (CAR_WIDTH * 2);
+
+				// 車の角度更新・補正処理
+				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
 			}
-			else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
-			{ // 左に曲がる場合
-				if (pCar->pos.z >= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+			break;					//抜け出す
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+		case DASH_LEFT:				//左に走っている
 
-					// 手前の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-					// 右の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x + (CAR_WIDTH * 2);
-				}
+			//這わせる
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x + (CAR_WIDTH * 2))
+			{ // 車の位置が曲がる位置に達した場合
+				// 位置を補正する
+				pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (CAR_WIDTH * 2);
+
+				// 車の角度更新・補正処理
+				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
 			}
-		}
-		else
-		{//左の壁が警察より右にある場合
-			if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_RIGHT)
-			{//右に曲がる場合
-				if (pCar->pos.z <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+			break;					//抜け出す
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+		case DASH_FAR:				//奥に走っている
 
-					// 左の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z + (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-				  // 左の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
-				}
+			//這わせる
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z - (CAR_WIDTH * 2))
+			{ // 車の位置が曲がる位置に達した場合
+				// 位置を補正する
+				pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (CAR_WIDTH * 2);
+
+				// 車の角度更新・補正処理
+				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
 			}
-			else if (pCar->carCurve.curveAngle[pCar->carCurve.nNowCurve] == CURVE_LEFT)
-			{
-				if (pCar->pos.z <= pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2))
-				{ // 左にある壁が途切れたら
 
-					// 車の角度更新・補正処理
-					CurveRotCar(&pCar->carCurve, &pCar->rot, &pCar->move);
+			break;					//抜け出す
 
-					// 移動量を減速
-					pCar->move.x += (0.0f - pCar->move.x) * REV_CAR_MOVE_SUB;
+		case DASH_NEAR:				//手前に走っている
 
-					// 左の壁に這わせる
-					pCar->pos.z = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].z - (CAR_WIDTH * 2);
-				}
-				else
-				{ // 左にある壁がまだあったら
-				  // 左の壁に這わせる
-					pCar->pos.x = pCar->carCurve.curvePoint[pCar->carCurve.nNowCurve].x - (CAR_WIDTH * 2);
-				}
+			//這わせる
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z + (CAR_WIDTH * 2))
+			{ // 車の位置が曲がる位置に達した場合
+				// 位置を補正する
+				pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (CAR_WIDTH * 2);
+
+				// 車の角度更新・補正処理
+				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
 			}
+
+			break;					//抜け出す
 		}
 	}
 

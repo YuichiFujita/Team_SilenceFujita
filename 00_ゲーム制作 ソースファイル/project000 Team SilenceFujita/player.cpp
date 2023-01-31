@@ -41,7 +41,6 @@
 #define BOOST_OK_MOVE	(15.0f)		// ブースト使用に必要なプレイヤーの最低速度
 #define BOOST_ADD_MOVE	(0.25f)		// ブーストの加速量
 #define BOOST_SUB_MOVE	(0.08f)		// ブーストの減速量
-#define BOOST_WAIT_CNT	(180)		// ブーストの再使用までの時間
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
 
 #define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
@@ -116,7 +115,7 @@ void InitPlayer(void)
 	g_player.wind.nCount       = 0;								// 風を出すカウント
 	g_player.wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
 
-	//ドリフトの情報の初期化
+	// ドリフトの情報の初期化
 	g_player.drift.bDrift = false;	// ドリフト状況
 
 	// プレイヤーの位置・向きの設定
@@ -701,9 +700,11 @@ void FlyAwayPlayer(void)
 {
 	if (GetKeyboardPress(DIK_U) == true)
 	{ // Uキーを押している場合
-
-		// 送風機を使用する
-		g_player.wind.bUseWind = true;
+		if (GetWindInfo()->state == WIND_USABLE)
+		{ // 風が使用可能だった場合
+			// 送風機を使用する
+			g_player.wind.bUseWind = true;
+		}
 	}
 	else
 	{ // Uキーを押していない場合
@@ -723,6 +724,18 @@ void UpdateFlyAway(void)
 
 		// 風を出すカウントを加算する
 		g_player.wind.nCount++;
+
+		// カウンターを加算する
+		GetWindInfo()->nUseCounter++;
+
+		if (GetWindInfo()->nUseCounter >= WIND_OVERHEAT_CNT)
+		{ // 3秒を超えた場合
+			// 風を使用しない
+			g_player.wind.bUseWind = false;
+
+			// オーバーヒート状態にする
+			GetWindInfo()->state = WIND_OVERHEAT;
+		}
 
 		if (g_player.wind.nCount % 3 == 0)
 		{ // 風のカウントが一定数になったら
@@ -770,6 +783,18 @@ void UpdateFlyAway(void)
 
 		// カウントを初期化する
 		g_player.wind.nCount = 0;
+
+		// カウンターを減算する
+		GetWindInfo()->nUseCounter--;
+
+		if (GetWindInfo()->nUseCounter <= 0)
+		{ // カウンターが0以下になった場合
+			// カウンターを補正する
+			GetWindInfo()->nUseCounter = 0;
+
+			// 使用可能にする
+			GetWindInfo()->state = WIND_USABLE;
+		}
 	}
 }
 
@@ -828,11 +853,11 @@ void UpdateBoost(void)
 			// カウンターを減算
 			g_player.boost.nCounter--;
 
-			//タイヤ痕を出す
+			// タイヤ痕を出す
 			SetTireMark(D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
 				g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
 
-			//タイヤ痕を出す
+			// タイヤ痕を出す
 			SetTireMark(D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
 				g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
 		}
