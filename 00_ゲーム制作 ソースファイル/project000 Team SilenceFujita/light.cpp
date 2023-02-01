@@ -38,9 +38,9 @@ void InitLight(void)
 	aDiffuse[2] = D3DXCOLOR(0.2f , 0.2f , 0.2f , 1.0f);
 
 	// 方向ベクトルを設定
-	aVecDir[0] = D3DXVECTOR3(0.22f, -0.87f, 0.44f);
-	aVecDir[1] = D3DXVECTOR3(-0.38f, 0.88f, -0.44f);
-	aVecDir[2] = D3DXVECTOR3(0.89f, -0.11f, 0.44f);
+	aVecDir[0] = D3DXVECTOR3( 0.34f, -0.87f,  0.35f);
+	aVecDir[1] = D3DXVECTOR3(-0.59f, -0.10f, -0.80f);
+	aVecDir[2] = D3DXVECTOR3(-0.22f, -0.74f,  0.63f);
 
 	for (int nCntLight = 0; nCntLight < MAX_LIGHT; nCntLight++)
 	{ // 使用するライト数分繰り返す

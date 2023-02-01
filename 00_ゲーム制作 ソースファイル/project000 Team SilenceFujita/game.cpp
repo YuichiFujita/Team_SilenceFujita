@@ -21,6 +21,8 @@
 #include "effect.h"
 #include "life.h"
 #include "light.h"
+#include "meshdome.h"
+#include "meshcylinder.h"
 #include "meshfield.h"
 #include "meshwall.h"
 #include "particle.h"
@@ -98,6 +100,12 @@ void InitGame(void)
 
 	// ライトの初期化
 	InitLight();
+
+	// メッシュドームの初期化
+	InitMeshDome();
+
+	// メッシュシリンダーの初期化
+	InitMeshCylinder();
 
 	// メッシュフィールドの初期化
 	InitMeshField();
@@ -179,6 +187,12 @@ void UninitGame(void)
 
 	// ライトの終了
 	UninitLight();
+
+	// メッシュドームの終了
+	UninitMeshDome();
+
+	// メッシュシリンダーの終了
+	UninitMeshCylinder();
 
 	// メッシュフィールドの終了
 	UninitMeshField();
@@ -298,6 +312,12 @@ void UpdateGame(void)
 		if (g_bPause == false)
 		{ // ポーズ状態ではない場合
 
+			// メッシュドームの更新
+			UpdateMeshDome();
+
+			// メッシュシリンダーの更新
+			UpdateMeshCylinder();
+
 			// メッシュフィールドの更新
 			UpdateMeshField();
 
@@ -409,6 +429,12 @@ void UpdateGame(void)
 		// ライトの更新
 		UpdateLight();
 
+		// メッシュドームの更新
+		UpdateMeshDome();
+
+		// メッシュシリンダーの更新
+		UpdateMeshCylinder();
+
 		// メッシュフィールドの更新
 		UpdateMeshField();
 
@@ -492,6 +518,12 @@ void DrawGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	// カメラの設定
 	SetCamera(CAMERATYPE_MAIN);
+
+	// メッシュドームの描画
+	DrawMeshDome();
+
+	// メッシュシリンダーの描画
+	DrawMeshCylinder();
 
 	// メッシュフィールドの描画
 	DrawMeshField();
