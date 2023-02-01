@@ -508,7 +508,7 @@ void DashCarAction(Car *pCar)
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になったまたは、行き止まりだった場合
-						  // スキップ回数を0にする
+							// スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
