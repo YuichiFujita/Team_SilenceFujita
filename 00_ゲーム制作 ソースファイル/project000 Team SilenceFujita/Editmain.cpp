@@ -227,7 +227,7 @@ void TxtSaveStage(void)
 
 				// 基本情報の書き出し
 				fprintf(pFile, "		POS        = %.1f %.1f %.1f\n", pObject->pos.x,   pObject->pos.y,   pObject->pos.z);	// 位置
-				fprintf(pFile, "		ROT        = %.1f %.1f %.1f\n", pObject->rot.x,   pObject->rot.y,   pObject->rot.z);	// 向き
+				fprintf(pFile, "		ROT        = %.2f %.2f %.2f\n", pObject->rot.x,   pObject->rot.y,   pObject->rot.z);	// 向き
 				fprintf(pFile, "		SCALE      = %.1f %.1f %.1f\n", pObject->scale.x, pObject->scale.y, pObject->scale.z);	// 拡大率
 				fprintf(pFile, "		TYPE       = %d\n", pObject->nType);			// オブジェクトの種類
 				fprintf(pFile, "		BREAKTYPE  = %d\n", pObject->nBreakType);		// 壊れ方の種類
@@ -300,7 +300,7 @@ void TxtSaveStage(void)
 
 				// 基本情報の書き出し
 				fprintf(pFile, "		POS        = %.1f %.1f %.1f\n",      pBillboard->pos.x, pBillboard->pos.y, pBillboard->pos.z);						// 位置
-				fprintf(pFile, "		ROT        = %.1f %.1f %.1f\n",      pBillboard->rot.x, pBillboard->rot.y, pBillboard->rot.z);						// 向き
+				fprintf(pFile, "		ROT        = %.2f %.2f %.2f\n",      pBillboard->rot.x, pBillboard->rot.y, pBillboard->rot.z);						// 向き
 				fprintf(pFile, "		COL        = %.1f %.1f %.1f %.1f\n", pBillboard->col.r, pBillboard->col.g, pBillboard->col.b, pBillboard->col.a);	// 色
 				fprintf(pFile, "		RADIUS     = %.1f %.1f\n",           pBillboard->Radius.x, pBillboard->Radius.y);	// 半径
 				fprintf(pFile, "		TYPE       = %d\n",                  pBillboard->Type);								// 種類
