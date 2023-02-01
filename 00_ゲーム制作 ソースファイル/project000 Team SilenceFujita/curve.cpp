@@ -21,6 +21,7 @@
 #define CURVE_MOVE_SLOW_MAGNI			(0.3f)				// カーブするときの減速係数
 #define CURVE_ADD						(0.03f)				// カーブするときの向きの追加量
 #define CURVE_TXT						"data\\TXT\\Curve.txt"		// カーブ設定用のテキストファイルの相対パス
+#define CURVE_SKIP_RANDOM				(2)					// スキップする回数のランダムの範囲
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -221,7 +222,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 		else if (pCurve->curveInfo.dashAngle == DASH_LEFT)
@@ -245,7 +246,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 		else if (pCurve->curveInfo.dashAngle == DASH_FAR)
@@ -269,7 +270,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 		else if (pCurve->curveInfo.dashAngle == DASH_NEAR)
@@ -293,7 +294,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 	}
@@ -324,7 +325,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 		else if (pCurve->curveInfo.dashAngle == DASH_LEFT)
@@ -349,7 +350,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 		else if (pCurve->curveInfo.dashAngle == DASH_FAR)
@@ -374,7 +375,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 		else if (pCurve->curveInfo.dashAngle == DASH_NEAR)
@@ -399,7 +400,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 				pCurve->actionState = CARACT_DASH;
 
 				// スキップする回数を設定する
-				pCurve->nSKipCnt = rand() % 2 + 1;
+				pCurve->nSKipCnt = rand() % CURVE_SKIP_RANDOM + 1;
 			}
 		}
 	}

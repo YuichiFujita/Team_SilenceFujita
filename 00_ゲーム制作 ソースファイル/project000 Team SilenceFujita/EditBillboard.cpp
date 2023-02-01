@@ -14,6 +14,17 @@
 #include "EditObject.h"
 #include "Editmain.h"
 
+//マクロ定義
+#define INIT_RADIUS							(30.0f)					// 半径の初期値
+#define EDITBB_DELETE_RANGE					(30.0f)					// ビルボード消去の範囲
+#define EDITBB_MOVE							(16.0f)					// 通常の移動量
+#define EDITBB_ADJUSTMENT_MOVE				(4.0f)					// 調整用の移動量
+#define EDITBB_SCALING						(1.0f)					// 拡大縮小率
+#define EDITBB_COL_CHANGE_CNT				(5)						// 色が変わるカウント
+#define EDITBB_COL_CONVERSION				(0.01f)					// 色の変化量
+#define EDITBB_UPDOWN_MOVE					(6.0f)					// 上下移動の移動量
+#define EDITBB_UPDOWN_ADJUSTMENT_MOVE		(2.0f)					// 調整用の上下移動の移動量
+
 //プロトタイプ宣言
 void TypeChangeEditBillboard(void);						//種類変更処理
 void MoveEditBillboard(void);							//移動処理
@@ -65,7 +76,7 @@ void InitEditBillboard(void)
 		g_EditBillboard.bUse = false;
 
 		//幅を初期化する
-		g_EditBillboard.Radius = D3DXVECTOR2(30.0f, 30.0f);
+		g_EditBillboard.Radius = D3DXVECTOR2(INIT_RADIUS, INIT_RADIUS);
 
 		//アニメーションしない
 		g_EditBillboard.EditAnim.bAnim = false;
@@ -339,10 +350,10 @@ void DeleteEditBillboard(void)
 	{
 		if (Billboard->bUse == true)
 		{//オブジェクトが使用されていた場合
-			if (g_EditBillboard.pos.x >= Billboard->pos.x - 10.0f &&
-				g_EditBillboard.pos.x <= Billboard->pos.x + 10.0f &&
-				g_EditBillboard.pos.z >= Billboard->pos.z - 10.0f &&
-				g_EditBillboard.pos.z <= Billboard->pos.z + 10.0f &&
+			if (g_EditBillboard.pos.x >= Billboard->pos.x - EDITBB_DELETE_RANGE &&
+				g_EditBillboard.pos.x <= Billboard->pos.x + EDITBB_DELETE_RANGE &&
+				g_EditBillboard.pos.z >= Billboard->pos.z - EDITBB_DELETE_RANGE &&
+				g_EditBillboard.pos.z <= Billboard->pos.z + EDITBB_DELETE_RANGE &&
 				g_EditBillboard.bUse == true)
 			{//範囲内に入った場合
 				//削除対象状態にする
@@ -397,25 +408,25 @@ void MoveEditBillboard(void)
 			if (GetKeyboardTrigger(DIK_W) == true)
 			{//Wキーを押した場合
 				//位置を奥に進める
-				g_EditBillboard.pos.z += 4.0f;
+				g_EditBillboard.pos.z += EDITBB_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_S) == true)
 			{//Sキーを押した場合
 				//位置を手前に進める
-				g_EditBillboard.pos.z -= 4.0f;
+				g_EditBillboard.pos.z -= EDITBB_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_A) == true)
 			{//Aキーを押した場合
 				//位置を左に進める
-				g_EditBillboard.pos.x -= 4.0f;
+				g_EditBillboard.pos.x -= EDITBB_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_D) == true)
 			{//Dキーを押した場合
 				//位置を右に進める
-				g_EditBillboard.pos.x += 4.0f;
+				g_EditBillboard.pos.x += EDITBB_ADJUSTMENT_MOVE;
 			}
 		}
 	}
@@ -426,25 +437,25 @@ void MoveEditBillboard(void)
 			if (GetKeyboardPress(DIK_W) == true)
 			{//Wキーを押した場合
 				//位置を奥に進める
-				g_EditBillboard.pos.z += 16.0f;
+				g_EditBillboard.pos.z += EDITBB_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_S) == true)
 			{//Sキーを押した場合
 				//位置を手前に進める
-				g_EditBillboard.pos.z -= 16.0f;
+				g_EditBillboard.pos.z -= EDITBB_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_A) == true)
 			{//Aキーを押した場合
 				//位置を左に進める
-				g_EditBillboard.pos.x -= 16.0f;
+				g_EditBillboard.pos.x -= EDITBB_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_D) == true)
 			{//Dキーを押した場合
 				//位置を右に進める
-				g_EditBillboard.pos.x += 16.0f;
+				g_EditBillboard.pos.x += EDITBB_MOVE;
 			}
 		}
 	}
@@ -485,12 +496,12 @@ void ScaleBillboardX(void)
 		if (GetKeyboardPress(DIK_U) == true)
 		{//Uキーを押した場合
 			//X軸を拡大する
-			g_EditBillboard.Radius.x += 1.0f;
+			g_EditBillboard.Radius.x += EDITBB_SCALING;
 		}
 		else if (GetKeyboardPress(DIK_J) == true)
 		{//Jキーを押した場合
 			//X軸を縮小する
-			g_EditBillboard.Radius.x -= 1.0f;
+			g_EditBillboard.Radius.x -= EDITBB_SCALING;
 		}
 
 		//頂点座標の設定
@@ -520,12 +531,12 @@ void ScaleBillboardY(void)
 		if (GetKeyboardPress(DIK_I) == true)
 		{//Iキーを押した場合
 			//Y軸を拡大する
-			g_EditBillboard.Radius.y += 1.0f;
+			g_EditBillboard.Radius.y += EDITBB_SCALING;
 		}
 		else if (GetKeyboardPress(DIK_K) == true)
 		{//Kキーを押した場合
 			//Y軸を縮小する
-			g_EditBillboard.Radius.y -= 1.0f;
+			g_EditBillboard.Radius.y -= EDITBB_SCALING;
 		}
 
 		//頂点座標の設定
@@ -555,14 +566,14 @@ void ScaleBillboard(void)
 		if (GetKeyboardPress(DIK_4) == true)
 		{//4キーを押した場合
 			//拡大する
-			g_EditBillboard.Radius.x += 1.0f;
-			g_EditBillboard.Radius.y += 1.0f;
+			g_EditBillboard.Radius.x += EDITBB_SCALING;
+			g_EditBillboard.Radius.y += EDITBB_SCALING;
 		}
 		else if (GetKeyboardPress(DIK_5) == true)
 		{//5キーを押した場合
 			//縮小する
-			g_EditBillboard.Radius.x -= 1.0f;
-			g_EditBillboard.Radius.y -= 1.0f;
+			g_EditBillboard.Radius.x -= EDITBB_SCALING;
+			g_EditBillboard.Radius.y -= EDITBB_SCALING;
 		}
 
 		//頂点座標の設定
@@ -592,7 +603,7 @@ void ResetEditBillboard(void)
 		if (GetKeyboardTrigger(DIK_3) == true)
 		{//3キーを押した場合
 			//拡大率を初期化する
-			g_EditBillboard.Radius = D3DXVECTOR2(30.0f, 30.0f);
+			g_EditBillboard.Radius = D3DXVECTOR2(INIT_RADIUS, INIT_RADIUS);
 
 			//頂点座標の設定
 			pVtx[0].pos = D3DXVECTOR3(-g_EditBillboard.Radius.x, +g_EditBillboard.Radius.y, 0.0f);
@@ -635,10 +646,10 @@ void CustomBillboardColor(void)
 				//色カウントを加算する
 				g_EditBillboard.nColorCount++;
 
-				if (g_EditBillboard.nColorCount % 5 == 0)
+				if (g_EditBillboard.nColorCount % EDITBB_COL_CHANGE_CNT == 0)
 				{//一定時間経過したら
 					//赤色を強くする
-					g_EditBillboard.col.r += 0.01f;
+					g_EditBillboard.col.r += EDITBB_COL_CONVERSION;
 
 					if (g_EditBillboard.col.r > 1.0f)
 					{//赤色が1.0fを超えたら
@@ -652,10 +663,10 @@ void CustomBillboardColor(void)
 				//色カウントを加算する
 				g_EditBillboard.nColorCount++;
 
-				if (g_EditBillboard.nColorCount % 5 == 0)
+				if (g_EditBillboard.nColorCount % EDITBB_COL_CHANGE_CNT == 0)
 				{//一定時間経過したら
 					//赤色を強くする
-					g_EditBillboard.col.r -= 0.01f;
+					g_EditBillboard.col.r -= EDITBB_COL_CONVERSION;
 
 					if (g_EditBillboard.col.r < 0.0f)
 					{//赤色が0.0fを超えたら
@@ -670,10 +681,10 @@ void CustomBillboardColor(void)
 				//色カウントを加算する
 				g_EditBillboard.nColorCount++;
 
-				if (g_EditBillboard.nColorCount % 5 == 0)
+				if (g_EditBillboard.nColorCount % EDITBB_COL_CHANGE_CNT == 0)
 				{//一定時間経過したら
 					//緑色を強くする
-					g_EditBillboard.col.g += 0.01f;
+					g_EditBillboard.col.g += EDITBB_COL_CONVERSION;
 
 					if (g_EditBillboard.col.g > 1.0f)
 					{//緑色が1.0fを超えたら
@@ -687,10 +698,10 @@ void CustomBillboardColor(void)
 				//色カウントを加算する
 				g_EditBillboard.nColorCount++;
 
-				if (g_EditBillboard.nColorCount % 5 == 0)
+				if (g_EditBillboard.nColorCount % EDITBB_COL_CHANGE_CNT == 0)
 				{//一定時間経過したら
 					//緑色を強くする
-					g_EditBillboard.col.g -= 0.01f;
+					g_EditBillboard.col.g -= EDITBB_COL_CONVERSION;
 
 					if (g_EditBillboard.col.g < 0.0f)
 					{//緑色が0.0fを超えたら
@@ -705,10 +716,10 @@ void CustomBillboardColor(void)
 				//色カウントを加算する
 				g_EditBillboard.nColorCount++;
 
-				if (g_EditBillboard.nColorCount % 5 == 0)
+				if (g_EditBillboard.nColorCount % EDITBB_COL_CHANGE_CNT == 0)
 				{//一定時間経過したら
 					//青色を強くする
-					g_EditBillboard.col.b += 0.01f;
+					g_EditBillboard.col.b += EDITBB_COL_CONVERSION;
 
 					if (g_EditBillboard.col.b > 1.0f)
 					{//青色が1.0fを超えたら
@@ -722,10 +733,10 @@ void CustomBillboardColor(void)
 				//色カウントを加算する
 				g_EditBillboard.nColorCount++;
 
-				if (g_EditBillboard.nColorCount % 5 == 0)
+				if (g_EditBillboard.nColorCount % EDITBB_COL_CHANGE_CNT == 0)
 				{//一定時間経過したら
 					//青色を強くする
-					g_EditBillboard.col.b -= 0.01f;
+					g_EditBillboard.col.b -= EDITBB_COL_CONVERSION;
 
 					if (g_EditBillboard.col.b < 0.0f)
 					{//青色が0.0fを超えたら
@@ -887,13 +898,13 @@ void UpDownEditBillboard(void)
 			if (GetKeyboardTrigger(DIK_W) == true)
 			{//Wキーを押している場合
 				//位置を奥に進める
-				g_EditBillboard.pos.y += 2.0f;
+				g_EditBillboard.pos.y += EDITBB_UPDOWN_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_S) == true)
 			{//Sキーを押している場合
 				//位置を手前に進める
-				g_EditBillboard.pos.y -= 2.0f;
+				g_EditBillboard.pos.y -= EDITBB_UPDOWN_ADJUSTMENT_MOVE;
 			}
 		}
 		else
@@ -901,13 +912,13 @@ void UpDownEditBillboard(void)
 			if (GetKeyboardPress(DIK_W) == true)
 			{//Wキーを押している場合
 				//位置を奥に進める
-				g_EditBillboard.pos.y += 6.0f;
+				g_EditBillboard.pos.y += EDITBB_UPDOWN_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_S) == true)
 			{//Sキーを押している場合
 				//位置を手前に進める
-				g_EditBillboard.pos.y -= 6.0f;
+				g_EditBillboard.pos.y -= EDITBB_UPDOWN_MOVE;
 			}
 		}
 	}
