@@ -53,7 +53,6 @@ typedef struct
 	bool		bMove;					// 移動しているかどうか
 	bool		bJump;					// ジャンプの状況
 	bool		bUse;					// 使用しているか
-	CURVE		policeCurve;			// カーブ処理
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
 }Police;
 
@@ -64,7 +63,7 @@ void InitPolice(void);					// 警察の初期化処理
 void UninitPolice(void);				// 警察の終了処理
 void UpdatePolice(void);				// 警察の更新処理
 void DrawPolice(void);					// 警察の描画処理
-void SetPolice(D3DXVECTOR3 pos, CURVE poliCurve);		// 警察の設定処理
+void SetPolice(D3DXVECTOR3 pos);		// 警察の設定処理
 void HitPolice(Police *pPolice, int nDamage);												// 警察のダメージ判定
 Police *GetPoliceData(void);																// 警察の取得処理
 
