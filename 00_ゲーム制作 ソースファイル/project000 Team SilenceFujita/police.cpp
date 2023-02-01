@@ -500,11 +500,8 @@ void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove
 //============================================================
 void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 {
-	//--------------------------------------------------------
-	//	Œü‚«‚Ì³‹K‰»
-	//--------------------------------------------------------
-	if (rot->y > D3DX_PI) { rot->y -= D3DX_PI * 2; }
-	else if (rot->y < -D3DX_PI) { rot->y += D3DX_PI * 2; }
+	// Œü‚«‚Ì³‹K‰»
+	RotNormalize(rot->y);
 
 	//--------------------------------------------------------
 	//	ˆÚ“®”ÍˆÍ‚Ì•â³

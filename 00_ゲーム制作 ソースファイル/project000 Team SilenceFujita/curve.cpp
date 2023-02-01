@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "curve.h"
+#include "calculation.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -18,6 +19,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define CURVE_MOVE_SLOW_MAGNI			(0.3f)				// カーブするときの減速係数
+#define CURVE_ADD						(0.03f)				// カーブするときの向きの追加量
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -214,7 +216,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = 0.0f;
 
 			// 向きを加える
-			rot->y -= 0.03f;
+			rot->y -= CURVE_ADD;
 
 			if (rot->y <= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -238,7 +240,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = -D3DX_PI;
 
 			// 向きを加える
-			rot->y -= 0.03f;
+			rot->y -= CURVE_ADD;
 
 			if (rot->y <= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -262,7 +264,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = -D3DX_PI * 0.5f;
 
 			// 向きを加える
-			rot->y -= 0.03f;
+			rot->y -= CURVE_ADD;
 
 			if (rot->y <= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -286,7 +288,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = D3DX_PI * 0.5f;
 
 			// 向きを加える
-			rot->y -= 0.03f;
+			rot->y -= CURVE_ADD;
 
 			if (rot->y <= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -317,7 +319,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = D3DX_PI;
 
 			// 向きを加える
-			rot->y += 0.03f;
+			rot->y += CURVE_ADD;
 
 			if (rot->y >= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -342,7 +344,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = 0.0f;
 
 			// 向きを加える
-			rot->y += 0.03f;
+			rot->y += CURVE_ADD;
 
 			if (rot->y >= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -367,7 +369,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = D3DX_PI * 0.5f;
 
 			// 向きを加える
-			rot->y += 0.03f;
+			rot->y += CURVE_ADD;
 
 			if (rot->y >= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -392,7 +394,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 			pCurve->rotDest.y = -D3DX_PI * 0.5f;
 
 			// 向きを加える
-			rot->y += 0.03f;
+			rot->y += CURVE_ADD;
 
 			if (rot->y >= pCurve->rotDest.y)
 			{ // 向きが目標値を超えた場合
@@ -412,11 +414,8 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 		}
 	}
 
-	//--------------------------------------------------------
-	//	向きの正規化
-	//--------------------------------------------------------
-	if (rot->y > D3DX_PI) { rot->y -= D3DX_PI * 2; }
-	else if (rot->y < -D3DX_PI) { rot->y += D3DX_PI * 2; }
+	// 向きの正規化
+	RotNormalize(rot->y);
 }
 
 //============================================================
