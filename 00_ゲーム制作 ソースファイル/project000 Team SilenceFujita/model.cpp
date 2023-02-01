@@ -22,22 +22,45 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\BigTree.x",		// 大木
 	"data\\MODEL_OBJECT\\YellowTree.x",		// 黄色い木
 	"data\\MODEL_OBJECT\\Grass.x",			// 草
-	//"data\\MODEL_OBJECT\\Apart001.x",		//アパート
-	"data\\MODEL_OBJECT\\House001.x",		//家
-	"data\\MODEL_OBJECT\\CurryShop.x",		//カレー屋
-	"data\\MODEL_OBJECT\\bill001.x",		//ビルver1
-	"data\\MODEL_OBJECT\\bill002.x",		//ビルver2
-	"data\\MODEL_OBJECT\\ARCS.x",			//スーパー
-	"data\\MODEL_OBJECT\\Bakery.x",			//パン屋
-	"data\\MODEL_OBJECT\\CityOffice.x",		//市役所
-	"data\\MODEL_OBJECT\\gymnasium.x",		//体育館
+	"data\\MODEL_OBJECT\\House001.x",		// 家
+	"data\\MODEL_OBJECT\\CurryShop.x",		// カレー屋
+	"data\\MODEL_OBJECT\\bill001.x",		// ビルver1
+	"data\\MODEL_OBJECT\\bill002.x",		// ビルver2
+	"data\\MODEL_OBJECT\\ARCS.x",			// スーパー
+	"data\\MODEL_OBJECT\\Bakery.x",			// パン屋
+	"data\\MODEL_OBJECT\\CityOffice.x",		// 市役所
+	"data\\MODEL_OBJECT\\gymnasium.x",		// 体育館
+	"data\\MODEL_OBJECT\\Casino000.x",		// カジノ
+	"data\\MODEL_OBJECT\\sunaba001.x",		// 公園（砂場）
+	"data\\MODEL_OBJECT\\Toilet001.x",		// 公園（トイレ）
+	"data\\MODEL_OBJECT\\suidou.x",			// 公園（水道）
+	"data\\MODEL_OBJECT\\gomibako001.x",	// 公園（ゴミ箱）
+	"data\\MODEL_OBJECT\\benti001.x",		// 公園（ベンチ）
+	"data\\MODEL_OBJECT\\gaitou001.x",		// 公園（街灯）
+	"data\\MODEL_OBJECT\\tetubou001.x",		// 公園（鉄棒）
+	"data\\MODEL_OBJECT\\suberidai001.x",	// 公園（滑り台）
+	"data\\MODEL_OBJECT\\Apart001.x",		// アパート
+	"data\\MODEL_OBJECT\\gas.x",			// ガソリンスタンド
+	"data\\MODEL_OBJECT\\711.x",			// コンビニ
+	"data\\MODEL_OBJECT\\JoyFat.x",			// ジム
+	"data\\MODEL_OBJECT\\towercrane.x",		// タワーレーン
+	"data\\MODEL_OBJECT\\KaikanClub.x",		// ネットカフェ
+	"data\\MODEL_OBJECT\\House002.x",		// 家（2）
+	"data\\MODEL_OBJECT\\House003.x",		// 家（3）
+	"data\\MODEL_OBJECT\\School.x",			// 学校
+	"data\\MODEL_OBJECT\\DENTALCLINIC.x",	// 歯医者
+	"data\\MODEL_OBJECT\\singou001.x",		// 信号
+	"data\\MODEL_OBJECT\\HOSPITAL.x",		// 病院
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",		// プレイヤー
 
 	// 車モデル
-	"data\\MODEL_OBJECT\\policecar.x",	// パトカー
-	"data\\MODEL_OBJECT\\farecar.x",	// 消防車
+	"data\\MODEL_OBJECT\\policecar.x",		// パトカー
+	"data\\MODEL_OBJECT\\farecar.x",		// 消防車
+	"data\\MODEL_OBJECT\\car001.x",			// 自動車
+	"data\\MODEL_OBJECT\\yakiimocar.x",		// 焼き芋屋
+	"data\\MODEL_OBJECT\\senkyoCar000.x",	// 選挙カー
 
 	// エディットモデル
 	"data\\MODEL_EDIT\\collision000.x",	// 当たり判定

@@ -71,7 +71,8 @@ void InitWind(void)
 	}
 
 	// 風の情報の初期化
-	g_WindInfo.nUseCounter = 0;
+	g_WindInfo.nUseCounter = 0;										// 風のカウンターを初期化する
+	g_WindInfo.nOverHeatCounter = 0;								// オーバーヒートカウンターを初期化する
 	g_WindInfo.state = WIND_USABLE;									//使用可能状態
 
 	// テクスチャの読み込み
