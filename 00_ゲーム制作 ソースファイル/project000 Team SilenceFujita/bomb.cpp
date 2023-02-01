@@ -11,7 +11,8 @@
 #include "bomb.h"
 #include "calculation.h"
 #include "player.h"
-#include "Police.h"
+#include "car.h"
+#include "police.h"
 
 #include "input.h"
 #include "particle.h"
@@ -30,14 +31,14 @@
 #define BOMB_LEFT_PLUS	(BOMB_RADIUS + 100.0f)	// 車の位置関係の設定用ベクトルの計算用
 
 //**********************************************************************************************************************
-//	列挙型定義 (CARTYPE)
+//	列挙型定義 (ALL_CARTYPE)
 //**********************************************************************************************************************
 typedef enum
 {
-	CARTYPE_NORMAL = 0,		// 通常車
-	CARTYPE_POLICE,			// 警察車
-	CARTYPE_MAX,			// この列挙型の総数
-} CARTYPE;
+	ALL_CARTYPE_NORMAL = 0,		// 通常車
+	ALL_CARTYPE_POLICE,			// 警察車
+	ALL_CARTYPE_MAX,			// この列挙型の総数
+} ALL_CARTYPE;
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -46,7 +47,7 @@ typedef struct
 {
 	D3DXVECTOR3 pos;		// 位置
 	BOMBSTATE   state;		// 状態
-	CARTYPE     type;		// 種類
+	ALL_CARTYPE type;		// 種類
 	void       *pCar;		// 車アドレス
 	float       fOrder;		// 判定距離
 	bool        bUse;		// 使用状況
@@ -55,7 +56,7 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void SetBomb(D3DXVECTOR3 pos, CARTYPE type, void *pCar);	// ボムの設定
+void SetBomb(D3DXVECTOR3 pos, ALL_CARTYPE type, void *pCar);	// ボムの設定
 
 void ResetBomb(void);		// ボムの再設定
 void CollisionBomb(void);	// ボム検知範囲の当たり判定
@@ -65,11 +66,11 @@ int  CurrentAim(void);		// 選択中の車両
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-int     g_nCurrentMaxBomb;	// 現在狙い中の車の総数
-CARTYPE g_nType;			// 現在狙い中の車の種類
-int     g_nID;				// 現在狙い中の車のID
-void   *g_pCurrentAim;		// 現在狙い中の車のアドレス
-Bomb    g_aBomb[MAX_BOMB];	// 爆弾の情報
+int         g_nCurrentMaxBomb;	// 現在狙い中の車の総数
+ALL_CARTYPE g_nType;			// 現在狙い中の車の種類
+int         g_nID;				// 現在狙い中の車のID
+void       *g_pCurrentAim;		// 現在狙い中の車のアドレス
+Bomb        g_aBomb[MAX_BOMB];	// 爆弾の情報
 
 //======================================================================================================================
 //	爆弾の初期化処理
@@ -77,10 +78,10 @@ Bomb    g_aBomb[MAX_BOMB];	// 爆弾の情報
 void InitBomb(void)
 {
 	// グローバル変数を初期化
-	g_nCurrentMaxBomb = 0;			// 現在狙い中の車の総数
-	g_nType       = CARTYPE_NORMAL;	// 現在狙い中の車の種類
-	g_nID         = 0;				// 現在狙い中の車のID
-	g_pCurrentAim = NULL;			// 現在狙い中の車のアドレス
+	g_nCurrentMaxBomb = 0;				// 現在狙い中の車の総数
+	g_nType       = ALL_CARTYPE_NORMAL;	// 現在狙い中の車の種類
+	g_nID         = 0;					// 現在狙い中の車のID
+	g_pCurrentAim = NULL;				// 現在狙い中の車のアドレス
 
 	// 爆弾の情報の初期化
 	for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
@@ -122,11 +123,19 @@ void UpdateBomb(void)
 	if (g_nCurrentMaxBomb > 0)
 	{
 
-		if (GetKeyboardTrigger(DIK_RETURN) == true)
+		if (GetKeyboardTrigger(DIK_RIGHT) == true)
 		{
 
-			g_pCurrentAim = g_aBomb[g_nID].pCar;
 			g_nID = (g_nID + 1) % g_nCurrentMaxBomb;
+			g_pCurrentAim = g_aBomb[g_nID].pCar;
+
+		}
+		else if (GetKeyboardTrigger(DIK_LEFT) == true)
+		{
+
+			g_nID = (g_nID + (g_nCurrentMaxBomb - 1)) % g_nCurrentMaxBomb;
+			g_pCurrentAim = g_aBomb[g_nID].pCar;
+
 		}
 	}
 
@@ -164,7 +173,7 @@ void DrawBomb(void)
 //======================================================================================================================
 //	ボムの設定
 //======================================================================================================================
-void SetBomb(D3DXVECTOR3 pos, CARTYPE type, void *pCar)
+void SetBomb(D3DXVECTOR3 pos, ALL_CARTYPE type, void *pCar)
 {
 	// 変数を宣言
 	D3DXVECTOR3 playerPos;			// プレイヤーの位置
@@ -245,12 +254,33 @@ void CollisionBomb(void)
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();		// プレイヤーの情報
 	Police *pPolice = GetPoliceData();	// 警察の情報
+	Car    *pCar    = GetCarData();		// 車の情報
 	Object *pObject = GetObjectData();	// オブジェクトの情報
 
 	// ボムの検知範囲の中心を設定
 	rangePos.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * BOMB_PULS;
 	rangePos.y = pPlayer->pos.y + 0.0f;
 	rangePos.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * BOMB_PULS;
+
+	// 車の検知を確認
+	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
+	{ // 車の最大表示数分繰り返す
+
+		if (pCar->bUse == true)
+		{ // 車が使用されている場合
+
+			// 検知範囲と検知車の距離を求める
+			fLength = (rangePos.x - pCar->pos.x) * (rangePos.x - pCar->pos.x)
+					+ (rangePos.z - pCar->pos.z) * (rangePos.z - pCar->pos.z);
+
+			if (fLength < ((BOMB_RADIUS + BOMB_CAR_RADIUS) * (BOMB_RADIUS + BOMB_CAR_RADIUS)))
+			{ // 検知範囲内の場合
+
+				// ボムの設定
+				SetBomb(pCar->pos, ALL_CARTYPE_NORMAL, pCar);
+			}
+		}
+	}
 
 	// 警察の検知を確認
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++, pPolice++)
@@ -267,7 +297,7 @@ void CollisionBomb(void)
 			{ // 検知範囲内の場合
 
 				// ボムの設定
-				SetBomb(pPolice->pos, CARTYPE_POLICE, pPolice);
+				SetBomb(pPolice->pos, ALL_CARTYPE_POLICE, pPolice);
 			}
 		}
 	}
@@ -287,7 +317,7 @@ void CollisionBomb(void)
 			{ // 検知範囲内の場合
 
 				// ボムの設定
-				SetBomb(pObject->pos, CARTYPE_NORMAL, pObject);
+				SetBomb(pObject->pos, ALL_CARTYPE_NORMAL, pObject);
 			}
 		}
 	}
@@ -327,8 +357,6 @@ void SortBomb(void)
 			g_aBomb[nCntBomb]  = g_aBomb[nNowMaxID];
 			g_aBomb[nNowMaxID] = keepBomb;
 		}
-
-		// ここでID変更？
 	}
 }
 
