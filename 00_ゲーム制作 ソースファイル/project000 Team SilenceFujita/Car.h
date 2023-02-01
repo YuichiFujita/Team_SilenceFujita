@@ -67,7 +67,7 @@ void DrawCar(void);					// 車の描画処理
 void SetCar(D3DXVECTOR3 pos);		// 車の設定処理
 Car *GetCarData(void);																		// 車の取得処理
 void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// 車の停止処理
-void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, Model ModelData, COLLOBJECTTYPE collObject);	// 車同士の当たり判定
+void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject);		// 車同士の当たり判定
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

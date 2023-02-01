@@ -192,7 +192,8 @@ void UpdatePolice(void)
 					&g_aPolice[nCntPolice].posOld,
 					g_aPolice[nCntPolice].rot,
 					&g_aPolice[nCntPolice].move,
-					g_aPolice[nCntPolice].modelData,
+					POLICAR_WIDTH,
+					POLICAR_DEPTH,
 					COLLOBJECTTYPE_POLICE
 				);
 			}
@@ -659,6 +660,7 @@ void PatrolBackAct(Police *pPolice)
 {
 	//最初の位置と向きと移動量、今進むべき方向をリセットする
 	pPolice->pos = pPolice->posCopy;
+	pPolice->posOld = pPolice->posOld;
 	pPolice->move.x = 0.0f;
 }
 
