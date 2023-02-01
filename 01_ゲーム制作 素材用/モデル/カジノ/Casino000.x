@@ -1035,7 +1035,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "Casino000.png";
+    "data\\texture\\Casino000.png";
    }
   }
   Material {
@@ -1044,7 +1044,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "Casino001.png";
+    "data\\texture\\Casino001.png";
    }
   }
   Material {
@@ -1053,7 +1053,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "Casino002.png";
+    "data\\texture\\Casino002.png";
    }
   }
   Material {
@@ -1062,7 +1062,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "Casino003.png";
+    "data\\texture\\Casino003.png";
    }
   }
   Material {

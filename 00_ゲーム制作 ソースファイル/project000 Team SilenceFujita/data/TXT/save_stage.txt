@@ -125,14 +125,14 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 3716.0 10.0 -3196.0
+		POS        = 3712.0 10.0 -3200.0
 		ROT        = 0.0 -1.6 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 6
 		BREAKTYPE  = 0
 		SHADOWTYPE = 0
-		COLLTYPE   = 2
-		COLLROT    = 1
+		COLLTYPE   = 1
+		COLLROT    = 0
 
 		NUMMAT     = 11
 		00_MAT DIF = 0.25 0.19 0.24 1.00
@@ -160,14 +160,14 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 3716.0 10.0 -4528.0
+		POS        = 3712.0 10.0 -4528.0
 		ROT        = 0.0 -1.6 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 6
 		BREAKTYPE  = 0
 		SHADOWTYPE = 0
-		COLLTYPE   = 2
-		COLLROT    = 1
+		COLLTYPE   = 1
+		COLLROT    = 0
 
 		NUMMAT     = 11
 		00_MAT DIF = 0.25 0.19 0.24 1.00
@@ -195,14 +195,14 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 3716.0 10.0 -5844.0
+		POS        = 3712.0 10.0 -5840.0
 		ROT        = 0.0 -1.6 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 6
 		BREAKTYPE  = 0
 		SHADOWTYPE = 0
-		COLLTYPE   = 2
-		COLLROT    = 1
+		COLLTYPE   = 1
+		COLLROT    = 0
 
 		NUMMAT     = 11
 		00_MAT DIF = 0.25 0.19 0.24 1.00
@@ -230,14 +230,14 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 5788.0 10.0 -3204.0
+		POS        = 5788.0 10.0 -3200.0
 		ROT        = 0.0 1.6 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 6
 		BREAKTYPE  = 0
 		SHADOWTYPE = 0
-		COLLTYPE   = 2
-		COLLROT    = 3
+		COLLTYPE   = 1
+		COLLROT    = 0
 
 		NUMMAT     = 11
 		00_MAT DIF = 0.25 0.19 0.24 1.00
@@ -271,8 +271,8 @@ SETSTAGE_OBJECT
 		TYPE       = 6
 		BREAKTYPE  = 0
 		SHADOWTYPE = 0
-		COLLTYPE   = 2
-		COLLROT    = 3
+		COLLTYPE   = 1
+		COLLROT    = 0
 
 		NUMMAT     = 11
 		00_MAT DIF = 0.25 0.19 0.24 1.00
@@ -300,14 +300,14 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = 5788.0 10.0 -5844.0
+		POS        = 5788.0 10.0 -5840.0
 		ROT        = 0.0 1.6 0.0
 		SCALE      = 1.0 1.0 1.0
 		TYPE       = 6
 		BREAKTYPE  = 0
 		SHADOWTYPE = 0
-		COLLTYPE   = 2
-		COLLROT    = 3
+		COLLTYPE   = 1
+		COLLROT    = 0
 
 		NUMMAT     = 11
 		00_MAT DIF = 0.25 0.19 0.24 1.00
@@ -496,38 +496,13 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = -3328.0 10.0 3532.0
-		ROT        = 0.0 -1.6 0.0
-		SCALE      = 1.0 1.0 1.0
-		TYPE       = 11
-		BREAKTYPE  = 0
-		SHADOWTYPE = 0
-		COLLTYPE   = 2
-		COLLROT    = 1
-
-		NUMMAT     = 6
-		00_MAT DIF = 0.80 0.80 0.80 1.00
-		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.80 0.80 0.80 1.00
-		01_MAT AMB = 0.00 0.00 0.00 1.00
-		02_MAT DIF = 0.80 0.80 0.80 1.00
-		02_MAT AMB = 0.00 0.00 0.00 1.00
-		03_MAT DIF = 0.80 0.75 0.62 1.00
-		03_MAT AMB = 0.00 0.00 0.00 1.00
-		04_MAT DIF = 0.80 0.62 0.00 1.00
-		04_MAT AMB = 0.00 0.00 0.00 1.00
-		05_MAT DIF = 1.00 1.00 1.00 1.00
-		05_MAT AMB = 0.00 0.00 0.00 1.00
-	END_SET_OBJECT
-
-	SET_OBJECT
-		POS        = -3036.0 0.0 2848.0
+		POS        = -320.0 0.0 768.0
 		ROT        = 0.0 0.0 0.0
-		SCALE      = 2.1 2.1 2.1
+		SCALE      = 1.0 1.0 1.0
 		TYPE       = 0
 		BREAKTYPE  = 0
-		SHADOWTYPE = 1
-		COLLTYPE   = 2
+		SHADOWTYPE = 0
+		COLLTYPE   = 1
 		COLLROT    = 0
 
 		NUMMAT     = 2
@@ -538,20 +513,88 @@ SETSTAGE_OBJECT
 	END_SET_OBJECT
 
 	SET_OBJECT
-		POS        = -3452.0 0.0 2848.0
+		POS        = -176.0 0.0 768.0
 		ROT        = 0.0 0.0 0.0
-		SCALE      = 3.2 3.2 3.2
+		SCALE      = 1.0 1.0 1.0
 		TYPE       = 0
 		BREAKTYPE  = 0
-		SHADOWTYPE = 1
-		COLLTYPE   = 2
+		SHADOWTYPE = 0
+		COLLTYPE   = 1
 		COLLROT    = 0
 
 		NUMMAT     = 2
 		00_MAT DIF = 0.80 0.80 0.80 1.00
 		00_MAT AMB = 0.00 0.00 0.00 1.00
-		01_MAT DIF = 0.06 0.30 0.00 1.00
-		01_MAT AMB = 0.00 0.90 0.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = -64.0 0.0 768.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+		SHADOWTYPE = 0
+		COLLTYPE   = 1
+		COLLROT    = 0
+
+		NUMMAT     = 2
+		00_MAT DIF = 0.80 0.80 0.80 1.00
+		00_MAT AMB = 0.00 0.00 0.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = 48.0 0.0 768.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+		SHADOWTYPE = 0
+		COLLTYPE   = 1
+		COLLROT    = 0
+
+		NUMMAT     = 2
+		00_MAT DIF = 0.80 0.80 0.80 1.00
+		00_MAT AMB = 0.00 0.00 0.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = 192.0 0.0 768.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+		SHADOWTYPE = 0
+		COLLTYPE   = 1
+		COLLROT    = 0
+
+		NUMMAT     = 2
+		00_MAT DIF = 0.80 0.80 0.80 1.00
+		00_MAT AMB = 0.00 0.00 0.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
+	END_SET_OBJECT
+
+	SET_OBJECT
+		POS        = 336.0 0.0 768.0
+		ROT        = 0.0 0.0 0.0
+		SCALE      = 1.0 1.0 1.0
+		TYPE       = 0
+		BREAKTYPE  = 0
+		SHADOWTYPE = 0
+		COLLTYPE   = 1
+		COLLROT    = 0
+
+		NUMMAT     = 2
+		00_MAT DIF = 0.80 0.80 0.80 1.00
+		00_MAT AMB = 0.00 0.00 0.00 1.00
+		01_MAT DIF = 0.06 0.41 0.00 1.00
+		01_MAT AMB = 0.00 0.00 0.00 1.00
 	END_SET_OBJECT
 
 END_SETSTAGE_OBJECT
