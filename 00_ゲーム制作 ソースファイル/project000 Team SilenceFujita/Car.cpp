@@ -48,6 +48,7 @@
 void PosCar(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);		// 車の位置の更新処理
 void RevCar(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 車の補正の更新処理
 void CurveCar(Car *pCar);							// 車のカーブ処理
+void DashCarAction(Car *pCar);						// 車の走行処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -93,7 +94,7 @@ void InitCar(void)
 		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle = CURVE_LEFT;	// 左に曲がる
 		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;		// カーブする番地
 		g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;						// スキップする曲がり角の回数
-		g_aCar[nCntCar].carCurveInfo.rotOld = g_aCar[nCntCar].rot;		// 前回の向き
+		g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;		// 前回の向き
 		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;			// 現在の車の行動
 
 		// モデル情報の初期化
@@ -296,7 +297,7 @@ void SetCar(D3DXVECTOR3 pos, CURVE carCurve)
 			g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;																	// 次の曲がり角を設定する
 			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber);					// 曲がり角を設定する
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
-			g_aCar[nCntCar].carCurveInfo.rotOld = g_aCar[nCntCar].rot;																	// 前回の向き
+			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
 			g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;																		// 走っている状態
 
 			////曲がり角関係の設定
@@ -687,6 +688,36 @@ void CurveCar(Car *pCar)
 	//	}
 	//}
 
+	switch (pCar->carCurveInfo.actionState)
+	{
+	case CARACT_DASH:		// 走行状態
+
+		// 車の走行処理
+		DashCarAction(pCar);
+
+		break;				// 抜け出す
+
+	case CARACT_CURVE:		// カーブ状態
+
+		// 車の角度更新・補正処理
+		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move);
+
+		break;				// 抜け出す
+	}
+
+	if (pCar->move.x > MAX_CAR_FORWARD_PATROL)
+	{ // プレイヤーの移動量 (x) が一定値以上の場合
+
+	  // プレイヤーの移動量 (x) を補正
+		pCar->move.x = MAX_CAR_FORWARD_PATROL;
+	}
+}
+
+//============================================================
+// 車の走行処理
+//============================================================
+void DashCarAction(Car *pCar)
+{
 	for (int nCnt = 0; nCnt < 24; nCnt++)
 	{
 		switch (pCar->carCurveInfo.curveInfo.dashAngle)
@@ -703,12 +734,12 @@ void CurveCar(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
 					{ // 右に走る場合のみ
-						// スキップカウントを減算する
+					  // スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になったまたは、行き止まりだった場合
-							// スキップ回数を0にする
+						  // スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -732,12 +763,12 @@ void CurveCar(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
 					{ // 左に走る場合のみ
-						// スキップカウントを減算する
+					  // スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になった場合
-							// スキップ回数を0にする
+						  // スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -761,12 +792,12 @@ void CurveCar(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
 					{ // 奥に走る場合のみ
-						// スキップカウントを減算する
+					  // スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になった場合
-							// スキップ回数を0にする
+						  // スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -790,7 +821,7 @@ void CurveCar(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
 					{ // 手前に走る場合のみ
-						// スキップカウントを減算する
+					  // スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
@@ -800,6 +831,17 @@ void CurveCar(Car *pCar)
 
 							// 曲がり角の情報を更新する
 							pCar->carCurveInfo.curveInfo = GetCurveInfo(nCnt);
+
+							if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
+							{ // 曲がる方向が左方向だった場合
+								// 角度を補正する
+								pCar->rot.y = D3DX_PI;
+							}
+							else
+							{ // 曲がる方向が右方向だった場合
+								// 角度を補正する
+								pCar->rot.y = -D3DX_PI;
+							}
 						}
 					}
 				}
@@ -818,13 +860,27 @@ void CurveCar(Car *pCar)
 			//這わせる
 			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-			if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x - (CAR_WIDTH * 2))
-			{ // 車の位置が曲がる位置に達した場合
-				// 位置を補正する
-				pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (CAR_WIDTH * 2);
+			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
+			{ // 右に曲がる場合
+				if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-				// 車の角度更新・補正処理
-				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
+			}
+			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
+			{ // 左に曲がる場合
+				if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
 			}
 
 			break;					//抜け出す
@@ -834,13 +890,27 @@ void CurveCar(Car *pCar)
 			//這わせる
 			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-			if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x + (CAR_WIDTH * 2))
-			{ // 車の位置が曲がる位置に達した場合
-				// 位置を補正する
-				pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (CAR_WIDTH * 2);
+			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
+			{ // 右に曲がる場合
+				if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-				// 車の角度更新・補正処理
-				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
+			}
+			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
+			{ // 左に曲がる場合
+				if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
 			}
 
 			break;					//抜け出す
@@ -850,13 +920,27 @@ void CurveCar(Car *pCar)
 			//這わせる
 			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-			if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z - (CAR_WIDTH * 2))
-			{ // 車の位置が曲がる位置に達した場合
-				// 位置を補正する
-				pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (CAR_WIDTH * 2);
+			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
+			{ // 右に曲がる場合
+				if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-				// 車の角度更新・補正処理
-				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
+			}
+			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
+			{ // 左に曲がる場合
+				if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
 			}
 
 			break;					//抜け出す
@@ -866,24 +950,31 @@ void CurveCar(Car *pCar)
 			//這わせる
 			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-			if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z + (CAR_WIDTH * 2))
-			{ // 車の位置が曲がる位置に達した場合
-				// 位置を補正する
-				pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (CAR_WIDTH * 2);
+			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
+			{ // 右に曲がる場合
+				if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-				// 車の角度更新・補正処理
-				CurveInfoRotCar(&pCar->carCurveInfo.curveInfo, &pCar->rot, &pCar->move, &pCar->carCurveInfo.nSKipCnt);
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
+			}
+			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
+			{ // 左に曲がる場合
+				if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				{ // 車の位置が曲がる位置に達した場合
+					// 位置を補正する
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+					// カーブ状態にする
+					pCar->carCurveInfo.actionState = CARACT_CURVE;
+				}
 			}
 
 			break;					//抜け出す
 		}
-	}
-
-	if (pCar->move.x > MAX_CAR_FORWARD_PATROL)
-	{ // プレイヤーの移動量 (x) が一定値以上の場合
-
-	  // プレイヤーの移動量 (x) を補正
-		pCar->move.x = MAX_CAR_FORWARD_PATROL;
 	}
 }
 

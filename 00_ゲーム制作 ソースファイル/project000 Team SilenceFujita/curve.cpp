@@ -683,70 +683,222 @@ void CurveRotCar(CURVE *pCurve,D3DXVECTOR3 *rot,D3DXVECTOR3 *move)
 //============================================================
 // 車の角度更新・補正処理
 //============================================================
-void CurveInfoRotCar(CURVEINFO *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, int *pCnt)
+void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move)
 {
-	if (pCurve->curveAngle == CURVE_LEFT)
+	//速度を落とす
+	move->x *= 0.3f;
+
+	if (pCurve->curveInfo.curveAngle == CURVE_LEFT)
 	{ // 曲がる方向が左だった場合
-		// 向きを更新
-		rot->y -= D3DX_PI * 0.5f;
-
-		//速度を落とす
-		move->x *= 0.3f;
-
-		if (pCurve->dashAngle == DASH_RIGHT)
+		if (pCurve->curveInfo.dashAngle == DASH_RIGHT)
 		{ // 右に走っている場合
-			// 奥に走る
-			pCurve->dashAngle = DASH_FAR;
-		}
-		else if (pCurve->dashAngle == DASH_LEFT)
-		{ // 左に走っている場合
-			// 手前に走る
-			pCurve->dashAngle = DASH_NEAR;
-		}
-		else if (pCurve->dashAngle == DASH_FAR)
-		{ // 奥に走っている場合
-			// 左に走る
-			pCurve->dashAngle = DASH_LEFT;
-		}
-		else if (pCurve->dashAngle == DASH_NEAR)
-		{ // 手前に走っている場合
-			// 右に走る
-			pCurve->dashAngle = DASH_RIGHT;
-		}
+			// 目標の向きを設定する
+			pCurve->rotDest.y = 0.0f;
 
-		*pCnt = rand() % 2 + 1;
+			// 向きを加える
+			rot->y -= 0.03f;
+
+			if (rot->y <= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 奥に走る
+				pCurve->curveInfo.dashAngle = DASH_FAR;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
+		else if (pCurve->curveInfo.dashAngle == DASH_LEFT)
+		{ // 左に走っている場合
+			// 目標の向きを設定する
+			pCurve->rotDest.y = -D3DX_PI;
+
+			// 向きを加える
+			rot->y -= 0.03f;
+
+			if (rot->y <= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 手前に走る
+				pCurve->curveInfo.dashAngle = DASH_NEAR;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
+		else if (pCurve->curveInfo.dashAngle == DASH_FAR)
+		{ // 奥に走っている場合
+			// 目標の向きを設定する
+			pCurve->rotDest.y = -D3DX_PI * 0.5f;
+
+			// 向きを加える
+			rot->y -= 0.03f;
+
+			if (rot->y <= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 左に走る
+				pCurve->curveInfo.dashAngle = DASH_LEFT;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
+		else if (pCurve->curveInfo.dashAngle == DASH_NEAR)
+		{ // 手前に走っている場合
+			// 目標の向きを設定する
+			pCurve->rotDest.y = D3DX_PI * 0.5f;
+
+			// 向きを加える
+			rot->y -= 0.03f;
+
+			if (rot->y <= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 右に走る
+				pCurve->curveInfo.dashAngle = DASH_RIGHT;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
 	}
 	else
 	{ // 曲がる方向が右だった場合
-		// 向きを更新
-		rot->y += D3DX_PI * 0.5f;
-
 		//速度を落とす
 		move->x *= 0.3f;
 
-		if (pCurve->dashAngle == DASH_RIGHT)
+		if (pCurve->curveInfo.dashAngle == DASH_RIGHT)
 		{ // 右に走っている場合
-			// 奥に走る
-			pCurve->dashAngle = DASH_NEAR;
-		}
-		else if (pCurve->dashAngle == DASH_LEFT)
-		{ // 左に走っている場合
-			// 手前に走る
-			pCurve->dashAngle = DASH_FAR;
-		}
-		else if (pCurve->dashAngle == DASH_FAR)
-		{ // 奥に走っている場合
-			// 左に走る
-			pCurve->dashAngle = DASH_RIGHT;
-		}
-		else if (pCurve->dashAngle == DASH_NEAR)
-		{ // 手前に走っている場合
-			// 右に走る
-			pCurve->dashAngle = DASH_LEFT;
-		}
 
-		*pCnt = rand() % 2 + 1;
+			// 目標の向きを設定する
+			pCurve->rotDest.y = D3DX_PI;
+
+			// 向きを加える
+			rot->y += 0.03f;
+
+			if (rot->y >= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 手前に走る
+				pCurve->curveInfo.dashAngle = DASH_NEAR;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
+		else if (pCurve->curveInfo.dashAngle == DASH_LEFT)
+		{ // 左に走っている場合
+
+			// 目標の向きを設定する
+			pCurve->rotDest.y = 0.0f;
+
+			// 向きを加える
+			rot->y += 0.03f;
+
+			if (rot->y >= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 奥に走る
+				pCurve->curveInfo.dashAngle = DASH_FAR;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
+		else if (pCurve->curveInfo.dashAngle == DASH_FAR)
+		{ // 奥に走っている場合
+
+			// 目標の向きを設定する
+			pCurve->rotDest.y = D3DX_PI * 0.5f;
+
+			// 向きを加える
+			rot->y += 0.03f;
+
+			if (rot->y >= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 右に走る
+				pCurve->curveInfo.dashAngle = DASH_RIGHT;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
+		else if (pCurve->curveInfo.dashAngle == DASH_NEAR)
+		{ // 手前に走っている場合
+
+			// 目標の向きを設定する
+			pCurve->rotDest.y = -D3DX_PI * 0.5f;
+
+			// 向きを加える
+			rot->y += 0.03f;
+
+			if (rot->y >= pCurve->rotDest.y)
+			{ // 向きが目標値を超えた場合
+
+				// 向きを補正する
+				rot->y = pCurve->rotDest.y;
+
+				// 左に走る
+				pCurve->curveInfo.dashAngle = DASH_LEFT;
+
+				// 走行状態にする
+				pCurve->actionState = CARACT_DASH;
+
+				// スキップする回数を設定する
+				pCurve->nSKipCnt = rand() % 2 + 1;
+			}
+		}
 	}
+
+	//--------------------------------------------------------
+	//	向きの正規化
+	//--------------------------------------------------------
+	if (rot->y > D3DX_PI) { rot->y -= D3DX_PI * 2; }
+	else if (rot->y < -D3DX_PI) { rot->y += D3DX_PI * 2; }
 }
 
 //============================================================
