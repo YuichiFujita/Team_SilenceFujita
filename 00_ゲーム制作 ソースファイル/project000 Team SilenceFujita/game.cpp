@@ -149,6 +149,9 @@ void InitGame(void)
 	// ステージのセットアップ
 	TxtSetStage();
 
+	// カーブテキストのロード処理
+	LoadCurveTxt();
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
 	InitEditmain();
