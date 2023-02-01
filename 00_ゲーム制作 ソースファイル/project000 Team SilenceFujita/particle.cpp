@@ -281,9 +281,10 @@ void ParticleBoost(Particle *pParticle)
 void ParticleSpark(Particle *pParticle)
 {
 	// 変数を宣言
-	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
-	float fRadius;		// エフェクトの半径の代入用
-	int nLife;			// エフェクトの寿命の代入用
+	D3DXVECTOR3 shiftPos;	// エフェクトのずらす位置
+	D3DXVECTOR3 move;		// エフェクトの移動量の代入用
+	float fRadius;			// エフェクトの半径の代入用
+	int nLife;				// エフェクトの寿命の代入用
 
 	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
 	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
@@ -298,8 +299,13 @@ void ParticleSpark(Particle *pParticle)
 
 		// 移動量を乗算
 		move.x *= 3.0f;
-		move.y *= 5.0f;
+		move.y *= 4.0f;
 		move.z *= 3.0f;
+
+		// ずらす位置を設定する
+		shiftPos.x = (float)((rand() % 600) / 100.0f);
+		shiftPos.y = (float)((rand() % 600) / 100.0f);
+		shiftPos.z = (float)((rand() % 600) / 100.0f);
 
 		// 半径をランダムに設定
 		fRadius = (float)((rand() % 900) / 100.0f) + 5.0f;
@@ -310,7 +316,7 @@ void ParticleSpark(Particle *pParticle)
 		// エフェクトの設定
 		SetEffect
 		( // 引数
-			pParticle->pos,	// 位置
+			pParticle->pos + shiftPos,	// 位置
 			move,			// 移動量
 			pParticle->col,	// 色
 			nLife,			// 寿命
