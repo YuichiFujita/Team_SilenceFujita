@@ -609,6 +609,19 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							// 位置を補正
 							pPos->z = collPos.z - g_aObject[nCntObject].collInfo.fDepth[nCntColl] - fDepth - 0.01f;
 
+							if (pMove->x >= 13.0f)
+							{ // 移動量が一定以上の場合
+								// パーティクルの設定処理
+								SetParticle
+								(
+									D3DXVECTOR3(pPos->x, pPos->y + 50.0f, pPos->z + fDepth),	// 位置
+									D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+									PARTICLETYPE_SPARK,									// パーティクルの種類
+									10,													// 生成数
+									2													// 寿命
+								);
+							}
+
 							// 移動量を削除
 							pMove->x *= 0.95f;
 						}
@@ -618,6 +631,19 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 							// 位置を補正
 							pPos->z = collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl] + fDepth + 0.01f;
+
+							if (pMove->x >= 13.0f)
+							{ // 移動量が一定以上の場合
+							  // パーティクルの設定処理
+								SetParticle
+								(
+									D3DXVECTOR3(pPos->x, pPos->y + 50.0f, pPos->z - fDepth),	// 位置
+									D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+									PARTICLETYPE_SPARK,									// パーティクルの種類
+									10,													// 生成数
+									2													// 寿命
+								);
+							}
 
 							// 移動量を削除
 							pMove->x *= 0.95f;
@@ -636,6 +662,19 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							// 位置を補正
 							pPos->x = collPos.x - g_aObject[nCntObject].collInfo.fWidth[nCntColl] - fWidth - 0.01f;
 
+							if (pMove->x >= 13.0f)
+							{ // 移動量が一定以上の場合
+								// パーティクルの設定処理
+								SetParticle
+								(
+									D3DXVECTOR3(pPos->x + fWidth, pPos->y + 50.0f, pPos->z),	// 位置
+									D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+									PARTICLETYPE_SPARK,									// パーティクルの種類
+									10,													// 生成数
+									2													// 寿命
+								);
+							}
+
 							// 移動量を削除
 							pMove->x *= 0.95f;
 						}
@@ -645,6 +684,19 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							
 							// 位置を補正
 							pPos->x = collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl] + fWidth + 0.01f;
+
+							if (pMove->x >= 13.0f)
+							{ // 移動量が一定以上の場合
+								// パーティクルの設定処理
+								SetParticle
+								(
+									D3DXVECTOR3(pPos->x - fWidth, pPos->y + 50.0f, pPos->z),	// 位置
+									D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+									PARTICLETYPE_SPARK,									// パーティクルの種類
+									10,													// 生成数
+									2													// 寿命
+								);
+							}
 
 							// 移動量を削除
 							pMove->x *= 0.95f;

@@ -359,10 +359,10 @@ void DeleteEditObject(void)
 	{
 		if (pObject->bUse == true)
 		{//オブジェクトが使用されていた場合
-			if (g_EditObject.pos.x >= pObject->pos.x - 50.0f &&
-				g_EditObject.pos.x <= pObject->pos.x + 50.0f &&
-				g_EditObject.pos.z >= pObject->pos.z - 50.0f &&
-				g_EditObject.pos.z <= pObject->pos.z + 50.0f &&
+			if (g_EditObject.pos.x >= pObject->pos.x - 70.0f &&
+				g_EditObject.pos.x <= pObject->pos.x + 70.0f &&
+				g_EditObject.pos.z >= pObject->pos.z - 70.0f &&
+				g_EditObject.pos.z <= pObject->pos.z + 70.0f &&
 				g_EditObject.bUse == true)
 			{//範囲内に入った場合
 				//削除対象状態にする

@@ -27,7 +27,7 @@ typedef enum
 	PARTICLETYPE_EXPLOSION,		// パーティクル (爆発)
 	PARTICLETYPE_DAMAGE,		// パーティクル (ダメージ)
 	PARTICLETYPE_BOOST,			// パーティクル (ブースト)
-	PARTICLETYPE_WIND,			// パーティクル	(風)
+	PARTICLETYPE_SPARK,			// パーティクル（火花）
 	PARTICLETYPE_MAX,			// この列挙型の総数
 } PARTICLETYPE;
 
@@ -38,7 +38,7 @@ void InitParticle(void);		// パーティクルの初期化処理
 void UninitParticle(void);		// パーティクルの終了処理
 void UpdateParticle(void);		// パーティクルの更新処理
 void DrawParticle(void);		// パーティクルの描画処理
-void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, int nLife);	// パーティクルの設定処理
+void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, int nLife);		// パーティクルの設定処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
