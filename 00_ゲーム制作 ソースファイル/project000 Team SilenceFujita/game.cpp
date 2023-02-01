@@ -75,7 +75,7 @@ void InitGame(void)
 	//	使用するソースファイルの初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// カーブの情報の初期化処理
-	//InitCurveInfo();
+	InitCurveInfo();
 
 	// 影の初期化
 	InitShadow();
@@ -443,6 +443,9 @@ void UpdateGame(void)
 
 		// プレイヤーの更新
 		UpdatePlayer();
+
+		// タイヤ痕の更新
+		UpdateTireMark();
 
 		// 警察の更新
 		UpdatePolice();
