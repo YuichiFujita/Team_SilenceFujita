@@ -251,7 +251,8 @@ void UpdatePlayer(void)
 			&g_player.oldPos,
 			g_player.rot,
 			&g_player.move,
-			g_player.modelData,
+			PLAY_WIDTH,
+			PLAY_DEPTH,
 			COLLOBJECTTYPE_PLAYER
 		);
 

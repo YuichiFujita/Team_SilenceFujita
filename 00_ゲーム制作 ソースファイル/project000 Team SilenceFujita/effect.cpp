@@ -44,8 +44,14 @@ typedef struct
 	float       fRadius;			// 半径
 	float       fSub;				// 減算量 (半径)
 	float       fAlpha;				// 1Fごとの薄くなる量
+	EFFECTTYPE	effectType;			// エフェクトの種類
 	bool        bUse;				// 使用状況
 }Effect;
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void EffectSparkUpdate(Effect *pEffect);			// 火花エフェクトの更新処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -93,6 +99,7 @@ void InitEffect(void)
 		g_aEffect[nCntEffect].fRadius = 0.0f;								// 半径
 		g_aEffect[nCntEffect].fSub    = 0.0f;								// 減算量 (半径)
 		g_aEffect[nCntEffect].fAlpha  = 0.0f;								// 1Fごとの薄くなる量
+		g_aEffect[nCntEffect].effectType = EFFECTTYPE_NONE;					// エフェクトの種類
 		g_aEffect[nCntEffect].bUse    = false;								// 使用状況
 	}
 
@@ -179,6 +186,24 @@ void UpdateEffect(void)
 
 		if (g_aEffect[nCntEffect].bUse == true)
 		{ // エフェクトが使用されている場合
+
+			switch (g_aEffect[nCntEffect].effectType)
+			{
+			case EFFECTTYPE_SPARK:		// 火花
+
+				// 火花エフェクトの更新処理
+				EffectSparkUpdate(&g_aEffect[nCntEffect]);
+
+				// 処理から抜ける
+				break;
+
+			default:					// その他
+
+				// 特に無し
+
+				// 処理から抜ける
+				break;
+			}
 
 			// 移動の更新
 			g_aEffect[nCntEffect].pos += g_aEffect[nCntEffect].move;
@@ -311,7 +336,7 @@ void DrawEffect(void)
 //======================================================================================================================
 //	エフェクトの設定処理
 //======================================================================================================================
-void SetEffect(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, int nLife, float fRadius, float fSub)
+void SetEffect(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, int nLife, float fRadius, float fSub,EFFECTTYPE effectType)
 {
 	// ポインタを宣言
 	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
@@ -332,6 +357,7 @@ void SetEffect(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, int nLife, floa
 			g_aEffect[nCntEffect].nLife   = nLife;		// 寿命
 			g_aEffect[nCntEffect].fRadius = fRadius;	// 半径
 			g_aEffect[nCntEffect].fSub    = fSub;		// 減算量 (半径)
+			g_aEffect[nCntEffect].effectType = effectType;		// エフェクトの種類
 
 			// 1F ごとの薄くなる量を設定
 			g_aEffect[nCntEffect].fAlpha = 1.0f / nLife;
@@ -361,6 +387,18 @@ void SetEffect(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, int nLife, floa
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffEffect->Unlock();
+}
+
+//======================================================================================================================
+// 火花エフェクトの更新処理
+//======================================================================================================================
+void EffectSparkUpdate(Effect *pEffect)
+{
+	// 下に移動量を足していく
+	pEffect->move.y -= 0.5f;
+
+	// 火花を赤くしていく
+	pEffect->col.g -= 0.125f;
 }
 
 #ifdef _DEBUG	// デバッグ処理
