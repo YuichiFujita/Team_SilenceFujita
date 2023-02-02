@@ -62,6 +62,7 @@ typedef struct
 	int nCurveNumber;					// カーブの番号
 	DASHANGLE dashAngle;				// 走っている方向
 	bool bDeadEnd;						// 行き止まりかどうか
+	bool bHumanDeadEnd;					// 人間の行き止まりかどうか
 }CURVEINFO;
 
 //**********************************************************************************************************************
