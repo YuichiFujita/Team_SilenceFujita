@@ -39,8 +39,6 @@
 #define MAX_CAR_FORWARD_PATROL  (15.0f)		// パトロール中の前進時の最高速度
 #define MAX_CAR_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_CAR_MOVE_SUB		(0.04f)		// 移動量の減速係数
-#define CAR_WIDTH				(45.0f)		// 車の縦幅
-#define CAR_DEPTH				(45.0f)		// 車の奥行
 #define CAR_NOTMOVE_SLOW		(0.04f)		// 車の移動していないときの減速係数
 #define CAR_STOP_RADIUS_DIST	(300.0f)	// 車の止まる指標の円のずらす距離
 #define CAR_STOP_ADD_RADIUS		(50.0f)		// 車の止まる半径の追加分
@@ -284,7 +282,8 @@ void SetCar(D3DXVECTOR3 pos)
 			// 影の位置設定
 			SetPositionShadow(g_aCar[nCntCar].nShadowID, g_aCar[nCntCar].pos, g_aCar[nCntCar].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(0);
+			g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 3;
+			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber);
 			g_aCar[nCntCar].carCurveInfo.curveInfo.dashAngle = DASH_FAR;
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
 			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
@@ -469,7 +468,7 @@ void CurveCar(Car *pCar)
 	case CARACT_CURVE:		// カーブ状態
 
 		// 車の角度更新・補正処理
-		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move);
+		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move, &pCar->pos);
 
 		break;				// 抜け出す
 	}
