@@ -68,6 +68,7 @@ void InitPolice(void)
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 
+		// 基本情報を初期化
 		g_aPolice[nCntPolice].pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_aPolice[nCntPolice].posOld	= g_aPolice[nCntPolice].pos;		// 前回の位置
 		g_aPolice[nCntPolice].posCopy	= g_aPolice[nCntPolice].pos;		// 最初の位置
@@ -75,6 +76,7 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
 		g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// 警察の状態
+		g_aPolice[nCntPolice].bombState = BOMBSTATE_NONE;					// ボムの状態
 		g_aPolice[nCntPolice].nLife		= 0;								// 体力
 		g_aPolice[nCntPolice].nShadowID = NONE_SHADOW;						// 影のインデックス
 		g_aPolice[nCntPolice].bJump		= false;							// ジャンプしていない
@@ -224,6 +226,7 @@ void DrawPolice(void)
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
 
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
@@ -254,60 +257,99 @@ void DrawPolice(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aPolice[nCntPolice].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				switch (g_aPolice[nCntPolice].state)
-				{
-				case POLICESTATE_PATBACK:	//パトロールに戻っている状態
+				if (pPlayer->atkState == ATTACKSTATE_BOMB)
+				{ // 攻撃状態がボム攻撃状態の場合
 
-					// 透明度を下げる
-					pMat[nCntMat].MatD3D.Diffuse.a -= 0.005f;
-					pMat[nCntMat].MatD3D.Ambient.a -= 0.005f;
-					pMat[nCntMat].MatD3D.Emissive.a -= 0.005f;
+					switch (g_aPolice[nCntPolice].bombState)
+					{ // ボムの状態
+					case BOMBSTATE_RANGE:	// 範囲内状態
 
-					if (pMat->MatD3D.Emissive.a <= 0.0f)
-					{ // 透明度が0.0f以下になった場合
+						// 範囲内時のマテリアルの色を設定
+						pMat[nCntMat].MatD3D.Diffuse = BOMB_RANGE_COL;
+
+						// 処理を抜ける
+						break;
+
+					case BOMBSTATE_AIM:		// 狙い状態
+
+						// 狙い時のマテリアルの色を設定
+						pMat[nCntMat].MatD3D.Diffuse = BOMB_AIM_COL;
+
+						// 処理を抜ける
+						break;
+
+					default:				// 上記以外
+
+						// 範囲外時のマテリアルの色を設定
+						pMat[nCntMat].MatD3D.Diffuse = BOMB_NONE_COL;
+
+						// 処理を抜ける
+						break;
+					}
+				}
+				else
+				{ // 攻撃状態がそれ以外の状態の場合
+
+					switch (g_aPolice[nCntPolice].state)
+					{ // 状態ごとの処理
+					case POLICESTATE_PATBACK:	// パトロールに戻っている状態
+
 						// 透明度を下げる
-						pMat[nCntMat].MatD3D.Diffuse.a = 0.0f;
-						pMat[nCntMat].MatD3D.Ambient.a = 0.0f;
-						pMat[nCntMat].MatD3D.Emissive.a = 0.0f;
+						pMat[nCntMat].MatD3D.Diffuse.a  -= 0.005f;
+						pMat[nCntMat].MatD3D.Ambient.a  -= 0.005f;
+						pMat[nCntMat].MatD3D.Emissive.a -= 0.005f;
 
-						// パトロールに戻る処理
-						PatrolBackAct(&g_aPolice[nCntPolice]);
+						if (pMat->MatD3D.Emissive.a <= 0.0f)
+						{ // 透明度が0.0f以下になった場合
 
-						//最初の位置に戻す処理
-						g_aPolice[nCntPolice].state = POLICESTATE_POSBACK;
+							// 透明度を下げる
+							pMat[nCntMat].MatD3D.Diffuse.a  = 0.0f;
+							pMat[nCntMat].MatD3D.Ambient.a  = 0.0f;
+							pMat[nCntMat].MatD3D.Emissive.a = 0.0f;
+
+							// パトロールに戻る処理
+							PatrolBackAct(&g_aPolice[nCntPolice]);
+
+							// 最初の位置に戻す処理
+							g_aPolice[nCntPolice].state = POLICESTATE_POSBACK;
+						}
+
+						// 処理を抜ける
+						break;
+
+					case POLICESTATE_POSBACK:	// 最初の位置に戻る状態
+
+						// 透明度を下げる
+						pMat[nCntMat].MatD3D.Diffuse.a  += 0.005f;
+						pMat[nCntMat].MatD3D.Ambient.a  += 0.005f;
+						pMat[nCntMat].MatD3D.Emissive.a += 0.005f;
+
+						if (pMat->MatD3D.Emissive.a >= 1.0f)
+						{ // 透明度が0.0f以下になった場合
+
+							// 透明度を下げる
+							pMat[nCntMat].MatD3D.Diffuse.a  = 1.0f;
+							pMat[nCntMat].MatD3D.Ambient.a  = 1.0f;
+							pMat[nCntMat].MatD3D.Emissive.a = 1.0f;
+
+							// 最初の移動量を元に戻す
+							g_aPolice[nCntPolice].move.x = 0.0f;
+
+							// 最初の位置に戻す処理
+							g_aPolice[nCntPolice].state = POLICESTATE_PATROL;
+						}
+
+						// 処理を抜ける
+						break;
+
+					default:					// 上記以外
+
+						// 元々のマテリアルを代入する
+						pMat = (D3DXMATERIAL*)g_aPolice[nCntPolice].modelData.pBuffMat->GetBufferPointer();
+
+						// 処理を抜ける
+						break;
 					}
-
-					break;					//抜け出す
-
-				case POLICESTATE_POSBACK:	//最初の位置に戻る状態
-
-					// 透明度を下げる
-					pMat[nCntMat].MatD3D.Diffuse.a += 0.005f;
-					pMat[nCntMat].MatD3D.Ambient.a += 0.005f;
-					pMat[nCntMat].MatD3D.Emissive.a += 0.005f;
-
-					if (pMat->MatD3D.Emissive.a >= 1.0f)
-					{ // 透明度が0.0f以下になった場合
-					  // 透明度を下げる
-						pMat[nCntMat].MatD3D.Diffuse.a = 1.0f;
-						pMat[nCntMat].MatD3D.Ambient.a = 1.0f;
-						pMat[nCntMat].MatD3D.Emissive.a = 1.0f;
-
-						// 最初の移動量を元に戻す
-						g_aPolice[nCntPolice].move.x = 0.0f;
-
-						//最初の位置に戻す処理
-						g_aPolice[nCntPolice].state = POLICESTATE_PATROL;
-					}
-
-					break;					//抜け出す
-
-				default:					//上記以外
-
-					//元々のマテリアルを代入する
-					pMat = (D3DXMATERIAL*)g_aPolice[nCntPolice].modelData.pBuffMat->GetBufferPointer();
-
-					break;					//抜け出す
 				}
 
 				// マテリアルの設定
@@ -345,6 +387,7 @@ void SetPolice(D3DXVECTOR3 pos)
 			g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
 			g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// パトロール状態にする
+			g_aPolice[nCntPolice].bombState = BOMBSTATE_NONE;					// 何もしていない状態にする
 			g_aPolice[nCntPolice].nLife		= POLI_LIFE;						// 体力
 			g_aPolice[nCntPolice].bJump		= false;							// ジャンプしていない
 			g_aPolice[nCntPolice].bMove		= false;							// 移動していない
