@@ -93,6 +93,7 @@ void InitPlayer(void)
 	g_player.rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の向き
 	g_player.destRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の向き
 	g_player.state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
+	g_player.atkState      = ATTACKSTATE_NORMAL;				// 攻撃の状態
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
@@ -707,8 +708,10 @@ void FlyAwayPlayer(void)
 {
 	if (GetKeyboardPress(DIK_U) == true)
 	{ // Uキーを押している場合
+
 		if (GetWindInfo()->state == WIND_USABLE)
 		{ // 風が使用可能だった場合
+
 			// 送風機を使用する
 			g_player.wind.bUseWind = true;
 		}

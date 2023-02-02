@@ -30,7 +30,17 @@
 #define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)	// 無敵状態に変更する時間
 
 //************************************************************
-//	カメラの列挙 (PlayerCamera)
+//	列挙型定義 (ATTACKSTATE)
+//************************************************************
+typedef enum
+{
+	ATTACKSTATE_NORMAL = 0,			// 通常状態
+	ATTACKSTATE_BOMB,				// ボム攻撃状態
+	ATTACKSTATE_MAX					// この列挙型の総数
+}ATTACKSTATE;
+
+//************************************************************
+//	列挙型定義 (PLAYCAMESTATE)
 //************************************************************
 typedef enum
 {
@@ -93,6 +103,7 @@ typedef struct
 	D3DXVECTOR3 destRot;			// 目標の向き
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	ACTIONSTATE state;				// プレイヤーの状態
+	ATTACKSTATE atkState;			// 攻撃の状態
 	Model       modelData;			// モデル情報
 	PlayerBoost boost;				// ブーストの情報
 	PlayerWind	wind;				// 風の情報
