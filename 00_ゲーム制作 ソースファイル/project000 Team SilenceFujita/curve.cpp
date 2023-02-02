@@ -44,6 +44,7 @@ void InitCurveInfo(void)
 		g_aCurveInfo[nCnt].curveAngle = CURVE_RIGHT;				// ‹È‚ª‚é•ûŒü
 		g_aCurveInfo[nCnt].dashAngle = DASH_RIGHT;					// ‹È‚ª‚èŠp‚É‚½‚Ç‚è’…‚­‚Ü‚Å‚Ì‘–‚Á‚Ä‚¢‚é•ûŒü
 		g_aCurveInfo[nCnt].bDeadEnd = false;						// s‚«~‚Ü‚è‚©‚Ç‚¤‚©
+		g_aCurveInfo[nCnt].bHumanDeadEnd = false;					// lŠÔ‚Ìs‚«~‚Ü‚è‚©‚Ç‚¤‚©
 	}
 
 	/*g_aCurveInfo[0].pos = D3DXVECTOR3(-7000.0f, 0.0f, 7000.0f);
