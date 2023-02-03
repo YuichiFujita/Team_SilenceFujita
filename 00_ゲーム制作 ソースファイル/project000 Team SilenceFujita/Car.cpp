@@ -39,8 +39,6 @@
 #define MAX_CAR_FORWARD_PATROL  (15.0f)		// パトロール中の前進時の最高速度
 #define MAX_CAR_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_CAR_MOVE_SUB		(0.04f)		// 移動量の減速係数
-#define CAR_WIDTH				(45.0f)		// 車の縦幅
-#define CAR_DEPTH				(45.0f)		// 車の奥行
 #define CAR_NOTMOVE_SLOW		(0.04f)		// 車の移動していないときの減速係数
 #define CAR_STOP_RADIUS_DIST	(300.0f)	// 車の止まる指標の円のずらす距離
 #define CAR_STOP_ADD_RADIUS		(50.0f)		// 車の止まる半径の追加分
@@ -70,31 +68,32 @@ void InitCar(void)
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		g_aCar[nCntCar].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;			// 前回の位置
-		g_aCar[nCntCar].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aCar[nCntCar].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCar[nCntCar].nShadowID = NONE_SHADOW;				// 影のインデックス
-		g_aCar[nCntCar].bJump = false;							// ジャンプしているかどうか
-		g_aCar[nCntCar].bMove = false;							// 移動しているか
-		g_aCar[nCntCar].bUse = false;							// 使用状況
+		g_aCar[nCntCar].pos       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCar[nCntCar].posOld    = g_aCar[nCntCar].pos;			// 前回の位置
+		g_aCar[nCntCar].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aCar[nCntCar].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aCar[nCntCar].nShadowID = NONE_SHADOW;					// 影のインデックス
+		g_aCar[nCntCar].bombState = BOMBSTATE_NONE;					// ボムの状態
+		g_aCar[nCntCar].bJump     = false;							// ジャンプしているかどうか
+		g_aCar[nCntCar].bMove     = false;							// 移動しているか
+		g_aCar[nCntCar].bUse      = false;							// 使用状況
 
 		//曲がり角の情報の初期化
-		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle = CURVE_LEFT;	// 左に曲がる
-		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;		// カーブする番地
-		g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;						// スキップする曲がり角の回数
-		g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;		// 前回の向き
-		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;			// 現在の車の行動
+		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle   = CURVE_LEFT;	// 左に曲がる
+		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;			// カーブする番地
+		g_aCar[nCntCar].carCurveInfo.nSKipCnt    = 0;						// スキップする曲がり角の回数
+		g_aCar[nCntCar].carCurveInfo.rotDest     = g_aCar[nCntCar].rot;		// 前回の向き
+		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;				// 現在の車の行動
 
 		// モデル情報の初期化
-		g_aCar[nCntCar].modelData.dwNumMat = 0;					// マテリアルの数
-		g_aCar[nCntCar].modelData.pTexture = NULL;				// テクスチャへのポインタ
-		g_aCar[nCntCar].modelData.pMesh = NULL;					// メッシュ (頂点情報) へのポインタ
-		g_aCar[nCntCar].modelData.pBuffMat = NULL;				// マテリアルへのポインタ
-		g_aCar[nCntCar].modelData.vtxMin = INIT_VTX_MIN;		// 最小の頂点座標
-		g_aCar[nCntCar].modelData.vtxMax = INIT_VTX_MAX;		// 最大の頂点座標
-		g_aCar[nCntCar].modelData.size = INIT_SIZE;				// 大きさ
-		g_aCar[nCntCar].modelData.fRadius = 0.0f;				// 半径
+		g_aCar[nCntCar].modelData.dwNumMat = 0;						// マテリアルの数
+		g_aCar[nCntCar].modelData.pTexture = NULL;					// テクスチャへのポインタ
+		g_aCar[nCntCar].modelData.pMesh    = NULL;					// メッシュ (頂点情報) へのポインタ
+		g_aCar[nCntCar].modelData.pBuffMat = NULL;					// マテリアルへのポインタ
+		g_aCar[nCntCar].modelData.vtxMin   = INIT_VTX_MIN;			// 最小の頂点座標
+		g_aCar[nCntCar].modelData.vtxMax   = INIT_VTX_MAX;			// 最大の頂点座標
+		g_aCar[nCntCar].modelData.size     = INIT_SIZE;				// 大きさ
+		g_aCar[nCntCar].modelData.fRadius  = 0.0f;					// 半径
 	}
 
 	//車の設定処理
@@ -204,7 +203,9 @@ void DrawCar(void)
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+	D3DXMATERIAL      bombMat;					// マテリアルデータ (ボム用)
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -234,8 +235,48 @@ void DrawCar(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aCar[nCntCar].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				if (pPlayer->atkState == ATTACKSTATE_BOMB)
+				{ // 攻撃状態がボム攻撃状態の場合
+
+					// 構造体の要素をクリア
+					ZeroMemory(&bombMat, sizeof(D3DXMATERIAL));
+
+					switch (g_aCar[nCntCar].bombState)
+					{ // ボムの状態
+					case BOMBSTATE_RANGE:	// 範囲内状態
+
+						// 範囲内時のマテリアルの色を設定
+						bombMat.MatD3D.Diffuse = BOMB_RANGE_COL;
+
+						// 処理を抜ける
+						break;
+
+					case BOMBSTATE_AIM:		// 狙い状態
+
+						// 狙い時のマテリアルの色を設定
+						bombMat.MatD3D.Diffuse = BOMB_AIM_COL;
+
+						// 処理を抜ける
+						break;
+
+					default:				// 上記以外
+
+						// 範囲外時のマテリアルの色を設定
+						bombMat.MatD3D.Diffuse = BOMB_NONE_COL;
+
+						// 処理を抜ける
+						break;
+					}
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&bombMat.MatD3D);
+				}
+				else
+				{ // 攻撃状態がそれ以外の状態の場合
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				}
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aCar[nCntCar].modelData.pTexture[nCntMat]);
@@ -261,11 +302,12 @@ void SetCar(D3DXVECTOR3 pos)
 		if (g_aCar[nCntCar].bUse == false)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
-			g_aCar[nCntCar].pos = pos;								// 現在の位置
-			g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;			// 前回の位置
-			g_aCar[nCntCar].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aCar[nCntCar].bJump = false;							// ジャンプしているかどうか
-			g_aCar[nCntCar].bMove = false;							// 移動していない
+			g_aCar[nCntCar].pos       = pos;							// 現在の位置
+			g_aCar[nCntCar].posOld    = g_aCar[nCntCar].pos;			// 前回の位置
+			g_aCar[nCntCar].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aCar[nCntCar].bombState = BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aCar[nCntCar].bJump     = false;							// ジャンプしているかどうか
+			g_aCar[nCntCar].bMove     = false;							// 移動していない
 
 			// 使用している状態にする
 			g_aCar[nCntCar].bUse = true;
@@ -284,7 +326,8 @@ void SetCar(D3DXVECTOR3 pos)
 			// 影の位置設定
 			SetPositionShadow(g_aCar[nCntCar].nShadowID, g_aCar[nCntCar].pos, g_aCar[nCntCar].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(0);
+			g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 3;
+			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber);
 			g_aCar[nCntCar].carCurveInfo.curveInfo.dashAngle = DASH_FAR;
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
 			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
@@ -469,7 +512,7 @@ void CurveCar(Car *pCar)
 	case CARACT_CURVE:		// カーブ状態
 
 		// 車の角度更新・補正処理
-		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move);
+		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move, &pCar->pos);
 
 		break;				// 抜け出す
 	}

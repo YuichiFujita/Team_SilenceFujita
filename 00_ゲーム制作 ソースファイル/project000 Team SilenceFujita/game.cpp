@@ -77,6 +77,9 @@ void InitGame(void)
 	// カーブの情報の初期化処理
 	InitCurveInfo();
 
+	// カーブテキストのロード処理
+	LoadCurveTxt();
+
 	// 影の初期化
 	InitShadow();
 
@@ -148,9 +151,6 @@ void InitGame(void)
 
 	// ステージのセットアップ
 	TxtSetStage();
-
-	// カーブテキストのロード処理
-	LoadCurveTxt();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化

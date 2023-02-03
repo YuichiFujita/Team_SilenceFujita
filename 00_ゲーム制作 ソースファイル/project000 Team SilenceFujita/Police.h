@@ -12,6 +12,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "model.h"
+#include "bomb.h"
 #include "curve.h"
 
 //**********************************************************************************************************************
@@ -48,6 +49,7 @@ typedef struct
 	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
 	Model       modelData;				// モデル情報
 	POLICESTATE state;					// 警察車両の状態
+	BOMBSTATE   bombState;				// ボムの状態
 	int			nShadowID;				// 影のインデックス
 	int			nLife;					// 寿命
 	bool		bMove;					// 移動しているかどうか
