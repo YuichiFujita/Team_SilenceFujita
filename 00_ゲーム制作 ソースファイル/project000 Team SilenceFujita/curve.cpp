@@ -22,7 +22,7 @@
 #define CURVE_MOVE_SLOW_MAGNI			(0.3f)				// カーブするときの減速係数
 #define CURVE_ADD						(0.03f)				// カーブするときの向きの追加量
 #define CURVE_TXT						"data\\TXT\\Curve.txt"		// カーブ設定用のテキストファイルの相対パス
-#define CURVE_SKIP_RANDOM				(4)					// スキップする回数のランダムの範囲
+#define CURVE_SKIP_RANDOM				(3)					// スキップする回数のランダムの範囲
 #define CURVE_SKIP_LEAST				(2)					// スキップする回数の最低数
 
 //**********************************************************************************************************************

@@ -11,6 +11,7 @@
 #include "input.h"
 #include "sound.h"
 #include "fade.h"
+#include "calculation.h"
 
 #include "game.h"
 
@@ -35,6 +36,7 @@
 #include "timer.h"
 #include "tiremark.h"
 #include "velocity.h"
+#include "weather.h"
 #include "wind.h"
 
 #ifdef _DEBUG	// デバッグ処理
@@ -43,6 +45,12 @@
 #endif
 
 #include "bomb.h"
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void WeatherRain(void);							// 雨を降らせる処理
+void SetWeather(void);							// 天気の設定処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -79,6 +87,9 @@ void InitGame(void)
 
 	// カーブテキストのロード処理
 	LoadCurveTxt();
+
+	// 天気の初期化処理
+	InitWeather();
 
 	// 影の初期化
 	InitShadow();
@@ -167,6 +178,9 @@ void InitGame(void)
 //======================================================================================================================
 void UninitGame(void)
 {
+	// 天気の終了処理
+	UninitWeather();
+
 	// 影の終了
 	UninitShadow();
 
@@ -315,6 +329,9 @@ void UpdateGame(void)
 		if (g_bPause == false)
 		{ // ポーズ状態ではない場合
 
+			// 天気の更新処理
+			UpdateWeather();
+
 			// メッシュドームの更新
 			UpdateMeshDome();
 
@@ -432,6 +449,9 @@ void UpdateGame(void)
 		// ライトの更新
 		UpdateLight();
 
+		// 天気の更新処理
+		UpdateWeather();
+
 		// メッシュドームの更新
 		UpdateMeshDome();
 
@@ -522,6 +542,9 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_MAIN);
 
+	// 天気の描画処理
+	DrawWeather();
+
 	// メッシュドームの描画
 	DrawMeshDome();
 
@@ -603,20 +626,20 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
-	// 体力バーの描画
-	DrawLife();
+	//// 体力バーの描画
+	//DrawLife();
 
-	// タイマーの描画
-	DrawTimer();
+	//// タイマーの描画
+	//DrawTimer();
 
-	// 能力バーの描画
-	DrawAbility();
+	//// 能力バーの描画
+	//DrawAbility();
 
-	// 速度バーの描画
-	DrawVelocity();
+	//// 速度バーの描画
+	//DrawVelocity();
 
-	// スコアの描画
-	DrawScore();
+	//// スコアの描画
+	//DrawScore();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合
@@ -672,6 +695,65 @@ int GetGameMode(void)
 {
 	// ゲームモードを返す
 	return g_nGameMode;
+}
+
+//======================================================================================================================
+//雨を降らせる処理
+//======================================================================================================================
+void WeatherRain(void)
+{	
+	D3DXVECTOR3 Playerpos = GetPlayer()->pos;	// プレイヤーの位置
+	D3DXVECTOR3 Playerrot = GetPlayer()->rot;	// プレイヤーの向き
+	D3DXVECTOR3 posRain;						// 雨の降る位置
+	float rotRain;								// 雨の降る角度
+	float moveRain;								// 雨の移動量
+
+	for (int nCnt = 0; nCnt < RAIN_GENERATE; nCnt++)
+	{
+		// 雨の角度を設定する
+		rotRain = (float)((rand() % 315 - 157) / 100);
+
+		// プレイヤーの角度を足す
+		rotRain += Playerrot.y;
+
+		// 向きの正規化
+		rotRain = RotNormalize(rotRain);
+
+		// 雨の位置を設定する
+		posRain.x = Playerpos.x + sinf(rotRain) * (rand() % RAIN_RANGE);
+		posRain.y = Playerpos.y + 300.0f;
+		posRain.z = Playerpos.z + cosf(rotRain) * (rand() % RAIN_RANGE);
+
+		// 速度を設定する
+		moveRain = (rand() % RAIN_MOVE_RANGE) + 5.0f;
+
+		// 雨の設定処理
+		SetRain
+		(
+			posRain,							// 位置
+			D3DXVECTOR3(0.0f, moveRain, 0.0f),	// 移動量
+			5.0f								// 半径
+		);
+	}
+}
+
+//======================================================================================================================
+// 天気の設定処理
+//======================================================================================================================
+void SetWeather(void)
+{
+	WEATHERTYPE Weather = GetWeather();			// 天気の状態
+
+	switch (Weather)
+	{
+	case WEATHERTYPE_SUNNY:	// 晴れ
+
+		break;				// 抜け出す
+
+	case WEATHERTYPE_RAIN:	// 雨
+
+		break;				// 抜け出す
+	}
 }
 
 //================================

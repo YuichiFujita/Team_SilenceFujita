@@ -25,84 +25,99 @@ LPDIRECT3DTEXTURE9		g_apTextureWeather = NULL;		// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWeather = NULL;		// 頂点バッファへのポインタ
 
 Rain g_aRain[MAX_RAIN];		// エフェクトの情報
+WEATHERTYPE g_Weather;		// 天気の状態
 
 //======================================================================================================================
-//	エフェクトの初期化処理
+//	天気の初期化処理
 //======================================================================================================================
 void InitWeather(void)
 {
+	// 天気を設定する
+	g_Weather = WEATHERTYPE_RAIN;
+
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	VERTEX_3D *pVtx;							// 頂点情報へのポインタ
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, RAIN_TEXTURE, &g_apTextureWeather);
+	switch (g_Weather)
+	{
+	case WEATHERTYPE_SUNNY:		// 晴れ
 
-	// 頂点バッファの生成
-	pDevice->CreateVertexBuffer
-	( // 引数
-		sizeof(VERTEX_3D) * 4 * MAX_RAIN,		// 必要頂点数
-		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_3D,							// 頂点フォーマット
-		D3DPOOL_MANAGED,
-		&g_pVtxBuffWeather,
-		NULL
-	);
+		break;					// 抜け出す
 
-	// 雨の情報の初期化
-	for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
-	{ // 雨の最大表示数分繰り返す
+	case WEATHERTYPE_RAIN:		// 雨
 
-		g_aRain[nCntWeather].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aRain[nCntWeather].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
-		g_aRain[nCntWeather].fRadius = 0.0f;							// 半径
-		g_aRain[nCntWeather].bUse = false;								// 使用状況
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice, RAIN_TEXTURE, &g_apTextureWeather);
 
+		// 頂点バッファの生成
+		pDevice->CreateVertexBuffer
+		( // 引数
+			sizeof(VERTEX_3D) * 4 * MAX_RAIN,		// 必要頂点数
+			D3DUSAGE_WRITEONLY,
+			FVF_VERTEX_3D,							// 頂点フォーマット
+			D3DPOOL_MANAGED,
+			&g_pVtxBuffWeather,
+			NULL
+		);
+
+		// 雨の情報の初期化
+		for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
+		{ // 雨の最大表示数分繰り返す
+
+			g_aRain[nCntWeather].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+			g_aRain[nCntWeather].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+			g_aRain[nCntWeather].fRadius = 0.0f;							// 半径
+			g_aRain[nCntWeather].bUse = false;								// 使用状況
+
+		}
+
+		//------------------------------------------------------------------------------------------------------------------
+		//	頂点情報の初期化
+		//------------------------------------------------------------------------------------------------------------------
+		// 頂点バッファをロックし、頂点情報へのポインタを取得
+		g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
+
+		for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
+		{ // エフェクトの最大表示数分繰り返す
+
+		  // 頂点座標の設定
+			pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			pVtx[1].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			pVtx[2].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			pVtx[3].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+			// 法線ベクトルの設定
+			pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+			pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+			pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+			pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+
+			// 頂点カラーの設定
+			pVtx[0].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+			pVtx[1].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+			pVtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+			pVtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+
+			// テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+			// 頂点データのポインタを 4つ分進める
+			pVtx += 4;
+		}
+
+		// 頂点バッファをアンロックする
+		g_pVtxBuffWeather->Unlock();
+
+		break;					// 抜け出す
 	}
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	頂点情報の初期化
-	//------------------------------------------------------------------------------------------------------------------
-	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
-
-	for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
-	{ // エフェクトの最大表示数分繰り返す
-
-		// 頂点座標の設定
-		pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		pVtx[1].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		pVtx[2].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		pVtx[3].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-		// 法線ベクトルの設定
-		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-		pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-		pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-		pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-
-		// 頂点カラーの設定
-		pVtx[0].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-		pVtx[1].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-		pVtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-		pVtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-
-		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
-
-		// 頂点データのポインタを 4つ分進める
-		pVtx += 4;
-	}
-
-	// 頂点バッファをアンロックする
-	g_pVtxBuffWeather->Unlock();
 }
 
 //======================================================================================================================
-//	エフェクトの終了処理
+//	天気の終了処理
 //======================================================================================================================
 void UninitWeather(void)
 {
@@ -123,50 +138,61 @@ void UninitWeather(void)
 }
 
 //======================================================================================================================
-//	エフェクトの更新処理
+//	天気の更新処理
 //======================================================================================================================
 void UpdateWeather(void)
 {
 	// ポインタを宣言
 	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
 
-						// 頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
+	switch (g_Weather)
+	{
+	case WEATHERTYPE_SUNNY:		// 晴れ
 
-	for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
-	{ // エフェクトの最大表示数分繰り返す
+		break;					// 抜け出す
 
-		if (g_aRain[nCntWeather].bUse == true)
-		{ // エフェクトが使用されている場合
+	case WEATHERTYPE_RAIN:		// 雨
 
-			// 移動の更新
-			g_aRain[nCntWeather].pos += g_aRain[nCntWeather].move;
+		// 頂点バッファをロックし、頂点情報へのポインタを取得
+		g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
 
-			// 半径の補正
-			if (g_aRain[nCntWeather].fRadius < 0.0f)
-			{ // 半径が 0.0f より小さい場合
+		for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
+		{ // エフェクトの最大表示数分繰り返す
 
-				// 半径に 0.0f を代入
-				g_aRain[nCntWeather].fRadius = 0.0f;
+			if (g_aRain[nCntWeather].bUse == true)
+			{ // エフェクトが使用されている場合
+
+				// 移動の更新
+				g_aRain[nCntWeather].pos += g_aRain[nCntWeather].move;
+
+				// 半径の補正
+				if (g_aRain[nCntWeather].fRadius < 0.0f)
+				{ // 半径が 0.0f より小さい場合
+
+					// 半径に 0.0f を代入
+					g_aRain[nCntWeather].fRadius = 0.0f;
+				}
+
+				// 頂点座標の設定
+				pVtx[0].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius, +g_aRain[nCntWeather].fRadius, 0.0f);
+				pVtx[1].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius, +g_aRain[nCntWeather].fRadius, 0.0f);
+				pVtx[2].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
+				pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
 			}
 
-			// 頂点座標の設定
-			pVtx[0].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius, +g_aRain[nCntWeather].fRadius, 0.0f);
-			pVtx[1].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius, +g_aRain[nCntWeather].fRadius, 0.0f);
-			pVtx[2].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
-			pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
+			// 頂点データのポインタを 4つ分進める
+			pVtx += 4;
 		}
 
-		// 頂点データのポインタを 4つ分進める
-		pVtx += 4;
-	}
+		// 頂点バッファをアンロックする
+		g_pVtxBuffWeather->Unlock();
 
-	// 頂点バッファをアンロックする
-	g_pVtxBuffWeather->Unlock();
+		break;					// 抜け出す
+	}
 }
 
 //======================================================================================================================
-//	エフェクトの描画処理
+//	天気の描画処理
 //======================================================================================================================
 void DrawWeather(void)
 {
@@ -174,7 +200,7 @@ void DrawWeather(void)
 	D3DXMATRIX mtxTrans;						// 計算用マトリックス
 	D3DXMATRIX mtxView;							// ビューマトリックス取得用
 
-												// ポインタを宣言
+	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
 	// Zテストを無効にする
@@ -189,43 +215,54 @@ void DrawWeather(void)
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
-	for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
-	{ // エフェクトの最大表示数分繰り返す
+	switch (g_Weather)
+	{
+	case WEATHERTYPE_SUNNY:		// 晴れ
 
-		if (g_aRain[nCntWeather].bUse == true)
-		{ // エフェクトが使用されている場合
+		break;					// 抜け出す
 
-		  // ワールドマトリックスの初期化
-			D3DXMatrixIdentity(&g_aRain[nCntWeather].mtxWorld);
+	case WEATHERTYPE_RAIN:		// 雨
 
-			// ビューマトリックスを取得
-			pDevice->GetTransform(D3DTS_VIEW, &mtxView);
+		for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
+		{ // エフェクトの最大表示数分繰り返す
 
-			// ポリゴンをカメラに対して正面に向ける
-			D3DXMatrixInverse(&g_aRain[nCntWeather].mtxWorld, NULL, &mtxView);	// 逆行列を求める
-			g_aRain[nCntWeather].mtxWorld._41 = 0.0f;
-			g_aRain[nCntWeather].mtxWorld._42 = 0.0f;
-			g_aRain[nCntWeather].mtxWorld._43 = 0.0f;
+			if (g_aRain[nCntWeather].bUse == true)
+			{ // エフェクトが使用されている場合
 
-			// 位置を反映
-			D3DXMatrixTranslation(&mtxTrans, g_aRain[nCntWeather].pos.x, g_aRain[nCntWeather].pos.y, g_aRain[nCntWeather].pos.z);
-			D3DXMatrixMultiply(&g_aRain[nCntWeather].mtxWorld, &g_aRain[nCntWeather].mtxWorld, &mtxTrans);
+				// ワールドマトリックスの初期化
+				D3DXMatrixIdentity(&g_aRain[nCntWeather].mtxWorld);
 
-			// ワールドマトリックスの設定
-			pDevice->SetTransform(D3DTS_WORLD, &g_aRain[nCntWeather].mtxWorld);
+				// ビューマトリックスを取得
+				pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 
-			// 頂点バッファをデータストリームに設定
-			pDevice->SetStreamSource(0, g_pVtxBuffWeather, 0, sizeof(VERTEX_3D));
+				// ポリゴンをカメラに対して正面に向ける
+				D3DXMatrixInverse(&g_aRain[nCntWeather].mtxWorld, NULL, &mtxView);	// 逆行列を求める
+				g_aRain[nCntWeather].mtxWorld._41 = 0.0f;
+				g_aRain[nCntWeather].mtxWorld._42 = 0.0f;
+				g_aRain[nCntWeather].mtxWorld._43 = 0.0f;
 
-			// 頂点フォーマットの設定
-			pDevice->SetFVF(FVF_VERTEX_3D);
+				// 位置を反映
+				D3DXMatrixTranslation(&mtxTrans, g_aRain[nCntWeather].pos.x, g_aRain[nCntWeather].pos.y, g_aRain[nCntWeather].pos.z);
+				D3DXMatrixMultiply(&g_aRain[nCntWeather].mtxWorld, &g_aRain[nCntWeather].mtxWorld, &mtxTrans);
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureWeather);
+				// ワールドマトリックスの設定
+				pDevice->SetTransform(D3DTS_WORLD, &g_aRain[nCntWeather].mtxWorld);
 
-			// ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntWeather * 4, 2);
+				// 頂点バッファをデータストリームに設定
+				pDevice->SetStreamSource(0, g_pVtxBuffWeather, 0, sizeof(VERTEX_3D));
+
+				// 頂点フォーマットの設定
+				pDevice->SetFVF(FVF_VERTEX_3D);
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureWeather);
+
+				// ポリゴンの描画
+				pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntWeather * 4, 2);
+			}
 		}
+
+		break;					// 抜け出す
 	}
 
 	// Zテストを有効にする
@@ -249,7 +286,7 @@ void SetRain(D3DXVECTOR3 pos, D3DXVECTOR3 move, float fRadius)
 	// ポインタを宣言
 	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
 
-						// 頂点バッファをロックし、頂点情報へのポインタを取得
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
 
 	for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
@@ -282,6 +319,15 @@ void SetRain(D3DXVECTOR3 pos, D3DXVECTOR3 move, float fRadius)
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffWeather->Unlock();
+}
+
+//======================================================================================================================
+// 天気の取得処理
+//======================================================================================================================
+WEATHERTYPE GetWeather(void)
+{
+	// 天気の状態を返す
+	return g_Weather;
 }
 
 #ifdef _DEBUG	// デバッグ処理

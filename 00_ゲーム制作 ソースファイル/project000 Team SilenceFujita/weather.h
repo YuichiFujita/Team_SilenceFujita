@@ -13,6 +13,9 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define MAX_RAIN			(512)						// 雨の最大数
+#define RAIN_RANGE			(500)						// 雨の降る範囲
+#define RAIN_GENERATE		(20)						// 雨の生成数
+#define RAIN_MOVE_RANGE		(20)						// 雨の速度の範囲
 
 //**********************************************************************************************************************
 //	天気の種類(WEATHERTYPE)
@@ -44,5 +47,6 @@ void UninitWeather(void);	// 天気の終了処理
 void UpdateWeather(void);	// 天気の更新処理
 void DrawWeather(void);		// 天気の描画処理
 void SetRain(D3DXVECTOR3 pos, D3DXVECTOR3 move, float fRadius);	// 雨の設定処理
+WEATHERTYPE GetWeather(void);									// 天気の取得処理
 
 #endif
