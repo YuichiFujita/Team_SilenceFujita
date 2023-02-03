@@ -172,7 +172,7 @@ void UpdatePlayer(void)
 			}
 		}
 
-#if 1
+#if 0
 		// â¡ë¨ÇÃçXêV
 		UpdateBoost();
 

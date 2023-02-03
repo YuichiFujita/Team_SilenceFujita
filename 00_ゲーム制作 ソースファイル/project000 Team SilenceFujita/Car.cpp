@@ -50,6 +50,8 @@ void PosCar(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	
 void RevCar(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 車の補正の更新処理
 void CurveCar(Car *pCar);							// 車のカーブ処理
 void DashCarAction(Car *pCar);						// 車の走行処理
+void SetCarPosRot(Car *pCar);						// 車の位置と向きの設定処理
+void CarPosRotCorrect(Car *pCar);					// 車の位置の補正処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -97,7 +99,7 @@ void InitCar(void)
 	}
 
 	//車の設定処理
-	SetCar(D3DXVECTOR3(-7000.0f, 0.0f, 6000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
 }
 
 //======================================================================================================================
@@ -326,9 +328,8 @@ void SetCar(D3DXVECTOR3 pos)
 			// 影の位置設定
 			SetPositionShadow(g_aCar[nCntCar].nShadowID, g_aCar[nCntCar].pos, g_aCar[nCntCar].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 3;
-			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber);
-			g_aCar[nCntCar].carCurveInfo.curveInfo.dashAngle = DASH_FAR;
+			// 車の位置と向きの設定処理
+			SetCarPosRot(&g_aCar[nCntCar]);
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
 			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
 			g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;																		// 走っている状態
@@ -546,7 +547,7 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
 					{ // 右に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
@@ -575,12 +576,12 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
 					{ // 左に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になった場合
-						  // スキップ回数を0にする
+							// スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -604,12 +605,12 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
 					{ // 奥に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になった場合
-						  // スキップ回数を0にする
+							// スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -633,7 +634,7 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
 					{ // 手前に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
@@ -646,12 +647,12 @@ void DashCarAction(Car *pCar)
 
 							if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
 							{ // 曲がる方向が左方向だった場合
-								// 角度を補正する
+							  // 角度を補正する
 								pCar->rot.y = D3DX_PI;
 							}
 							else
 							{ // 曲がる方向が右方向だった場合
-								// 角度を補正する
+							  // 角度を補正する
 								pCar->rot.y = -D3DX_PI;
 							}
 						}
@@ -929,7 +930,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	//	{
 	//		// 前後の当たり判定
 	//		if (pPos->x + fWidth > pCar[nCntCar].pos.x - CAR_WIDTH
-	//			&&  pPos->x - fWidth < pCar[nCntCar].pos.x + CAR_WIDTH)
+	//			&&  pPosOld->x - fWidth < pCar[nCntCar].posOld.x + CAR_WIDTH)
 	//		{ // 車の左右の範囲内の場合
 
 	//			if (pPos->z + fDepth > pCar[nCntCar].pos.z - CAR_DEPTH
@@ -937,7 +938,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	//			{ // 前からの当たり判定
 
 	//				// 位置を補正
-	//				pPos->z = pCar[nCntCar].pos.z - (fDepth + CAR_DEPTH) - 0.01f;
+	//				pPos->z = pCar[nCntCar].pos.z + (fDepth + CAR_DEPTH) + 0.01f;
 
 	//				switch (collObject)
 	//				{
@@ -961,7 +962,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	//			{ // 後ろからの当たり判定
 
 	//				// 位置を補正
-	//				pPos->z = pCar[nCntCar].pos.z + (fDepth + CAR_DEPTH) - 0.01f;
+	//				pPos->z = pCar[nCntCar].pos.z - (fDepth + CAR_DEPTH) - 0.01f;
 
 	//				switch (collObject)
 	//				{
@@ -984,7 +985,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 	//		// 左右の当たり判定
 	//		if (pPos->z + fDepth > pCar[nCntCar].pos.z - CAR_DEPTH
-	//			&&  pPos->z - fDepth < pCar[nCntCar].pos.z + CAR_DEPTH)
+	//			&&  pPosOld->z - fDepth < pCar[nCntCar].pos.z + CAR_DEPTH)
 	//		{ // ブロックの前後の範囲内の場合
 
 	//			if (pPos->x + fWidth > pCar[nCntCar].pos.x - CAR_WIDTH
@@ -992,7 +993,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	//			{ // 左からの当たり判定
 
 	//				// 位置を補正
-	//				pPos->x = pCar[nCntCar].pos.x + (fWidth + CAR_WIDTH) - 0.01f;
+	//				pPos->x = pCar[nCntCar].pos.x - (fWidth + CAR_WIDTH) - 0.01f;
 
 	//				switch (collObject)
 	//				{
@@ -1016,7 +1017,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	//			{ // 右からの当たり判定
 
 	//				// 位置を補正
-	//				pPos->x = pCar[nCntCar].pos.x - (fWidth + CAR_WIDTH) + 0.01f;
+	//				pPos->x = pCar[nCntCar].pos.x + (fWidth + CAR_WIDTH) + 0.01f;
 
 	//				switch (collObject)
 	//				{
@@ -1038,6 +1039,106 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	//		}
 	//	}
 	//}
+}
+
+//============================================================
+// 車の位置と向きの設定処理
+//============================================================
+void SetCarPosRot(Car *pCar)
+{
+	float fCurveDist;			// 最近の曲がり角との距離
+	int nCurveNumber = 0;		// 最近の曲がり角の番号
+
+	fCurveDist = fabsf(sqrtf((pCar->pos.x - GetCurveInfo(0).pos.x) * (pCar->pos.x - GetCurveInfo(0).pos.x) +
+		(pCar->pos.z - GetCurveInfo(0).pos.z) * (pCar->pos.z - GetCurveInfo(0).pos.z)));
+
+	for (int nCnt = 1; nCnt < MAX_CURVEPOINT; nCnt++)
+	{ // 全ての曲がり角と参照
+
+		float fCurvePoint;		// 曲がり角の値
+
+		// カーブの距離
+		fCurvePoint = fabsf(sqrtf((pCar->pos.x - GetCurveInfo(nCnt).pos.x) * (pCar->pos.x - GetCurveInfo(nCnt).pos.x) +
+			(pCar->pos.z - GetCurveInfo(nCnt).pos.z) * (pCar->pos.z - GetCurveInfo(nCnt).pos.z)));
+
+		if (fCurvePoint <= fCurveDist)
+		{ // 距離の近さが更新された場合
+			// 最近値を更新する
+			fCurveDist = fCurvePoint;
+
+			// 番号を更新する
+			nCurveNumber = nCnt;
+		}
+	}
+
+	// 曲がり角の情報を代入する
+	pCar->carCurveInfo.curveInfo = GetCurveInfo(nCurveNumber);
+
+	// 車の位置の補正処理
+	CarPosRotCorrect(pCar);
+}
+
+//============================================================
+// 車の位置の補正処理
+//============================================================
+void CarPosRotCorrect(Car *pCar)
+{
+	switch (pCar->carCurveInfo.curveInfo.dashAngle)
+	{
+	case DASH_RIGHT:		// 右に向かって走る
+
+		//這わせる
+		pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+		// 向きを変える
+		pCar->rot.y = D3DX_PI * 0.5f;
+
+		break;				// 抜け出す
+
+	case DASH_LEFT:			// 左に向かって走る
+
+		//這わせる
+		pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+		// 向きを変える
+		pCar->rot.y = -D3DX_PI * 0.5f;
+
+		break;				// 抜け出す
+
+	case DASH_FAR:			// 奥に向かって走る
+
+		//這わせる
+		pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+		// 向きを変える
+		pCar->rot.y = 0.0f;
+
+		break;				// 抜け出す
+
+	case DASH_NEAR:			// 手前に向かって走る
+
+		//這わせる
+		pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+		switch (pCar->carCurveInfo.curveInfo.curveAngle)
+		{
+		case CURVE_RIGHT:	// 右に曲がる
+
+			// 向きを変える
+			pCar->rot.y = -D3DX_PI;
+
+			break;			// 抜け出す
+
+		case CURVE_LEFT:	// 左に曲がる
+
+			// 向きを変える
+			pCar->rot.y = D3DX_PI;
+
+			break;			// 抜け出す
+		}
+
+		break;				// 抜け出す
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理
