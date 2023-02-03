@@ -44,9 +44,12 @@
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
 //**********************************************************************************************************************
-#define POLICAR_TACKLE_CNT		(90)		// タックル状態に移行するまでのカウント
-#define POLICAR_TACKLE_ADD		(0.2f)		// 増していく移動量
-#define MAX_POLICAR_TACKLE_MOVE	(20.0f)		// 追加移動量の最大数
+#define POLICAR_TACKLE_CNT		(60)		// タックル状態に移行するまでのカウント
+#define POLICAR_TACKLE_ADD		(3.35f)		// 増していく移動量
+#define MAX_POLICAR_TACKLE_MOVE	(50.0f)		// 追加移動量の最大数
+#define FINISH_POLICAR_TACKLE	(90)		// タックル終了するまでの時間
+#define STOP_POLICAR_CNT		(40)		// 止まっている間のカウント数
+#define POLICAR_ATTEN_STOP		(0.1f)		// 追加移動量の減衰係数
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -109,6 +112,9 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].tackle.nTackleCnt = 0;						// タックルのカウント
 		g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
 	}
+
+	// 警察の設定処理
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
 }
 
 //======================================================================================================================
@@ -448,6 +454,9 @@ void SetPolice(D3DXVECTOR3 pos)
 			g_aPolice[nCntPolice].policeCurve.nSKipCnt = 0;										// スキップする曲がり角の回数
 			g_aPolice[nCntPolice].policeCurve.rotDest = g_aPolice[nCntPolice].rot;				// 前回の向き
 			g_aPolice[nCntPolice].policeCurve.actionState = CARACT_DASH;						// 走っている状態
+
+			// 初期位置を設定する
+			g_aPolice[nCntPolice].posCopy = g_aPolice[nCntPolice].pos;
 
 			// タックル関係の変数の初期化
 			g_aPolice[nCntPolice].tackle.nTackleCnt = 0;			// タックルのカウント
@@ -1151,29 +1160,52 @@ void PolicePosRotCorrect(Police *pPolice)
 //============================================================
 void PoliceTackle(Police *pPolice)
 {
-	// 追加移動量を加算していく
-	pPolice->tackle.Tacklemove.x += POLICAR_TACKLE_ADD;
-
-	if(pPolice->tackle.Tacklemove.x >= MAX_POLICAR_TACKLE_MOVE)
-	{ // 追加分の移動量が一定を超えた場合
-		// 移動量を補正する
-		pPolice->tackle.Tacklemove.x = MAX_POLICAR_TACKLE_MOVE;
-	}
-
 	// タックルのカウントを加算する
 	pPolice->tackle.nTackleCnt++;
 
-	if (pPolice->tackle.nTackleCnt >= 60)
+	if (pPolice->tackle.nTackleCnt <= STOP_POLICAR_CNT)
+	{ // 車を止めるカウント数の時
+		// 移動量を減衰させていく
+		pPolice->move.x *= POLICAR_ATTEN_STOP;
+
+		if (pPolice->move.x <= 0.0f)
+		{ // 移動量が0.0f以下になった場合
+			// 移動量を0に設定する
+			pPolice->move.x = 0.0f;
+		}
+	}
+	else
+	{ // 上記以外
+		// 追加移動量を加算していく
+		pPolice->tackle.Tacklemove.x += POLICAR_TACKLE_ADD;
+
+		// 移動量を加算していく
+		pPolice->move.x += POLI_MOVE_FORWARD;
+
+		if (pPolice->tackle.Tacklemove.x >= MAX_POLICAR_TACKLE_MOVE)
+		{ // 追加分の移動量が一定を超えた場合
+			// 移動量を補正する
+			pPolice->tackle.Tacklemove.x = MAX_POLICAR_TACKLE_MOVE;
+		}
+	}
+
+	if (pPolice->tackle.nTackleCnt >= FINISH_POLICAR_TACKLE)
 	{ // タックルのカウントが一定数以上になった場合
 		// タックルのカウントを0にする
 		pPolice->tackle.nTackleCnt = 0;
+
+		// 移動量を0にする
+		pPolice->tackle.Tacklemove.x = 0.0f;
 
 		//警察車両の探知処理
 		PatrolCarSearch(pPolice);
 	}
 
-	// 位置に追加の移動量分足す
-	pPolice->pos + pPolice->tackle.Tacklemove;
+	//--------------------------------------------------------
+	//	位置の更新
+	//--------------------------------------------------------
+	pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+	pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
 }
 
 #ifdef _DEBUG	// デバッグ処理
