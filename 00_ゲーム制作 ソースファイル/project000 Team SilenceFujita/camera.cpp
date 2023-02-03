@@ -11,7 +11,6 @@
 #include "input.h"
 #include "camera.h"
 #include "player.h"
-#include "Car.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
