@@ -617,15 +617,31 @@ void ScaleObjectX(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_U) == true)
-		{//Uキーを押した場合
-			//X軸を拡大する
-			g_EditObject.scale.x += EDITOBJ_SCALING;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_U) == true)
+			{//Uキーを押した場合
+				//X軸を拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_J) == true)
+			{//Jキーを押した場合
+				//X軸を縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_J) == true)
-		{//Jキーを押した場合
-			//X軸を縮小する
-			g_EditObject.scale.x -= EDITOBJ_SCALING;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_U) == true)
+			{//Uキーを押した場合
+				//X軸を拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_J) == true)
+			{//Jキーを押した場合
+				//X軸を縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }
@@ -640,15 +656,31 @@ void ScaleObjectY(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_I) == true)
-		{//Iキーを押した場合
-			//Y軸を拡大する
-			g_EditObject.scale.y += EDITOBJ_SCALING;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_I) == true)
+			{//Iキーを押した場合
+				//Y軸を拡大する
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_K) == true)
+			{//Kキーを押した場合
+				//Y軸を縮小する
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_K) == true)
-		{//Kキーを押した場合
-			//Y軸を縮小する
-			g_EditObject.scale.y -= EDITOBJ_SCALING;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_I) == true)
+			{//Iキーを押した場合
+				//Y軸を拡大する
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_K) == true)
+			{//Kキーを押した場合
+				//Y軸を縮小する
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }
@@ -663,15 +695,31 @@ void ScaleObjectZ(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_O) == true)
-		{//Oキーを押した場合
-			//Z軸を拡大する
-			g_EditObject.scale.z += EDITOBJ_SCALING;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_O) == true)
+			{//Oキーを押した場合
+				//Z軸を拡大する
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_L) == true)
+			{//Lキーを押した場合
+				//Z軸を縮小する
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_L) == true)
-		{//Lキーを押した場合
-			//Z軸を縮小する
-			g_EditObject.scale.z -= EDITOBJ_SCALING;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_O) == true)
+			{//Oキーを押した場合
+				//Z軸を拡大する
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_L) == true)
+			{//Lキーを押した場合
+				//Z軸を縮小する
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }
@@ -686,19 +734,39 @@ void ScaleObject(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_4) == true)
-		{//4キーを押した場合
-			//拡大する
-			g_EditObject.scale.x += EDITOBJ_SCALING;
-			g_EditObject.scale.y += EDITOBJ_SCALING;
-			g_EditObject.scale.z += EDITOBJ_SCALING;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_4) == true)
+			{//4キーを押した場合
+				//拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_5) == true)
+			{//5キーを押した場合
+				//縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_5) == true)
-		{//5キーを押した場合
-			//縮小する
-			g_EditObject.scale.x -= EDITOBJ_SCALING;
-			g_EditObject.scale.y -= EDITOBJ_SCALING;
-			g_EditObject.scale.z -= EDITOBJ_SCALING;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_4) == true)
+			{//4キーを押した場合
+				//拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_5) == true)
+			{//5キーを押した場合
+				//縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }

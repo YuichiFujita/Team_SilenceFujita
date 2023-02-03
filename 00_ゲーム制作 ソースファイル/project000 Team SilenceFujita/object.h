@@ -19,19 +19,21 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_OBJECT			(256)		// 使用するモデル数 (オブジェクトの最大数)
-#define MAX_COLLISION		(6)			// 当たり判定の最大数
+#define COLLISION_SETUP_TXT	"data\\TXT\\collision.txt"	// ステージセットアップ用のテキストファイルの相対パス
+
+#define MAX_OBJECT		(256)	// 使用するモデル数 (オブジェクトの最大数)
+#define MAX_COLLISION	(10)	// 当たり判定の最大数
 
 //**********************************************************************************************************************
 //	列挙型定義 (ROTSTATE)
 //**********************************************************************************************************************
 typedef enum
 {
-	ROTSTATE_0 = 0,						// 向き 0度 (360度)
-	ROTSTATE_90,						// 向き 90度
-	ROTSTATE_180,						// 向き 180度
-	ROTSTATE_270,						// 向き 270度
-	ROTSTATE_MAX,						// この列挙型の総数
+	ROTSTATE_0 = 0,				// 向き 0度 (360度)
+	ROTSTATE_90,				// 向き 90度
+	ROTSTATE_180,				// 向き 180度
+	ROTSTATE_270,				// 向き 270度
+	ROTSTATE_MAX,				// この列挙型の総数
 } ROTSTATE;
 
 //**********************************************************************************************************************
@@ -39,11 +41,11 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	COLLISIONTYPE_NONE = 0,				// 当たり判定無し
-	COLLISIONTYPE_MODEL,				// モデル頂点の当たり判定
-	COLLISIONTYPE_CREATE,				// 作成した当たり判定 (汎用)
-	//COLLISIONTYPE_ONLY,					// 作成した当たり判定 (それぞれ)
-	COLLISIONTYPE_MAX,					// この列挙型の総数
+	COLLISIONTYPE_NONE = 0,		// 当たり判定無し
+	COLLISIONTYPE_MODEL,		// モデル頂点の当たり判定
+	COLLISIONTYPE_CREATE,		// 作成した当たり判定 (汎用)
+	//COLLISIONTYPE_ONLY,		// 作成した当たり判定 (それぞれ)
+	COLLISIONTYPE_MAX,			// この列挙型の総数
 } COLLISIONTYPE;
 
 //**********************************************************************************************************************
@@ -51,9 +53,9 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	BREAKTYPE_NONE = 0,					// 壊れない種類
-	BREAKTYPE_ON,						// 壊れる種類
-	BREAKTYPE_MAX,						// この列挙型の総数
+	BREAKTYPE_NONE = 0,			// 壊れない種類
+	BREAKTYPE_ON,				// 壊れる種類
+	BREAKTYPE_MAX,				// この列挙型の総数
 } BREAKTYPE;
 
 //**********************************************************************************************************************
@@ -109,21 +111,21 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void InitObject(void);					// オブジェクトの初期化処理
-void UninitObject(void);				// オブジェクトの終了処理
-void UpdateObject(void);				// オブジェクトの更新処理
-void DrawObject(void);					// オブジェクトの描画処理
+void InitObject(void);			// オブジェクトの初期化処理
+void UninitObject(void);		// オブジェクトの終了処理
+void UpdateObject(void);		// オブジェクトの更新処理
+void DrawObject(void);			// オブジェクトの描画処理
 
 void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot);	// オブジェクトの設定処理
 void HitObject(Object *pObject, int nDamage);																	// オブジェクトのダメージ判定
 void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
 
-Object *GetObjectData(void);			// オブジェクトの取得処理
-Collision *GetCollision(void);			// 当たり判定の取得処理
+Object *GetObjectData(void);	// オブジェクトの取得処理
+Collision *GetCollision(void);	// 当たり判定の取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
 //**********************************************************************************************************************
-int GetNumObject(void);					// オブジェクトの総数取得処理
+int GetNumObject(void);			// オブジェクトの総数取得処理
 
 #endif

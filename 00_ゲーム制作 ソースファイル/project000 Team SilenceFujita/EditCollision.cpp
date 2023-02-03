@@ -227,7 +227,7 @@ void NumChangeEdit(void)
 	else if (GetKeyboardTrigger(DIK_DOWN) == true)
 	{//↓キーを押した場合
 		//当たり判定の使用数を減算する
-		//g_EditCollision.collision.nNumColl = g_EditCollision.collision.nNumColl % MAX_COLLISION - 1;
+		//g_EditCollision.pCollision->nNumColl = g_EditCollision.pCollision->nNumColl % MAX_COLLISION - 1;
 	}
 }
 
@@ -310,15 +310,31 @@ void CollisionMoveEdit(void)
 //=======================================
 void CollisionScaleObjectX(void)
 {
-	if (GetKeyboardPress(DIK_U) == true)
-	{//Uキーを押した場合
-		//x軸を拡大する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x += 0.02f;
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左コントロールキーを押していた場合
+		if (GetKeyboardTrigger(DIK_U) == true)
+		{//Uキーを押した場合
+			//x軸を拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x += 0.02f;
+		}
+		else if (GetKeyboardTrigger(DIK_J) == true)
+		{//Jキーを押した場合
+			//x軸を縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x -= 0.02f;
+		}
 	}
-	else if (GetKeyboardPress(DIK_J) == true)
-	{//Jキーを押した場合
-		//x軸を縮小する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x -= 0.02f;
+	else
+	{//左コントロールキーを押していない場合
+		if (GetKeyboardPress(DIK_U) == true)
+		{//Uキーを押した場合
+			//x軸を拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x += 0.1f;
+		}
+		else if (GetKeyboardPress(DIK_J) == true)
+		{//Jキーを押した場合
+			//x軸を縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x -= 0.1f;
+		}
 	}
 }
 
@@ -327,15 +343,31 @@ void CollisionScaleObjectX(void)
 //=======================================
 void CollisionScaleObjectY(void)
 {
-	if (GetKeyboardPress(DIK_I) == true)
-	{//Iキーを押した場合
-		//y軸を拡大する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y += 0.02f;
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左コントロールキーを押していた場合
+		if (GetKeyboardTrigger(DIK_I) == true)
+		{//Iキーを押した場合
+			//y軸を拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y += 0.02f;
+		}
+		else if (GetKeyboardTrigger(DIK_K) == true)
+		{//Kキーを押した場合
+			//y軸を縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y -= 0.02f;
+		}
 	}
-	else if (GetKeyboardPress(DIK_K) == true)
-	{//Kキーを押した場合
-		//y軸を縮小する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y -= 0.02f;
+	else
+	{//左コントロールキーを押していない場合
+		if (GetKeyboardPress(DIK_I) == true)
+		{//Iキーを押した場合
+			//y軸を拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y += 0.1f;
+		}
+		else if (GetKeyboardPress(DIK_K) == true)
+		{//Kキーを押した場合
+			//y軸を縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y -= 0.1f;
+		}
 	}
 }
 
@@ -344,15 +376,31 @@ void CollisionScaleObjectY(void)
 //=======================================
 void CollisionScaleObjectZ(void)
 {
-	if (GetKeyboardPress(DIK_O) == true)
-	{//Oキーを押した場合
-		//z軸を拡大する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z += 0.02f;
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左コントロールキーを押していた場合
+		if (GetKeyboardTrigger(DIK_O) == true)
+		{//Oキーを押した場合
+			//z軸を拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z += 0.02f;
+		}
+		else if (GetKeyboardTrigger(DIK_L) == true)
+		{//Lキーを押した場合
+			//z軸を縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z -= 0.02f;
+		}
 	}
-	else if (GetKeyboardPress(DIK_L) == true)
-	{//Lキーを押した場合
-		//z軸を縮小する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z -= 0.02f;
+	else
+	{//左コントロールキーを押していない場合
+		if (GetKeyboardPress(DIK_O) == true)
+		{//Oキーを押した場合
+			//z軸を拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z += 0.1f;
+		}
+		else if (GetKeyboardPress(DIK_L) == true)
+		{//Lキーを押した場合
+			//z軸を縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z -= 0.1f;
+		}
 	}
 }
 
@@ -361,19 +409,39 @@ void CollisionScaleObjectZ(void)
 //=======================================
 void CollisionScaleObject(void)
 {
-	if (GetKeyboardPress(DIK_4) == true)
-	{//4キーを押した場合
-		//拡大する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x += 0.02f;
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y += 0.02f;
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z += 0.02f;
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左コントロールキーを押していた場合
+		if (GetKeyboardTrigger(DIK_4) == true)
+		{//4キーを押した場合
+			//拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x += 0.02f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y += 0.02f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z += 0.02f;
+		}
+		else if (GetKeyboardTrigger(DIK_5) == true)
+		{//5キーを押した場合
+			//縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x -= 0.02f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y -= 0.02f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z -= 0.02f;
+		}
 	}
-	else if (GetKeyboardPress(DIK_5) == true)
-	{//5キーを押した場合
-		//縮小する
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x -= 0.02f;
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y -= 0.02f;
-		g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z -= 0.02f;
+	else
+	{//左コントロールキーを押していない場合
+		if (GetKeyboardPress(DIK_4) == true)
+		{//4キーを押した場合
+			//拡大する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x += 0.1f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y += 0.1f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z += 0.1f;
+		}
+		else if (GetKeyboardPress(DIK_5) == true)
+		{//5キーを押した場合
+			//縮小する
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].x -= 0.1f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].y -= 0.1f;
+			g_EditCollision.pCollision->scale[g_EditCollision.nSelectColl].z -= 0.1f;
+		}
 	}
 }
 
