@@ -107,7 +107,7 @@ void UpdateBomb(void)
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーの情報
 
-	if (GetKeyboardTrigger(DIK_RETURN) == true)
+	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_A, 0))
 	{ // 攻撃モードの変更の操作が行われた場合
 
 		// 攻撃モードを変更
@@ -349,7 +349,7 @@ void ChangeAim(void)
 	if (g_nCurrentMaxBomb > 0)
 	{ // 狙える車が 0より多い場合
 
-		if (GetKeyboardTrigger(DIK_RIGHT) == true)
+		if (GetKeyboardTrigger(DIK_RIGHT) == true || GetJoyKeyTrigger(JOYKEY_R1, 0)/* || GetJoyStickPressRX(0) > 0*/)
 		{ // 右の車へ変更する捜査が行われた場合
 
 			// 選択している車のインデックスを変更
@@ -358,7 +358,7 @@ void ChangeAim(void)
 			// 現在狙っている車のアドレスを変更
 			g_pCurrentAim = g_aBomb[g_nID].pCar;
 		}
-		else if (GetKeyboardTrigger(DIK_LEFT) == true)
+		else if (GetKeyboardTrigger(DIK_LEFT) == true || GetJoyKeyTrigger(JOYKEY_L1, 0)/* || GetJoyStickPressRX(0) < 0*/)
 		{ // 左の車へ変更する捜査が行われた場合
 
 			// 選択している車のインデックスを変更
