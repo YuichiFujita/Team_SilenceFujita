@@ -275,9 +275,9 @@ void MoveFollowCamera(void)
 	D3DXVECTOR3 diffPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// カメラの注視点の位置の計算代入用
 
 	// ポインタを宣言
-	Car *pPlayer = GetCarData();		// プレイヤーの情報
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
 
-			// 目標の注視点の位置を更新
+	// 目標の注視点の位置を更新
 	g_aCamera[CAMERATYPE_MAIN].destPosR.x = pPlayer->pos.x + sinf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
 	g_aCamera[CAMERATYPE_MAIN].destPosR.y = pPlayer->pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
 	g_aCamera[CAMERATYPE_MAIN].destPosR.z = pPlayer->pos.z + cosf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
