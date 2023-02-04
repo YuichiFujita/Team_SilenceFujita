@@ -43,7 +43,7 @@ typedef struct
 {
 	D3DXVECTOR3 Tacklemove;					// タックル時の追加移動量
 	int nTackleCnt;							// タックル状態に移行する
-}PoliceTackle;
+}PoliTackle;
 
 //**********************************************************************************************************************
 //	構造体定義 (Police)
@@ -67,7 +67,7 @@ typedef struct
 	bool		bUse;					// 使用しているか
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
 	CARCURVE	policeCurve;			// 曲がり角関係の情報
-	PoliceTackle tackle;				// タックル関係の変数
+	PoliTackle tackle;					// タックル関係の変数
 }Police;
 
 //**********************************************************************************************************************
