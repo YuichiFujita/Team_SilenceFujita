@@ -8,11 +8,13 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "weather.h"
+#include "camera.h"
+#include "player.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define RAIN_TEXTURE		"data\\TEXTURE\\effect000.jpg"		// 雨のテクスチャ
+
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -26,6 +28,7 @@ LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWeather = NULL;		// 頂点バッファへのポインタ
 
 Rain g_aRain[MAX_RAIN];		// エフェクトの情報
 WEATHERTYPE g_Weather;		// 天気の状態
+int g_NumWeather;			// 降っている数を取得する
 
 //======================================================================================================================
 //	天気の初期化処理
@@ -34,6 +37,9 @@ void InitWeather(void)
 {
 	// 天気を設定する
 	g_Weather = WEATHERTYPE_RAIN;
+
+	// 総数を初期化する
+	g_NumWeather = 0;
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -48,7 +54,7 @@ void InitWeather(void)
 	case WEATHERTYPE_RAIN:		// 雨
 
 		// テクスチャの読み込み
-		D3DXCreateTextureFromFile(pDevice, RAIN_TEXTURE, &g_apTextureWeather);
+		D3DXCreateTextureFromFile(pDevice, NULL, &g_apTextureWeather);
 
 		// 頂点バッファの生成
 		pDevice->CreateVertexBuffer
@@ -143,7 +149,10 @@ void UninitWeather(void)
 void UpdateWeather(void)
 {
 	// ポインタを宣言
-	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
+	VERTEX_3D *pVtx;		// 頂点情報へのポインタ
+	int nNumWeather = 0;	// 降っている物の数
+
+	Player *pPlayer = GetPlayer();
 
 	switch (g_Weather)
 	{
@@ -162,8 +171,14 @@ void UpdateWeather(void)
 			if (g_aRain[nCntWeather].bUse == true)
 			{ // エフェクトが使用されている場合
 
+				// 降っているものの総数を加算する
+				nNumWeather++;
+
+				g_aRain[nCntWeather].pos.x += sinf(pPlayer->rot.y) * pPlayer->move.x;
+				g_aRain[nCntWeather].pos.z += cosf(pPlayer->rot.y) * pPlayer->move.x;
+
 				// 移動の更新
-				g_aRain[nCntWeather].pos += g_aRain[nCntWeather].move;
+				g_aRain[nCntWeather].pos -= g_aRain[nCntWeather].move;
 
 				// 半径の補正
 				if (g_aRain[nCntWeather].fRadius < 0.0f)
@@ -178,6 +193,18 @@ void UpdateWeather(void)
 				pVtx[1].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius, +g_aRain[nCntWeather].fRadius, 0.0f);
 				pVtx[2].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
 				pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
+
+				// 頂点カラーの設定
+				pVtx[0].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+				pVtx[1].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+				pVtx[2].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+				pVtx[3].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+
+				if (g_aRain[nCntWeather].pos.y <= 0.0f)
+				{ // 雨が地面に落ちたとき
+					// 使用しない
+					g_aRain[nCntWeather].bUse = false;
+				}
 			}
 
 			// 頂点データのポインタを 4つ分進める
@@ -189,6 +216,8 @@ void UpdateWeather(void)
 
 		break;					// 抜け出す
 	}
+
+	g_NumWeather = nNumWeather;	// 総数を代入する
 }
 
 //======================================================================================================================
@@ -309,6 +338,12 @@ void SetRain(D3DXVECTOR3 pos, D3DXVECTOR3 move, float fRadius)
 			pVtx[2].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
 			pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius, -g_aRain[nCntWeather].fRadius, 0.0f);
 
+			// 頂点カラーの設定
+			pVtx[0].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+			pVtx[1].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+			pVtx[2].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+			pVtx[3].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+
 			// 処理を抜ける
 			break;
 		}
@@ -329,6 +364,72 @@ WEATHERTYPE GetWeather(void)
 	// 天気の状態を返す
 	return g_Weather;
 }
+
+//======================================================================================================================
+//雨を降らせる処理
+//======================================================================================================================
+void WeatherRain(void)
+{
+	D3DXVECTOR3 Camerapos = GetCamera()->posV;	// カメラの視点
+	D3DXVECTOR3 posRain;						// 雨の降る位置
+	float moveRain;								// 雨の移動量
+	float Rainrot;								// 雨の降っている方向
+
+	for (int nCnt = 0; nCnt < RAIN_GENERATE; nCnt++)
+	{
+		// 雨の位置を設定する
+		posRain.x = Camerapos.x + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
+		posRain.y = Camerapos.y + 300.0f;
+		posRain.z = Camerapos.z + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
+
+		// 角度を取る
+		Rainrot = atan2f(posRain.x - Camerapos.x, posRain.z - Camerapos.z);
+
+		posRain.x += sinf(Rainrot) * SHIFT_RAIN;
+		posRain.z += cosf(Rainrot) * SHIFT_RAIN;
+
+		// 速度を設定する
+		moveRain = (rand() % RAIN_MOVE_RANGE) + 9.0f;
+
+		// 雨の設定処理
+		SetRain
+		(
+			posRain,							// 位置
+			D3DXVECTOR3(0.0f, moveRain, 0.0f),	// 移動量
+			RAIN_RADIUS							// 半径
+		);
+	}
+}
+
+//======================================================================================================================
+// 天気の設定処理
+//======================================================================================================================
+void SetWeather(void)
+{
+	switch (g_Weather)
+	{
+	case WEATHERTYPE_SUNNY:	// 晴れ
+
+		break;				// 抜け出す
+
+	case WEATHERTYPE_RAIN:	// 雨
+
+		// 雨を降らせる処理
+		WeatherRain();
+
+		break;				// 抜け出す
+	}
+}
+
+//======================================================================================================================
+// 雨の総数取得処理
+//======================================================================================================================
+int GetNumWeather(void)
+{
+	// 降っている総数を返す
+	return g_NumWeather;
+}
+
 
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================

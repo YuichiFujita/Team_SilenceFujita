@@ -32,6 +32,7 @@
 #include "EditCollision.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
+#include "weather.h"
 #endif
 
 //************************************************************
@@ -1255,6 +1256,7 @@ void DrawDebug(void)
 	Car *pCar = GetCarData();						// 車の情報を取得する
 	Police *pPolice = GetPoliceData();
 	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
+	int nNumWeather = GetNumWeather();				// 降っている物の総数を取得する
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1290,7 +1292,8 @@ void DrawDebug(void)
 		"   警察の向き：[%d]\n"
 		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
 		" 　警察のスピード：[%.3f]\n"
-		" 　人間の位置：[%.3f,%.3f,%.3f]",
+		" 　人間の位置：[%.3f,%.3f,%.3f]\n"
+		" 　降っている物の総数：%d",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1310,7 +1313,8 @@ void DrawDebug(void)
 		(int)D3DXToDegree(pPolice->rot.y),
 		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
 		pPolice->move.x,
-		HumanPos.x, HumanPos.y, HumanPos.z
+		HumanPos.x, HumanPos.y, HumanPos.z,
+		nNumWeather
 	);
 
 	//--------------------------------------------------------
