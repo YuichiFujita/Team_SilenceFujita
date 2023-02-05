@@ -457,6 +457,7 @@ void SetPolice(D3DXVECTOR3 pos)
 
 			// 初期位置を設定する
 			g_aPolice[nCntPolice].posCopy = g_aPolice[nCntPolice].pos;
+			g_aPolice[nCntPolice].rotCopy = g_aPolice[nCntPolice].rot;
 
 			// タックル関係の変数の初期化
 			g_aPolice[nCntPolice].tackle.nTackleCnt = 0;			// タックルのカウント
@@ -763,7 +764,8 @@ void PatrolBackAct(Police *pPolice)
 {
 	//最初の位置と向きと移動量、今進むべき方向をリセットする
 	pPolice->pos = pPolice->posCopy;
-	pPolice->posOld = pPolice->posOld;
+	pPolice->posOld = pPolice->pos;
+	pPolice->rot = pPolice->rotCopy;
 	pPolice->move.x = 0.0f;
 }
 

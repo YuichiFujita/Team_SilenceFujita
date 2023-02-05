@@ -56,6 +56,7 @@ typedef struct
 	D3DXVECTOR3 move;					// 移動量
 	D3DXVECTOR3 rot;					// 向き
 	D3DXVECTOR3 rotDest;				// 目標の向き
+	D3DXVECTOR3	rotCopy;				// 最初の向き
 	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
 	Model       modelData;				// モデル情報
 	POLICESTATE state;					// 警察車両の状態
