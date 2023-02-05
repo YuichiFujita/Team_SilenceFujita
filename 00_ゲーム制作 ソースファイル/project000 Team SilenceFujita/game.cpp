@@ -630,20 +630,22 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
-	//// 体力バーの描画
-	//DrawLife();
+#if 1
+	// 体力バーの描画
+	DrawLife();
 
-	//// タイマーの描画
-	//DrawTimer();
+	// タイマーの描画
+	DrawTimer();
 
-	//// 能力バーの描画
-	//DrawAbility();
+	// 能力バーの描画
+	DrawAbility();
 
-	//// 速度バーの描画
-	//DrawVelocity();
+	// 速度バーの描画
+	DrawVelocity();
 
-	//// スコアの描画
-	//DrawScore();
+	// スコアの描画
+	DrawScore();
+#endif
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合
