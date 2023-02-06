@@ -32,7 +32,9 @@
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-CURVEINFO g_aCurveInfo[MAX_CURVEPOINT];		// 車のカーブの位置の情報
+CURVEINFO g_aCurveInfo[MAX_CURVEPOINT];						// 車のカーブの情報
+HUMANCURVEINFO g_aCurveHuman[MAX_HUMAN_ROUTE];				// 人間のカーブの情報
+float g_aDefaultRot[MAX_HUMAN_ROUTE];						// 最初の曲がり角
 
 //======================================================================================================================
 // カーブの情報の初期化処理
@@ -40,13 +42,39 @@ CURVEINFO g_aCurveInfo[MAX_CURVEPOINT];		// 車のカーブの位置の情報
 void InitCurveInfo(void)
 {
 	for (int nCnt = 0; nCnt < MAX_CURVEPOINT; nCnt++)
-	{ // 曲がり角の情報の初期化
+	{ // 車の曲がり角の情報の初期化
 		g_aCurveInfo[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
 		g_aCurveInfo[nCnt].nCurveNumber = nCnt;						// 番号
 		g_aCurveInfo[nCnt].curveAngle = CURVE_RIGHT;				// 曲がる方向
 		g_aCurveInfo[nCnt].dashAngle = DASH_RIGHT;					// 曲がり角にたどり着くまでの走っている方向
 		g_aCurveInfo[nCnt].bDeadEnd = false;						// 行き止まりかどうか
 	}
+
+	for (int nCnt = 0; nCnt < MAX_HUMAN_ROUTE; nCnt++)
+	{ // 人間のルートの情報の初期化
+		for (int nCntCur = 0; nCntCur < MAX_HUMAN_CURVE; nCntCur++)
+		{
+			g_aCurveHuman[nCnt].curvePoint[nCntCur] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+			g_aCurveHuman[nCnt].curveAngle[nCntCur] = CURVE_LEFT;						// 曲がる方向
+			g_aCurveHuman[nCnt].dashAngle[nCntCur] = DASH_RIGHT;						// 走っている方向
+			g_aCurveHuman[nCnt].nNowCurve = 0;											// 現在の曲がり角の番号
+			g_aCurveHuman[nCnt].nCurveTime = 0;											// 曲がる回数
+		}
+	}
+
+	g_aCurveHuman[0].nCurveTime = 8;
+	g_aCurveHuman[0].nNowCurve = 0;
+	g_aCurveHuman[0].curvePoint[0] = D3DXVECTOR3(-2250.0f, 0.0f, 2000.0f);
+	g_aCurveHuman[0].curvePoint[1] = D3DXVECTOR3(-2250.0f, 0.0f, 250.0f);
+	g_aCurveHuman[0].curvePoint[2] = D3DXVECTOR3(2000.0f, 0.0f, 250.0f);
+	g_aCurveHuman[0].curvePoint[3] = D3DXVECTOR3(2000.0f, 0.0f, -250.0f);
+	g_aCurveHuman[0].curvePoint[4] = D3DXVECTOR3(-2250.0f, 0.0f, -250.0f);
+	g_aCurveHuman[0].curvePoint[5] = D3DXVECTOR3(-2250.0f, 0.0f, -2000.0f);
+	g_aCurveHuman[0].curvePoint[6] = D3DXVECTOR3(2000.0f, 0.0f, -2000.0f);
+	g_aCurveHuman[0].curvePoint[7] = D3DXVECTOR3(2000.0f, 0.0f, 2000.0f);
+
+	// 曲がり角の設定処理
+	SetCurvePoint();
 }
 
 //============================================================
@@ -292,7 +320,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 	}
 
 	// 向きの正規化
-	RotNormalize(rot->y);
+	rot->y = RotNormalize(rot->y);
 }
 
 //============================================================
@@ -441,4 +469,251 @@ void LoadCurveTxt(void)
 		// エラーメッセージボックス
 		MessageBox(NULL, "カーブファイルの読み込みに失敗です", "ざまぁみろwww", MB_ICONWARNING);
 	}
+}
+
+//============================================================
+// 曲がり角の設定処理
+//============================================================
+void SetCurvePoint(void)
+{
+	for (int nCntCur = 0; nCntCur < MAX_HUMAN_ROUTE; nCntCur++)
+	{ // ルート分設定する
+		for (int nCnt = 0; nCnt < g_aCurveHuman[nCntCur].nCurveTime; nCnt++)
+		{ // 走る軸と方向を決める
+
+			if ((int)g_aCurveHuman[nCntCur].curvePoint[nCnt].x == (int)g_aCurveHuman[nCntCur].curvePoint[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime].x)
+			{ // X座標が同じだったら
+
+				if ((int)g_aCurveHuman[nCntCur].curvePoint[nCnt].z < (int)g_aCurveHuman[nCntCur].curvePoint[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime].z)
+				{ // 行先のZ座標が今のポイントよりも奥だった場合
+
+					// 奥に走っている
+					g_aCurveHuman[nCntCur].dashAngle[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime] = DASH_FAR;
+				}
+				else
+				{ // 行先のZ座標が今のポイントよりも手前だった場合
+
+					// 手前に走っている
+					g_aCurveHuman[nCntCur].dashAngle[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime] = DASH_NEAR;
+				}
+			}
+			else
+			{ // Z座標が同じだったら
+				if ((int)g_aCurveHuman[nCntCur].curvePoint[nCnt].x < (int)g_aCurveHuman[nCntCur].curvePoint[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime].x)
+				{ // 行先のX座標が今のポイントよりも右だった場合
+
+					// 右に走っている
+					g_aCurveHuman[nCntCur].dashAngle[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime] = DASH_RIGHT;
+				}
+				else
+				{ // 行先のX座標が今のポイントよりも左だった場合
+
+					// 左方向に走っている
+					g_aCurveHuman[nCntCur].dashAngle[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime] = DASH_LEFT;
+				}
+			}
+		}
+
+		for (int nCnt = 0; nCnt < g_aCurveHuman[nCntCur].nCurveTime; nCnt++)
+		{ // 走る曲がる方向を決める
+
+			if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_RIGHT)
+			{ // 右に走っている場合
+				if ((int)g_aCurveHuman[nCntCur].curvePoint[nCnt].z < (int)g_aCurveHuman[nCntCur].curvePoint[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime].z)
+				{ // 次の目的地が奥だった場合
+
+					// 左曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_LEFT;
+				}
+				else
+				{ // 次の目的地が手前だった場合
+
+					// 右曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_RIGHT;
+				}
+			}
+			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_LEFT)
+			{ // 左に走っている場合
+
+				if ((int)g_aCurveHuman[nCntCur].curvePoint[nCnt].z < (int)g_aCurveHuman[nCntCur].curvePoint[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime].z)
+				{ // 次の目的地が奥だった場合
+
+					// 右曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_RIGHT;
+				}
+				else
+				{ // 次の目的地が手前だった場合
+
+					// 左曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_LEFT;
+				}
+			}
+			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_FAR)
+			{ // 奥に走っている場合
+
+				if ((int)g_aCurveHuman[nCntCur].curvePoint[nCnt].x < (int)g_aCurveHuman[nCntCur].curvePoint[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime].x)
+				{ // 次の目的地が右だった場合
+
+					// 右曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_RIGHT;
+				}
+				else
+				{ // 次の目的地が左だった場合
+
+					// 左曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_LEFT;
+				}
+			}
+			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_NEAR)
+			{ // 手前に走っている場合
+
+				if ((int)g_aCurveHuman[nCntCur].curvePoint[nCnt].x < (int)g_aCurveHuman[nCntCur].curvePoint[(nCnt + 1) % g_aCurveHuman[nCntCur].nCurveTime].x)
+				{ // 次の目的地が右だった場合
+
+					// 左曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_LEFT;
+				}
+				else
+				{ // 次の目的地が左だった場合
+
+					// 右曲がりになる
+					g_aCurveHuman[nCntCur].curveAngle[nCnt] = CURVE_RIGHT;
+				}
+			}
+		}
+
+		for (int nCnt = 0; nCnt < g_aCurveHuman[nCntCur].nCurveTime; nCnt++)
+		{ // 曲がる回数分回す
+
+			if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_RIGHT)
+			{ // 右方向に移動していた場合
+
+				// 曲がるポイントのZ軸を75.0f戻す
+				g_aCurveHuman[nCntCur].curvePoint[nCnt].z += SHIFT_HUMAN_CURVE;
+
+				if (nCnt == 0)
+				{ // 一回目の場合
+
+					// 向きを90度に設定する
+					g_aDefaultRot[nCntCur] = D3DXToRadian(90);
+				}
+
+				if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_RIGHT)
+				{ // 右に曲がる場合
+
+					//曲がるポイントのX軸を75.0fずらす
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].x += SHIFT_HUMAN_CURVE;
+				}
+				else if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_LEFT)
+				{ // 左に曲がる場合
+
+					//曲がるポイントのX軸を75.0fずらす
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].x -= SHIFT_HUMAN_CURVE;
+				}
+			}
+			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_LEFT)
+			{ // 左方向に移動していた場合
+
+				// 曲がるポイントのZ軸を75.0f進める
+				g_aCurveHuman[nCntCur].curvePoint[nCnt].z -= SHIFT_HUMAN_CURVE;
+
+				if (nCnt == 0)
+				{ // 一回目の場合
+
+					// 向きを-90度に設定する
+					g_aDefaultRot[nCntCur] = D3DXToRadian(-90);
+				}
+
+				if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_RIGHT)
+				{ // 右に曲がる場合
+
+					// 曲がるポイントのX軸を75.0f進める
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].x -= SHIFT_HUMAN_CURVE;
+				}
+				else if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_LEFT)
+				{ // 左に曲がる場合
+
+					// 曲がるポイントのX軸を75.0f戻る
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].x += SHIFT_HUMAN_CURVE;
+				}
+			}
+			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_FAR)
+			{ // 奥方向に移動していた場合
+
+				// 曲がるポイントのX軸を進める
+				g_aCurveHuman[nCntCur].curvePoint[nCnt].x -= SHIFT_HUMAN_CURVE;
+
+				if (nCnt == 0)
+				{ // 一回目の場合
+
+					// 向きを0度に設定する
+					g_aDefaultRot[nCntCur] = D3DXToRadian(0);
+				}
+
+				if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_RIGHT)
+				{ // 右に曲がる場合
+
+					// 曲がるポイントのZ軸を75.0f進める
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].z += SHIFT_HUMAN_CURVE;
+				}
+				else if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_LEFT)
+				{ // 左に曲がる場合
+
+					// 曲がるポイントのZ軸を75.0f戻す
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].z -= SHIFT_HUMAN_CURVE;
+				}
+			}
+			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_NEAR)
+			{ // 手前方向に移動していた場合
+
+				// 曲がるポイントのX軸を75.0f戻す
+				g_aCurveHuman[nCntCur].curvePoint[nCnt].x += SHIFT_HUMAN_CURVE;
+
+				if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_RIGHT)
+				{ // 右に曲がる場合
+
+					// 曲がるポイントのZ軸を75.0f進める
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].z -= SHIFT_HUMAN_CURVE;
+
+					if (nCnt == 0)
+					{ // 一回目の場合
+
+						// 向きを-180度に設定する
+						g_aDefaultRot[nCntCur] = D3DXToRadian(-180);
+					}
+				}
+				else if (g_aCurveHuman[nCntCur].curveAngle[nCnt] == CURVE_LEFT)
+				{ // 左に曲がる場合
+
+					// 曲がるポイントのZ軸を75.0f戻す
+					g_aCurveHuman[nCntCur].curvePoint[nCnt].z += SHIFT_HUMAN_CURVE;
+
+					if (nCnt == 0)
+					{ // 一回目の場合
+
+						// 向きを180度に設定する
+						g_aDefaultRot[nCntCur] = D3DXToRadian(180);
+					}
+				}
+			}
+		}
+	}
+}
+
+//============================================================
+// 人間のルートの取得処理
+//============================================================
+HUMANCURVEINFO GetHumanRoute(int nID)
+{
+	// カーブの情報を返す
+	return g_aCurveHuman[nID];
+}
+
+//============================================================
+// 人間の初期向きの取得処理
+//============================================================
+float GetDefaultRot(int nID)
+{
+	// 初期向きを返す
+	return g_aDefaultRot[nID];
 }

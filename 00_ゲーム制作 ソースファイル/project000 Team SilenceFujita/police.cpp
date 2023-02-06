@@ -97,6 +97,18 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].bJump		= false;							// ジャンプしていない
 		g_aPolice[nCntPolice].bUse		= false;							// 使用状況
 
+		// 曲がり角関係を初期化
+		g_aPolice[nCntPolice].policeCurve.curveInfo.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 曲がり角の位置
+		g_aPolice[nCntPolice].policeCurve.curveInfo.nCurveNumber = -1;						// 番号
+		g_aPolice[nCntPolice].policeCurve.curveInfo.curveAngle = CURVE_RIGHT;				// 右に曲がる
+		g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_RIGHT;					// 右に進む
+		g_aPolice[nCntPolice].policeCurve.curveInfo.bDeadEnd = false;						// 行き止まりかどうか
+		g_aPolice[nCntPolice].policeCurve.actionState = CARACT_DASH;						// 状態
+		g_aPolice[nCntPolice].policeCurve.nSKipCnt = 0;										// スキップする回数
+		g_aPolice[nCntPolice].policeCurve.rotDest = g_aPolice[nCntPolice].rot;				// 目標の向き
+
+		g_aPolice[nCntPolice].policeCurveCopy = g_aPolice[nCntPolice].policeCurve;			// 曲がり角の情報を代入
+
 		// モデル情報の初期化
 		g_aPolice[nCntPolice].modelData.dwNumMat = 0;						// マテリアルの数
 		g_aPolice[nCntPolice].modelData.pTexture = NULL;					// テクスチャへのポインタ
@@ -113,8 +125,8 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
 	}
 
-	// 警察の設定処理
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+	//// 警察の設定処理
+	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
 }
 
 //======================================================================================================================
@@ -588,7 +600,7 @@ void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove
 void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 {
 	// 向きの正規化
-	RotNormalize(rot->y);
+	rot->y = RotNormalize(rot->y);
 
 	//--------------------------------------------------------
 	//	移動範囲の補正
@@ -767,9 +779,7 @@ void PatrolBackAct(Police *pPolice)
 	pPolice->posOld = pPolice->pos;						// 前回の位置
 	pPolice->rot = pPolice->rotCopy;					// 向き
 	pPolice->move.x = 0.0f;								// 移動量
-	pPolice->policeCurve.nSKipCnt = 0;					// スキップする曲がり角の回数
-	pPolice->policeCurve.rotDest = pPolice->rot;		// 前回の向き
-	pPolice->policeCurve.actionState = CARACT_DASH;		// 走っている状態
+	pPolice->policeCurve = pPolice->policeCurveCopy;	// 曲がり角の情報を代入
 }
 
 //============================================================
@@ -1092,6 +1102,7 @@ void SetPolicePosRot(Police *pPolice)
 
 	// 曲がり角の情報を代入する
 	pPolice->policeCurve.curveInfo = GetCurveInfo(nCurveNumber);
+	pPolice->policeCurveCopy = pPolice->policeCurve;			// 曲がり角の情報のコピーを設定
 
 	// 車の位置の補正処理
 	PolicePosRotCorrect(pPolice);

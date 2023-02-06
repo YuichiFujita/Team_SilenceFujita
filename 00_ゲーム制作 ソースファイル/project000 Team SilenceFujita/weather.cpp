@@ -16,6 +16,9 @@
 //**********************************************************************************************************************
 #define SNOW_TEXTURE	"data\\TEXTURE\\effect000.jpg"	//雪のテクスチャ
 
+#define RAIN_COL		(D3DXCOLOR(0.5f, 0.5f, 0.95f, 1.0f))	// 雨の頂点カラー
+#define SNOW_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// 雪の頂点カラー
+
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
@@ -39,7 +42,7 @@ int g_NumWeather;			// 降っている数を取得する
 void InitWeather(void)
 {
 	// 天気を設定する
-	g_Weather = WEATHERTYPE_SNOW;
+	g_Weather = WEATHERTYPE_RAIN;
 
 	// 総数を初期化する
 	g_NumWeather = 0;
@@ -267,8 +270,8 @@ void UpdateRain(void)
 			nNumWeather++;
 
 			// プレイヤー分の移動量を足す
-			g_aRain[nCntWeather].pos.x += sinf(pPlayer->rot.y) * (pPlayer->move.x + pPlayer->boost.plusMove.x);
-			g_aRain[nCntWeather].pos.z += cosf(pPlayer->rot.y) * (pPlayer->move.x + pPlayer->boost.plusMove.x);
+			g_aRain[nCntWeather].pos.x += pPlayer->pos.x - pPlayer->oldPos.x;
+			g_aRain[nCntWeather].pos.z += pPlayer->pos.z - pPlayer->oldPos.z;
 
 			// 移動の更新
 			g_aRain[nCntWeather].pos -= g_aRain[nCntWeather].move;
@@ -296,10 +299,10 @@ void UpdateRain(void)
 			pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius.x, -g_aRain[nCntWeather].fRadius.y, 0.0f);
 
 			// 頂点カラーの設定
-			pVtx[0].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
-			pVtx[1].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
-			pVtx[2].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
-			pVtx[3].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+			pVtx[0].col = RAIN_COL;
+			pVtx[1].col = RAIN_COL;
+			pVtx[2].col = RAIN_COL;
+			pVtx[3].col = RAIN_COL;
 
 			if (g_aRain[nCntWeather].pos.y <= 0.0f)
 			{ // 雨が地面に落ちたとき
@@ -342,8 +345,8 @@ void UpdateSnow(void)
 			nNumWeather++;
 
 			// プレイヤー分の移動量を足す
-			g_aSnow[nCntWeather].pos.x += sinf(pPlayer->rot.y) * (pPlayer->move.x + pPlayer->boost.plusMove.x);
-			g_aSnow[nCntWeather].pos.z += cosf(pPlayer->rot.y) * (pPlayer->move.x + pPlayer->boost.plusMove.x);
+			g_aSnow[nCntWeather].pos.x += pPlayer->pos.x - pPlayer->oldPos.x;
+			g_aSnow[nCntWeather].pos.z += pPlayer->pos.z - pPlayer->oldPos.z;
 
 			// 移動の更新
 			g_aSnow[nCntWeather].pos -= g_aSnow[nCntWeather].move;
@@ -371,10 +374,10 @@ void UpdateSnow(void)
 			pVtx[3].pos = D3DXVECTOR3(+g_aSnow[nCntWeather].fRadius.x, -g_aSnow[nCntWeather].fRadius.y, 0.0f);
 
 			// 頂点カラーの設定
-			pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-			pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-			pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-			pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[0].col = SNOW_COL;
+			pVtx[1].col = SNOW_COL;
+			pVtx[2].col = SNOW_COL;
+			pVtx[3].col = SNOW_COL;
 
 			if (g_aSnow[nCntWeather].pos.y <= 0.0f)
 			{ // 雨が地面に落ちたとき
@@ -411,11 +414,6 @@ void DrawWeather(void)
 
 	// ライティングを無効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-
-	// αブレンディングを加算合成に設定
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
 	switch (g_Weather)
 	{
@@ -516,11 +514,6 @@ void DrawWeather(void)
 
 	// ライティングを有効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	// αブレンディングを元に戻す
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
 //======================================================================================================================
@@ -555,10 +548,10 @@ void SetRain(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR2 fRadius)
 			pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius.x, -g_aRain[nCntWeather].fRadius.y, 0.0f);
 
 			// 頂点カラーの設定
-			pVtx[0].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
-			pVtx[1].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
-			pVtx[2].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
-			pVtx[3].col = D3DXCOLOR(0.0f, 0.4f, 1.0f, 1.0f);
+			pVtx[0].col = RAIN_COL;
+			pVtx[1].col = RAIN_COL;
+			pVtx[2].col = RAIN_COL;
+			pVtx[3].col = RAIN_COL;
 
 			// 処理を抜ける
 			break;
@@ -604,10 +597,10 @@ void SetSnow(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR2 fRadius)
 			pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius.x, -g_aRain[nCntWeather].fRadius.y, 0.0f);
 
 			// 頂点カラーの設定
-			pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-			pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-			pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-			pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[0].col = SNOW_COL;
+			pVtx[1].col = SNOW_COL;
+			pVtx[2].col = SNOW_COL;
+			pVtx[3].col = SNOW_COL;
 
 			// 処理を抜ける
 			break;
