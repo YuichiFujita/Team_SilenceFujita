@@ -24,7 +24,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define COLLISION_SETUP_TXT	"data\\TXT\\collision.txt"	// ステージセットアップ用のテキストファイルの相対パス
+#define SHADOW_SETUP_TXT	"data\\TXT\\shadow.txt"		// ステージセットアップ用のテキストファイルの相対パス
 
 #define OBJ_LIFE			(50)						// オブジェクトの体力
 #define DAMAGE_TIME_OBJ		(20)						// ダメージ状態を保つ時間
@@ -33,13 +33,15 @@
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void TxtSetCollision(void);						// 当たり判定のセットアップ処理
+void TxtSetCollision(void);		// 当たり判定のセットアップ処理
+void TxtSetShadow(void);		// 影の半径のセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
 Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
+float     g_aShadowRadius[MODEL_OBJ_MAX];		// 影の半径の情報
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -115,8 +117,18 @@ void InitObject(void)
 		}
 	}
 
+	// 影の半径の情報の初期化
+	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
+	{ // オブジェクトの種類の総数分繰り返す
+
+		g_aShadowRadius[nCntObject] = FIRST_RADIUS;
+	}
+
 	// 当たり判定のセットアップ
 	TxtSetCollision();
+
+	// 影の半径のセットアップ
+	TxtSetShadow();
 }
 
 //======================================================================================================================
@@ -312,8 +324,11 @@ void DrawObject(void)
 //======================================================================================================================
 void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot)
 {
+	// 変数を宣言
+	float AverageScale;			// 拡大率の平均値
+
 	// ポインタを宣言
-	D3DXMATERIAL *pMatModel;		// マテリアルデータへのポインタ
+	D3DXMATERIAL *pMatModel;	// マテリアルデータへのポインタ
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -411,13 +426,16 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			if (nShadowType == SHADOWTYPE_CIRCLE)
 			{ // 丸影の場合
 
+				// 拡大率の平均を求める
+				AverageScale = (g_aObject[nCntObject].scale.x + g_aObject[nCntObject].scale.z) * 0.5f;
+
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = SetCircleShadow
 				( // 引数
-					0.5f,																						// α値
-					fabsf(g_aObject[nCntObject].modelData.vtxMax.x - g_aObject[nCntObject].modelData.vtxMin.x),	// 半径
-					&g_aObject[nCntObject].nShadowID,															// 影の親の影インデックス
-					&g_aObject[nCntObject].bUse																	// 影の親の使用状況
+					0.5f,										// α値
+					g_aShadowRadius[nType] * AverageScale,		// 半径
+					&g_aObject[nCntObject].nShadowID,			// 影の親の影インデックス
+					&g_aObject[nCntObject].bUse					// 影の親の使用状況
 				);
 			}
 			else if (nShadowType == SHADOWTYPE_MODEL)
@@ -828,6 +846,78 @@ void TxtSetCollision(void)
 
 		// エラーメッセージボックス
 		MessageBox(NULL, "当たり判定ファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
+
+//======================================================================================================================
+//	影の半径のセットアップ処理
+//======================================================================================================================
+void TxtSetShadow(void)
+{
+	// 変数を宣言
+	int nEnd;					// テキスト読み込み終了の確認用
+	int nType;					// 種類の代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE *pFile;				// ファイルポインタ
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(SHADOW_SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
+
+			if (strcmp(&aString[0], "SETSHADOW_OBJECT") == 0)
+			{ // 読み込んだ文字列が SETSHADOW_OBJECT の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETSHADOW_OBJECT ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_SHADOW") == 0)
+					{ // 読み込んだ文字列が SET_SHADOW の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_SHADOW ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);					// 種類を読み込む
+							}
+							else if (strcmp(&aString[0], "RADIUS") == 0)
+							{ // 読み込んだ文字列が RADIUS の場合
+								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+								fscanf(pFile, "%f", &g_aShadowRadius[nType]);	// 影の半径を読み込む
+							}
+						} while (strcmp(&aString[0], "END_SET_SHADOW") != 0);	// 読み込んだ文字列が END_SET_SHADOW ではない場合ループ
+					}
+				} while (strcmp(&aString[0], "END_SETSHADOW_OBJECT") != 0);		// 読み込んだ文字列が END_SETSHADOW_OBJECT ではない場合ループ
+			}
+		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "影の半径ファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
 }
 

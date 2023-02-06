@@ -33,11 +33,16 @@
 #define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
 #define REV_MOVE_ROT	(0.085f)	// 移動量による向き変更量の補正係数
 #define SUB_MOVE_VALUE	(10.0f)		// 向き変更時の減速が行われる移動量
-#define SUB_MOVE		(0.2f)		// 向き変更時の減速量
+#define SUB_MOVE		(0.15f)		// 向き変更時の減速量
+#define REV_MOVE_BRAKE	(0.1f)		// ブレーキ時の減速係数
+#define DEL_MOVE_ABS	(1.9f)		// 移動量の削除範囲の絶対値
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
 
+//------------------------------------------------------------
+//	破滅疾走 (スラム・ブースト) マクロ定義
+//------------------------------------------------------------
 #define BOOST_OK_MOVE	(15.0f)		// ブースト使用に必要なプレイヤーの最低速度
 #define BOOST_ADD_MOVE	(0.25f)		// ブーストの加速量
 #define BOOST_SUB_MOVE	(0.08f)		// ブーストの減速量
@@ -48,7 +53,7 @@
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
 
 //------------------------------------------------------------
-//吹飛散風(フライ・アウェイ)のマクロ定義
+//	吹飛散風 (フライ・アウェイ) マクロ定義
 //------------------------------------------------------------
 #define FLYAWAY_INTERVAL_CNT	(3)			// 風の出る間隔
 #define FLYAWAY_SET_CNT			(10)		// 風の出る量
@@ -93,6 +98,7 @@ void InitPlayer(void)
 	g_player.rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の向き
 	g_player.destRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の向き
 	g_player.state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
+	g_player.atkState      = ATTACKSTATE_NORMAL;				// 攻撃の状態
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
@@ -467,7 +473,7 @@ void HitPlayer(MainPlayer *pPlayer, int nDamage)
 //============================================================
 void MovePlayer(void)
 {
-	if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
+	if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
 	{ // 前進の操作が行われた場合
 
 		// 移動量を更新
@@ -476,7 +482,7 @@ void MovePlayer(void)
 		// 移動している状態にする
 		g_player.bMove = true;
 	}
-	else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true || GetJoyStickPressLY(0) < 0)
+	else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyL2Press(0) == true)
 	{ // 後退の操作が行われた場合
 
 		if (g_player.move.x >= 5.0f)
@@ -505,7 +511,7 @@ void MovePlayer(void)
 		g_player.bMove = false;
 	}
 
-	if (GetKeyboardPress(DIK_A) == true)
+	if (GetKeyboardPress(DIK_A) == true || GetJoyStickPressLX(0) < 0)
 	{ // 左方向の操作が行われた場合
 
 		if (g_player.drift.bDrift == true)
@@ -535,7 +541,7 @@ void MovePlayer(void)
 			}
 		}
 	}
-	else if (GetKeyboardPress(DIK_D) == true)
+	else if (GetKeyboardPress(DIK_D) == true || GetJoyStickPressLX(0) > 0)
 	{ // 右方向の操作が行われた場合
 
 		if (g_player.drift.bDrift == true)
@@ -570,6 +576,22 @@ void MovePlayer(void)
 	
 		// ドリフトしていない状態にする
 		g_player.drift.bDrift = false;
+	}
+
+	if (GetKeyboardPress(DIK_X) == true || GetJoyKeyPress(JOYKEY_X, 0) == true)
+	{ // ブレーキの操作が行われた場合
+
+		// 移動量を減速
+		g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
+
+		// 移動量の補正
+		if (g_player.move.x <=  DEL_MOVE_ABS
+		&&  g_player.move.x >= -DEL_MOVE_ABS)
+		{ // 移動量が削除の範囲内の場合
+
+			// 移動量を削除
+			g_player.move.x = 0.0f;
+		}
 	}
 }
 
@@ -635,7 +657,7 @@ void RevPlayer(void)
 		g_player.pos.z = GetLimitStage().fNear - (PLAY_DEPTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.95f;
+		g_player.move.x *= 0.99f;
 	}
 	if (g_player.pos.z < GetLimitStage().fFar + (PLAY_DEPTH * 2))
 	{ // 範囲外の場合 (奥)
@@ -644,7 +666,7 @@ void RevPlayer(void)
 		g_player.pos.z = GetLimitStage().fFar + (PLAY_DEPTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.95f;
+		g_player.move.x *= 0.99f;
 	}
 	if (g_player.pos.x > GetLimitStage().fRight - (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (右)
@@ -653,7 +675,7 @@ void RevPlayer(void)
 		g_player.pos.x = GetLimitStage().fRight - (PLAY_WIDTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.95f;
+		g_player.move.x *= 0.99f;
 	}
 	if (g_player.pos.x < GetLimitStage().fLeft + (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (左)
@@ -662,7 +684,7 @@ void RevPlayer(void)
 		g_player.pos.x = GetLimitStage().fLeft + (PLAY_WIDTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.95f;
+		g_player.move.x *= 0.99f;
 	}
 }
 
@@ -682,6 +704,7 @@ void DriftPlayer(void)
 {
 	if (g_player.drift.bDrift == true)
 	{ // ドリフトしている場合
+
 		// 移動量を少し下げる
 		g_player.move.x += (0.0f - g_player.move.x) * 0.04f;
 	}
@@ -692,7 +715,7 @@ void DriftPlayer(void)
 //============================================================
 void SlumBoostPlayer(void)
 {
-	if (GetKeyboardPress(DIK_SPACE) == true)
+	if (GetKeyboardPress(DIK_SPACE) == true || GetJoyKeyPress(JOYKEY_A, 0) == true)
 	{ // 加速の操作が行われている場合
 
 		// 加速の設定
@@ -705,16 +728,18 @@ void SlumBoostPlayer(void)
 //============================================================
 void FlyAwayPlayer(void)
 {
-	if (GetKeyboardPress(DIK_U) == true)
-	{ // Uキーを押している場合
+	if (GetKeyboardPress(DIK_U) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
+	{ // 送風機の操作が行われている場合
+
 		if (GetWindInfo()->state == WIND_USABLE)
 		{ // 風が使用可能だった場合
+
 			// 送風機を使用する
 			g_player.wind.bUseWind = true;
 		}
 	}
 	else
-	{ // Uキーを押していない場合
+	{ // 送風機の操作が行われていない場合
 	
 		// 送風機を使用しない
 		g_player.wind.bUseWind = false;
@@ -870,15 +895,15 @@ void UpdateFlyAway(void)
 //============================================================
 void CameraChangePlayer(void)
 {
-	if (GetKeyboardTrigger(DIK_J) == true)
-	{ // Jキーを押した場合
+	if (GetKeyboardTrigger(DIK_J) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true)
+	{ // カメラ方向の変更操作が行われた場合
 
 		// カメラの状態を変える
 		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYCAMESTATE_MAX;
 	}
 
-	if (GetKeyboardTrigger(DIK_K) == true)
-	{ // Kキーを押した場合
+	if (GetKeyboardTrigger(DIK_K) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true)
+	{ // 一人称カメラの ON / OFF の変更操作が行われた場合
 
 		// 一人称カメラの状況を変える
 		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;

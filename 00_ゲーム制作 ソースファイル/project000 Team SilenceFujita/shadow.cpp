@@ -441,21 +441,19 @@ void SetPositionShadow(int nShadowID, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECT
 	if (nShadowID > NONE_SHADOW)
 	{ // 使用できるIDの場合
 
+		// 引数の影の位置を設定
+		g_aShadow[nShadowID].pos = pos;
+
 		switch (g_aShadow[nShadowID].type)
 		{ // 種類ごとの処理
 		case SHADOWTYPE_CIRCLE:	// 丸影
 
-			// 引数の影の位置を設定
-			g_aShadow[nShadowID].pos.x = pos.x;
-			g_aShadow[nShadowID].pos.z = pos.z;
+			// 無し
 
 			// 処理を抜ける
 			break;
 
 		case SHADOWTYPE_MODEL:	// モデル影
-
-			// 引数の影の位置を設定
-			g_aShadow[nShadowID].pos = pos;
 
 			// 影の親のワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aShadow[nShadowID].mtxParent);

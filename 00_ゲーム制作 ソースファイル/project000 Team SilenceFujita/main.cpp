@@ -32,6 +32,7 @@
 #include "EditCollision.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
+#include "weather.h"
 #endif
 
 //************************************************************
@@ -1255,6 +1256,7 @@ void DrawDebug(void)
 	Car *pCar = GetCarData();						// 車の情報を取得する
 	Police *pPolice = GetPoliceData();
 	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
+	int nNumWeather = GetNumWeather();				// 降っている物の総数を取得する
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1290,7 +1292,8 @@ void DrawDebug(void)
 		"   警察の向き：[%d]\n"
 		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
 		" 　警察のスピード：[%.3f]\n"
-		" 　人間の位置：[%.3f,%.3f,%.3f]",
+		" 　人間の位置：[%.3f,%.3f,%.3f]\n"
+		" 　降っている物の総数：%d",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1310,7 +1313,8 @@ void DrawDebug(void)
 		(int)D3DXToDegree(pPolice->rot.y),
 		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
 		pPolice->move.x,
-		HumanPos.x, HumanPos.y, HumanPos.z
+		HumanPos.x, HumanPos.y, HumanPos.z,
+		nNumWeather
 	);
 
 	//--------------------------------------------------------
@@ -1579,8 +1583,8 @@ void DrawDebugControlObject(void)
 		"\n種類の変更：[1] 　"
 		"\n向きのリセット：[2] 　"
 		"\n拡大率のリセット：[3] 　"
-		"\n全体の拡大：[4] 　"
-		"\n全体の縮小：[5] 　"
+		"\n全体の拡大：[4 LCTRL+4] 　"
+		"\n全体の縮小：[5 LCTRL+5] 　"
 		"\n設置スタイルの変更：[6] 　"
 		"\n破壊の種類の変更：[7] 　"
 		"\n影の種類の変更：[8] 　"
@@ -1593,9 +1597,9 @@ void DrawDebugControlObject(void)
 		"\nオブジェクトの移動：[W/A/S/D] 　"
 		"\nオブジェクトの平面移動微調整：[LCTRL+W/A/S/D] 　"
 		"\nオブジェクトの向き変更：[Q/E] 　"
-		"\nオブジェクトのX軸の拡大縮小：[U/J] 　"
-		"\nオブジェクトのY軸の拡大縮小：[I/K] 　"
-		"\nオブジェクトのZ軸の拡大縮小：[O/L] 　"
+		"\nオブジェクトのX軸の拡大縮小：[U/J LCTRL+U/J] 　"
+		"\nオブジェクトのY軸の拡大縮小：[I/K LCTRL+I/K] 　"
+		"\nオブジェクトのZ軸の拡大縮小：[O/L LCTRL+Q/L] 　"
 		"\n--------------------------------------------- 　"
 		"\nオブジェクトの縦の移動：[LSHIFT+W/S] 　"
 		"\nオブジェクトの縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
@@ -1640,8 +1644,8 @@ void DrawDebugControlCollision(void)
 		"\n位置のリセット：[1] 　"
 		"\n向きのリセット：[2] 　"
 		"\n拡大率のリセット：[3] 　"
-		"\n全体の拡大：[4] 　"
-		"\n全体の縮小：[5] 　"
+		"\n全体の拡大：[4 LCTRL+4] 　"
+		"\n全体の縮小：[5 LCTRL+5] 　"
 		"\n設置スタイルの変更：[6] 　"
 		"\n当たり判定の総数：[↑/↓] 　"
 		"\n選択中の当たり判定の変更：[SPACE] 　"
@@ -1650,9 +1654,9 @@ void DrawDebugControlCollision(void)
 		"\n当たり判定の移動：[W/A/S/D] 　"
 		"\n当たり判定の平面移動微調整：[LCTRL+W/A/S/D] 　"
 		"\n当たり判定の向き変更：[Q/E] 　"
-		"\n当たり判定のX軸の拡大縮小：[U/J] 　"
-		"\n当たり判定のY軸の拡大縮小：[I/K] 　"
-		"\n当たり判定のZ軸の拡大縮小：[O/L] 　"
+		"\n当たり判定のX軸の拡大縮小：[U/J LCTRL+U/J] 　"
+		"\n当たり判定のY軸の拡大縮小：[I/K LCTRL+I/K] 　"
+		"\n当たり判定のZ軸の拡大縮小：[O/L LCTRL+Q/L] 　"
 		"\n--------------------------------------------- 　"
 		"\n当たり判定の縦の移動：[LSHIFT+W/S] 　"
 		"\n当たり判定の縦移動微調整：[LSHIFT+LCTRL+W/S] 　"

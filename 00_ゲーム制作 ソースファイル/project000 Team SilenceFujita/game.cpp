@@ -11,6 +11,7 @@
 #include "input.h"
 #include "sound.h"
 #include "fade.h"
+#include "calculation.h"
 
 #include "game.h"
 
@@ -35,6 +36,7 @@
 #include "timer.h"
 #include "tiremark.h"
 #include "velocity.h"
+#include "weather.h"
 #include "wind.h"
 
 #ifdef _DEBUG	// デバッグ処理
@@ -43,6 +45,10 @@
 #endif
 
 #include "bomb.h"
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -76,6 +82,12 @@ void InitGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	// カーブの情報の初期化処理
 	InitCurveInfo();
+
+	// カーブテキストのロード処理
+	LoadCurveTxt();
+
+	// 天気の初期化処理
+	InitWeather();
 
 	// 影の初期化
 	InitShadow();
@@ -164,6 +176,9 @@ void InitGame(void)
 //======================================================================================================================
 void UninitGame(void)
 {
+	// 天気の終了処理
+	UninitWeather();
+
 	// 影の終了
 	UninitShadow();
 
@@ -312,6 +327,12 @@ void UpdateGame(void)
 		if (g_bPause == false)
 		{ // ポーズ状態ではない場合
 
+			// 天気の設定処理
+			SetWeather();
+
+			// 天気の更新処理
+			UpdateWeather();
+
 			// メッシュドームの更新
 			UpdateMeshDome();
 
@@ -428,6 +449,12 @@ void UpdateGame(void)
 
 		// ライトの更新
 		UpdateLight();
+
+		// 天気の設定処理
+		SetWeather();
+
+		// 天気の更新処理
+		UpdateWeather();
 
 		// メッシュドームの更新
 		UpdateMeshDome();
@@ -564,6 +591,9 @@ void DrawGame(void)
 	// パーティクルの描画
 	DrawParticle();
 
+	// 天気の描画処理
+	DrawWeather();
+
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードの場合
@@ -600,6 +630,7 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
+#if 1
 	// 体力バーの描画
 	DrawLife();
 
@@ -614,6 +645,7 @@ void DrawGame(void)
 
 	// スコアの描画
 	DrawScore();
+#endif
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合

@@ -12,6 +12,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "model.h"
+#include "bomb.h"
 #include "curve.h"
 
 //**********************************************************************************************************************
@@ -31,8 +32,18 @@ typedef enum
 	POLICESTATE_CHASE,					// 追跡処理
 	POLICESTATE_PATBACK,				// パトロールに戻るときの処理
 	POLICESTATE_POSBACK,				// 最初の座標に戻る
+	POLICESTATE_TACKLE,					// タックル状態
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
+
+//**********************************************************************************************************************
+//	構造体定義 (PoliceTackle)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3 Tacklemove;					// タックル時の追加移動量
+	int nTackleCnt;							// タックル状態に移行する
+}PoliTackle;
 
 //**********************************************************************************************************************
 //	構造体定義 (Police)
@@ -45,15 +56,19 @@ typedef struct
 	D3DXVECTOR3 move;					// 移動量
 	D3DXVECTOR3 rot;					// 向き
 	D3DXVECTOR3 rotDest;				// 目標の向き
+	D3DXVECTOR3	rotCopy;				// 最初の向き
 	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
 	Model       modelData;				// モデル情報
 	POLICESTATE state;					// 警察車両の状態
+	BOMBSTATE   bombState;				// ボムの状態
 	int			nShadowID;				// 影のインデックス
 	int			nLife;					// 寿命
 	bool		bMove;					// 移動しているかどうか
 	bool		bJump;					// ジャンプの状況
 	bool		bUse;					// 使用しているか
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
+	CARCURVE	policeCurve;			// 曲がり角関係の情報
+	PoliTackle tackle;					// タックル関係の変数
 }Police;
 
 //**********************************************************************************************************************

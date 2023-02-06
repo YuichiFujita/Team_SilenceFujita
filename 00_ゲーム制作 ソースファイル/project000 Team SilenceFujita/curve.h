@@ -16,7 +16,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_CURVEPOINT		(24)		// 曲がり角の最大数
+#define MAX_CURVEPOINT		(224)		// 曲がり角の最大数
 #define SHIFT_CAR_CURVE		(45.0f)		// 車のカーブでずらす幅
 #define SHIFT_HUMAN_CURVE	(100.0f)	// 人のカーブでずらす幅
 
@@ -60,7 +60,6 @@ typedef struct
 	D3DXVECTOR3 pos;					// 曲がり角の位置
 	CURVEANGLE curveAngle;				// カーブ出来る方向
 	int nCurveNumber;					// カーブの番号
-	int nPairNumber;					// 対となるカーブ番号
 	DASHANGLE dashAngle;				// 走っている方向
 	bool bDeadEnd;						// 行き止まりかどうか
 }CURVEINFO;
@@ -80,10 +79,8 @@ typedef struct
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void InitCurveInfo(void);				// カーブの情報の初期化処理
-//void SetCurvePoint(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);						// 車の曲がる位置の設定処理
-//void SetCurvePointHuman(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);					// 人間の曲がる位置の設定処理
-//void CurveRotCar(CURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move);						// 車の角度更新処理	
-void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move);				// 車の角度更新・補正処理
-CURVEINFO GetCurveInfo(int nID);		//曲がり角の位置の取得処理
+void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DXVECTOR3 *pPos);				// 車の角度更新・補正処理
+CURVEINFO GetCurveInfo(int nID);		// 曲がり角の位置の取得処理
+void LoadCurveTxt(void);				// カーブテキストのロード処理
 
 #endif

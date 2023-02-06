@@ -57,6 +57,12 @@
 #define MAPCAM_POS_R	(0.0f)		// マップカメラの注視点の位置 (y)
 #define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)
 
+//一人称視点カメラ
+#define CAMERA_FORWARD_SHIFT	(18.5f)		// 前にカメラをずらす距離
+#define CAMERA_UP_SHIFT			(80.0f)		// 上にカメラをずらす距離
+#define CAMERA_RIGHT_SHIFT		(7.0f)		// 右にカメラをずらす距離
+#define CAMERA_BACK_SHIFT		(35.0f)		// 後ろにカメラをずらす距離
+
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
@@ -300,7 +306,7 @@ void MoveFollowCamera(void)
 			g_aCamera[CAMERATYPE_MAIN].destPosV.y = POS_V_Y;																																						// 固定の高さ
 			g_aCamera[CAMERATYPE_MAIN].destPosV.z = g_aCamera[CAMERATYPE_MAIN].destPosR.z + ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * cosf(g_aCamera[CAMERATYPE_MAIN].rot.y));	// 目標注視点から距離分離れた位置
 
-			// 目標の位置までの差分を計算
+																																																					// 目標の位置までの差分を計算
 			diffPosV = g_aCamera[CAMERATYPE_MAIN].destPosV - g_aCamera[CAMERATYPE_MAIN].posV;	// 視点
 			diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;	// 注視点
 
@@ -345,7 +351,7 @@ void MoveFollowCamera(void)
 			g_aCamera[CAMERATYPE_MAIN].destPosV.y = POS_V_Y;																																						// 固定の高さ
 			g_aCamera[CAMERATYPE_MAIN].destPosV.z = g_aCamera[CAMERATYPE_MAIN].destPosR.z - ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * cosf(g_aCamera[CAMERATYPE_MAIN].rot.y));	// 目標注視点から距離分離れた位置
 
-			// 目標の位置までの差分を計算
+																																																					// 目標の位置までの差分を計算
 			diffPosV = g_aCamera[CAMERATYPE_MAIN].destPosV - g_aCamera[CAMERATYPE_MAIN].posV;	// 視点
 			diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;	// 注視点
 

@@ -17,6 +17,20 @@
 #include "EditBillboard.h"
 #include "SoundDJ.h"
 
+//マクロ定義
+#define EDITOBJ_SELECT_MATERIAL_ALPHA	(1.0f)		// 選択中のマテリアルの透明度
+#define EDITOBJ_NORMAL_MATERIAL_ALPHA	(0.5f)		// 選択していないマテリアルの透明度
+#define EDITOBJ_DELETE_OBJECT_RANGE		(70.0f)		// オブジェクト消去の範囲
+#define EDITOBJ_ADJUSTMENT_MOVE			(4.0f)		// 調整用の移動量
+#define EDITOBJ_MOVE					(16.0f)		// 通常の移動量
+#define EDITOBJ_ROT_MOVE				(0.02f)		// 向きの移動量
+#define EDITOBJ_SCALING					(0.02f)		// 拡大縮小率
+#define EDITOBJ_COL_CHANGE_CNT			(5)			// 色が変わるカウント
+#define EDITOBJ_COL_CONVERSION			(0.01f)		// マテリアルの変化量
+#define EDITOBJ_UPDOWN_MOVE				(6.0f)		// 上下移動の移動量
+#define EDITOBJ_UPDOWN_ADJUSTMENT_MOVE	(2.0f)		// 調整用の上下移動の移動量
+#define EDITOBJ_ADJUSTMENT_ROT_MOVE		(15)		// 調整用の向きの移動量
+
 //プロトタイプ宣言
 void SaveCurrentEdit(void);			//エディット状況の一時保存処理
 void TypeChangeEdit(void);			//種類変更処理
@@ -315,14 +329,14 @@ void DrawEditObject(void)
 			if (nCntMat == g_EditObject.nCntMaterial)
 			{//選択中のマテリアルだった場合
 				//透明度を設定する
-				pEditMat->MatD3D.Ambient.a = 1.0f;
-				pEditMat->MatD3D.Diffuse.a = 1.0f;
+				pEditMat->MatD3D.Ambient.a = EDITOBJ_SELECT_MATERIAL_ALPHA;
+				pEditMat->MatD3D.Diffuse.a = EDITOBJ_SELECT_MATERIAL_ALPHA;
 			}
 			else
 			{//選択されていないマテリアルだった場合
 				//透明度を設定する
-				pEditMat->MatD3D.Ambient.a = 0.5f;
-				pEditMat->MatD3D.Diffuse.a = 0.5f;
+				pEditMat->MatD3D.Ambient.a = EDITOBJ_NORMAL_MATERIAL_ALPHA;
+				pEditMat->MatD3D.Diffuse.a = EDITOBJ_NORMAL_MATERIAL_ALPHA;
 			}
 
 			//マテリアルの設定
@@ -359,10 +373,10 @@ void DeleteEditObject(void)
 	{
 		if (pObject->bUse == true)
 		{//オブジェクトが使用されていた場合
-			if (g_EditObject.pos.x >= pObject->pos.x - 70.0f &&
-				g_EditObject.pos.x <= pObject->pos.x + 70.0f &&
-				g_EditObject.pos.z >= pObject->pos.z - 70.0f &&
-				g_EditObject.pos.z <= pObject->pos.z + 70.0f &&
+			if (g_EditObject.pos.x >= pObject->pos.x - EDITOBJ_DELETE_OBJECT_RANGE &&
+				g_EditObject.pos.x <= pObject->pos.x + EDITOBJ_DELETE_OBJECT_RANGE &&
+				g_EditObject.pos.z >= pObject->pos.z - EDITOBJ_DELETE_OBJECT_RANGE &&
+				g_EditObject.pos.z <= pObject->pos.z + EDITOBJ_DELETE_OBJECT_RANGE &&
 				g_EditObject.bUse == true)
 			{//範囲内に入った場合
 				//削除対象状態にする
@@ -476,25 +490,25 @@ void MoveEdit(void)
 			if (GetKeyboardTrigger(DIK_W) == true)
 			{//Wキーを押した場合
 				//位置を奥に進める
-				g_EditObject.pos.z += 4.0f;
+				g_EditObject.pos.z += EDITOBJ_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_S) == true)
 			{//Sキーを押した場合
 				//位置を手前に進める
-				g_EditObject.pos.z -= 4.0f;
+				g_EditObject.pos.z -= EDITOBJ_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_A) == true)
 			{//Aキーを押した場合
 				//位置を左に進める
-				g_EditObject.pos.x -= 4.0f;
+				g_EditObject.pos.x -= EDITOBJ_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_D) == true)
 			{//Dキーを押した場合
 				//位置を右に進める
-				g_EditObject.pos.x += 4.0f;
+				g_EditObject.pos.x += EDITOBJ_ADJUSTMENT_MOVE;
 			}
 		}
 	}
@@ -505,25 +519,25 @@ void MoveEdit(void)
 			if (GetKeyboardPress(DIK_W) == true)
 			{//Wキーを押した場合
 			 //位置を奥に進める
-				g_EditObject.pos.z += 16.0f;
+				g_EditObject.pos.z += EDITOBJ_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_S) == true)
 			{//Sキーを押した場合
 			 //位置を手前に進める
-				g_EditObject.pos.z -= 16.0f;
+				g_EditObject.pos.z -= EDITOBJ_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_A) == true)
 			{//Aキーを押した場合
 			 //位置を左に進める
-				g_EditObject.pos.x -= 16.0f;
+				g_EditObject.pos.x -= EDITOBJ_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_D) == true)
 			{//Dキーを押した場合
 			 //位置を右に進める
-				g_EditObject.pos.x += 16.0f;
+				g_EditObject.pos.x += EDITOBJ_MOVE;
 			}
 		}
 	}
@@ -550,12 +564,12 @@ void RotationEdit(void)
 	if (GetKeyboardPress(DIK_Q) == true)
 	{//Qキーを押した場合
 		//向きを変える
-		g_EditObject.rot.y += 0.02f;
+		g_EditObject.rot.y += EDITOBJ_ROT_MOVE;
 	}
 	else if (GetKeyboardPress(DIK_E) == true)
 	{//Eキーを押した場合
 		//向きを変える
-		g_EditObject.rot.y -= 0.02f;
+		g_EditObject.rot.y -= EDITOBJ_ROT_MOVE;
 	}
 }
 
@@ -577,8 +591,8 @@ void SetEdit(void)
 			for (int nCount = 0; nCount < MAX_MATERIAL; nCount++)
 			{//マテリアルの透明度を1.0fにする
 				//透明度を1.0fにする
-				g_EditObject.EditMaterial[g_EditObject.nType][nCount].MatD3D.Ambient.a = 1.0f;
-				g_EditObject.EditMaterial[g_EditObject.nType][nCount].MatD3D.Diffuse.a = 1.0f;
+				g_EditObject.EditMaterial[g_EditObject.nType][nCount].MatD3D.Ambient.a = g_EditObject.MatCopy[g_EditObject.nType][nCount].MatD3D.Ambient.a;
+				g_EditObject.EditMaterial[g_EditObject.nType][nCount].MatD3D.Diffuse.a = g_EditObject.MatCopy[g_EditObject.nType][nCount].MatD3D.Ambient.a;
 			}
 
 			//代入する向き状態を設定
@@ -603,15 +617,31 @@ void ScaleObjectX(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_U) == true)
-		{//Uキーを押した場合
-			//X軸を拡大する
-			g_EditObject.scale.x += 0.02f;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_U) == true)
+			{//Uキーを押した場合
+				//X軸を拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_J) == true)
+			{//Jキーを押した場合
+				//X軸を縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_J) == true)
-		{//Jキーを押した場合
-			//X軸を縮小する
-			g_EditObject.scale.x -= 0.02f;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_U) == true)
+			{//Uキーを押した場合
+				//X軸を拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_J) == true)
+			{//Jキーを押した場合
+				//X軸を縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }
@@ -626,15 +656,31 @@ void ScaleObjectY(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_I) == true)
-		{//Iキーを押した場合
-			//Y軸を拡大する
-			g_EditObject.scale.y += 0.02f;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_I) == true)
+			{//Iキーを押した場合
+				//Y軸を拡大する
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_K) == true)
+			{//Kキーを押した場合
+				//Y軸を縮小する
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_K) == true)
-		{//Kキーを押した場合
-			//Y軸を縮小する
-			g_EditObject.scale.y -= 0.02f;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_I) == true)
+			{//Iキーを押した場合
+				//Y軸を拡大する
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_K) == true)
+			{//Kキーを押した場合
+				//Y軸を縮小する
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }
@@ -649,15 +695,31 @@ void ScaleObjectZ(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_O) == true)
-		{//Oキーを押した場合
-			//Z軸を拡大する
-			g_EditObject.scale.z += 0.02f;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_O) == true)
+			{//Oキーを押した場合
+				//Z軸を拡大する
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_L) == true)
+			{//Lキーを押した場合
+				//Z軸を縮小する
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_L) == true)
-		{//Lキーを押した場合
-			//Z軸を縮小する
-			g_EditObject.scale.z -= 0.02f;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_O) == true)
+			{//Oキーを押した場合
+				//Z軸を拡大する
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_L) == true)
+			{//Lキーを押した場合
+				//Z軸を縮小する
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }
@@ -672,19 +734,39 @@ void ScaleObject(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardPress(DIK_4) == true)
-		{//4キーを押した場合
-			//拡大する
-			g_EditObject.scale.x += 0.02f;
-			g_EditObject.scale.y += 0.02f;
-			g_EditObject.scale.z += 0.02f;
+		if (GetKeyboardPress(DIK_LCONTROL) == true)
+		{//左コントロールキーを押していた場合
+			if (GetKeyboardTrigger(DIK_4) == true)
+			{//4キーを押した場合
+				//拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardTrigger(DIK_5) == true)
+			{//5キーを押した場合
+				//縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
-		else if (GetKeyboardPress(DIK_5) == true)
-		{//5キーを押した場合
-			//縮小する
-			g_EditObject.scale.x -= 0.02f;
-			g_EditObject.scale.y -= 0.02f;
-			g_EditObject.scale.z -= 0.02f;
+		else
+		{//左コントロールキーを押していない場合
+			if (GetKeyboardPress(DIK_4) == true)
+			{//4キーを押した場合
+				//拡大する
+				g_EditObject.scale.x += EDITOBJ_SCALING;
+				g_EditObject.scale.y += EDITOBJ_SCALING;
+				g_EditObject.scale.z += EDITOBJ_SCALING;
+			}
+			else if (GetKeyboardPress(DIK_5) == true)
+			{//5キーを押した場合
+				//縮小する
+				g_EditObject.scale.x -= EDITOBJ_SCALING;
+				g_EditObject.scale.y -= EDITOBJ_SCALING;
+				g_EditObject.scale.z -= EDITOBJ_SCALING;
+			}
 		}
 	}
 }
@@ -741,10 +823,10 @@ void EditMaterialCustom(void)
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
-						if (g_EditObject.nColorCount % 5 == 0)
+						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
 							//R値を増やす
-							pMatEdit->Ambient.r += 0.01f;
+							pMatEdit->Ambient.r += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.r > 1.0f)
 							{//R値が限界を超えたら
@@ -752,7 +834,7 @@ void EditMaterialCustom(void)
 								pMatEdit->Ambient.r = 0.0f;
 							}
 
-							pMatEdit->Diffuse.r += 0.01f;
+							pMatEdit->Diffuse.r += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Diffuse.r > 1.0f)
 							{//R値が限界を超えたら
@@ -766,10 +848,10 @@ void EditMaterialCustom(void)
 					 //カウントを加算する
 						g_EditObject.nColorCount++;
 
-						if (g_EditObject.nColorCount % 5 == 0)
+						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
 							//R値を増やす
-							pMatEdit->Ambient.r -= 0.01f;
+							pMatEdit->Ambient.r -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.r < 0.0f)
 							{//R値が限界を超えたら
@@ -777,7 +859,7 @@ void EditMaterialCustom(void)
 								pMatEdit->Ambient.r = 1.0f;
 							}
 
-							pMatEdit->Diffuse.r -= 0.01f;
+							pMatEdit->Diffuse.r -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Diffuse.r < 0.0f)
 							{//R値が限界を超えたら
@@ -792,10 +874,10 @@ void EditMaterialCustom(void)
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
-						if (g_EditObject.nColorCount % 5 == 0)
+						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
 							//G値を増やす
-							pMatEdit->Ambient.g += 0.01f;
+							pMatEdit->Ambient.g += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.g > 1.0f)
 							{//G値が限界を超えたら
@@ -804,7 +886,7 @@ void EditMaterialCustom(void)
 							}
 
 							//G値を増やす
-							pMatEdit->Diffuse.g += 0.01f;
+							pMatEdit->Diffuse.g += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Diffuse.g > 1.0f)
 							{//G値が限界を超えたら
@@ -818,10 +900,10 @@ void EditMaterialCustom(void)
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
-						if (g_EditObject.nColorCount % 5 == 0)
+						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
 							//R値を増やす
-							pMatEdit->Ambient.g -= 0.01f;
+							pMatEdit->Ambient.g -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.g < 0.0f)
 							{//R値が限界を超えたら
@@ -830,7 +912,7 @@ void EditMaterialCustom(void)
 							}
 
 							//G値を増やす
-							pMatEdit->Diffuse.g -= 0.01f;
+							pMatEdit->Diffuse.g -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Diffuse.g < 0.0f)
 							{//R値が限界を超えたら
@@ -845,10 +927,10 @@ void EditMaterialCustom(void)
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
-						if (g_EditObject.nColorCount % 5 == 0)
+						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
 							//B値を増やす
-							pMatEdit->Ambient.b += 0.01f;
+							pMatEdit->Ambient.b += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.b > 1.0f)
 							{//B値が限界を超えたら
@@ -857,7 +939,7 @@ void EditMaterialCustom(void)
 							}
 
 							//B値を増やす
-							pMatEdit->Diffuse.b += 0.01f;
+							pMatEdit->Diffuse.b += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Diffuse.b > 1.0f)
 							{//B値が限界を超えたら
@@ -871,10 +953,10 @@ void EditMaterialCustom(void)
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
-						if (g_EditObject.nColorCount % 5 == 0)
+						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
 							//R値を増やす
-							pMatEdit->Ambient.b -= 0.01f;
+							pMatEdit->Ambient.b -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.b < 0.0f)
 							{//R値が限界を超えたら
@@ -882,7 +964,7 @@ void EditMaterialCustom(void)
 								pMatEdit->Ambient.b = 1.0f;
 							}
 
-							pMatEdit->Diffuse.b -= 0.01f;
+							pMatEdit->Diffuse.b -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Diffuse.b < 0.0f)
 							{//R値が限界を超えたら
@@ -972,13 +1054,13 @@ void UpDownEditObject(void)
 			if (GetKeyboardTrigger(DIK_W) == true)
 			{//Wキーを押している場合
 				//位置を奥に進める
-				g_EditObject.pos.y += 2.0f;
+				g_EditObject.pos.y += EDITOBJ_UPDOWN_ADJUSTMENT_MOVE;
 			}
 
 			if (GetKeyboardTrigger(DIK_S) == true)
 			{//Sキーを押している場合
 				//位置を手前に進める
-				g_EditObject.pos.y -= 2.0f;
+				g_EditObject.pos.y -= EDITOBJ_UPDOWN_ADJUSTMENT_MOVE;
 			}
 		}
 		else
@@ -986,13 +1068,13 @@ void UpDownEditObject(void)
 			if (GetKeyboardPress(DIK_W) == true)
 			{//Wキーを押している場合
 			 //位置を奥に進める
-				g_EditObject.pos.y += 6.0f;
+				g_EditObject.pos.y += EDITOBJ_UPDOWN_MOVE;
 			}
 
 			if (GetKeyboardPress(DIK_S) == true)
 			{//Sキーを押している場合
 			 //位置を手前に進める
-				g_EditObject.pos.y -= 6.0f;
+				g_EditObject.pos.y -= EDITOBJ_UPDOWN_MOVE;
 			}
 		}
 
@@ -1021,12 +1103,12 @@ void RightAngleEditObject(void)
 		if (GetKeyboardTrigger(DIK_Q) == true)
 		{//Qキーを押した場合
 			//向きを変える
-			g_EditObject.rot.y += D3DXToRadian(15);
+			g_EditObject.rot.y += D3DXToRadian(EDITOBJ_ADJUSTMENT_ROT_MOVE);
 		}
 		else if (GetKeyboardTrigger(DIK_E) == true)
 		{//Eキーを押した場合
 			//向きを変える
-			g_EditObject.rot.y -= D3DXToRadian(15);
+			g_EditObject.rot.y -= D3DXToRadian(EDITOBJ_ADJUSTMENT_ROT_MOVE);
 		}
 	}
 }

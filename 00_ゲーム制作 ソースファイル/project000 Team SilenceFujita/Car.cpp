@@ -39,8 +39,6 @@
 #define MAX_CAR_FORWARD_PATROL  (15.0f)		// パトロール中の前進時の最高速度
 #define MAX_CAR_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_CAR_MOVE_SUB		(0.04f)		// 移動量の減速係数
-#define CAR_WIDTH				(45.0f)		// 車の縦幅
-#define CAR_DEPTH				(45.0f)		// 車の奥行
 #define CAR_NOTMOVE_SLOW		(0.04f)		// 車の移動していないときの減速係数
 #define CAR_STOP_RADIUS_DIST	(300.0f)	// 車の止まる指標の円のずらす距離
 #define CAR_STOP_ADD_RADIUS		(50.0f)		// 車の止まる半径の追加分
@@ -52,6 +50,8 @@ void PosCar(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	
 void RevCar(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 車の補正の更新処理
 void CurveCar(Car *pCar);							// 車のカーブ処理
 void DashCarAction(Car *pCar);						// 車の走行処理
+void SetCarPosRot(Car *pCar);						// 車の位置と向きの設定処理
+void CarPosRotCorrect(Car *pCar);					// 車の位置の補正処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -70,35 +70,36 @@ void InitCar(void)
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		g_aCar[nCntCar].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;			// 前回の位置
-		g_aCar[nCntCar].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aCar[nCntCar].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCar[nCntCar].nShadowID = NONE_SHADOW;				// 影のインデックス
-		g_aCar[nCntCar].bJump = false;							// ジャンプしているかどうか
-		g_aCar[nCntCar].bMove = false;							// 移動しているか
-		g_aCar[nCntCar].bUse = false;							// 使用状況
+		g_aCar[nCntCar].pos       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCar[nCntCar].posOld    = g_aCar[nCntCar].pos;			// 前回の位置
+		g_aCar[nCntCar].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aCar[nCntCar].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aCar[nCntCar].nShadowID = NONE_SHADOW;					// 影のインデックス
+		g_aCar[nCntCar].bombState = BOMBSTATE_NONE;					// ボムの状態
+		g_aCar[nCntCar].bJump     = false;							// ジャンプしているかどうか
+		g_aCar[nCntCar].bMove     = false;							// 移動しているか
+		g_aCar[nCntCar].bUse      = false;							// 使用状況
 
 		//曲がり角の情報の初期化
-		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle = CURVE_LEFT;	// 左に曲がる
-		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;		// カーブする番地
-		g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;						// スキップする曲がり角の回数
-		g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;		// 前回の向き
-		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;			// 現在の車の行動
+		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle   = CURVE_LEFT;	// 左に曲がる
+		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;			// カーブする番地
+		g_aCar[nCntCar].carCurveInfo.nSKipCnt    = 0;						// スキップする曲がり角の回数
+		g_aCar[nCntCar].carCurveInfo.rotDest     = g_aCar[nCntCar].rot;		// 前回の向き
+		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;				// 現在の車の行動
 
 		// モデル情報の初期化
-		g_aCar[nCntCar].modelData.dwNumMat = 0;					// マテリアルの数
-		g_aCar[nCntCar].modelData.pTexture = NULL;				// テクスチャへのポインタ
-		g_aCar[nCntCar].modelData.pMesh = NULL;					// メッシュ (頂点情報) へのポインタ
-		g_aCar[nCntCar].modelData.pBuffMat = NULL;				// マテリアルへのポインタ
-		g_aCar[nCntCar].modelData.vtxMin = INIT_VTX_MIN;		// 最小の頂点座標
-		g_aCar[nCntCar].modelData.vtxMax = INIT_VTX_MAX;		// 最大の頂点座標
-		g_aCar[nCntCar].modelData.size = INIT_SIZE;				// 大きさ
-		g_aCar[nCntCar].modelData.fRadius = 0.0f;				// 半径
+		g_aCar[nCntCar].modelData.dwNumMat = 0;						// マテリアルの数
+		g_aCar[nCntCar].modelData.pTexture = NULL;					// テクスチャへのポインタ
+		g_aCar[nCntCar].modelData.pMesh    = NULL;					// メッシュ (頂点情報) へのポインタ
+		g_aCar[nCntCar].modelData.pBuffMat = NULL;					// マテリアルへのポインタ
+		g_aCar[nCntCar].modelData.vtxMin   = INIT_VTX_MIN;			// 最小の頂点座標
+		g_aCar[nCntCar].modelData.vtxMax   = INIT_VTX_MAX;			// 最大の頂点座標
+		g_aCar[nCntCar].modelData.size     = INIT_SIZE;				// 大きさ
+		g_aCar[nCntCar].modelData.fRadius  = 0.0f;					// 半径
 	}
 
 	//車の設定処理
-	SetCar(D3DXVECTOR3(-7000.0f, 0.0f, 6000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
 }
 
 //======================================================================================================================
@@ -204,7 +205,9 @@ void DrawCar(void)
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+	D3DXMATERIAL      bombMat;					// マテリアルデータ (ボム用)
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -234,8 +237,48 @@ void DrawCar(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aCar[nCntCar].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				if (pPlayer->atkState == ATTACKSTATE_BOMB)
+				{ // 攻撃状態がボム攻撃状態の場合
+
+					// 構造体の要素をクリア
+					ZeroMemory(&bombMat, sizeof(D3DXMATERIAL));
+
+					switch (g_aCar[nCntCar].bombState)
+					{ // ボムの状態
+					case BOMBSTATE_RANGE:	// 範囲内状態
+
+						// 範囲内時のマテリアルの色を設定
+						bombMat.MatD3D.Diffuse = BOMB_RANGE_COL;
+
+						// 処理を抜ける
+						break;
+
+					case BOMBSTATE_AIM:		// 狙い状態
+
+						// 狙い時のマテリアルの色を設定
+						bombMat.MatD3D.Diffuse = BOMB_AIM_COL;
+
+						// 処理を抜ける
+						break;
+
+					default:				// 上記以外
+
+						// 範囲外時のマテリアルの色を設定
+						bombMat.MatD3D.Diffuse = BOMB_NONE_COL;
+
+						// 処理を抜ける
+						break;
+					}
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&bombMat.MatD3D);
+				}
+				else
+				{ // 攻撃状態がそれ以外の状態の場合
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				}
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aCar[nCntCar].modelData.pTexture[nCntMat]);
@@ -261,11 +304,12 @@ void SetCar(D3DXVECTOR3 pos)
 		if (g_aCar[nCntCar].bUse == false)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
-			g_aCar[nCntCar].pos = pos;								// 現在の位置
-			g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;			// 前回の位置
-			g_aCar[nCntCar].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aCar[nCntCar].bJump = false;							// ジャンプしているかどうか
-			g_aCar[nCntCar].bMove = false;							// 移動していない
+			g_aCar[nCntCar].pos       = pos;							// 現在の位置
+			g_aCar[nCntCar].posOld    = g_aCar[nCntCar].pos;			// 前回の位置
+			g_aCar[nCntCar].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aCar[nCntCar].bombState = BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aCar[nCntCar].bJump     = false;							// ジャンプしているかどうか
+			g_aCar[nCntCar].bMove     = false;							// 移動していない
 
 			// 使用している状態にする
 			g_aCar[nCntCar].bUse = true;
@@ -284,8 +328,8 @@ void SetCar(D3DXVECTOR3 pos)
 			// 影の位置設定
 			SetPositionShadow(g_aCar[nCntCar].nShadowID, g_aCar[nCntCar].pos, g_aCar[nCntCar].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			g_aCar[nCntCar].carCurveInfo.curveInfo = GetCurveInfo(0);
-			g_aCar[nCntCar].carCurveInfo.curveInfo.dashAngle = DASH_FAR;
+			// 車の位置と向きの設定処理
+			SetCarPosRot(&g_aCar[nCntCar]);
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
 			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
 			g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;																		// 走っている状態
@@ -469,7 +513,7 @@ void CurveCar(Car *pCar)
 	case CARACT_CURVE:		// カーブ状態
 
 		// 車の角度更新・補正処理
-		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move);
+		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move, &pCar->pos);
 
 		break;				// 抜け出す
 	}
@@ -503,12 +547,12 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
 					{ // 右に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になったまたは、行き止まりだった場合
-						  // スキップ回数を0にする
+							// スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -532,12 +576,12 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
 					{ // 左に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になった場合
-						  // スキップ回数を0にする
+							// スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -561,12 +605,12 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
 					{ // 奥に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
 						{ // スキップ回数が0になった場合
-						  // スキップ回数を0にする
+							// スキップ回数を0にする
 							pCar->carCurveInfo.nSKipCnt = 0;
 
 							// 曲がり角の情報を更新する
@@ -590,7 +634,7 @@ void DashCarAction(Car *pCar)
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
 					{ // 手前に走る場合のみ
-					  // スキップカウントを減算する
+						// スキップカウントを減算する
 						pCar->carCurveInfo.nSKipCnt--;
 
 						if (pCar->carCurveInfo.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
@@ -603,12 +647,12 @@ void DashCarAction(Car *pCar)
 
 							if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
 							{ // 曲がる方向が左方向だった場合
-								// 角度を補正する
+							  // 角度を補正する
 								pCar->rot.y = D3DX_PI;
 							}
 							else
 							{ // 曲がる方向が右方向だった場合
-								// 角度を補正する
+							  // 角度を補正する
 								pCar->rot.y = -D3DX_PI;
 							}
 						}
@@ -879,122 +923,107 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject)
 {
-	//{ // 車の当たり判定
-	//	Car *pCar = GetCarData();
+	
+}
 
-	//	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
-	//	{
-	//		// 前後の当たり判定
-	//		if (pPos->x + fWidth > pCar[nCntCar].pos.x - CAR_WIDTH
-	//			&&  pPos->x - fWidth < pCar[nCntCar].pos.x + CAR_WIDTH)
-	//		{ // 車の左右の範囲内の場合
+//============================================================
+// 車の位置と向きの設定処理
+//============================================================
+void SetCarPosRot(Car *pCar)
+{
+	float fCurveDist;			// 最近の曲がり角との距離
+	int nCurveNumber = 0;		// 最近の曲がり角の番号
 
-	//			if (pPos->z + fDepth > pCar[nCntCar].pos.z - CAR_DEPTH
-	//				&&  pPosOld->z + fDepth <= pCar[nCntCar].pos.z - CAR_DEPTH)
-	//			{ // 前からの当たり判定
+	fCurveDist = fabsf(sqrtf((pCar->pos.x - GetCurveInfo(0).pos.x) * (pCar->pos.x - GetCurveInfo(0).pos.x) +
+		(pCar->pos.z - GetCurveInfo(0).pos.z) * (pCar->pos.z - GetCurveInfo(0).pos.z)));
 
-	//				// 位置を補正
-	//				pPos->z = pCar[nCntCar].pos.z - (fDepth + CAR_DEPTH) - 0.01f;
+	for (int nCnt = 1; nCnt < MAX_CURVEPOINT; nCnt++)
+	{ // 全ての曲がり角と参照
 
-	//				switch (collObject)
-	//				{
-	//				case COLLOBJECTTYPE_PLAYER:	// プレイヤーの場合
+		float fCurvePoint;		// 曲がり角の値
 
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
+		// カーブの距離
+		fCurvePoint = fabsf(sqrtf((pCar->pos.x - GetCurveInfo(nCnt).pos.x) * (pCar->pos.x - GetCurveInfo(nCnt).pos.x) +
+			(pCar->pos.z - GetCurveInfo(nCnt).pos.z) * (pCar->pos.z - GetCurveInfo(nCnt).pos.z)));
 
-	//					break;					// 抜け出す
+		if (fCurvePoint <= fCurveDist)
+		{ // 距離の近さが更新された場合
+			// 最近値を更新する
+			fCurveDist = fCurvePoint;
 
-	//				case COLLOBJECTTYPE_CAR:	// 車の場合
+			// 番号を更新する
+			nCurveNumber = nCnt;
+		}
+	}
 
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
+	// 曲がり角の情報を代入する
+	pCar->carCurveInfo.curveInfo = GetCurveInfo(nCurveNumber);
 
-	//					break;					// 抜け出す
-	//				}
-	//			}
-	//			else if (pPos->z - fDepth < pCar[nCntCar].pos.z + CAR_DEPTH
-	//				&&  pPosOld->z - fDepth >= pCar[nCntCar].pos.z + CAR_DEPTH)
-	//			{ // 後ろからの当たり判定
+	// 車の位置の補正処理
+	CarPosRotCorrect(pCar);
+}
 
-	//				// 位置を補正
-	//				pPos->z = pCar[nCntCar].pos.z + (fDepth + CAR_DEPTH) - 0.01f;
+//============================================================
+// 車の位置の補正処理
+//============================================================
+void CarPosRotCorrect(Car *pCar)
+{
+	switch (pCar->carCurveInfo.curveInfo.dashAngle)
+	{
+	case DASH_RIGHT:		// 右に向かって走る
 
-	//				switch (collObject)
-	//				{
-	//				case COLLOBJECTTYPE_PLAYER:	// プレイヤーの場合
+		//這わせる
+		pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
+		// 向きを変える
+		pCar->rot.y = D3DX_PI * 0.5f;
 
-	//					break;					// 抜け出す
+		break;				// 抜け出す
 
-	//				case COLLOBJECTTYPE_CAR:	// 車の場合
+	case DASH_LEFT:			// 左に向かって走る
 
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
+		//這わせる
+		pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-	//					break;					// 抜け出す
-	//				}
-	//			}
-	//		}
+		// 向きを変える
+		pCar->rot.y = -D3DX_PI * 0.5f;
 
-	//		// 左右の当たり判定
-	//		if (pPos->z + fDepth > pCar[nCntCar].pos.z - CAR_DEPTH
-	//			&&  pPos->z - fDepth < pCar[nCntCar].pos.z + CAR_DEPTH)
-	//		{ // ブロックの前後の範囲内の場合
+		break;				// 抜け出す
 
-	//			if (pPos->x + fWidth > pCar[nCntCar].pos.x - CAR_WIDTH
-	//				&&  pPosOld->x + fWidth <= pCar[nCntCar].pos.x - CAR_WIDTH)
-	//			{ // 左からの当たり判定
+	case DASH_FAR:			// 奥に向かって走る
 
-	//				// 位置を補正
-	//				pPos->x = pCar[nCntCar].pos.x + (fWidth + CAR_WIDTH) - 0.01f;
+		//這わせる
+		pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-	//				switch (collObject)
-	//				{
-	//				case COLLOBJECTTYPE_PLAYER:	// プレイヤーの場合
+		// 向きを変える
+		pCar->rot.y = 0.0f;
 
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
+		break;				// 抜け出す
 
-	//					break;					// 抜け出す
+	case DASH_NEAR:			// 手前に向かって走る
 
-	//				case COLLOBJECTTYPE_CAR:	// 車の場合
+		//這わせる
+		pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
 
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
+		switch (pCar->carCurveInfo.curveInfo.curveAngle)
+		{
+		case CURVE_RIGHT:	// 右に曲がる
 
-	//					break;					// 抜け出す
-	//				}
-	//			}
-	//			else if (pPos->x - fWidth < pCar[nCntCar].pos.x + CAR_WIDTH
-	//				&&  pPosOld->x - fWidth >= pCar[nCntCar].pos.x + CAR_WIDTH)
-	//			{ // 右からの当たり判定
+			// 向きを変える
+			pCar->rot.y = -D3DX_PI;
 
-	//				// 位置を補正
-	//				pPos->x = pCar[nCntCar].pos.x - (fWidth + CAR_WIDTH) + 0.01f;
+			break;			// 抜け出す
 
-	//				switch (collObject)
-	//				{
-	//				case COLLOBJECTTYPE_PLAYER:	// プレイヤーの場合
+		case CURVE_LEFT:	// 左に曲がる
 
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
+			// 向きを変える
+			pCar->rot.y = D3DX_PI;
 
-	//					break;					// 抜け出す
+			break;			// 抜け出す
+		}
 
-	//				case COLLOBJECTTYPE_CAR:	// 車の場合
-
-	//					// 移動量を削除
-	//					pMove->x *= 0.95f;
-
-	//					break;					// 抜け出す
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+		break;				// 抜け出す
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理
