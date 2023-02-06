@@ -22,6 +22,7 @@ const char *apTextureMeshField[] =		// テクスチャの相対パス
 	"data\\TEXTURE\\road002.png",		// 交差点のテクスチャの相対パス
 	"data\\TEXTURE\\road003.png",		// 丁字路のテクスチャの相対パス
 	"data\\TEXTURE\\sidewalk000.png",	// 歩道のテクスチャの相対パス
+	"data\\TEXTURE\\Tile.jpg",			// タイルのテクスチャの相対パス
 };
 
 //**********************************************************************************************************************
@@ -34,6 +35,7 @@ typedef enum
 	TEXTURE_MESHFIELD_ROAD_CROSS,		// (道路) 交差点
 	TEXTURE_MESHFIELD_ROAD_TJUNC,		// (道路) 丁字路
 	TEXTURE_MESHFIELD_SIDEWALK,			// 歩道
+	TEXTURE_MESHFIELD_TILE,				// タイル
 	TEXTURE_MESHFIELD_MAX,				// この列挙型の総数
 } TEXTURE_MESHFIELD;
 
