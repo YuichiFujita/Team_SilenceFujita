@@ -13,14 +13,16 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_MESHCYLINDER	(1)			// メッシュシリンダーの最大数
+#define MAX_MESHCYLINDER	(4)			// メッシュシリンダーの最大数
 
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
 const char *apTextureMeshCylinder[] =	// テクスチャの相対パス
 {
-	"data\\TEXTURE\\wall000.png",		// ビル街のテクスチャの相対パス
+	"data\\TEXTURE\\scenery000.png",	// ビル街 (明るい) のテクスチャの相対パス
+	"data\\TEXTURE\\scenery001.png",	// ビル街 (通常) のテクスチャの相対パス
+	"data\\TEXTURE\\scenery002.png",	// ビル街 (暗い) のテクスチャの相対パス
 };
 
 //**********************************************************************************************************************
@@ -28,7 +30,9 @@ const char *apTextureMeshCylinder[] =	// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_MESHCYLINDER_NORMAL = 0,	// メッシュシリンダー (通常)
+	TEXTURE_MESHCYLINDER_BRIGHT = 0,	// メッシュシリンダー (明るい)
+	TEXTURE_MESHCYLINDER_NORMAL,		// メッシュシリンダー (通常)
+	TEXTURE_MESHCYLINDER_DARK,			// メッシュシリンダー (暗い)
 	TEXTURE_MESHCYLINDER_MAX,			// この列挙型の総数
 } TEXTURE_MESHCYLINDER;
 
@@ -46,14 +50,15 @@ typedef struct
 	int         nPartHeight;			// 縦の分割数
 	int         nNumVtx;				// 必要頂点数
 	int         nNumIdx;				// 必要インデックス数
+	int         nType;					// 種類
 	bool        bUse;					// 使用状況
 } MeshCylinder;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void SetMeshCylinder(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius, float fHeight, int nPartWidth, int nPartHeight);	// メッシュシリンダーの設定処理
-void TxtSetMeshCylinder(void);																							// メッシュシリンダーのセットアップ処理
+void SetMeshCylinder(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius, float fHeight, int nPartWidth, int nPartHeight, int nType);	// メッシュシリンダーの設定処理
+void TxtSetMeshCylinder(void);																										// メッシュシリンダーのセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -97,6 +102,7 @@ void InitMeshCylinder(void)
 		g_aMeshCylinder[nCntMeshCylinder].nPartHeight = 0;								// 縦の分割数
 		g_aMeshCylinder[nCntMeshCylinder].nNumVtx     = 0;								// 必要頂点数
 		g_aMeshCylinder[nCntMeshCylinder].nNumIdx     = 0;								// 必要インデックス数
+		g_aMeshCylinder[nCntMeshCylinder].nType       = 0;								// 種類
 		g_aMeshCylinder[nCntMeshCylinder].bUse        = false;							// 使用状況
 	}
 
@@ -318,7 +324,7 @@ void DrawMeshCylinder(void)
 			pDevice->SetFVF(FVF_VERTEX_3D);
 
 			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureMeshCylinder[TEXTURE_MESHCYLINDER_NORMAL]);
+			pDevice->SetTexture(0, g_apTextureMeshCylinder[g_aMeshCylinder[nCntMeshCylinder].nType]);
 
 			// ポリゴンの描画
 			pDevice->DrawIndexedPrimitive
@@ -343,7 +349,7 @@ void DrawMeshCylinder(void)
 //======================================================================================================================
 //	メッシュシリンダーの設定処理
 //======================================================================================================================
-void SetMeshCylinder(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius, float fHeight, int nPartWidth, int nPartHeight)
+void SetMeshCylinder(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius, float fHeight, int nPartWidth, int nPartHeight, int nType)
 {
 	for (int nCntMeshCylinder = 0; nCntMeshCylinder < MAX_MESHCYLINDER; nCntMeshCylinder++)
 	{ // メッシュシリンダーの最大表示数分繰り返す
@@ -358,6 +364,7 @@ void SetMeshCylinder(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius, float fHei
 			g_aMeshCylinder[nCntMeshCylinder].fHeight     = fHeight;		// 縦幅
 			g_aMeshCylinder[nCntMeshCylinder].nPartWidth  = nPartWidth;		// 横の分割数
 			g_aMeshCylinder[nCntMeshCylinder].nPartHeight = nPartHeight;	// 縦の分割数
+			g_aMeshCylinder[nCntMeshCylinder].nType       = nType;			// 種類
 
 			// 使用している状態にする
 			g_aMeshCylinder[nCntMeshCylinder].bUse = true;
@@ -388,6 +395,7 @@ void TxtSetMeshCylinder(void)
 	float       fHeight;		// 縦幅の代入用
 	int         nPartWidth;		// 横の分割数の代入用
 	int         nPartHeight;	// 縦の分割数の代入用
+	int         nType;			// 種類の代入用
 	int         nEnd;			// テキスト読み込み終了の確認用
 
 	// 変数配列を宣言
@@ -460,11 +468,16 @@ void TxtSetMeshCylinder(void)
 								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
 								fscanf(pFile, "%d", &nPartHeight);	// 縦の分割数を読み込む
 							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// 種類を読み込む
+							}
 
 						} while (strcmp(&aString[0], "END_MESHCYLINDERSET") != 0);	// 読み込んだ文字列が END_MESHCYLINDERSET ではない場合ループ
 
 						// メッシュフィールドの設定
-						SetMeshCylinder(pos, D3DXToRadian(rot), fRadius, fHeight, nPartWidth, nPartHeight);
+						SetMeshCylinder(pos, D3DXToRadian(rot), fRadius, fHeight, nPartWidth, nPartHeight, nType);
 					}
 				} while (strcmp(&aString[0], "END_STAGE_MESHCYLINDERSET") != 0);	// 読み込んだ文字列が END_STAGE_MESHCYLINDERSET ではない場合ループ
 			}

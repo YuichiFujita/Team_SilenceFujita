@@ -57,7 +57,7 @@
 #define MAPCAM_POS_R	(0.0f)		// マップカメラの注視点の位置 (y)
 #define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)
 
-//一人称視点カメラ
+// 一人称視点カメラ
 #define CAMERA_FORWARD_SHIFT	(18.5f)		// 前にカメラをずらす距離
 #define CAMERA_UP_SHIFT			(80.0f)		// 上にカメラをずらす距離
 #define CAMERA_RIGHT_SHIFT		(7.0f)		// 右にカメラをずらす距離
