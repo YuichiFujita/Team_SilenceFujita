@@ -107,13 +107,6 @@ void UpdateBomb(void)
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーの情報
 
-	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
-	{ // 攻撃モードの変更の操作が行われた場合
-
-		// 攻撃モードを変更
-		pPlayer->atkState = (ATTACKSTATE)((pPlayer->atkState + 1) % ATTACKSTATE_MAX);
-	}
-
 	if (pPlayer->atkState == ATTACKSTATE_BOMB)
 	{ // プレイヤーの攻撃状態がボムの場合
 
@@ -152,6 +145,51 @@ void UpdateBomb(void)
 void DrawBomb(void)
 {
 	
+}
+
+//======================================================================================================================
+//	爆弾の発射処理
+//======================================================================================================================
+void ShotBomb(void)
+{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+	Car    *pCar;					// 車の情報
+	Police *pPolice;				// 警察の情報
+
+	if (g_pCurrentAim != NULL)
+	{ // 現在狙っている車のアドレスが NULLではない場合
+
+		if (g_aBomb[g_nID].bUse == true)
+		{ // 現在狙い中の車が使用されている場合
+
+			switch (g_aBomb[g_nID].type)
+			{ // 現在狙い中の車の種類ごとの処理
+			case BOMBTYPE_CAR:		// 車
+
+				// 狙っている車のアドレスを代入
+				pCar = (Car*)g_aBomb[g_nID].pCar;
+
+
+
+				// 処理を抜ける
+				break;
+
+			case BOMBTYPE_POLICE:	// 警察
+
+				// 狙っている警察のアドレスを代入
+				pPolice = (Police*)g_aBomb[g_nID].pCar;
+
+
+
+				// 処理を抜ける
+				break;
+			}
+
+			// 攻撃モードを通常状態に変更
+			pPlayer->atkState = ATTACKSTATE_NORMAL;
+		}
+	}
 }
 
 //======================================================================================================================
