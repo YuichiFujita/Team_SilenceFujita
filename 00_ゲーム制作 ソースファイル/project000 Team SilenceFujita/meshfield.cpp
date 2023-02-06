@@ -13,6 +13,12 @@
 #include "player.h"
 
 //**********************************************************************************************************************
+//	マクロ定義
+//**********************************************************************************************************************
+#define MAP_COL_ROAD		(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f))		// マップの道路の色
+#define MAP_COL_SIDEWALK	(D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f))		// マップの歩道の色
+
+//**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
 const char *apTextureMeshField[] =		// テクスチャの相対パス
@@ -22,6 +28,15 @@ const char *apTextureMeshField[] =		// テクスチャの相対パス
 	"data\\TEXTURE\\road002.png",		// 交差点のテクスチャの相対パス
 	"data\\TEXTURE\\road003.png",		// 丁字路のテクスチャの相対パス
 	"data\\TEXTURE\\sidewalk000.png",	// 歩道のテクスチャの相対パス
+};
+
+const D3DXCOLOR aColorMeshField[] =		// マップの地面カラー
+{
+	MAP_COL_ROAD,						// 直線のテクスチャの地面カラー
+	MAP_COL_ROAD,						// 曲がり角度のテクスチャの地面カラー
+	MAP_COL_ROAD,						// 交差点のテクスチャの地面カラー
+	MAP_COL_ROAD,						// 丁字路のテクスチャの地面カラー
+	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
 };
 
 //**********************************************************************************************************************
@@ -254,7 +269,7 @@ void UpdateMeshField(void)
 //======================================================================================================================
 //	メッシュフィールドの描画処理
 //======================================================================================================================
-void DrawMeshField(void)
+void DrawMeshField(bool bMap)
 {
 	// 変数を宣言
 	int        nNumIdx = 0;						// インデックス数の計測用
@@ -262,6 +277,49 @@ void DrawMeshField(void)
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	VERTEX_3D        *pVtx;						// 頂点情報へのポインタ
+
+	if (bMap == true)
+	{ // マップ表示用のメッシュフィールドの描画の場合
+
+		// Zテストを無効にする
+		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// Zテストの設定
+		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zバッファ更新の有効 / 無効の設定
+	}
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	g_pVtxBuffMeshField->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
+	{ // メッシュフィールドの最大表示数分繰り返す
+
+		if (g_aMeshField[nCntMeshField].bUse == true)
+		{ // メッシュフィールドが使用されている場合
+
+			for (int nCntCol = 0; nCntCol < g_aMeshField[nCntMeshField].nNumVtx; nCntCol++)
+			{ // メッシュフィールドの頂点数分繰り返す
+
+				if (bMap == true)
+				{ // マップ表示用のメッシュフィールドの描画の場合
+
+					// 頂点カラーの設定
+					pVtx[nCntCol].col = aColorMeshField[g_aMeshField[nCntMeshField].nType];
+				}
+				else
+				{ // 通常のメッシュフィールドの描画の場合
+
+					// 頂点カラーの設定
+					pVtx[nCntCol].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				}
+			}
+		}
+
+		// 頂点データのポインタの開始地点を必要数分ずらす
+		pVtx += g_aMeshField[nCntMeshField].nNumVtx;
+	}
+
+	// 頂点バッファをアンロックする
+	g_pVtxBuffMeshField->Unlock();
 
 	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
 	{ // メッシュフィールドの最大表示数分繰り返す
@@ -292,24 +350,38 @@ void DrawMeshField(void)
 			// 頂点フォーマットの設定
 			pDevice->SetFVF(FVF_VERTEX_3D);
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureMeshField[g_aMeshField[nCntMeshField].nType]);
+			if (bMap == true)
+			{ // マップ表示用のメッシュフィールドの描画の場合
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, NULL);
+			}
+			else
+			{ // 通常のメッシュフィールドの描画の場合
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureMeshField[g_aMeshField[nCntMeshField].nType]);
+			}
 
 			// ポリゴンの描画
 			pDevice->DrawIndexedPrimitive
 			( // 引数
-				D3DPT_TRIANGLESTRIP,					// プリミティブの種類
+				D3DPT_TRIANGLESTRIP,						// プリミティブの種類
 				0,
 				0,
-				g_aMeshField[nCntMeshField].nNumVtx,	// 使用する頂点数
-				nNumIdx,								// インデックスバッファの開始地点
-				g_aMeshField[nCntMeshField].nNumIdx - 2	// プリミティブ (ポリゴン) 数
+				g_aMeshField[nCntMeshField].nNumVtx,		// 使用する頂点数
+				nNumIdx,									// インデックスバッファの開始地点
+				g_aMeshField[nCntMeshField].nNumIdx - 2		// プリミティブ (ポリゴン) 数
 			);
 
 			// インデックスバッファの開始地点を必要数分ずらす
 			nNumIdx += g_aMeshField[nCntMeshField].nNumIdx;
 		}
 	}
+
+	// Zテストを有効にする
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);	// Zテストの設定
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);		// Zバッファ更新の有効 / 無効の設定
 }
 
 //======================================================================================================================
