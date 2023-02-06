@@ -53,7 +53,8 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\HOSPITAL.x",		// 病院
 
 	// プレイヤーモデル
-	"data\\MODEL_PLAYER\\car000.x",		// プレイヤー
+	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
+	"data\\MODEL_EDIT\\barrier000.x",		// バリア
 
 	// 車モデル
 	"data\\MODEL_OBJECT\\policecar.x",		// パトカー
@@ -63,7 +64,7 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\senkyoCar000.x",	// 選挙カー
 
 	// エディットモデル
-	"data\\MODEL_EDIT\\collision000.x",	// 当たり判定
+	"data\\MODEL_EDIT\\collision000.x",		// 当たり判定
 };
 
 //************************************************************
