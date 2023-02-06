@@ -22,6 +22,7 @@ typedef enum
 	BOMBSTATE_NONE = 0,		// ‰½‚à‚µ‚È‚¢ó‘Ô
 	BOMBSTATE_RANGE,		// ”ÍˆÍ“àó‘Ô
 	BOMBSTATE_AIM,			// ‘_‚¢ó‘Ô
+	BOMBSTATE_BARRIER,		// ƒoƒŠƒA“àó‘Ô
 	BOMBSTATE_MAX,			// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 } BOMBSTATE;
 

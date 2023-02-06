@@ -50,19 +50,32 @@ typedef enum
 	MODELTYPE_OBJECT_HOSPITAL,			// 病院
 
 	// プレイヤーモデル
-	MODELTYPE_PLAYER_CAR,			// プレイヤー
+	MODELTYPE_PLAYER_CAR,				// プレイヤー
+	MODELTYPE_PLAYER_BARRIER,			// バリア
 
 	// 車モデル
-	MODELTYPE_CAR_POLICE,			// パトカー
-	MODELTYPE_CAR_FARECAR,			// 消防車
-	MODELTYPE_CAR_CAR001,			// 自動車
-	MODELTYPE_CAR_YAKIIMOCAR,		// 石焼き芋屋
-	MODELTYPE_CAR_ELECTIONCAR,		// 選挙カー
+	MODELTYPE_CAR_POLICE,				// パトカー
+	MODELTYPE_CAR_FARECAR,				// 消防車
+	MODELTYPE_CAR_CAR001,				// 自動車
+	MODELTYPE_CAR_YAKIIMOCAR,			// 石焼き芋屋
+	MODELTYPE_CAR_ELECTIONCAR,			// 選挙カー
 
 	// エディットモデル
-	MODELTYPE_EDIT_COLLISION,		// 当たり判定
-	MODELTYPE_MAX,					// 全モデルの総数
+	MODELTYPE_EDIT_COLLISION,			// 当たり判定
+	MODELTYPE_MAX,						// 全モデルの総数
 } MODELTYPE;
+
+////************************************************************
+////	列挙型定義 (MODELTYPE)
+////************************************************************
+//typedef enum
+//{
+//	MODELTYPE_OBJECT = 0,	// オブジェクトモデル
+//	MODELTYPE_PLAYER,		// プレイヤーモデル
+//	MODELTYPE_CAR,			// 車モデル
+//	MODELTYPE_EDIT,			// エディットモデル
+//	MODELTYPE_MAX,			// モデルの種類の総数
+//} MODELTYPE;
 
 //************************************************************
 //	マクロ定義
@@ -74,7 +87,7 @@ typedef enum
 #define FROM_OBJECT		(0)								// オブジェクトのモデル列挙の開始地点
 #define MODEL_OBJ_MAX	(int(MODELTYPE_PLAYER_CAR))		// オブジェクトのモデルの総数
 #define FROM_PLAYER		(int(MODELTYPE_PLAYER_CAR))		// プレイヤーのモデル列挙の開始地点
-#define MODEL_PLAY_MAX	(1)								// プレイヤーのモデルの総数
+#define MODEL_PLAY_MAX	(2)								// プレイヤーのモデルの総数
 #define FROM_CAR		(int(MODELTYPE_CAR_POLICE))		// 車のモデル列挙の開始地点
 #define MODEL_CAR_MAX	(5)								// 車のモデルの総数
 #define FROM_EDIT		(int(MODELTYPE_EDIT_COLLISION))	// エディットのモデル列挙の開始地点
