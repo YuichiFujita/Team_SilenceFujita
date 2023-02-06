@@ -553,7 +553,7 @@ void DrawGame(void)
 	DrawMeshCylinder();
 
 	// メッシュフィールドの描画
-	DrawMeshField();
+	DrawMeshField(false);
 
 	// メッシュウォールの描画
 	DrawMeshWall();
@@ -613,16 +613,8 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_MAP);
 
-	// Zテストを無効にする
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// Zテストの設定
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zバッファ更新の有効 / 無効の設定
-
 	// メッシュフィールドの描画
-	DrawMeshField();
-
-	// Zテストを有効にする
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);	// Zテストの設定
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);		// Zバッファ更新の有効 / 無効の設定
+	DrawMeshField(true);
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	UIの描画

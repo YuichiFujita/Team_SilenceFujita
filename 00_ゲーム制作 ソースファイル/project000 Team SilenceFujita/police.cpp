@@ -146,115 +146,117 @@ void UpdatePolice(void)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
-
+			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BARRIER)
+			{ // バリア内状態ではない場合
 			// 前回位置の更新
-			g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
+				g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
-			// プレイヤーの着地の更新処理
-			LandObject(&g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].bJump);
+				// プレイヤーの着地の更新処理
+				LandObject(&g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].bJump);
 
-			//----------------------------------------------------
-			//	影の更新
-			//----------------------------------------------------
-			// 影の位置設定
-			SetPositionShadow
-			( // 引数
-				g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
-				g_aPolice[nCntPolice].pos,			// 位置
-				g_aPolice[nCntPolice].rot,			// 向き
-				NONE_SCALE							// 拡大率
-			);
-
-			// プレイヤーの位置の更新
-			PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
-
-			switch (g_aPolice[nCntPolice].state)
-			{//状態で判断する
-			case POLICESTATE_PATROL:				//パトロール状態
-
-				// 警察のパトロール行動処理
-				PatrolPoliceAct(&g_aPolice[nCntPolice]);
-
-				break;						//抜け出す
-
-			case POLICESTATE_CHASE:			//追跡処理
-
-				// 警察の追跡処理
-				ChasePoliceAct(&g_aPolice[nCntPolice]);
-
-				break;						//抜け出す
-
-			case POLICESTATE_PATBACK:		//パトロールへ戻る処理			
-
-				break;						//抜け出す
-
-			case POLICESTATE_POSBACK:		//最初の座標に戻る処理
-
-				// 最初の移動量を元に戻す
-				g_aPolice[nCntPolice].move.x = 0.0f;
-
-				break;						//抜け出す
-
-			case POLICESTATE_TACKLE:		//タックル状態
-
-				// 警察のタックル処理
-				PoliceTackle(&g_aPolice[nCntPolice]);
-
-				break;						//抜け出す
-			}
-
-			//----------------------------------------------------
-			//	当たり判定
-			//----------------------------------------------------
-			// オブジェクトとの当たり判定
-			CollisionObject
-			( // 引数
-				&g_aPolice[nCntPolice].pos,		// 現在の位置
-				&g_aPolice[nCntPolice].posOld,	// 前回の位置
-				&g_aPolice[nCntPolice].move,	// 移動量
-				POLICAR_WIDTH,			// 横幅
-				POLICAR_DEPTH			// 奥行
-			);
-
-			if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
-			{ // 警察がパトロール状態の場合
-				// 車の停止処理
-				CollisionStopCar
+				//----------------------------------------------------
+				//	影の更新
+				//----------------------------------------------------
+				// 影の位置設定
+				SetPositionShadow
 				( // 引数
-					g_aPolice[nCntPolice].pos,		//位置
-					g_aPolice[nCntPolice].rot,		//向き
-					&g_aPolice[nCntPolice].move,	//移動量
-					g_aPolice[nCntPolice].modelData.fRadius,	//半径
-					COLLOBJECTTYPE_POLICE			//対象のサイズ
+					g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
+					g_aPolice[nCntPolice].pos,			// 位置
+					g_aPolice[nCntPolice].rot,			// 向き
+					NONE_SCALE							// 拡大率
 				);
-			}
 
-			if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
-			{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
-				// 車同士の当たり判定
-				CollisionCarBody
+				// プレイヤーの位置の更新
+				PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
+
+				switch (g_aPolice[nCntPolice].state)
+				{//状態で判断する
+				case POLICESTATE_PATROL:				//パトロール状態
+
+					// 警察のパトロール行動処理
+					PatrolPoliceAct(&g_aPolice[nCntPolice]);
+
+					break;						//抜け出す
+
+				case POLICESTATE_CHASE:			//追跡処理
+
+					// 警察の追跡処理
+					ChasePoliceAct(&g_aPolice[nCntPolice]);
+
+					break;						//抜け出す
+
+				case POLICESTATE_PATBACK:		//パトロールへ戻る処理			
+
+					break;						//抜け出す
+
+				case POLICESTATE_POSBACK:		//最初の座標に戻る処理
+
+					// 最初の移動量を元に戻す
+					g_aPolice[nCntPolice].move.x = 0.0f;
+
+					break;						//抜け出す
+
+				case POLICESTATE_TACKLE:		//タックル状態
+
+					// 警察のタックル処理
+					PoliceTackle(&g_aPolice[nCntPolice]);
+
+					break;						//抜け出す
+				}
+
+				//----------------------------------------------------
+				//	当たり判定
+				//----------------------------------------------------
+				// オブジェクトとの当たり判定
+				CollisionObject
 				( // 引数
-					&g_aPolice[nCntPolice].pos,
-					&g_aPolice[nCntPolice].posOld,
-					g_aPolice[nCntPolice].rot,
-					&g_aPolice[nCntPolice].move,
-					POLICAR_WIDTH,
-					POLICAR_DEPTH,
-					COLLOBJECTTYPE_POLICE
+					&g_aPolice[nCntPolice].pos,		// 現在の位置
+					&g_aPolice[nCntPolice].posOld,	// 前回の位置
+					&g_aPolice[nCntPolice].move,	// 移動量
+					POLICAR_WIDTH,			// 横幅
+					POLICAR_DEPTH			// 奥行
 				);
+
+				if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
+				{ // 警察がパトロール状態の場合
+					// 車の停止処理
+					CollisionStopCar
+					( // 引数
+						g_aPolice[nCntPolice].pos,		//位置
+						g_aPolice[nCntPolice].rot,		//向き
+						&g_aPolice[nCntPolice].move,	//移動量
+						g_aPolice[nCntPolice].modelData.fRadius,	//半径
+						COLLOBJECTTYPE_POLICE			//対象のサイズ
+					);
+				}
+
+				if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
+				{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
+					// 車同士の当たり判定
+					CollisionCarBody
+					( // 引数
+						&g_aPolice[nCntPolice].pos,
+						&g_aPolice[nCntPolice].posOld,
+						g_aPolice[nCntPolice].rot,
+						&g_aPolice[nCntPolice].move,
+						POLICAR_WIDTH,
+						POLICAR_DEPTH,
+						COLLOBJECTTYPE_POLICE
+					);
+				}
+
+				if (g_aPolice[nCntPolice].pos.y < 0.0f)
+				{//Y軸の位置が0.0fだった場合
+					//縦への移動量を0.0fにする
+					g_aPolice[nCntPolice].move.y = 0.0f;
+
+					//位置を0.0fに戻す
+					g_aPolice[nCntPolice].pos.y = 0.0f;
+				}
+
+				// プレイヤーの補正の更新処理
+				RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 			}
-
-			if (g_aPolice[nCntPolice].pos.y < 0.0f)
-			{//Y軸の位置が0.0fだった場合
-				//縦への移動量を0.0fにする
-				g_aPolice[nCntPolice].move.y = 0.0f;
-
-				//位置を0.0fに戻す
-				g_aPolice[nCntPolice].pos.y = 0.0f;
-			}
-
-			// プレイヤーの補正の更新処理
-			RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 		}
 	}
 }

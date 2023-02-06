@@ -70,12 +70,12 @@ void RevPlayer(void);				// プレイヤーの補正の更新処理
 
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
 void DriftPlayer(void);				// プレイヤーのドリフト処理
-void FlyAwayPlayer(void);			// プレイヤーの送風処理
 void SlumBoostPlayer(void);			// プレイヤーの加速処理
+void FlyAwayPlayer(void);			// プレイヤーの送風処理
+void SilenceWorldPlayer(void);		// プレイヤーの爆弾処理
 
 void UpdateBoost(void);				// 加速の更新処理
 void SetBoost(void);				// 加速の設定処理
-
 void UpdateFlyAway(void);			// 送風の更新処理
 
 //************************************************************
@@ -187,22 +187,25 @@ void UpdatePlayer(void)
 		// プレイヤーの位置の更新
 		PosPlayer();
 
-		// プレイヤーの着地の更新処理
+		// プレイヤーの着地の更新処
 		LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 		
-		// プレイヤーのドリフト処理
+		// プレイヤーのドリフト
 		DriftPlayer();
 
-		// プレイヤーの加速処理
+		// プレイヤーの加速
 		SlumBoostPlayer();
 
-		// プレイヤーの送風処理
+		// プレイヤーの送風
 		FlyAwayPlayer();
 
-		// 送風の更新処理
-		UpdateFlyAway();			
+		// プレイヤーの爆弾
+		SilenceWorldPlayer();
 
-		// プレイヤーのカメラの状態変化処理
+		// 送風の更新
+		UpdateFlyAway();
+
+		// プレイヤーのカメラの状態変化
 		CameraChangePlayer();
 #else
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
@@ -747,146 +750,22 @@ void FlyAwayPlayer(void)
 }
 
 //============================================================
-// 送風の更新処理
+//	プレイヤーの爆弾処理
 //============================================================
-void UpdateFlyAway(void)
+void SilenceWorldPlayer(void)
 {
-	WindInfo *pWindInfo = GetWindInfo();
+	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
+	{ // 攻撃モードの変更の操作が行われた場合
 
-	switch (pWindInfo->state)
-	{
-	case WIND_USABLE:			// 風が使える場合
+		// 攻撃モードを変更
+		g_player.atkState = (ATTACKSTATE)((g_player.atkState + 1) % ATTACKSTATE_MAX);
+	}
 
-		if (g_player.wind.bUseWind == true)
-		{ // 送風機を使用した場合
+	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
+	{ // 爆弾の発射の操作が行われた場合
 
-			// 風を出すカウントを加算する
-			g_player.wind.nCount++;
-
-			// カウンターを加算する
-			pWindInfo->nUseCounter++;
-
-			if (pWindInfo->nUseCounter >= WIND_OVERHEAT_CNT)
-			{ // 3秒を超えた場合
-				// 風を使用しない
-				g_player.wind.bUseWind = false;
-
-				// オーバーヒート状態にする
-				pWindInfo->state = WIND_OVERHEAT;
-			}
-
-			if (g_player.wind.nCount % FLYAWAY_INTERVAL_CNT == 0)
-			{ // 風のカウントが一定数になったら
-
-			  // 変数を宣言
-				float fRotAdd;	// 向きの追加分
-
-				for (int nCnt = 0; nCnt < FLYAWAY_SET_CNT; nCnt++)
-				{
-
-					{ // 右の分
-
-						// 向きの追加分を算出する
-						fRotAdd = -(float)((rand() % 240 + 52) - 157) / 100;
-
-						// 風の位置を設定する
-						g_player.wind.pos = D3DXVECTOR3
-						(
-							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
-							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT,												// Y座標
-							g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
-						);
-
-						//風の向きを設定する
-						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y + D3DX_PI * 0.5f + fRotAdd, 0.0f);
-
-						// 風の設定処理
-						SetWind(g_player.wind.pos, g_player.wind.rot);
-					}
-
-					{ // 左の分
-
-					  // 向きの追加分を算出する
-						fRotAdd = (float)((rand() % 240 + 52) - 157) / 100;
-
-						// 風の位置を設定する
-						g_player.wind.pos = D3DXVECTOR3
-						(
-							g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
-							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT, 												// Y座標
-							g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
-						);
-
-						//風の向きを設定する
-						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y - D3DX_PI * 0.5f + fRotAdd, 0.0f);
-
-						// 風の設定処理
-						SetWind(g_player.wind.pos, g_player.wind.rot);
-					}
-				}
-			}
-		}
-		else
-		{ // 送風機を使用していない場合
-
-			// カウントを初期化する
-			g_player.wind.nCount = 0;
-
-			// カウンターを減算する
-			pWindInfo->nUseCounter--;
-
-			if (pWindInfo->nUseCounter <= 0)
-			{ // カウンターが0以下になった場合
-				// カウンターを補正する
-				pWindInfo->nUseCounter = 0;
-
-				// 使用可能にする
-				pWindInfo->state = WIND_USABLE;
-			}
-		}
-
-		break;					// 抜け出す
-
-	case WIND_OVERHEAT:			// オーバーヒート状態
-
-		// 風のカウントを180に固定する
-		pWindInfo->nUseCounter = WIND_OVERHEAT_CNT;
-
-		// オーバーヒートカウンターを加算する
-		pWindInfo->nOverHeatCounter++;
-
-		if (pWindInfo->nOverHeatCounter >= FLYAWAY_OVERHEAT_CNT)
-		{ // オーバーヒートカウンターが一定数に達したら
-			// オーバーヒートカウンターを初期化する
-			pWindInfo->nOverHeatCounter = 0;
-
-			// クールダウン状態にする
-			pWindInfo->state = WIND_COOLDOWN;
-		}
-
-		// 風を使用しない
-		g_player.wind.bUseWind = false;
-
-		break;					// 抜け出す
-
-	case WIND_COOLDOWN:			// クールダウン状態
-
-		// カウントを初期化する
-		g_player.wind.nCount = 0;
-
-		// カウンターを減算する
-		pWindInfo->nUseCounter--;
-
-		if (pWindInfo->nUseCounter <= 0)
-		{ // カウンターが0以下になった場合
-			// カウンターを補正する
-			pWindInfo->nUseCounter = 0;
-
-			// 使用可能にする
-			pWindInfo->state = WIND_USABLE;
-		}
-
-		break;					// 抜け出す
+		// 爆弾の発射
+		ShotBomb();
 	}
 }
 
@@ -1048,6 +927,155 @@ void SetBoost(void)
 
 		// カウンターを設定
 		g_player.boost.nCounter = BOOST_UP_CNT;
+	}
+}
+
+//============================================================
+//	送風の更新処理
+//============================================================
+void UpdateFlyAway(void)
+{
+	// ポインタを宣言
+	WindInfo *pWindInfo = GetWindInfo();
+
+	switch (pWindInfo->state)
+	{
+	case WIND_USABLE:			// 風が使える場合
+
+		if (g_player.wind.bUseWind == true)
+		{ // 送風機を使用した場合
+
+			// 風を出すカウントを加算する
+			g_player.wind.nCount++;
+
+			// カウンターを加算する
+			pWindInfo->nUseCounter++;
+
+			if (pWindInfo->nUseCounter >= WIND_OVERHEAT_CNT)
+			{ // 3秒を超えた場合
+
+				// 風を使用しない
+				g_player.wind.bUseWind = false;
+
+				// オーバーヒート状態にする
+				pWindInfo->state = WIND_OVERHEAT;
+			}
+
+			if (g_player.wind.nCount % FLYAWAY_INTERVAL_CNT == 0)
+			{ // 風のカウントが一定数になったら
+
+				// 変数を宣言
+				float fRotAdd;	// 向きの追加分
+
+				for (int nCnt = 0; nCnt < FLYAWAY_SET_CNT; nCnt++)
+				{
+
+					{ // 右の分
+
+						// 向きの追加分を算出する
+						fRotAdd = -(float)((rand() % 240 + 52) - 157) / 100;
+
+						// 風の位置を設定する
+						g_player.wind.pos = D3DXVECTOR3
+						(
+							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
+							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT,												// Y座標
+							g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
+						);
+
+						//風の向きを設定する
+						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y + D3DX_PI * 0.5f + fRotAdd, 0.0f);
+
+						// 風の設定処理
+						SetWind(g_player.wind.pos, g_player.wind.rot);
+					}
+
+					{ // 左の分
+
+						// 向きの追加分を算出する
+						fRotAdd = (float)((rand() % 240 + 52) - 157) / 100;
+
+						// 風の位置を設定する
+						g_player.wind.pos = D3DXVECTOR3
+						(
+							g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
+							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT, 												// Y座標
+							g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
+						);
+
+						//風の向きを設定する
+						g_player.wind.rot = D3DXVECTOR3(0.0f, g_player.rot.y - D3DX_PI * 0.5f + fRotAdd, 0.0f);
+
+						// 風の設定処理
+						SetWind(g_player.wind.pos, g_player.wind.rot);
+					}
+				}
+			}
+		}
+		else
+		{ // 送風機を使用していない場合
+
+			// カウントを初期化する
+			g_player.wind.nCount = 0;
+
+			// カウンターを減算する
+			pWindInfo->nUseCounter--;
+
+			if (pWindInfo->nUseCounter <= 0)
+			{ // カウンターが0以下になった場合
+
+				// カウンターを補正する
+				pWindInfo->nUseCounter = 0;
+
+				// 使用可能にする
+				pWindInfo->state = WIND_USABLE;
+			}
+		}
+
+		break;					// 抜け出す
+
+	case WIND_OVERHEAT:			// オーバーヒート状態
+
+		// 風のカウントを180に固定する
+		pWindInfo->nUseCounter = WIND_OVERHEAT_CNT;
+
+		// オーバーヒートカウンターを加算する
+		pWindInfo->nOverHeatCounter++;
+
+		if (pWindInfo->nOverHeatCounter >= FLYAWAY_OVERHEAT_CNT)
+		{ // オーバーヒートカウンターが一定数に達したら
+
+			// オーバーヒートカウンターを初期化する
+			pWindInfo->nOverHeatCounter = 0;
+
+			// クールダウン状態にする
+			pWindInfo->state = WIND_COOLDOWN;
+		}
+
+		// 風を使用しない
+		g_player.wind.bUseWind = false;
+
+		break;					// 抜け出す
+
+	case WIND_COOLDOWN:			// クールダウン状態
+
+		// カウントを初期化する
+		g_player.wind.nCount = 0;
+
+		// カウンターを減算する
+		pWindInfo->nUseCounter--;
+
+		if (pWindInfo->nUseCounter <= 0)
+		{ // カウンターが0以下になった場合
+
+			// カウンターを補正する
+			pWindInfo->nUseCounter = 0;
+
+			// 使用可能にする
+			pWindInfo->state = WIND_USABLE;
+		}
+
+		break;					// 抜け出す
 	}
 }
 

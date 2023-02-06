@@ -119,77 +119,79 @@ void UpdateCar(void)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aCar[nCntCar].bUse == true)
 		{ // オブジェクトが使用されている場合
+			if (g_aCar[nCntCar].bombState != BOMBSTATE_BARRIER)
+			{ // バリア内状態ではない場合
+				// 前回位置の更新
+				g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;
 
-			// 前回位置の更新
-			g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;
+				// オブジェクトの着地の更新処理
+				LandObject(&g_aCar[nCntCar].pos, &g_aCar[nCntCar].move, &g_aCar[nCntCar].bJump);
 
-			// オブジェクトの着地の更新処理
-			LandObject(&g_aCar[nCntCar].pos, &g_aCar[nCntCar].move, &g_aCar[nCntCar].bJump);
+				//----------------------------------------------------
+				//	影の更新
+				//----------------------------------------------------
+				// 影の位置設定
+				SetPositionShadow
+				( // 引数
+					g_aCar[nCntCar].nShadowID,	// 影のインデックス
+					g_aCar[nCntCar].pos,		// 位置
+					g_aCar[nCntCar].rot,		// 向き
+					NONE_SCALE					// 拡大率
+				);
 
-			//----------------------------------------------------
-			//	影の更新
-			//----------------------------------------------------
-			// 影の位置設定
-			SetPositionShadow
-			( // 引数
-				g_aCar[nCntCar].nShadowID,	// 影のインデックス
-				g_aCar[nCntCar].pos,			// 位置
-				g_aCar[nCntCar].rot,			// 向き
-				NONE_SCALE							// 拡大率
-			);
+				// プレイヤーの位置の更新
+				PosCar(&g_aCar[nCntCar].move, &g_aCar[nCntCar].pos, &g_aCar[nCntCar].rot, g_aCar[nCntCar].bMove);
 
-			// プレイヤーの位置の更新
-			PosCar(&g_aCar[nCntCar].move, &g_aCar[nCntCar].pos, &g_aCar[nCntCar].rot, g_aCar[nCntCar].bMove);
+				//車のカーブ処理
+				CurveCar(&g_aCar[nCntCar]);
 
-			//車のカーブ処理
-			CurveCar(&g_aCar[nCntCar]);
+				if (g_aCar[nCntCar].pos.y < 0.0f)
+				{//Y軸の位置が0.0fだった場合
+					//縦への移動量を0.0fにする
+					g_aCar[nCntCar].move.y = 0.0f;
 
-			if (g_aCar[nCntCar].pos.y < 0.0f)
-			{//Y軸の位置が0.0fだった場合
-				//縦への移動量を0.0fにする
-				g_aCar[nCntCar].move.y = 0.0f;
+					//位置を0.0fに戻す
+					g_aCar[nCntCar].pos.y = 0.0f;
+				}
 
-				//位置を0.0fに戻す
-				g_aCar[nCntCar].pos.y = 0.0f;
+				//----------------------------------------------------
+				//	当たり判定
+				//----------------------------------------------------
+				// オブジェクトとの当たり判定
+				CollisionObject
+				( // 引数
+					&g_aCar[nCntCar].pos,		// 現在の位置
+					&g_aCar[nCntCar].posOld,	// 前回の位置
+					&g_aCar[nCntCar].move,		// 移動量
+					CAR_WIDTH,					// 横幅
+					CAR_DEPTH					// 奥行
+				);
+
+				// 車の停止処理
+				CollisionStopCar
+				( // 引数
+					g_aCar[nCntCar].pos,				//位置
+					g_aCar[nCntCar].rot,				//向き
+					&g_aCar[nCntCar].move,				//移動量
+					g_aCar[nCntCar].modelData.fRadius,	//半径
+					COLLOBJECTTYPE_CAR					//対象のサイズ
+				);
+
+				// 車同士の当たり判定
+				CollisionCarBody
+				( // 引数
+					&g_aCar[nCntCar].pos,
+					&g_aCar[nCntCar].posOld,
+					g_aCar[nCntCar].rot,
+					&g_aCar[nCntCar].move,
+					CAR_WIDTH,
+					CAR_DEPTH,
+					COLLOBJECTTYPE_CAR
+				);
+
+				// 車の補正の更新処理
+				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 			}
-
-			//----------------------------------------------------
-			//	当たり判定
-			//----------------------------------------------------
-			// オブジェクトとの当たり判定
-			CollisionObject
-			( // 引数
-				&g_aCar[nCntCar].pos,		// 現在の位置
-				&g_aCar[nCntCar].posOld,	// 前回の位置
-				&g_aCar[nCntCar].move,		// 移動量
-				CAR_WIDTH,					// 横幅
-				CAR_DEPTH					// 奥行
-			);
-
-			// 車の停止処理
-			CollisionStopCar
-			( // 引数
-				g_aCar[nCntCar].pos,		//位置
-				g_aCar[nCntCar].rot,		//向き
-				&g_aCar[nCntCar].move,		//移動量
-				g_aCar[nCntCar].modelData.fRadius,	//半径
-				COLLOBJECTTYPE_CAR			//対象のサイズ
-			);
-
-			// 車同士の当たり判定
-			CollisionCarBody
-			( // 引数
-				&g_aCar[nCntCar].pos, 
-				&g_aCar[nCntCar].posOld,
-				g_aCar[nCntCar].rot,
-				&g_aCar[nCntCar].move,
-				CAR_WIDTH,
-				CAR_DEPTH,
-				COLLOBJECTTYPE_CAR
-			);
-
-			// 車の補正の更新処理
-			RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 		}
 	}
 }

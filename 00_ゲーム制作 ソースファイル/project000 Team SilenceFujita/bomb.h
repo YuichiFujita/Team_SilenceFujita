@@ -22,6 +22,7 @@ typedef enum
 	BOMBSTATE_NONE = 0,		// 何もしない状態
 	BOMBSTATE_RANGE,		// 範囲内状態
 	BOMBSTATE_AIM,			// 狙い状態
+	BOMBSTATE_BARRIER,		// バリア内状態
 	BOMBSTATE_MAX,			// この列挙型の総数
 } BOMBSTATE;
 
@@ -32,6 +33,7 @@ void InitBomb(void);		// 爆弾の初期化処理
 void UninitBomb(void);		// 爆弾の終了処理
 void UpdateBomb(void);		// 爆弾の更新処理
 void DrawBomb(void);		// 爆弾の描画処理
+void ShotBomb(void);		// 爆弾の発射処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
