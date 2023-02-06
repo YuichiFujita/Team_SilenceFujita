@@ -33,7 +33,7 @@
 #define POLI_MOVE_FORWARD		(0.1f)		// プレイヤー前進時の移動量
 #define POLI_MOVE_BACKWARD		(0.2f)		// プレイヤー後退時の移動量
 #define POLI_MOVE_ROT			(0.012f)	// プレイヤーの向き変更量
-#define REV_POLI_MOVE_ROT		(0.1f)		// 移動量による向き変更量の補正係数
+#define REV_POLI_MOVE_ROT		(0.085f)	// 移動量による向き変更量の補正係数
 #define SUB_POLI_MOVE_VALUE		(15.0f)		// 向き変更時の減速が行われる移動量
 #define SUB_POLI_MOVE			(0.05f)		// 向き変更時の減速量
 #define MAX_POLI_FORWARD		(30.0f)		// 前進時の最高速度
@@ -44,9 +44,12 @@
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
 //**********************************************************************************************************************
-#define POLICAR_TACKLE_CNT		(90)		// タックル状態に移行するまでのカウント
-#define POLICAR_TACKLE_ADD		(0.2f)		// 増していく移動量
-#define MAX_POLICAR_TACKLE_MOVE	(20.0f)		// 追加移動量の最大数
+#define POLICAR_TACKLE_CNT		(60)		// タックル状態に移行するまでのカウント
+#define POLICAR_TACKLE_ADD		(3.35f)		// 増していく移動量
+#define MAX_POLICAR_TACKLE_MOVE	(50.0f)		// 追加移動量の最大数
+#define FINISH_POLICAR_TACKLE	(90)		// タックル終了するまでの時間
+#define STOP_POLICAR_CNT		(40)		// 止まっている間のカウント数
+#define POLICAR_ATTEN_STOP		(0.1f)		// 追加移動量の減衰係数
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -109,6 +112,9 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].tackle.nTackleCnt = 0;						// タックルのカウント
 		g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
 	}
+
+	// 警察の設定処理
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
 }
 
 //======================================================================================================================
@@ -171,6 +177,9 @@ void UpdatePolice(void)
 				break;						//抜け出す
 
 			case POLICESTATE_POSBACK:		//最初の座標に戻る処理
+
+				// 最初の移動量を元に戻す
+				g_aPolice[nCntPolice].move.x = 0.0f;
 
 				break;						//抜け出す
 
@@ -355,9 +364,6 @@ void DrawPolice(void)
 							pMat[nCntMat].MatD3D.Ambient.a  = 1.0f;
 							pMat[nCntMat].MatD3D.Emissive.a = 1.0f;
 
-							// 最初の移動量を元に戻す
-							g_aPolice[nCntPolice].move.x = 0.0f;
-
 							// 最初の位置に戻す処理
 							g_aPolice[nCntPolice].state = POLICESTATE_PATROL;
 						}
@@ -448,6 +454,10 @@ void SetPolice(D3DXVECTOR3 pos)
 			g_aPolice[nCntPolice].policeCurve.nSKipCnt = 0;										// スキップする曲がり角の回数
 			g_aPolice[nCntPolice].policeCurve.rotDest = g_aPolice[nCntPolice].rot;				// 前回の向き
 			g_aPolice[nCntPolice].policeCurve.actionState = CARACT_DASH;						// 走っている状態
+
+			// 初期位置を設定する
+			g_aPolice[nCntPolice].posCopy = g_aPolice[nCntPolice].pos;
+			g_aPolice[nCntPolice].rotCopy = g_aPolice[nCntPolice].rot;
 
 			// タックル関係の変数の初期化
 			g_aPolice[nCntPolice].tackle.nTackleCnt = 0;			// タックルのカウント
@@ -752,10 +762,14 @@ void ChasePoliceAct(Police *pPolice)
 //============================================================
 void PatrolBackAct(Police *pPolice)
 {
-	//最初の位置と向きと移動量、今進むべき方向をリセットする
-	pPolice->pos = pPolice->posCopy;
-	pPolice->posOld = pPolice->posOld;
-	pPolice->move.x = 0.0f;
+	//情報をリセットする
+	pPolice->pos = pPolice->posCopy;					// 位置
+	pPolice->posOld = pPolice->pos;						// 前回の位置
+	pPolice->rot = pPolice->rotCopy;					// 向き
+	pPolice->move.x = 0.0f;								// 移動量
+	pPolice->policeCurve.nSKipCnt = 0;					// スキップする曲がり角の回数
+	pPolice->policeCurve.rotDest = pPolice->rot;		// 前回の向き
+	pPolice->policeCurve.actionState = CARACT_DASH;		// 走っている状態
 }
 
 //============================================================
@@ -1151,29 +1165,88 @@ void PolicePosRotCorrect(Police *pPolice)
 //============================================================
 void PoliceTackle(Police *pPolice)
 {
-	// 追加移動量を加算していく
-	pPolice->tackle.Tacklemove.x += POLICAR_TACKLE_ADD;
-
-	if(pPolice->tackle.Tacklemove.x >= MAX_POLICAR_TACKLE_MOVE)
-	{ // 追加分の移動量が一定を超えた場合
-		// 移動量を補正する
-		pPolice->tackle.Tacklemove.x = MAX_POLICAR_TACKLE_MOVE;
-	}
-
 	// タックルのカウントを加算する
 	pPolice->tackle.nTackleCnt++;
 
-	if (pPolice->tackle.nTackleCnt >= 60)
-	{ // タックルのカウントが一定数以上になった場合
-		// タックルのカウントを0にする
-		pPolice->tackle.nTackleCnt = 0;
+	if (pPolice->tackle.nTackleCnt <= STOP_POLICAR_CNT)
+	{ // 車を止めるカウント数の時
+		// 移動量を減衰させていく
+		pPolice->move.x *= POLICAR_ATTEN_STOP;
 
-		//警察車両の探知処理
-		PatrolCarSearch(pPolice);
+		if (pPolice->move.x <= 0.0f)
+		{ // 移動量が0.0f以下になった場合
+			// 移動量を0に設定する
+			pPolice->move.x = 0.0f;
+		}
+	}
+	else
+	{ // 上記以外
+
+		float fRotDest;			// 目標の向き
+		float fRotDiff;			// 目標の差分
+		Player *pPlayer = GetPlayer();		// プレイヤーの情報
+
+		// 目的の向きを設定する
+		fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
+
+		// 向きの差分を求める
+		fRotDiff = fRotDest - pPolice->rot.y;
+
+		if (fRotDiff > D3DX_PI)
+		{ // 角度が3.14fより大きかった場合
+			// 角度から1周分減らす
+			fRotDiff = -D3DX_PI;
+		}
+		else if (fRotDiff < -D3DX_PI)
+		{ // 角度が-3.14fより小さかった場合
+			// 角度に1周分加える
+			fRotDiff = D3DX_PI;
+		}
+
+		// 角度を補正する
+		pPolice->rot.y += fRotDiff * (pPolice->move.x * REV_POLI_MOVE_ROT);
+
+		if (pPolice->rot.y > D3DX_PI)
+		{ // 角度が3.14fより大きかった場合
+			// 角度から1周分減らす
+			pPolice->rot.y = -D3DX_PI;
+		}
+		else if (pPolice->rot.y < -D3DX_PI)
+		{ // 角度が-3.14fより小さかった場合
+			// 角度に1周分加える
+			pPolice->rot.y = D3DX_PI;
+		}
+
+		// 追加移動量を加算していく
+		pPolice->tackle.Tacklemove.x += POLICAR_TACKLE_ADD;
+
+		// 移動量を加算していく
+		pPolice->move.x += POLI_MOVE_FORWARD;
+
+		if (pPolice->tackle.Tacklemove.x >= MAX_POLICAR_TACKLE_MOVE)
+		{ // 追加分の移動量が一定を超えた場合
+			// 移動量を補正する
+			pPolice->tackle.Tacklemove.x = MAX_POLICAR_TACKLE_MOVE;
+		}
+
+		if (pPolice->tackle.nTackleCnt >= FINISH_POLICAR_TACKLE)
+		{ // タックルのカウントが一定数以上になった場合
+			// タックルのカウントを0にする
+			pPolice->tackle.nTackleCnt = 0;
+
+			// 移動量を0にする
+			pPolice->tackle.Tacklemove.x = 0.0f;
+
+			//警察車両の探知処理
+			PatrolCarSearch(pPolice);
+		}
 	}
 
-	// 位置に追加の移動量分足す
-	pPolice->pos + pPolice->tackle.Tacklemove;
+	//--------------------------------------------------------
+	//	位置の更新
+	//--------------------------------------------------------
+	pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+	pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
 }
 
 #ifdef _DEBUG	// デバッグ処理

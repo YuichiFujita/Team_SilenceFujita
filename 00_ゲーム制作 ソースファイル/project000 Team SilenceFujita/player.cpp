@@ -33,11 +33,16 @@
 #define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
 #define REV_MOVE_ROT	(0.085f)	// 移動量による向き変更量の補正係数
 #define SUB_MOVE_VALUE	(10.0f)		// 向き変更時の減速が行われる移動量
-#define SUB_MOVE		(0.2f)		// 向き変更時の減速量
+#define SUB_MOVE		(0.15f)		// 向き変更時の減速量
+#define REV_MOVE_BRAKE	(0.1f)		// ブレーキ時の減速係数
+#define DEL_MOVE_ABS	(1.9f)		// 移動量の削除範囲の絶対値
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
 
+//------------------------------------------------------------
+//	破滅疾走 (スラム・ブースト) マクロ定義
+//------------------------------------------------------------
 #define BOOST_OK_MOVE	(15.0f)		// ブースト使用に必要なプレイヤーの最低速度
 #define BOOST_ADD_MOVE	(0.25f)		// ブーストの加速量
 #define BOOST_SUB_MOVE	(0.08f)		// ブーストの減速量
@@ -48,7 +53,7 @@
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
 
 //------------------------------------------------------------
-//吹飛散風(フライ・アウェイ)のマクロ定義
+//	吹飛散風 (フライ・アウェイ) マクロ定義
 //------------------------------------------------------------
 #define FLYAWAY_INTERVAL_CNT	(3)			// 風の出る間隔
 #define FLYAWAY_SET_CNT			(10)		// 風の出る量
@@ -572,6 +577,22 @@ void MovePlayer(void)
 		// ドリフトしていない状態にする
 		g_player.drift.bDrift = false;
 	}
+
+	if (GetKeyboardPress(DIK_X) == true || GetJoyKeyPress(JOYKEY_X, 0) == true)
+	{ // ブレーキの操作が行われた場合
+
+		// 移動量を減速
+		g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
+
+		// 移動量の補正
+		if (g_player.move.x <=  DEL_MOVE_ABS
+		&&  g_player.move.x >= -DEL_MOVE_ABS)
+		{ // 移動量が削除の範囲内の場合
+
+			// 移動量を削除
+			g_player.move.x = 0.0f;
+		}
+	}
 }
 
 //============================================================
@@ -694,7 +715,7 @@ void DriftPlayer(void)
 //============================================================
 void SlumBoostPlayer(void)
 {
-	if (GetKeyboardPress(DIK_SPACE) == true || GetJoyKeyPress(JOYKEY_B, 0) == true)
+	if (GetKeyboardPress(DIK_SPACE) == true || GetJoyKeyPress(JOYKEY_A, 0) == true)
 	{ // 加速の操作が行われている場合
 
 		// 加速の設定
@@ -707,7 +728,7 @@ void SlumBoostPlayer(void)
 //============================================================
 void FlyAwayPlayer(void)
 {
-	if (GetKeyboardPress(DIK_U) == true || GetJoyKeyPress(JOYKEY_X, 0) == true)
+	if (GetKeyboardPress(DIK_U) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
 	{ // 送風機の操作が行われている場合
 
 		if (GetWindInfo()->state == WIND_USABLE)

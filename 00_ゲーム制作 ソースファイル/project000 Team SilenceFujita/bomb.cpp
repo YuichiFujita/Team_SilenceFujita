@@ -107,7 +107,7 @@ void UpdateBomb(void)
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーの情報
 
-	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_A, 0))
+	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
 	{ // 攻撃モードの変更の操作が行われた場合
 
 		// 攻撃モードを変更
