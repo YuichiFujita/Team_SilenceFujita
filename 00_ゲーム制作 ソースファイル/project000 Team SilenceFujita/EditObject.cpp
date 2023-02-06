@@ -437,7 +437,37 @@ void TypeChangeEdit(void)
 
 	if (g_nStyleObject == EDITSTYLE_OBJECT)
 	{//オブジェクト設置モードだった場合
-		if (GetKeyboardTrigger(DIK_1) == true)
+		if (GetKeyboardTrigger(DIK_1) == true &&
+			GetKeyboardPress(DIK_LSHIFT) == true)
+		{
+			//設定オブジェクトの種類を選択する
+			g_EditObject.nType = (g_EditObject.nType + (MODEL_OBJ_MAX - 1)) % MODEL_OBJ_MAX;
+
+			//設定する
+			g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
+
+			//現在の向きを初期化
+			g_EditObject.CollInfo.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			g_EditObject.CollInfo.stateRot = ROTSTATE_0;
+
+			//現在の当たり判定をロード
+			pEditCollision->pCollision = &pCollision[g_EditObject.nType];
+
+			// 位置情報の初期化
+			for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+			{ // 当たり判定の最大数分繰り返す
+
+				pEditCollision->pos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 位置
+				pEditCollision->vecPos[nCntColl] = pEditCollision->pCollision->vecPos[nCntColl];	// 位置ベクトル
+			}
+
+			//現在のモデル向きをロード
+			g_EditObject.rot = g_aRotObject[g_EditObject.nType];
+
+			//現在のモデル拡大率をロード
+			g_EditObject.scale = g_aScaleObject[g_EditObject.nType];
+		}
+		else if (GetKeyboardTrigger(DIK_1) == true)
 		{//1キーを押した場合
 			//設定オブジェクトの種類を選択する
 			g_EditObject.nType = (g_EditObject.nType + 1) % MODEL_OBJ_MAX;
