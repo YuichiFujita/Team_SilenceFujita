@@ -41,6 +41,9 @@
 #define CLASS_NAME		"WindowClass"		// ウインドウクラスの名前
 #define WINDOW_NAME		"AnarchyCars"		// ウインドウの名前 (キャプションに表示)
 
+#define AI_SETUP_TXT	"data\\TXT\\Ai.txt"			// AI系セットアップ用のテキストファイルの相対パス
+#define OBJ_SETUP_TXT	"data\\TXT\\object.txt"		// オブジェクトセットアップ用のテキストファイルの相対パス
+
 #ifdef _DEBUG	// デバッグ処理
 #define DEBUG_PRINT		(1280)		// デバッグ表示の文字列の最長
 
@@ -54,15 +57,15 @@
 //************************************************************
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);	// ウインドウプロシージャ
 HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow);							// 初期化処理
-void Uninit(void);		// 終了処理
-void Update(void);		// 更新処理
-void Draw(void);		// 描画処理
+void Uninit(void);			// 終了処理
+void Update(void);			// 更新処理
+void Draw(void);			// 描画処理
 
 #ifdef _DEBUG	// デバッグ処理
-void InitDebug(void);	// デバッグの初期化処理
-void UninitDebug(void);	// デバッグの終了処理
-void UpdateDebug(void);	// デバッグの更新処理
-void DrawDebug(void);	// デバッグの描画処理
+void InitDebug(void);		// デバッグの初期化処理
+void UninitDebug(void);		// デバッグの終了処理
+void UpdateDebug(void);		// デバッグの更新処理
+void DrawDebug(void);		// デバッグの描画処理
 
 void DrawDebugEditObject(void);			// エディットオブジェクトモードのデバッグ表示
 void DrawDebugEditCollision(void);		// エディット当たり判定モードのデバッグ表示
@@ -721,29 +724,12 @@ void TxtSetStage(void)
 	// 変数を宣言
 	int         nEnd;			// テキスト読み込み終了の確認用
 	StageLimit  stageLimit;		// ステージの移動範囲の代入用
-	D3DXVECTOR3 pos;			// 位置の代入用
-	D3DXVECTOR3 rot;			// 向きの代入用
-	D3DXVECTOR3 scale;			// 拡大率の代入用
-	D3DXCOLOR   col;			// 色の代入用
-	D3DXVECTOR2 radius;			// 半径の代入用
-	int         nType;			// 種類の代入用
-	int         nBreakType;		// 壊れ方の種類の代入用
-	int         nShadowType;	// 影の種類の代入用
-	int         nCollisionType;	// 当たり判定の種類の代入用
-	int         nNumMat;		// マテリアル数の代入用
-	int         nAnimCnt;		// 再生カウントの代入用
-	int         nAnimPat;		// 再生パターンの代入用
-	int         nAnim;			// アニメーションの ON / OFF の設定用
-	bool        bAnim;			// アニメーションの ON / OFF の代入用
-	bool        bShadow;		// 影の ON / OFF の代入
-	ROTSTATE    stateRot;		// 向き状態
 
 	// 変数配列を宣言
 	char         aString[MAX_STRING];	// テキストの文字列の代入用
-	D3DXMATERIAL aMat[MAX_MATERIAL];	// マテリアルの情報の代入用
 
 	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
+	FILE *pFile;		// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
 	pFile = fopen(STAGE_SETUP_TXT, "r");
@@ -799,11 +785,66 @@ void TxtSetStage(void)
 				// ステージの移動範囲の設定
 				SetLimitStage(stageLimit);
 			}
+		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "ステージファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
+
+//============================================================
+//	オブジェクトのセットアップ処理
+//============================================================
+void TxtSetObject(void)
+{
+	// 変数を宣言
+	int         nEnd;			// テキスト読み込み終了の確認用
+	D3DXVECTOR3 pos;			// 位置の代入用
+	D3DXVECTOR3 rot;			// 向きの代入用
+	D3DXVECTOR3 scale;			// 拡大率の代入用
+	D3DXCOLOR   col;			// 色の代入用
+	D3DXVECTOR2 radius;			// 半径の代入用
+	int         nType;			// 種類の代入用
+	int         nBreakType;		// 壊れ方の種類の代入用
+	int         nShadowType;	// 影の種類の代入用
+	int         nCollisionType;	// 当たり判定の種類の代入用
+	int         nNumMat;		// マテリアル数の代入用
+	int         nAnimCnt;		// 再生カウントの代入用
+	int         nAnimPat;		// 再生パターンの代入用
+	int         nAnim;			// アニメーションの ON / OFF の設定用
+	bool        bAnim;			// アニメーションの ON / OFF の代入用
+	bool        bShadow;		// 影の ON / OFF の代入
+	ROTSTATE    stateRot;		// 向き状態
+
+	// 変数配列を宣言
+	char         aString[MAX_STRING];	// テキストの文字列の代入用
+	D3DXMATERIAL aMat[MAX_MATERIAL];	// マテリアルの情報の代入用
+
+	// ポインタを宣言
+	FILE *pFile;				// ファイルポインタ
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(OBJ_SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
 
 			//------------------------------------------------
 			//	オブジェクトの設定
 			//------------------------------------------------
-			else if (strcmp(&aString[0], "SETSTAGE_OBJECT") == 0)
+			if (strcmp(&aString[0], "SETSTAGE_OBJECT") == 0)
 			{ // 読み込んだ文字列が SETSTAGE_OBJECT の場合
 
 				do
@@ -980,7 +1021,7 @@ void TxtSetStage(void)
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_BILLBOARD") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
-		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
+		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
 		
 		// ファイルを閉じる
 		fclose(pFile);
@@ -989,12 +1030,12 @@ void TxtSetStage(void)
 	{ // ファイルが開けなかった場合
 
 		// エラーメッセージボックス
-		MessageBox(NULL, "ステージファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+		MessageBox(NULL, "オブジェクトファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
 }
 
 //============================================================
-// AI系のセットアップ処理
+//	AI系のセットアップ処理
 //============================================================
 void TxtSetAI(void)
 {
@@ -1630,6 +1671,7 @@ void DrawDebugControlObject(void)
 		"\nオブジェクトの削除：[9] 　"
 		"\nオブジェクトの設置：[0] 　"
 		"\nマテリアルの変更：[SPACE] 　"
+		"\nプレイヤーの位置へ移動：[ALT] 　"
 		"\n当たり判定の種類の変更：[BACKSPACE] 　"
 		"\n当たり判定の調整：[ENTER] 　"
 		"\n--------------------------------------------- 　"
@@ -1737,6 +1779,7 @@ void DrawDebugControlBillboard(void)
 		"\nアニメーション再生：[8] 　"
 		"\nビルボードの削除：[9] 　"
 		"\nビルボードの設置：[0] 　"
+		"\nプレイヤーの位置へ移動：[ALT] 　"
 		"\n--------------------------------------------- 　"
 		"\nビルボードの移動：[W/A/S/D] 　"
 		"\nビルボードの平面移動微調整：[LCTRL+W/A/S/D] 　"
