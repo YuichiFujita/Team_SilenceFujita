@@ -1133,8 +1133,8 @@ void UpDownEditObject(void)
 //=======================================
 void RightAngleEditObject(void)
 {
-	if (GetKeyboardPress(DIK_LSHIFT) == true)
-	{//左SHIFTキーを押している場合
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左CTRLキーを押している場合
 		if (GetKeyboardTrigger(DIK_Q) == true)
 		{//Qキーを押した場合
 			//向きを変える
