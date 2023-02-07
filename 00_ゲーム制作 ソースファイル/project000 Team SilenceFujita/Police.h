@@ -68,6 +68,7 @@ typedef struct
 	bool		bUse;					// 使用しているか
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
 	CARCURVE	policeCurve;			// 曲がり角関係の情報
+	CARCURVE	policeCurveCopy;		// 曲がり角の情報のコピー
 	PoliTackle tackle;					// タックル関係の変数
 }Police;
 

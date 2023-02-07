@@ -980,16 +980,55 @@ void TxtSetStage(void)
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_BILLBOARD") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
+		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "ステージファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
+
+//============================================================
+// AI系のセットアップ処理
+//============================================================
+void TxtSetAI(void)
+{
+	// 変数を宣言
+	int         nEnd;			// テキスト読み込み終了の確認用
+	D3DXVECTOR3 pos;			// 位置の代入用
+
+	// 変数配列を宣言
+	char         aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE *pFile;				// ファイルポインタ
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(AI_SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
 
 			//------------------------------------------------
 			//	車の設定
 			//------------------------------------------------
-			else if (strcmp(&aString[0], "SETSTAGE_CAR") == 0)
+			if (strcmp(&aString[0], "SETSTAGE_CAR") == 0)
 			{ // 読み込んだ文字列が SETSTAGE_CAR の場合
 				do
 				{ // 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
 
-					// ファイルから文字列を読み込む
+				  // ファイルから文字列を読み込む
 					fscanf(pFile, "%s", &aString[0]);
 
 					if (strcmp(&aString[0], "SET_CAR") == 0)
@@ -998,7 +1037,7 @@ void TxtSetStage(void)
 						do
 						{ // 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
-							// ファイルから文字列を読み込む
+						  // ファイルから文字列を読み込む
 							fscanf(pFile, "%s", &aString[0]);
 
 							if (strcmp(&aString[0], "POS") == 0)
@@ -1009,7 +1048,7 @@ void TxtSetStage(void)
 
 						} while (strcmp(&aString[0], "END_SET_CAR") != 0);					// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
-						 // 車の設定
+																							// 車の設定
 						SetCar(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
@@ -1032,7 +1071,7 @@ void TxtSetStage(void)
 						do
 						{ // 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
-							// ファイルから文字列を読み込む
+						  // ファイルから文字列を読み込む
 							fscanf(pFile, "%s", &aString[0]);
 
 							if (strcmp(&aString[0], "POS") == 0)
@@ -1043,7 +1082,7 @@ void TxtSetStage(void)
 
 						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);	// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
-						// 人間の設定
+																				// 人間の設定
 						SetHuman(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
@@ -1077,13 +1116,13 @@ void TxtSetStage(void)
 
 						} while (strcmp(&aString[0], "END_SET_POLICE") != 0);	// 読み込んだ文字列が END_SET_POLICE ではない場合ループ
 
-						// 警察の設定
+																				// 警察の設定
 						SetPolice(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_POLICE") != 0);		// 読み込んだ文字列が END_SETSTAGE_POLICE ではない場合ループ
 			}
 		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
-		
+
 		// ファイルを閉じる
 		fclose(pFile);
 	}
@@ -1091,7 +1130,7 @@ void TxtSetStage(void)
 	{ // ファイルが開けなかった場合
 
 		// エラーメッセージボックス
-		MessageBox(NULL, "ステージファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+		MessageBox(NULL, "AI系ファイルの読み込みに失敗！", "NDK?www", MB_ICONWARNING);
 	}
 }
 
