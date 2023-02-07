@@ -167,6 +167,9 @@ void InitGame(void)
 	// ステージのセットアップ
 	TxtSetStage();
 
+	// オブジェクトのセットアップ
+	TxtSetObject();
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
 	InitEditmain();

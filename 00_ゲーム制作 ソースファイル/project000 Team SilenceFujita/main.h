@@ -36,7 +36,6 @@
 #define FVF_VERTEX_3D		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 頂点フォーマット [3D]
 
 #define STAGE_SETUP_TXT		"data\\TXT\\stage.txt"		// ステージセットアップ用のテキストファイルの相対パス
-#define AI_SETUP_TXT		"data\\TXT\\Ai.txt"			// AI系セットアップ用のテキストファイルの相対パス
 
 #define SCREEN_WIDTH		(1280)			// ウインドウの幅
 #define SCREEN_HEIGHT		(720)			// ウインドウの高さ
@@ -126,6 +125,7 @@ typedef struct
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void TxtSetStage(void);					// ステージのセットアップ処理
+void TxtSetObject(void);				// オブジェクトのセットアップ処理
 void TxtSetAI(void);					// AI系のセットアップ処理
 void SetMode(MODE mode);				// モードの設定処理
 MODE GetMode(void);						// モードの取得処理

@@ -13,6 +13,7 @@
 #include "billboard.h"
 #include "EditObject.h"
 #include "Editmain.h"
+#include "player.h"
 
 //マクロ定義
 #define INIT_RADIUS							(30.0f)					// 半径の初期値
@@ -39,6 +40,7 @@ void CustomBillboardAnim(void);							//ビルボードのアニメーションカスタム処理
 void ReplayBillboard(void);								//ビルボードのアニメーション再生処理
 void UpDownEditBillboard(void);							//ビルボードの上下移動処理
 void CustomShadowBillboard(void);						//影のカスタム処理
+void PlayerPosSetEditBillboard(void);					//ビルボードのプレイヤー位置移動
 
 //グローバル変数
 EditBillboard g_EditBillboard;							//ビルボードの情報
@@ -260,6 +262,9 @@ void UpdateEditBillboard(void)
 
 	//ビルボードの上下移動処理
 	UpDownEditBillboard();
+
+	//ビルボードのプレイヤー位置移動
+	PlayerPosSetEditBillboard();
 }
 
 //=====================================
@@ -939,6 +944,22 @@ void CustomShadowBillboard(void)
 	{//2キーを押した場合
 		//影を切り替える
 		g_EditBillboard.bShadow = g_EditBillboard.bShadow ? false : true;
+	}
+}
+
+//=======================================
+//ビルボードのプレイヤー位置移動
+//=======================================
+void PlayerPosSetEditBillboard(void)
+{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+
+	if (GetKeyboardTrigger(DIK_LMENU) == true)
+	{ // 左の ALTキーが押された場合
+
+		// プレイヤーの位置に位置を移動
+		g_EditBillboard.pos = pPlayer->pos;
 	}
 }
 
