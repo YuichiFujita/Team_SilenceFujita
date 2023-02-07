@@ -96,6 +96,16 @@ typedef enum
 }HUMANACTIONSTATE;
 
 //**********************************************************************************************************************
+//	列挙型定義(ROADPOS)
+//**********************************************************************************************************************
+typedef enum
+{
+	ROADPOS_RIGHT = 0,					// 曲がり角より右を歩いている
+	ROADPOS_LEFT,						// 曲がり角より左を歩いている
+	ROADPOS_MAX							// この列挙型の総数
+}ROADPOS;
+
+//**********************************************************************************************************************
 //	曲がり角の構造体(HUMANCURVEINFO)
 //**********************************************************************************************************************
 typedef struct
@@ -105,6 +115,7 @@ typedef struct
 	int nNowCurve;								// 現在の曲がり角
 	int nCurveTime;								// 曲がる回数
 	DASHANGLE dashAngle[MAX_HUMAN_CURVE];		// どの方向に走っているか
+	ROADPOS roadPos[MAX_HUMAN_CURVE];			// 曲がり角よりどっちを歩いているか
 }HUMANCURVEINFO;
 
 //**********************************************************************************************************************
@@ -116,6 +127,7 @@ typedef struct
 	int					nRandamRoute;				// 走るルート
 	D3DXVECTOR3			rotDest;					// 目標の向き
 	HUMANACTIONSTATE	actionState;				// 行動パターン
+	float				fWalkRand;					// 歩く幅の差異
 }HUMANCURVE;
 
 //**********************************************************************************************************************
@@ -127,6 +139,7 @@ CURVEINFO GetCurveInfo(int nID);		// 曲がり角の位置の取得処理
 void LoadCurveTxt(void);				// カーブテキストのロード処理
 
 void SetCurvePoint(void);				// 曲がり角の設定処理
+void LoadHumanCurveTxt(void);			// 人間のルートのロード処理
 HUMANCURVEINFO GetHumanRoute(int nID);	// 人間のルートの取得処理
 float GetDefaultRot(int nID);			// 人間の初期向きの取得処理
 

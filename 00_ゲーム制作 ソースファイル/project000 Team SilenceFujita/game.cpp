@@ -86,6 +86,12 @@ void InitGame(void)
 	// カーブテキストのロード処理
 	LoadCurveTxt();
 
+	// 人間のルートのロード処理
+	LoadHumanCurveTxt();
+
+	// 曲がり角の設定処理
+	SetCurvePoint();
+
 	// 天気の初期化処理
 	InitWeather();
 
