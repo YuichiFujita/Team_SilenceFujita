@@ -100,6 +100,20 @@ void InitCar(void)
 
 	//é‘ÇÃê›íËèàóù
 	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+
 }
 
 //======================================================================================================================
