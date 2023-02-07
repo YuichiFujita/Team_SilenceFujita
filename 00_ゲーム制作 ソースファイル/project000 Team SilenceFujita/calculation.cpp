@@ -93,14 +93,11 @@ void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
 //==================================================================================
 // Œü‚«‚Ì³‹K‰»
 //==================================================================================
-float RotNormalize(float rot)
+void RotNormalize(float *rot)
 {
 	//--------------------------------------------------------
 	//	Œü‚«‚Ì³‹K‰»
 	//--------------------------------------------------------
-	if (rot > D3DX_PI) { rot -= D3DX_PI * 2; }
-	else if (rot < -D3DX_PI) { rot += D3DX_PI * 2; }
-
-	// Œü‚«‚ð•Ô‚·
-	return rot;
+	if (*rot > D3DX_PI) { *rot -= D3DX_PI * 2; }
+	else if (*rot < -D3DX_PI) { *rot += D3DX_PI * 2; }
 }

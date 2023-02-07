@@ -40,8 +40,6 @@
 #define MAX_HUMAN_FORWARD			(10.0f)		// 前進時の最高速度
 #define MAX_HUMAN_BACKWARD			(8.0f)		// 後退時の最高速度
 #define REV_HUMAN_MOVE_SUB			(0.04f)		// 移動量の減速係数
-#define HUMAN_WIDTH					(10.0f)		// 人の縦幅
-#define HUMAN_DEPTH					(10.0f)		// 人の奥行
 #define HUMAN_CURVE_ADD				(0.03f)		// 曲がり角での向きの加算数
 
 //**********************************************************************************************************************
@@ -585,7 +583,7 @@ void WalkHuman(Human *pHuman)
 		if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_RIGHT)
 		{ // 右に曲がる場合
 
-			if (pHuman->pos.x >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x - (HUMAN_WIDTH * 2))
+			if (pHuman->pos.x >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x)
 			{ // 目的地に着いたら
 
 				// カーブ状態になる
@@ -595,12 +593,12 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 左の壁に這わせる
-				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z - (HUMAN_WIDTH * 2);
+				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 			}
 		}
 		else if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_LEFT)
 		{ // 左に曲がる場合
-			if (pHuman->pos.x >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x + (HUMAN_WIDTH * 2))
+			if (pHuman->pos.x >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x)
 			{ // 目的地に着いたら
 
 				// カーブ状態になる
@@ -610,7 +608,7 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 左の壁に這わせる
-				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z - (HUMAN_WIDTH * 2);
+				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 			}
 		}
 	}
@@ -618,7 +616,7 @@ void WalkHuman(Human *pHuman)
 	{ // 左に走っている場合
 		if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_RIGHT)
 		{//右に曲がる場合
-			if (pHuman->pos.x <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x + (HUMAN_WIDTH * 2))
+			if (pHuman->pos.x <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x)
 			{ // 目的地に着いたら
 
 				// カーブ状態になる
@@ -628,12 +626,12 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 手前の壁に這わせる
-				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z + (HUMAN_WIDTH * 2);
+				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 			}
 		}
 		else if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_LEFT)
 		{//左に曲がる場合
-			if (pHuman->pos.x <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x - (HUMAN_WIDTH * 2))
+			if (pHuman->pos.x <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x)
 			{ // 目的地に着いたら
 
 				// カーブ状態になる
@@ -643,7 +641,7 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 手前の壁に這わせる
-				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z + (HUMAN_WIDTH * 2);
+				pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 			}
 		}
 	}
@@ -651,7 +649,7 @@ void WalkHuman(Human *pHuman)
 	{ // 奥に走っている場合
 		if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_RIGHT)
 		{//右に曲がる場合
-			if (pHuman->pos.z >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z - (HUMAN_WIDTH * 2))
+			if (pHuman->pos.z >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z)
 			{ // 目的地に着いたら
 
 				// カーブ状態になる
@@ -661,12 +659,12 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 右の壁に這わせる
-				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x + (HUMAN_WIDTH * 2);
+				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 			}
 		}
 		else if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_LEFT)
 		{ // 左に曲がる場合
-			if (pHuman->pos.z >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z + (HUMAN_WIDTH * 2))
+			if (pHuman->pos.z >= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z)
 			{ // 目的地に着いたら
 
 				// カーブ状態になる
@@ -676,7 +674,7 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 右の壁に這わせる
-				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x + (HUMAN_WIDTH * 2);
+				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 			}
 		}
 	}
@@ -684,7 +682,7 @@ void WalkHuman(Human *pHuman)
 	{ // 手前に走っている場合
 		if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_RIGHT)
 		{ // 右に曲がる場合
-			if (pHuman->pos.z <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z + (HUMAN_WIDTH * 2))
+			if (pHuman->pos.z <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z)
 			{ // 左にある壁が途切れたら
 
 				// カーブ状態になる
@@ -694,12 +692,12 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 左の壁に這わせる
-				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x - (HUMAN_WIDTH * 2);
+				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 			}
 		}
 		else if (pHuman->curveInfo.curveInfo.curveAngle[pHuman->curveInfo.curveInfo.nNowCurve] == CURVE_LEFT)
 		{ // 左に曲がる場合
-			if (pHuman->pos.z <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z - (HUMAN_WIDTH * 2))
+			if (pHuman->pos.z <= pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z)
 			{ // 左にある壁が途切れたら
 
 				// カーブ状態になる
@@ -709,7 +707,7 @@ void WalkHuman(Human *pHuman)
 			{ // 左にある壁がまだあったら
 
 				// 左の壁に這わせる
-				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x - (HUMAN_WIDTH * 2);
+				pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 			}
 		}
 	}
@@ -883,7 +881,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 右に走っている場合
 
 			// 位置を補正する
-			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x + (HUMAN_WIDTH * 2);
+			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = 0.0f;
@@ -892,7 +890,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 左に走っている場合
 
 			// 位置を補正する
-			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x - (HUMAN_WIDTH * 2);
+			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = -D3DX_PI;
@@ -901,7 +899,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 奥に走っている場合
 
 			// 位置を補正する
-			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z + (HUMAN_WIDTH * 2);
+			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = -D3DX_PI * 0.5f;
@@ -910,7 +908,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 手前に走っている場合
 
 			// 位置を補正する
-			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z - (HUMAN_WIDTH * 2);
+			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = D3DX_PI * 0.5f;
@@ -956,7 +954,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 右に走っている場合
 
 			//位置を補正する
-			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x - (HUMAN_WIDTH * 2);
+			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = D3DX_PI;
@@ -965,7 +963,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 左に走っている場合
 
 			// 位置を補正する
-			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x + (HUMAN_WIDTH * 2);
+			pHuman->pos.x = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = 0.0f;
@@ -974,7 +972,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 奥に走っている場合
 
 			// 位置を補正する
-			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z - (HUMAN_WIDTH * 2);
+			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = D3DX_PI * 0.5f;
@@ -983,7 +981,7 @@ void CurveRotHuman(Human *pHuman)
 		{ // 手前に走っている場合
 
 			// 位置を補正する
-			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z + (HUMAN_WIDTH * 2);
+			pHuman->pos.z = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z;
 
 			// 目標の向きを設定する
 			pHuman->curveInfo.rotDest.y = -D3DX_PI * 0.5f;
@@ -1015,7 +1013,7 @@ void CurveRotHuman(Human *pHuman)
 	}
 
 	// 向きの正規化
-	pHuman->rot.y = RotNormalize(pHuman->rot.y);
+	RotNormalize(&pHuman->rot.y);
 }
 
 #ifdef _DEBUG	// デバッグ処理

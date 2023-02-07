@@ -461,7 +461,7 @@ void PosCar(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove)
 void RevCar(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 {
 	// Œü‚«‚Ì³‹K‰»
-	rot->y = RotNormalize(rot->y);
+	RotNormalize(&rot->y);
 
 	//--------------------------------------------------------
 	//	ˆÚ“®”ÍˆÍ‚Ì•â³
