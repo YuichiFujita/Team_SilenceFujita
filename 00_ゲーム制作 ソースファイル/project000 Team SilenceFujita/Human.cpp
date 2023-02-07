@@ -1013,7 +1013,7 @@ void CurveRotHuman(Human *pHuman)
 	}
 
 	// 向きの正規化
-	pHuman->rot.y = RotNormalize(pHuman->rot.y);
+	RotNormalize(&pHuman->rot.y);
 }
 
 #ifdef _DEBUG	// デバッグ処理

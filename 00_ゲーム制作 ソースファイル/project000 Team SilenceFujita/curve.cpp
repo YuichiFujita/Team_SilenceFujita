@@ -310,7 +310,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 	}
 
 	// Œü‚«‚Ì³‹K‰»
-	rot->y = RotNormalize(rot->y);
+	RotNormalize(&rot->y);
 }
 
 //============================================================

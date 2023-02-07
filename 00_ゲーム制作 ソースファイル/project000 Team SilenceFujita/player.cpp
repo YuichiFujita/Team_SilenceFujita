@@ -648,7 +648,7 @@ void PosPlayer(void)
 void RevPlayer(void)
 {
 	// Œü‚«‚Ì³‹K‰»
-	g_player.rot.y = RotNormalize(g_player.rot.y);
+	RotNormalize(&g_player.rot.y);
 
 	//--------------------------------------------------------
 	//	ˆÚ“®”ÍˆÍ‚Ì•â³
