@@ -29,6 +29,9 @@
 #define BOMB_FRONT_PLUS	(100.0f)				// プレイヤーの前方位置の計算用
 #define BOMB_LEFT_PLUS	(BOMB_RADIUS + 100.0f)	// 車の位置関係の設定用ベクトルの計算用
 
+#define BOMB_XZ_ADD		(90.0f)		// ボム発射位置の xz加算量
+#define BOMB_Y_ADD		(155.0f)	// ボム発射位置の y加算量
+
 #define LAND_CNT		(20)		// 着弾時のカウント
 #define SET_CNT			(2400)		// 完成時のカウント
 #define ENLARGE_SCALE	(10.0f)		// 拡大率の補正値
@@ -77,6 +80,7 @@ typedef struct
 typedef struct
 {
 	D3DXVECTOR3  pos;		// 位置
+	D3DXVECTOR3  move;		// 移動量
 	D3DXVECTOR3  rot;		// 向き
 	D3DXVECTOR3  scale;		// 拡大率
 	D3DXMATRIX   mtxWorld;	// ワールドマトリックス
@@ -99,6 +103,8 @@ void SortBomb(void);		// ボムの配列のソート
 void ChangeAim(void);		// 狙いの変更
 void CurrentAim(void);		// 選択中の車両判定
 void SetAim(void);			// 狙い状態の設定
+
+void MoveBarrier(int nCntBarrier);
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -135,6 +141,7 @@ void InitBomb(void)
 	{ // バリアの最大表示数分繰り返す
 
 		g_aBarrier[nCntBarrier].pos       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
+		g_aBarrier[nCntBarrier].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
 		g_aBarrier[nCntBarrier].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 		g_aBarrier[nCntBarrier].scale     = D3DXVECTOR3(1.0f, 1.0f, 1.0f);			// 拡大率
 		g_aBarrier[nCntBarrier].state     = BARRIERSTATE_NONE;						// 状態
@@ -214,10 +221,9 @@ void UpdateBomb(void)
 
 			case BARRIERSTATE_FLY:		// 発射中状態
 
-				/////////////////////////////////////
-				// [※] ここにy座標で着地したかを見る
-				//if ()
-				/////////////////////////////////////
+				MoveBarrier(nCntBarrier);
+
+				if (g_aBarrier[nCntBarrier].pos.y <= 0.0f)
 				{ // y座標が 0.0f以下の場合 (着弾)
 
 					// y座標を補正
@@ -427,6 +433,7 @@ void DrawBomb(void)
 //======================================================================================================================
 void ShotBomb(void)
 {
+#if 1
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーの情報
 	Car    *pCar;					// 車の情報
@@ -444,8 +451,17 @@ void ShotBomb(void)
 				if (g_aBarrier[nCntBarrier].bUse == false)
 				{ // バリアが使用されていない場合
 
+					// 発射位置を設定
+					g_aBarrier[nCntBarrier].pos.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * BOMB_XZ_ADD;	// x
+					g_aBarrier[nCntBarrier].pos.y = pPlayer->pos.y + BOMB_Y_ADD;							// y
+					g_aBarrier[nCntBarrier].pos.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * BOMB_XZ_ADD;	// z
+
+					// 移動量を設定
+					g_aBarrier[nCntBarrier].move.x = sinf(pPlayer->rot.y) * (5.0f + pPlayer->move.x + pPlayer->boost.plusMove.x);	// x
+					g_aBarrier[nCntBarrier].move.y = 15.0f;																			// y
+					g_aBarrier[nCntBarrier].move.z = cosf(pPlayer->rot.y) * (5.0f + pPlayer->move.x + pPlayer->boost.plusMove.x);	// z
+
 					// ボムの情報を代入
-					g_aBarrier[nCntBarrier].pos  = g_aBomb[g_nID].pos;	// 位置
 					g_aBarrier[nCntBarrier].type = g_aBomb[g_nID].type;	// 種類
 					g_aBarrier[nCntBarrier].pCar = g_aBomb[g_nID].pCar;	// 車アドレス
 
@@ -499,6 +515,7 @@ void ShotBomb(void)
 			}
 		}
 	}
+#endif
 }
 
 //======================================================================================================================
@@ -804,6 +821,94 @@ void SetAim(void)
 			break;
 		}
 	}
+}
+
+void MoveBarrier(int nCntBarrier)
+{
+	// 変数を宣言
+	D3DXVECTOR3 destPos;					// ホーミング目標位置
+	D3DXVECTOR2 moveRot, destRot, diffRot;	// ホーミング計算用
+
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();			// プレイヤーの情報
+	Car    *pCar;							// 車の情報
+	Police *pPolice;						// 警察の情報
+
+	switch (g_aBarrier[nCntBarrier].type)
+	{ // 現在狙い中の車の種類ごとの処理
+	case BOMBTYPE_CAR:		// 車
+
+		// 狙っている車のアドレスを代入
+		pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
+
+		// 目標位置を代入
+		destPos = pCar->pos;
+
+		// 処理を抜ける
+		break;
+
+	case BOMBTYPE_POLICE:	// 警察
+
+		// 狙っている警察のアドレスを代入
+		pPolice = (Police*)g_aBarrier[nCntBarrier].pCar;
+
+		// 目標位置を代入
+		destPos = pPolice->pos;
+
+		// 処理を抜ける
+		break;
+	}
+
+#if 0
+	// 現在の移動方向を求める
+	moveRot.x = atan2f(g_aBarrier[nCntBarrier].move.x, g_aBarrier[nCntBarrier].move.z);
+	moveRot.y = atan2f(g_aBarrier[nCntBarrier].move.x, g_aBarrier[nCntBarrier].move.y);
+
+	//// 向きの正規化
+	//moveRot.x = RotNormalize(moveRot.x);
+	//moveRot.y = RotNormalize(moveRot.y);
+
+	// 目標の移動方向を求める
+	destRot.x = atan2f(destPos.x - g_aBarrier[nCntBarrier].pos.x, destPos.z - g_aBarrier[nCntBarrier].pos.z);
+	destRot.y = atan2f(destPos.x - g_aBarrier[nCntBarrier].pos.x, destPos.y - g_aBarrier[nCntBarrier].pos.y);
+
+	//// 向きの正規化
+	//destRot.x = RotNormalize(destRot.x);
+	//destRot.y = RotNormalize(destRot.y);
+
+	// 目標までの差分を求める
+	diffRot.x = destRot.x - moveRot.x;
+	diffRot.y = destRot.y - moveRot.y;
+
+	// 向きの正規化
+	diffRot.x = RotNormalize(diffRot.x);
+	diffRot.y = RotNormalize(diffRot.y);
+
+	// 移動方向を補正
+	moveRot.x += diffRot.x * 1.0f;
+	moveRot.y += diffRot.y * 1.0f;
+
+	// 向きの正規化
+	moveRot.x = RotNormalize(moveRot.x);
+	moveRot.y = RotNormalize(moveRot.y);
+
+	//// 移動方向を設定
+	//g_aBarrier[nCntBarrier].move.x = 5.0f * sinf(moveRot.x) * sinf(moveRot.y);
+	//g_aBarrier[nCntBarrier].move.y = 5.0f * cosf(moveRot.x);
+	//g_aBarrier[nCntBarrier].move.z = 5.0f * sinf(moveRot.x) * cosf(moveRot.y);
+
+	g_aBarrier[nCntBarrier].move.x = 30.0f * sinf(moveRot.x);
+	g_aBarrier[nCntBarrier].move.z = 30.0f * cosf(moveRot.x);
+
+	//g_aBarrier[nCntBarrier].move.x = 5.0f * sinf(moveRot.y);
+	g_aBarrier[nCntBarrier].move.y = 30.0f * cosf(moveRot.y);
+#endif
+
+	// 位置を移動
+	g_aBarrier[nCntBarrier].pos += g_aBarrier[nCntBarrier].move;
+
+	// 重力を与える
+	g_aBarrier[nCntBarrier].move.y -= 0.5f;
 }
 
 #ifdef _DEBUG	// デバッグ処理
