@@ -146,9 +146,9 @@ void UpdatePolice(void)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
-			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BARRIER)
+			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
-			// 前回位置の更新
+				// 前回位置の更新
 				g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
 				// プレイヤーの着地の更新処理

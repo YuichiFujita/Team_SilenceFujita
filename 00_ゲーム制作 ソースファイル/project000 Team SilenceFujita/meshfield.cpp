@@ -23,12 +23,13 @@
 //**********************************************************************************************************************
 const char *apTextureMeshField[] =		// テクスチャの相対パス
 {
-	"data\\TEXTURE\\road000.png",		// 直線のテクスチャの相対パス
-	"data\\TEXTURE\\road001.png",		// 曲がり角度のテクスチャの相対パス
-	"data\\TEXTURE\\road002.png",		// 交差点のテクスチャの相対パス
-	"data\\TEXTURE\\road003.png",		// 丁字路のテクスチャの相対パス
-	"data\\TEXTURE\\sidewalk000.png",	// 歩道のテクスチャの相対パス
-	"data\\TEXTURE\\Tile.jpg",			// タイルのテクスチャの相対パス
+	"data\\TEXTURE\\road000.png",			// 直線のテクスチャの相対パス
+	"data\\TEXTURE\\road001.png",			// 曲がり角度のテクスチャの相対パス
+	"data\\TEXTURE\\road002.png",			// 交差点のテクスチャの相対パス
+	"data\\TEXTURE\\road003.png",			// 丁字路のテクスチャの相対パス
+	"data\\TEXTURE\\sidewalk000.png",		// 歩道のテクスチャの相対パス
+	"data\\TEXTURE\\Tile.jpg",				// タイルのテクスチャの相対パス
+	"data\\TEXTURE\\shopping_street.jpg",	// 商店街の道のテクスチャの相対パス
 };
 
 const D3DXCOLOR aColorMeshField[] =		// マップの地面カラー
@@ -51,6 +52,7 @@ typedef enum
 	TEXTURE_MESHFIELD_ROAD_TJUNC,		// (道路) 丁字路
 	TEXTURE_MESHFIELD_SIDEWALK,			// 歩道
 	TEXTURE_MESHFIELD_TILE,				// タイル
+	TEXTURE_MESHFIELD_SHOPPING_STREET,	// 商店街の道
 	TEXTURE_MESHFIELD_MAX,				// この列挙型の総数
 } TEXTURE_MESHFIELD;
 

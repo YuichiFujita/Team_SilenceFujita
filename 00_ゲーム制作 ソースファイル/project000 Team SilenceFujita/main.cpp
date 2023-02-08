@@ -416,7 +416,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_TITLE;	// モードをタイトルに初期化
+	g_mode = MODE_GAME;	// モードをタイトルに初期化
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -1685,7 +1685,7 @@ void DrawDebugControlObject(void)
 		"\nオブジェクトの縦の移動：[LSHIFT+W/S] 　"
 		"\nオブジェクトの縦移動微調整：[LSHIFT+LCTRL+W/S] 　"
 		"\nオブジェクトの縦の位置の初期化：[LSHIFT+A/D] 　"
-		"\nオブジェクトの15度回転：[LSHIFT+Q/E] 　"
+		"\nオブジェクトの15度回転：[LCTRL+Q/E] 　"
 		"\n当たり判定の90度回転：[Z/C] 　"
 		"\n--------------------------------------------- 　"
 		"\nマテリアルのR値の変更：[LSHIFT+R/F] 　"

@@ -140,6 +140,9 @@ void InitGame(void)
 	// 送風機の初期化
 	InitWind();
 
+	// 爆弾の初期化
+	InitBomb();
+
 	// エフェクトの初期化
 	InitEffect();
 
@@ -174,10 +177,6 @@ void InitGame(void)
 	// エディットメインの初期化
 	InitEditmain();
 #endif
-
-
-	// 爆弾の初期化
-	InitBomb();
 }
 
 //======================================================================================================================
@@ -233,6 +232,9 @@ void UninitGame(void)
 	// 送風機の終了
 	UninitWind();
 
+	// 爆弾の終了
+	UninitBomb();
+
 	// エフェクトの終了
 	UninitEffect();
 
@@ -261,10 +263,6 @@ void UninitGame(void)
 	// エディットメインの終了
 	UninitEditmain();
 #endif
-
-
-	// 爆弾の終了
-	UninitBomb();
 }
 
 //======================================================================================================================
@@ -576,14 +574,14 @@ void DrawGame(void)
 	// タイヤ痕の描画
 	DrawTireMark();
 
+	// オブジェクトの描画
+	DrawObject();
+
 	// 警察の描画
 	DrawPolice();
 
 	// 車の描画処理
 	DrawCar();
-
-	// オブジェクトの描画
-	DrawObject();
 
 	// 人間の描画
 	DrawHuman();
@@ -594,6 +592,9 @@ void DrawGame(void)
 	// 風の描画
 	DrawWind();
 
+	// 爆弾の描画
+	DrawBomb();
+
 	// エフェクトの描画
 	DrawEffect();
 
@@ -602,7 +603,6 @@ void DrawGame(void)
 
 	// 天気の描画処理
 	DrawWeather();
-
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードの場合
@@ -611,10 +611,6 @@ void DrawGame(void)
 		DrawEditmain();
 	}
 #endif
-
-
-	// 爆弾の描画
-	DrawBomb();
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	マップカメラの描画
@@ -632,6 +628,7 @@ void DrawGame(void)
 	SetCamera(CAMERATYPE_UI);
 
 #if 1
+
 	// 体力バーの描画
 	DrawLife();
 

@@ -125,7 +125,7 @@ void UpdateCar(void)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aCar[nCntCar].bUse == true)
 		{ // オブジェクトが使用されている場合
-			if (g_aCar[nCntCar].bombState != BOMBSTATE_BARRIER)
+			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
 				// 前回位置の更新
 				g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;
