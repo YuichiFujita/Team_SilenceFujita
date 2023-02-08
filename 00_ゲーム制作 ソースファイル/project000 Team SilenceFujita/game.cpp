@@ -352,8 +352,11 @@ void UpdateGame(void)
 			// メッシュウォールの更新
 			UpdateMeshWall();
 
-			// 風の更新
+			// 送風機の更新
 			UpdateWind();
+
+			// 爆弾の更新
+			UpdateBomb();
 
 			// プレイヤーの更新
 			UpdatePlayer();
@@ -496,8 +499,11 @@ void UpdateGame(void)
 		// ビルボードの更新
 		UpdateBillboard();
 
-		// 風の更新
+		// 送風機の更新
 		UpdateWind();
+
+		// 爆弾の更新
+		UpdateBomb();
 
 		// カメラの更新
 		UpdateCamera();
@@ -533,10 +539,6 @@ void UpdateGame(void)
 		UpdatePause();
 	}
 #endif
-
-
-	// 爆弾の更新
-	UpdateBomb();
 }
 
 //======================================================================================================================
@@ -589,7 +591,7 @@ void DrawGame(void)
 	// ビルボードの描画
 	DrawBillboard();
 
-	// 風の描画
+	// 送風機の描画
 	DrawWind();
 
 	// 爆弾の描画

@@ -42,7 +42,7 @@ int g_NumWeather;			// 降っている数を取得する
 void InitWeather(void)
 {
 	// 天気を設定する
-	g_Weather = WEATHERTYPE_RAIN;
+	g_Weather = WEATHERTYPE_SNOW;
 
 	// 総数を初期化する
 	g_NumWeather = 0;
@@ -232,7 +232,7 @@ void UpdateWeather(void)
 	case WEATHERTYPE_RAIN:		// 雨
 
 		// 雨の更新処理
-		UpdateRain();									
+		UpdateRain();
 
 		break;					// 抜け出す
 
@@ -466,6 +466,11 @@ void DrawWeather(void)
 
 	case WEATHERTYPE_SNOW:		// 雪
 
+		// αブレンディングを加算合成に設定
+		pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+
 		for (int nCntWeather = 0; nCntWeather < MAX_SNOW; nCntWeather++)
 		{ // エフェクトの最大表示数分繰り返す
 
@@ -504,6 +509,11 @@ void DrawWeather(void)
 				pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntWeather * 4, 2);
 			}
 		}
+
+		// αブレンディングを元に戻す
+		pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 		break;					// 抜け出す
 	}
