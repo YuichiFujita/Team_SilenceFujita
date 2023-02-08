@@ -98,8 +98,16 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.fRadius  = 0.0f;					// 半径
 	}
 
-	////車の設定処理
-	//SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	//車の設定処理
+	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-4000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-5000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-6000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-7000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-8000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-9000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-10000.0f, 0.0f, 3000.0f));
+	SetCar(D3DXVECTOR3(-11000.0f, 0.0f, 3000.0f));
 }
 
 //======================================================================================================================
@@ -119,7 +127,7 @@ void UpdateCar(void)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aCar[nCntCar].bUse == true)
 		{ // オブジェクトが使用されている場合
-			if (g_aCar[nCntCar].bombState != BOMBSTATE_BARRIER)
+			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
 				// 前回位置の更新
 				g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;
