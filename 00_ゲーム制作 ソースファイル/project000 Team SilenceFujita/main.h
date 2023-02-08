@@ -125,6 +125,8 @@ typedef struct
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void TxtSetStage(void);					// ステージのセットアップ処理
+void TxtSetObject(void);				// オブジェクトのセットアップ処理
+void TxtSetAI(void);					// AI系のセットアップ処理
 void SetMode(MODE mode);				// モードの設定処理
 MODE GetMode(void);						// モードの取得処理
 void SetLimitStage(StageLimit limit);	// ステージの移動範囲の設定処理

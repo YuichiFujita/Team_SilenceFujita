@@ -146,9 +146,9 @@ void UpdatePolice(void)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
-			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BARRIER)
+			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
-			// 前回位置の更新
+				// 前回位置の更新
 				g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
 				// プレイヤーの着地の更新処理
@@ -602,7 +602,7 @@ void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove
 void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 {
 	// 向きの正規化
-	rot->y = RotNormalize(rot->y);
+	RotNormalize(&rot->y);
 
 	//--------------------------------------------------------
 	//	移動範囲の補正

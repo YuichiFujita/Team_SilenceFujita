@@ -395,10 +395,16 @@ void SetEffect(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, int nLife, floa
 void EffectSparkUpdate(Effect *pEffect)
 {
 	// 下に移動量を足していく
-	pEffect->move.y -= 0.5f;
+	pEffect->move.y -= 1.0f;
 
 	// 火花を赤くしていく
-	pEffect->col.g -= 0.125f;
+	pEffect->col.g -= 0.05f;
+
+	if (pEffect->col.g <= 0.5f)
+	{ // 一定の値以下になった場合
+		// G値を補正する
+		pEffect->col.g = 0.5f;
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理

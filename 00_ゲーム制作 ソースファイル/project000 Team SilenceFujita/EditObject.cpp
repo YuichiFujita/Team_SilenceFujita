@@ -16,6 +16,7 @@
 #include "Shadow.h"
 #include "EditBillboard.h"
 #include "SoundDJ.h"
+#include "player.h"
 
 //マクロ定義
 #define EDITOBJ_SELECT_MATERIAL_ALPHA	(1.0f)		// 選択中のマテリアルの透明度
@@ -50,6 +51,7 @@ void CollisionEdit(void);			//オブジェクトの当たり判定のエディット処理
 void UpDownEditObject(void);		//オブジェクトの上下移動処理
 void RightAngleEditObject(void);	//オブジェクトの直角処理
 void CollisionRotationEdit(void);	//当たり判定の回転処理
+void PlayerPosSetEditObject(void);	//オブジェクトのプレイヤー位置移動
 
 //破壊モードの表記
 const char *c_apBreakmodename[BREAKTYPE_MAX] =
@@ -284,6 +286,9 @@ void UpdateEditObject(void)
 
 		//回転処理
 		CollisionRotationEdit();
+
+		//オブジェクトのプレイヤー位置移動
+		PlayerPosSetEditObject();
 	}
 }
 
@@ -1128,8 +1133,8 @@ void UpDownEditObject(void)
 //=======================================
 void RightAngleEditObject(void)
 {
-	if (GetKeyboardPress(DIK_LSHIFT) == true)
-	{//左SHIFTキーを押している場合
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左CTRLキーを押している場合
 		if (GetKeyboardTrigger(DIK_Q) == true)
 		{//Qキーを押した場合
 			//向きを変える
@@ -1197,6 +1202,22 @@ void CollisionRotationEdit(void)
 	{//-3.14fより小さくなった場合
 		//3.14fに補正する
 		g_EditObject.CollInfo.rot.y += D3DX_PI * 2;
+	}
+}
+
+//=======================================
+//オブジェクトのプレイヤー位置移動
+//=======================================
+void PlayerPosSetEditObject(void)
+{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+
+	if (GetKeyboardTrigger(DIK_LMENU) == true)
+	{ // 左の ALTキーが押された場合
+
+		// プレイヤーの位置に位置を移動
+		g_EditObject.pos = pPlayer->pos;
 	}
 }
 

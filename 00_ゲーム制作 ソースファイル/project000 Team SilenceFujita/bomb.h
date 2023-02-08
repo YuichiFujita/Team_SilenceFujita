@@ -22,7 +22,8 @@ typedef enum
 	BOMBSTATE_NONE = 0,		// 何もしない状態
 	BOMBSTATE_RANGE,		// 範囲内状態
 	BOMBSTATE_AIM,			// 狙い状態
-	BOMBSTATE_BARRIER,		// バリア内状態
+	BOMBSTATE_BAR_NEAR,		// バリア接近状態
+	BOMBSTATE_BAR_IN,		// バリア内状態
 	BOMBSTATE_MAX,			// この列挙型の総数
 } BOMBSTATE;
 

@@ -86,6 +86,12 @@ void InitGame(void)
 	// カーブテキストのロード処理
 	LoadCurveTxt();
 
+	// 人間のルートのロード処理
+	LoadHumanCurveTxt();
+
+	// 曲がり角の設定処理
+	SetCurvePoint();
+
 	// 天気の初期化処理
 	InitWeather();
 
@@ -134,6 +140,9 @@ void InitGame(void)
 	// 送風機の初期化
 	InitWind();
 
+	// 爆弾の初期化
+	InitBomb();
+
 	// エフェクトの初期化
 	InitEffect();
 
@@ -161,14 +170,13 @@ void InitGame(void)
 	// ステージのセットアップ
 	TxtSetStage();
 
+	// オブジェクトのセットアップ
+	TxtSetObject();
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
 	InitEditmain();
 #endif
-
-
-	// 爆弾の初期化
-	InitBomb();
 }
 
 //======================================================================================================================
@@ -224,6 +232,9 @@ void UninitGame(void)
 	// 送風機の終了
 	UninitWind();
 
+	// 爆弾の終了
+	UninitBomb();
+
 	// エフェクトの終了
 	UninitEffect();
 
@@ -252,10 +263,6 @@ void UninitGame(void)
 	// エディットメインの終了
 	UninitEditmain();
 #endif
-
-
-	// 爆弾の終了
-	UninitBomb();
 }
 
 //======================================================================================================================
@@ -567,14 +574,14 @@ void DrawGame(void)
 	// タイヤ痕の描画
 	DrawTireMark();
 
+	// オブジェクトの描画
+	DrawObject();
+
 	// 警察の描画
 	DrawPolice();
 
 	// 車の描画処理
 	DrawCar();
-
-	// オブジェクトの描画
-	DrawObject();
 
 	// 人間の描画
 	DrawHuman();
@@ -584,6 +591,9 @@ void DrawGame(void)
 
 	// 風の描画
 	DrawWind();
+
+	// 爆弾の描画
+	DrawBomb();
 
 	// エフェクトの描画
 	DrawEffect();
@@ -601,10 +611,6 @@ void DrawGame(void)
 		DrawEditmain();
 	}
 #endif
-
-
-	// 爆弾の描画
-	DrawBomb();
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	マップカメラの描画
