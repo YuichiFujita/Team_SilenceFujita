@@ -556,11 +556,17 @@ void DrawGame(void)
 	// メッシュドームの描画
 	DrawMeshDome();
 
+	// 雷の描画処理
+	DrawThunder();
+
 	// メッシュシリンダーの描画
 	DrawMeshCylinder();
 
 	// メッシュフィールドの描画
 	DrawMeshField(false);
+
+	// 天気の描画処理
+	DrawWeather();
 
 	// メッシュウォールの描画
 	DrawMeshWall();
@@ -601,8 +607,6 @@ void DrawGame(void)
 	// パーティクルの描画
 	DrawParticle();
 
-	// 天気の描画処理
-	DrawWeather();
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードの場合

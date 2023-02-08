@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "light.h"
+#include "weather.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -28,14 +29,49 @@ void InitLight(void)
 	// 変数配列を宣言
 	D3DXCOLOR   aDiffuse[MAX_LIGHT];			// 設定用拡散光カラー
 	D3DXVECTOR3 aVecDir[MAX_LIGHT];				// 設定用方向ベクトル
+	WEATHERTYPE weather = GetWeather();			// 天気を取得する
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
-	// 拡散光カラーを設定
-	aDiffuse[0] = D3DXCOLOR(1.0f,  1.0f,  1.0f,  1.0f);
-	aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
-	aDiffuse[2] = D3DXCOLOR(0.2f , 0.2f , 0.2f , 1.0f);
+	switch (weather)
+	{
+	case WEATHERTYPE_SUNNY:		// 晴れ
+
+		// 拡散光カラーを設定
+		aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+		break;					// 抜け出す
+
+	case WEATHERTYPE_RAIN:		// 雨
+
+		// 拡散光カラーを設定
+		aDiffuse[0] = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+		aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+		break;					// 抜け出す
+
+	case WEATHERTYPE_SNOW:		// 雪
+
+		// 拡散光カラーを設定
+		aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+		break;					// 抜け出す
+
+	case WEATHERTYPE_THUNDER:	// 雷雨
+
+		// 拡散光カラーを設定
+		aDiffuse[0] = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+		aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+		aDiffuse[2] = D3DXCOLOR(0.1f, 0.1f, 0.1f, 1.0f);
+
+		break;					// 抜け出す
+	}
 
 	// 方向ベクトルを設定
 	aVecDir[0] = D3DXVECTOR3( 0.34f, -0.87f,  0.35f);

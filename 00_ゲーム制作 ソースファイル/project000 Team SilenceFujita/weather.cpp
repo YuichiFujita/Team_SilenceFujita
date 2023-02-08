@@ -18,11 +18,13 @@
 
 #define RAIN_COL		(D3DXCOLOR(0.5f, 0.5f, 0.95f, 1.0f))	// ‰J‚Ì’¸“_ƒJƒ‰[
 #define SNOW_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// á‚Ì’¸“_ƒJƒ‰[
+#define THUNDER_COL		(D3DXCOLOR(1.0f, 1.0f, 0.5f, 1.0f))		// —‹‚Ì’¸“_ƒJƒ‰[
 
 #define WEATHER_RAND	(10)									// “V‹C‚Ìƒ‰ƒ“ƒ_ƒ€‚Ì”ÍˆÍ
 #define SUNNY_RAND		(7)										// ƒ‰ƒ“ƒ_ƒ€‚Å‚Ì°‚ê‚Ì”ÍˆÍ
-#define RAIN_RAND		(9)										// ƒ‰ƒ“ƒ_ƒ€‚Å‚Ì‰J‚Ì”ÍˆÍ
-#define SNOW_RAND		(10)									// ƒ‰ƒ“ƒ_ƒ€‚Å‚Ìá‚Ì”ÍˆÍ
+#define RAIN_RAND		(8)										// ƒ‰ƒ“ƒ_ƒ€‚Å‚Ì‰J‚Ì”ÍˆÍ
+#define SNOW_RAND		(9)										// ƒ‰ƒ“ƒ_ƒ€‚Å‚Ìá‚Ì”ÍˆÍ
+#define THUNDER_RAND	(10)									// ƒ‰ƒ“ƒ_ƒ€‚Å‚Ì—‹‰J‚Ì”ÍˆÍ
 
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾
@@ -37,6 +39,10 @@ void InitSnow(void);									// á‚Ì‰Šú‰»ˆ—
 void UpdateSnow(void);									// á‚ÌXVˆ—
 void DrawSnow(void);									// á‚Ì•`‰æˆ—
 
+// —‹
+void InitThunder(void);									// —‹‚Ì‰Šú‰»ˆ—
+void UpdateThunder(void);								// —‹‚ÌXVˆ—
+
 //**********************************************************************************************************************
 //	ƒOƒ[ƒoƒ‹•Ï”
 //**********************************************************************************************************************
@@ -46,8 +52,10 @@ LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffThunder = NULL;		// ’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^(—
 
 Rain g_aRain[MAX_RAIN];		// ‰J‚Ìî•ñ
 Snow g_aSnow[MAX_SNOW];		// á‚Ìî•ñ
+Thunder g_aThunder[MAX_THUNDER];		// —‹‚Ìî•ñ
 WEATHERTYPE g_Weather;		// “V‹C‚Ìó‘Ô
 int g_NumWeather;			// ~‚Á‚Ä‚¢‚é”‚ğæ“¾‚·‚é
+int g_nThunderCount;		// —‹‚ÌƒJƒEƒ“ƒg
 
 //======================================================================================================================
 //	“V‹C‚Ì‰Šú‰»ˆ—
@@ -57,7 +65,7 @@ void InitWeather(void)
 	int nRandWeather;		// “V‹C‚Ì•Ï”
 
 	// “V‹C‚ğİ’è‚·‚é
-	nRandWeather = rand() % WEATHER_RAND;
+	nRandWeather = 9;
 
 	if (nRandWeather <= SUNNY_RAND)
 	{ // °‚ê‚Ìê‡
@@ -74,29 +82,47 @@ void InitWeather(void)
 		// “V‹C‚ğá‚Éİ’è‚·‚é
 		g_Weather = WEATHERTYPE_SNOW;
 	}
+	else if (nRandWeather <= THUNDER_RAND)
+	{ // —‹‰J‚Ìê‡
+		// “V‹C‚ğ—‹‰J‚Éİ’è‚·‚é
+		g_Weather = WEATHERTYPE_THUNDER;
+	}
 
 	// ‘”‚ğ‰Šú‰»‚·‚é
 	g_NumWeather = 0;
 
+	// —‹‚ÌƒJƒEƒ“ƒg‚ğ‰Šú‰»‚·‚é
+	g_nThunderCount = 0;
+
 	// ‰J‚Ìî•ñ‚Ì‰Šú‰»
-	for (int nCntWeather = 0; nCntWeather < MAX_RAIN; nCntWeather++)
+	for (int nCntRain = 0; nCntRain < MAX_RAIN; nCntRain++)
 	{ // ‰J‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
 
-		g_aRain[nCntWeather].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ˆÊ’u
-		g_aRain[nCntWeather].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ˆÚ“®—Ê
-		g_aRain[nCntWeather].fRadius = D3DXVECTOR2(0.0f, 0.0f);			// ”¼Œa
-		g_aRain[nCntWeather].bUse = false;								// g—pó‹µ
+		g_aRain[nCntRain].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// ˆÊ’u
+		g_aRain[nCntRain].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// ˆÚ“®—Ê
+		g_aRain[nCntRain].fRadius = D3DXVECTOR2(0.0f, 0.0f);			// ”¼Œa
+		g_aRain[nCntRain].bUse = false;									// g—pó‹µ
 
 	}
 
-	// ‰J‚Ìî•ñ‚Ì‰Šú‰»
-	for (int nCntWeather = 0; nCntWeather < MAX_SNOW; nCntWeather++)
+	// á‚Ìî•ñ‚Ì‰Šú‰»
+	for (int nCntSnow = 0; nCntSnow < MAX_SNOW; nCntSnow++)
 	{ // á‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
 
-		g_aSnow[nCntWeather].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ˆÊ’u
-		g_aSnow[nCntWeather].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ˆÚ“®—Ê
-		g_aSnow[nCntWeather].fRadius = D3DXVECTOR2(0.0f, 0.0f);			// ”¼Œa
-		g_aSnow[nCntWeather].bUse = false;								// g—pó‹µ
+		g_aSnow[nCntSnow].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// ˆÊ’u
+		g_aSnow[nCntSnow].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// ˆÚ“®—Ê
+		g_aSnow[nCntSnow].fRadius = D3DXVECTOR2(0.0f, 0.0f);			// ”¼Œa
+		g_aSnow[nCntSnow].bUse = false;									// g—pó‹µ
+	}
+
+	// —‹‚Ìî•ñ‚Ì‰Šú‰»
+	for (int nCntThunder = 0; nCntThunder < MAX_THUNDER; nCntThunder++)
+	{ // —‹‚ÌÅ‘å•\¦•ªŒJ‚è•Ô‚·
+		g_aThunder[nCntThunder].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ˆÊ’u
+		g_aThunder[nCntThunder].fRadius = D3DXVECTOR2(0.0f, 0.0f);		// ”¼Œa
+		g_aThunder[nCntThunder].fShiftWidth = 0.0f;						// ‚¸‚ç‚·•
+		g_aThunder[nCntThunder].nVariCount = 0;							// ƒJƒEƒ“ƒg
+		g_aThunder[nCntThunder].bUse = false;							// g—pó‹µ
 	}
 
 	switch (g_Weather)
@@ -116,6 +142,16 @@ void InitWeather(void)
 
 		// á‚Ì‰Šú‰»ˆ—
 		InitSnow();
+
+		break;					// ”²‚¯o‚·
+
+	case WEATHERTYPE_THUNDER:	// —‹‰J
+
+		// ‰J‚Ì‰Šú‰»ˆ—
+		InitRain();
+
+		// —‹‚Ì‰Šú‰»ˆ—
+		InitThunder();
 
 		break;					// ”²‚¯o‚·
 	}
@@ -250,6 +286,83 @@ void InitSnow(void)
 }
 
 //======================================================================================================================
+// —‹‚Ì‰Šú‰»ˆ—
+//======================================================================================================================
+void InitThunder(void)
+{
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	VERTEX_3D *pVtx;							// ’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+	// ’¸“_ƒoƒbƒtƒ@‚Ì¶¬
+	pDevice->CreateVertexBuffer
+	( // ˆø”
+		sizeof(VERTEX_3D) * 8 * MAX_THUNDER,	// •K—v’¸“_”
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_3D,							// ’¸“_ƒtƒH[ƒ}ƒbƒg
+		D3DPOOL_MANAGED,
+		&g_pVtxBuffThunder,
+		NULL
+	);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	’¸“_î•ñ‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
+	g_pVtxBuffThunder->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntWeather = 0; nCntWeather < MAX_THUNDER; nCntWeather++)
+	{ // ƒGƒtƒFƒNƒg‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
+
+		// ’¸“_À•W‚Ìİ’è
+		pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[4].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[5].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[6].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[7].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+		// –@üƒxƒNƒgƒ‹‚Ìİ’è
+		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[4].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[5].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[6].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[7].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+
+		// ’¸“_ƒJƒ‰[‚Ìİ’è
+		pVtx[0].col = THUNDER_COL;
+		pVtx[1].col = THUNDER_COL;
+		pVtx[2].col = THUNDER_COL;
+		pVtx[3].col = THUNDER_COL;
+		pVtx[4].col = THUNDER_COL;
+		pVtx[5].col = THUNDER_COL;
+		pVtx[6].col = THUNDER_COL;
+		pVtx[7].col = THUNDER_COL;
+
+		// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+		pVtx[4].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[5].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[6].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+		// ’¸“_ƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^‚ğ 8‚Â•ªi‚ß‚é
+		pVtx += 8;
+	}
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
+	g_pVtxBuffThunder->Unlock();
+}
+
+//======================================================================================================================
 //	“V‹C‚ÌI—¹ˆ—
 //======================================================================================================================
 void UninitWeather(void)
@@ -299,6 +412,16 @@ void UpdateWeather(void)
 
 		// á‚ÌXVˆ—
 		UpdateSnow();
+
+		break;					// ”²‚¯o‚·
+
+	case WEATHERTYPE_THUNDER:	// —‹
+
+		// ‰J‚ÌXVˆ—
+		UpdateRain();
+
+		// —‹‚ÌXVˆ—
+		UpdateThunder();
 
 		break;					// ”²‚¯o‚·
 	}
@@ -456,6 +579,68 @@ void UpdateSnow(void)
 }
 
 //======================================================================================================================
+// —‹‚ÌXVˆ—
+//======================================================================================================================
+void UpdateThunder(void)
+{
+	int nNumWeather = 0;	// ~‚Á‚Ä‚¢‚é•¨‚Ì”
+
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	VERTEX_3D *pVtx;		// ’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
+	g_pVtxBuffThunder->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntWeather = 0; nCntWeather < MAX_THUNDER; nCntWeather++)
+	{ // ƒGƒtƒFƒNƒg‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
+
+		if (g_aThunder[nCntWeather].bUse == true)
+		{ // ƒGƒtƒFƒNƒg‚ªg—p‚³‚ê‚Ä‚¢‚éê‡
+
+			// ~‚Á‚Ä‚¢‚é‚à‚Ì‚Ì‘”‚ğ‰ÁZ‚·‚é
+			nNumWeather++;
+
+			// ƒJƒEƒ“ƒg‚ğ‰ÁZ‚·‚é
+			g_aThunder[nCntWeather].nVariCount++;
+
+			// ’¸“_À•W‚Ìİ’è
+			pVtx[0].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x, +g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[1].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x, +g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[2].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x + g_aThunder[nCntWeather].fShiftWidth, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[3].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x + g_aThunder[nCntWeather].fShiftWidth, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[4].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x - (g_aThunder[nCntWeather].fShiftWidth * 2), -(g_aThunder[nCntWeather].fRadius.y * 2), 0.0f);
+			pVtx[5].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x - (g_aThunder[nCntWeather].fShiftWidth * 2), -(g_aThunder[nCntWeather].fRadius.y * 2), 0.0f);
+			pVtx[6].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x + (g_aThunder[nCntWeather].fShiftWidth * 2), -(g_aThunder[nCntWeather].fRadius.y * 3), 0.0f);
+			pVtx[7].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x + (g_aThunder[nCntWeather].fShiftWidth * 2), -(g_aThunder[nCntWeather].fRadius.y * 3), 0.0f);
+
+			// ’¸“_ƒJƒ‰[‚Ìİ’è
+			pVtx[0].col = THUNDER_COL;
+			pVtx[1].col = THUNDER_COL;
+			pVtx[2].col = THUNDER_COL;
+			pVtx[3].col = THUNDER_COL;
+			pVtx[4].col = THUNDER_COL;
+			pVtx[5].col = THUNDER_COL;
+			pVtx[6].col = THUNDER_COL;
+			pVtx[7].col = THUNDER_COL;
+
+			if (g_aThunder[nCntWeather].nVariCount >= THUNDER_COUNT)
+			{ // ˆê’èŠÔŒo‰ß‚µ‚½‚ç
+				// g—p‚µ‚È‚¢
+				g_aThunder[nCntWeather].bUse = false;
+			}
+		}
+
+		// ’¸“_ƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^‚ğ 4‚Â•ªi‚ß‚é
+		pVtx += 8;
+	}
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
+	g_pVtxBuffThunder->Unlock();
+
+	g_NumWeather = nNumWeather;	// ‘”‚ğ‘ã“ü‚·‚é
+}
+
+//======================================================================================================================
 //	“V‹C‚Ì•`‰æˆ—
 //======================================================================================================================
 void DrawWeather(void)
@@ -487,6 +672,13 @@ void DrawWeather(void)
 
 		// á‚Ì•`‰æˆ—
 		DrawSnow();
+
+		break;					// ”²‚¯o‚·
+
+	case WEATHERTYPE_THUNDER:	// —‹
+
+		// ‰J‚Ì•`‰æˆ—
+		DrawRain();
 
 		break;					// ”²‚¯o‚·
 	}
@@ -563,6 +755,11 @@ void DrawSnow(void)
 	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
+	// ƒ¿ƒuƒŒƒ“ƒfƒBƒ“ƒO‚ğ‰ÁZ‡¬‚Éİ’è
+	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+
 	for (int nCntWeather = 0; nCntWeather < MAX_SNOW; nCntWeather++)
 	{ // ƒGƒtƒFƒNƒg‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
 
@@ -601,6 +798,77 @@ void DrawSnow(void)
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntWeather * 4, 2);
 		}
 	}
+
+	// ƒ¿ƒuƒŒƒ“ƒfƒBƒ“ƒO‚ğŒ³‚É–ß‚·
+	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+}
+
+//======================================================================================================================
+// —‹‚Ì•`‰æˆ—
+//======================================================================================================================
+void DrawThunder(void)
+{
+	// •Ï”‚ğéŒ¾
+	D3DXMATRIX mtxTrans;						// ŒvZ—pƒ}ƒgƒŠƒbƒNƒX
+	D3DXMATRIX mtxView;							// ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒXæ“¾—p
+
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+	// ZƒeƒXƒg‚ğ–³Œø‚É‚·‚é
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);		// ZƒeƒXƒg‚Ìİ’è
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);			// Zƒoƒbƒtƒ@XV‚Ì—LŒø / –³Œø‚Ìİ’è
+
+	// ƒ‰ƒCƒeƒBƒ“ƒO‚ğ–³Œø‚É‚·‚é
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	for (int nCntWeather = 0; nCntWeather < MAX_THUNDER; nCntWeather++)
+	{ // ƒGƒtƒFƒNƒg‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
+
+		if (g_aThunder[nCntWeather].bUse == true)
+		{ // ƒGƒtƒFƒNƒg‚ªg—p‚³‚ê‚Ä‚¢‚éê‡
+
+			// ƒ[ƒ‹ƒhƒ}ƒgƒŠƒbƒNƒX‚Ì‰Šú‰»
+			D3DXMatrixIdentity(&g_aThunder[nCntWeather].mtxWorld);
+
+			// ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒX‚ğæ“¾
+			pDevice->GetTransform(D3DTS_VIEW, &mtxView);
+
+			// ƒ|ƒŠƒSƒ“‚ğƒJƒƒ‰‚É‘Î‚µ‚Ä³–Ê‚ÉŒü‚¯‚é
+			D3DXMatrixInverse(&g_aThunder[nCntWeather].mtxWorld, NULL, &mtxView);	// ‹ts—ñ‚ğ‹‚ß‚é
+			g_aThunder[nCntWeather].mtxWorld._41 = 0.0f;
+			g_aThunder[nCntWeather].mtxWorld._42 = 0.0f;
+			g_aThunder[nCntWeather].mtxWorld._43 = 0.0f;
+
+			// ˆÊ’u‚ğ”½‰f
+			D3DXMatrixTranslation(&mtxTrans, g_aThunder[nCntWeather].pos.x, g_aThunder[nCntWeather].pos.y, g_aThunder[nCntWeather].pos.z);
+			D3DXMatrixMultiply(&g_aThunder[nCntWeather].mtxWorld, &g_aThunder[nCntWeather].mtxWorld, &mtxTrans);
+
+			// ƒ[ƒ‹ƒhƒ}ƒgƒŠƒbƒNƒX‚Ìİ’è
+			pDevice->SetTransform(D3DTS_WORLD, &g_aThunder[nCntWeather].mtxWorld);
+
+			// ’¸“_ƒoƒbƒtƒ@‚ğƒf[ƒ^ƒXƒgƒŠ[ƒ€‚Éİ’è
+			pDevice->SetStreamSource(0, g_pVtxBuffThunder, 0, sizeof(VERTEX_3D));
+
+			// ’¸“_ƒtƒH[ƒ}ƒbƒg‚Ìİ’è
+			pDevice->SetFVF(FVF_VERTEX_3D);
+
+			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+			pDevice->SetTexture(0, NULL);
+
+			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntWeather * 8, 6);
+		}
+	}
+
+	// ZƒeƒXƒg‚ğ—LŒø‚É‚·‚é
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);		// ZƒeƒXƒg‚Ìİ’è
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);			// Zƒoƒbƒtƒ@XV‚Ì—LŒø / –³Œø‚Ìİ’è
+
+	// ƒ‰ƒCƒeƒBƒ“ƒO‚ğ—LŒø‚É‚·‚é
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 }
 
 //======================================================================================================================
@@ -666,22 +934,22 @@ void SetSnow(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR2 fRadius)
 	for (int nCntWeather = 0; nCntWeather < MAX_SNOW; nCntWeather++)
 	{ // ƒGƒtƒFƒNƒg‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
 
-		if (g_aRain[nCntWeather].bUse == false)
+		if (g_aSnow[nCntWeather].bUse == false)
 		{ // ƒGƒtƒFƒNƒg‚ªg—p‚³‚ê‚Ä‚¢‚È‚¢ê‡
 
 			// ˆø”‚ğ‘ã“ü
-			g_aRain[nCntWeather].pos = pos;			// ˆÊ’u
-			g_aRain[nCntWeather].move = move;		// ˆÚ“®—Ê
-			g_aRain[nCntWeather].fRadius = fRadius;	// ”¼Œa
+			g_aSnow[nCntWeather].pos = pos;			// ˆÊ’u
+			g_aSnow[nCntWeather].move = move;		// ˆÚ“®—Ê
+			g_aSnow[nCntWeather].fRadius = fRadius;	// ”¼Œa
 
 			// g—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
-			g_aRain[nCntWeather].bUse = true;
+			g_aSnow[nCntWeather].bUse = true;
 
 			// ’¸“_À•W‚Ìİ’è
-			pVtx[0].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius.x, +g_aRain[nCntWeather].fRadius.y, 0.0f);
-			pVtx[1].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius.x, +g_aRain[nCntWeather].fRadius.y, 0.0f);
-			pVtx[2].pos = D3DXVECTOR3(-g_aRain[nCntWeather].fRadius.x, -g_aRain[nCntWeather].fRadius.y, 0.0f);
-			pVtx[3].pos = D3DXVECTOR3(+g_aRain[nCntWeather].fRadius.x, -g_aRain[nCntWeather].fRadius.y, 0.0f);
+			pVtx[0].pos = D3DXVECTOR3(-g_aSnow[nCntWeather].fRadius.x, +g_aSnow[nCntWeather].fRadius.y, 0.0f);
+			pVtx[1].pos = D3DXVECTOR3(+g_aSnow[nCntWeather].fRadius.x, +g_aSnow[nCntWeather].fRadius.y, 0.0f);
+			pVtx[2].pos = D3DXVECTOR3(-g_aSnow[nCntWeather].fRadius.x, -g_aSnow[nCntWeather].fRadius.y, 0.0f);
+			pVtx[3].pos = D3DXVECTOR3(+g_aSnow[nCntWeather].fRadius.x, -g_aSnow[nCntWeather].fRadius.y, 0.0f);
 
 			// ’¸“_ƒJƒ‰[‚Ìİ’è
 			pVtx[0].col = SNOW_COL;
@@ -699,6 +967,66 @@ void SetSnow(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR2 fRadius)
 
 	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
 	g_pVtxBuffWeather->Unlock();
+}
+
+//======================================================================================================================
+// —‹‚Ìİ’èˆ—
+//======================================================================================================================
+void SetThunder(D3DXVECTOR3 pos, D3DXVECTOR2 fRadius)
+{
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	VERTEX_3D *pVtx;	// ’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
+	g_pVtxBuffThunder->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntWeather = 0; nCntWeather < MAX_THUNDER; nCntWeather++)
+	{ // ƒGƒtƒFƒNƒg‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
+
+		if (g_aThunder[nCntWeather].bUse == false)
+		{ // ƒGƒtƒFƒNƒg‚ªg—p‚³‚ê‚Ä‚¢‚È‚¢ê‡
+
+			// ˆø”‚ğ‘ã“ü
+			g_aThunder[nCntWeather].pos = pos;			// ˆÊ’u
+			g_aThunder[nCntWeather].fRadius = fRadius;	// ”¼Œa
+			g_aThunder[nCntWeather].nVariCount = 0;		// ƒJƒEƒ“ƒg
+
+			// ‚¸‚ç‚·•‚ğƒ‰ƒ“ƒ_ƒ€‚Å•Ï‚¦‚é
+			g_aThunder[nCntWeather].fShiftWidth = (float)(rand() % 300 + 100.0f);
+
+			// g—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
+			g_aThunder[nCntWeather].bUse = true;
+
+			// ’¸“_À•W‚Ìİ’è
+			pVtx[0].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x, +g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[1].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x, +g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[2].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[3].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[4].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[5].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[6].pos = D3DXVECTOR3(-g_aThunder[nCntWeather].fRadius.x, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+			pVtx[7].pos = D3DXVECTOR3(+g_aThunder[nCntWeather].fRadius.x, -g_aThunder[nCntWeather].fRadius.y, 0.0f);
+
+			// ’¸“_ƒJƒ‰[‚Ìİ’è
+			pVtx[0].col = THUNDER_COL;
+			pVtx[1].col = THUNDER_COL;
+			pVtx[2].col = THUNDER_COL;
+			pVtx[3].col = THUNDER_COL;
+			pVtx[4].col = THUNDER_COL;
+			pVtx[5].col = THUNDER_COL;
+			pVtx[6].col = THUNDER_COL;
+			pVtx[7].col = THUNDER_COL;
+
+			// ˆ—‚ğ”²‚¯‚é
+			break;
+		}
+
+		// ’¸“_ƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^‚ğ 4‚Â•ªi‚ß‚é
+		pVtx += 8;
+	}
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
+	g_pVtxBuffThunder->Unlock();
 }
 
 //======================================================================================================================
@@ -770,7 +1098,7 @@ void WeatherSnow(void)
 		posSnow.z += cosf(rotSnow) * SHIFT_SNOW;
 
 		// ‘¬“x‚ğİ’è‚·‚é
-		moveSnow = (rand() % SNOW_MOVE_RANGE) + SNOW_MOVE_LEAST;
+		moveSnow = (float)(rand() % SNOW_MOVE_RANGE) + SNOW_MOVE_LEAST;
 
 		// á‚Ìİ’èˆ—
 		SetSnow
@@ -783,29 +1111,72 @@ void WeatherSnow(void)
 }
 
 //======================================================================================================================
+// —‹‚ğ~‚ç‚¹‚éˆ—
+//======================================================================================================================
+void WeatherThunder(void)
+{
+	D3DXVECTOR3 posThunder;						// —‹‚Ì~‚éˆÊ’u
+	float rotThunder;							// —‹‚Ì~‚Á‚Ä‚¢‚é•ûŒü
+
+	if (g_nThunderCount % THUNDER_INTERVAL == 0)
+	{ // —‹‚Ì~‚éŠÔŠu‚ªŒo‰ß‚µ‚½ê‡
+		// —‹‚ÌˆÊ’u‚ğİ’è‚·‚é
+		posThunder.x = (float)(rand() % THUNDER_RANGE - (int)(THUNDER_RANGE * 0.5f));
+		posThunder.y = THUNDER_HEIGHT;
+		posThunder.z = (float)(rand() % THUNDER_RANGE - (int)(THUNDER_RANGE * 0.5f));
+
+		// Šp“x‚ğæ‚é
+		rotThunder = atan2f(posThunder.x - 0.0f, posThunder.z - 0.0f);
+
+		posThunder.x += sinf(rotThunder) * SHIFT_THUNDER;
+		posThunder.z += cosf(rotThunder) * SHIFT_THUNDER;
+
+		// —‹‚Ìİ’èˆ—
+		SetThunder
+		(
+			posThunder,										// ˆÊ’u
+			D3DXVECTOR2(THUNDER_RADIUS_X, THUNDER_RADIUS_Y)	// ”¼Œa
+		);
+	}
+}
+
+//======================================================================================================================
 // “V‹C‚Ìİ’èˆ—
 //======================================================================================================================
 void SetWeather(void)
 {
 	switch (g_Weather)
 	{
-	case WEATHERTYPE_SUNNY:	// °‚ê
+	case WEATHERTYPE_SUNNY:		// °‚ê
 
-		break;				// ”²‚¯o‚·
+		break;					// ”²‚¯o‚·
 
-	case WEATHERTYPE_RAIN:	// ‰J
+	case WEATHERTYPE_RAIN:		// ‰J
 
 		// ‰J‚ğ~‚ç‚¹‚éˆ—
 		WeatherRain();
 
-		break;				// ”²‚¯o‚·
+		break;					// ”²‚¯o‚·
 
-	case WEATHERTYPE_SNOW:	// á
+	case WEATHERTYPE_SNOW:		// á
 
 		// á‚ğ~‚ç‚¹‚éˆ—
 		WeatherSnow();
 
-		break;				// ”²‚¯o‚·
+		break;					// ”²‚¯o‚·
+
+	case WEATHERTYPE_THUNDER:	// —‹
+
+		// —‹‚ğ~‚ç‚¹‚éŠÔŠu‚ğ‰ÁZ‚·‚é
+		g_nThunderCount++;
+
+		// ‰J‚ğ~‚ç‚¹‚éˆ—
+		WeatherRain();
+
+		// —‹‚ğ~‚ç‚¹‚éˆ—
+		WeatherThunder();		
+
+		break;					// ”²‚¯o‚·
 	}
 }
 
