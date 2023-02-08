@@ -20,6 +20,7 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
+#include "gate.h"
 #include "life.h"
 #include "light.h"
 #include "meshdome.h"
@@ -113,6 +114,9 @@ void InitGame(void)
 	// 人間の初期化
 	InitHuman();
 
+	// ゲートの初期化
+	InitGate();
+
 	// カメラの初期化
 	InitCamera();
 
@@ -204,6 +208,9 @@ void UninitGame(void)
 
 	// 人間の終了
 	UninitHuman();
+
+	// ゲートの終了
+	UninitGate();
 
 	// カメラの終了
 	UninitCamera();
@@ -375,6 +382,9 @@ void UpdateGame(void)
 
 			// 人間の更新
 			UpdateHuman();
+
+			// ゲートの更新
+			UpdateGate();
 			
 			// エフェクトの更新
 			UpdateEffect();
@@ -496,6 +506,9 @@ void UpdateGame(void)
 		// オブジェクトの更新
 		UpdateObject();
 
+		// ゲートの更新
+		UpdateGate();
+
 		// ビルボードの更新
 		UpdateBillboard();
 
@@ -567,9 +580,6 @@ void DrawGame(void)
 	// メッシュフィールドの描画
 	DrawMeshField(false);
 
-	// 天気の描画処理
-	DrawWeather();
-
 	// メッシュウォールの描画
 	DrawMeshWall();
 
@@ -594,6 +604,9 @@ void DrawGame(void)
 	// 人間の描画
 	DrawHuman();
 
+	// ゲートの描画
+	DrawGate();
+
 	// ビルボードの描画
 	DrawBillboard();
 
@@ -608,6 +621,9 @@ void DrawGame(void)
 
 	// パーティクルの描画
 	DrawParticle();
+
+	// 天気の描画処理
+	DrawWeather();
 
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
