@@ -764,8 +764,8 @@ void SilenceWorldPlayer(void)
 	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
 	{ // ”š’e‚Ì”­Ë‚Ì‘€ì‚ªs‚í‚ê‚½ê‡
 
-		// ”š’e‚Ì”­Ë
-		ShotBomb();
+		// ƒoƒŠƒA‚Ì”­Ë
+		ShotBarrier();
 	}
 }
 
