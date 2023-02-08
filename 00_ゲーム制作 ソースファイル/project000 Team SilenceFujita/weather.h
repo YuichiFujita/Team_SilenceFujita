@@ -43,6 +43,7 @@ typedef enum
 	WEATHERTYPE_SUNNY = 0,		// °‚ê‚Ìê‡
 	WEATHERTYPE_RAIN,			// ‰J‚Ìê‡
 	WEATHERTYPE_SNOW,			// á‚Ìê‡
+	WEATHERTYPE_THUNDER,		// —‹‰J‚Ìê‡
 	WEATHERTYPE_MAX				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 }WEATHERTYPE;
 

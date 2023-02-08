@@ -48,6 +48,8 @@ typedef enum
 	MODELTYPE_OBJECT_DENTIST,			// 歯医者
 	MODELTYPE_OBJECT_SIGNAL,			// 信号
 	MODELTYPE_OBJECT_HOSPITAL,			// 病院
+	MODELTYPE_OBJECT_CONVENI_PARKING,	// コンビニの駐車場
+	MODELTYPE_OBJECT_FUJICAMERA,		// 家電量販店（フジカメラ）
 
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
