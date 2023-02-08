@@ -194,7 +194,7 @@ void InitMeshDome(void)
 					case WEATHERTYPE_SNOW:		// 雪
 
 						// 頂点カラーの設定
-						pVtx[0].col = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+						pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 						break;					// 抜け出す
 
