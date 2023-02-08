@@ -52,6 +52,12 @@ void CurveCar(Car *pCar);							// 車のカーブ処理
 void DashCarAction(Car *pCar);						// 車の走行処理
 void SetCarPosRot(Car *pCar);						// 車の位置と向きの設定処理
 void CarPosRotCorrect(Car *pCar);					// 車の位置の補正処理
+void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
+	D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject);		// プレイヤーとの当たり判定
+void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
+	D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject);		// 車との当たり判定
+void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
+	D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject);		// 警察との当たり判定
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -97,17 +103,9 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.size     = INIT_SIZE;				// 大きさ
 		g_aCar[nCntCar].modelData.fRadius  = 0.0f;					// 半径
 	}
-
+	
 	//車の設定処理
 	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-4000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-5000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-6000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-7000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-8000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-9000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-10000.0f, 0.0f, 3000.0f));
-	SetCar(D3DXVECTOR3(-11000.0f, 0.0f, 3000.0f));
 }
 
 //======================================================================================================================
@@ -505,12 +503,6 @@ void RevCar(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 //============================================================
 void CurveCar(Car *pCar)
 {
-	// 移動量を更新
-	pCar->move.x += CAR_MOVE_FORWARD;
-
-	// 移動している状態にする
-	pCar->bMove = true;
-
 	switch (pCar->carCurveInfo.actionState)
 	{
 	case CARACT_DASH:		// 走行状態
@@ -521,6 +513,9 @@ void CurveCar(Car *pCar)
 		break;				// 抜け出す
 
 	case CARACT_CURVE:		// カーブ状態
+
+		// 移動している状態にする
+		pCar->bMove = false;
 
 		// 車の角度更新・補正処理
 		CurveInfoRotCar(&pCar->carCurveInfo, &pCar->rot, &pCar->move, &pCar->pos);
@@ -541,6 +536,12 @@ void CurveCar(Car *pCar)
 //============================================================
 void DashCarAction(Car *pCar)
 {
+	// 移動量を更新
+	pCar->move.x += CAR_MOVE_FORWARD;
+
+	// 移動している状態にする
+	pCar->bMove = true;
+
 	for (int nCnt = 0; nCnt < MAX_CURVEPOINT; nCnt++)
 	{
 		switch (pCar->carCurveInfo.curveInfo.dashAngle)
@@ -933,453 +934,16 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject)
 {
-	{ // 車の当たり判定
-		Car *pCar = GetCarData();	// 車の情報を取得する
-
-		for (int nCnt = 0; nCnt < MAX_CAR; nCnt++, pCar++)
-		{
-			if (pCar->bUse == true)
-			{ // 車を使用している場合
-				if (pPos->x - fWidth <= pCar->pos.x + CAR_WIDTH
-					&& pPos->x + fWidth >= pCar->pos.x - CAR_WIDTH)
-				{ // 幅の中だった場合
-					if (pPosOld->z - fDepth >= pCar->posOld.z + CAR_DEPTH
-						&& pPos->z - fDepth <= pCar->pos.z + CAR_DEPTH)
-					{ // 前回の位置が車より奥かつ、現在の位置が車より手前だった場合(奥で止める処理)
-
-						switch (collObject)
-						{
-						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-							// 奥で止める
-							pPos->z = pCar->pos.z + (CAR_DEPTH + fDepth);
-
-							// 車の移動量を0にする
-							pCar->move.x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-							// 奥で止める
-							pPos->z = pCar->pos.z + (CAR_DEPTH + fDepth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_CAR:		// 車の場合
-
-							// 奥で止める
-							pPos->z = pCar->pos.z + (CAR_DEPTH + fDepth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-						}
-					}							//上に立つ処理
-					else if (pPosOld->z + fDepth <= pCar->posOld.z - CAR_DEPTH
-						&& pPos->z + fDepth >= pCar->pos.z - CAR_DEPTH)
-					{ // 前回の位置が車より手前かつ、現在の位置が車より奥だった場合(手前で止める処理)
-						switch (collObject)
-						{
-						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-							// 手前で止める
-							pPos->z = pCar->pos.z - (CAR_DEPTH + fDepth);
-
-							// 車の移動量を0にする
-							pCar->move.x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-							// 手前で止める
-							pPos->z = pCar->pos.z - (CAR_DEPTH + fDepth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_CAR:		// 車の場合
-
-							// 手前で止める
-							pPos->z = pCar->pos.z - (CAR_DEPTH + fDepth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-						}
-					}							//頭をぶつける処理
-				}
-				else if (pPos->z + fDepth >= pCar->pos.z - CAR_DEPTH
-					&& pPos->z - fDepth <= pCar->pos.z + CAR_DEPTH)
-				{ // 奥行の中だった場合
-					if (pPosOld->x + fWidth <= pCar->posOld.x - CAR_WIDTH
-						&& pPos->x + fWidth >= pCar->pos.x - CAR_WIDTH)
-					{ // 前回の位置が車より左かつ、現在の位置が車より右だった場合(左で止める処理)
-						switch (collObject)
-						{
-						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-							// 左で止める
-							pPos->x = pCar->pos.x - (CAR_WIDTH + fWidth);
-
-							// 車の移動量を0にする
-							pCar->move.x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-							// 左で止める
-							pPos->x = pCar->pos.x - (CAR_WIDTH + fWidth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_CAR:		// 車の場合
-
-							// 左で止める
-							pPos->x = pCar->pos.x - (CAR_WIDTH + fWidth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-						}
-					}							//左端の処理
-					else if (pPosOld->x - fWidth >= pCar->posOld.x + CAR_WIDTH
-						&& pPos->x - fWidth <= pCar->pos.x + CAR_WIDTH)
-					{ // 前回の位置が車より右かつ、現在の位置が車より左だった場合(右で止める処理)
-						switch (collObject)
-						{
-						case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-							// 右で止める
-							pPos->x = pCar->pos.x + (CAR_WIDTH + fWidth);
-
-							// 車の移動量を0にする
-							pCar->move.x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-							// 右で止める
-							pPos->x = pCar->pos.x + (CAR_WIDTH + fWidth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-
-						case COLLOBJECTTYPE_CAR:		// 車の場合
-
-							// 右で止める
-							pPos->x = pCar->pos.x + (CAR_WIDTH + fWidth);
-
-							// 移動量を0にする
-							pMove->x = 0.0f;
-
-							break;						// 抜け出す
-						}
-					}							//右端の処理
-				}
-			}
-		}
-	}
-
-	//{ // 警察の当たり判定
-	//	Police *pPolice = GetPoliceData();	// 車の情報を取得する
-
-	//	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++, pPolice++)
-	//	{
-	//		if (pPolice->bUse == true)
-	//		{ // 車を使用している場合
-	//			if (pPos->x - fWidth <= pPolice->pos.x + CAR_WIDTH
-	//				&& pPos->x + fWidth >= pPolice->pos.x - CAR_WIDTH)
-	//			{ // 幅の中だった場合
-	//				if (pPosOld->z - fDepth >= pPolice->posOld.z + CAR_DEPTH
-	//					&& pPos->z - fDepth <= pPolice->pos.z + CAR_DEPTH)
-	//				{ // 前回の位置が車より奥かつ、現在の位置が車より手前だった場合(奥で止める処理)
-
-	//					switch (collObject)
-	//					{
-	//					case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-	//						// 奥で止める
-	//						pPos->z = pPolice->pos.z + (CAR_DEPTH + fDepth);
-
-	//						// 車の移動量を0にする
-	//						pPolice->move.x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-	//						// 奥で止める
-	//						pPos->z = pPolice->pos.z + (CAR_DEPTH + fDepth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-	//						// 奥で止める
-	//						pPos->z = pPolice->pos.z + (CAR_DEPTH + fDepth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-	//					}
-	//				}							//上に立つ処理
-	//				else if (pPosOld->z + fDepth <= pPolice->posOld.z - CAR_DEPTH
-	//					&& pPos->z + fDepth >= pPolice->pos.z - CAR_DEPTH)
-	//				{ // 前回の位置が車より手前かつ、現在の位置が車より奥だった場合(手前で止める処理)
-	//					switch (collObject)
-	//					{
-	//					case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-	//						// 手前で止める
-	//						pPos->z = pPolice->pos.z - (CAR_DEPTH + fDepth);
-
-	//						// 車の移動量を0にする
-	//						pPolice->move.x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-	//						// 手前で止める
-	//						pPos->z = pPolice->pos.z - (CAR_DEPTH + fDepth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-	//						// 手前で止める
-	//						pPos->z = pPolice->pos.z - (CAR_DEPTH + fDepth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-	//					}
-	//				}							//頭をぶつける処理
-	//			}
-	//			else if (pPos->z + fDepth >= pPolice->pos.z - CAR_DEPTH
-	//				&& pPos->z - fDepth <= pPolice->pos.z + CAR_DEPTH)
-	//			{ // 奥行の中だった場合
-	//				if (pPosOld->x + fWidth <= pPolice->posOld.x - CAR_WIDTH
-	//					&& pPos->x + fWidth >= pPolice->pos.x - CAR_WIDTH)
-	//				{ // 前回の位置が車より左かつ、現在の位置が車より右だった場合(左で止める処理)
-	//					switch (collObject)
-	//					{
-	//					case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-	//						// 左で止める
-	//						pPos->x = pPolice->pos.x - (CAR_WIDTH + fWidth);
-
-	//						// 車の移動量を0にする
-	//						pPolice->move.x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-	//						// 左で止める
-	//						pPos->x = pPolice->pos.x - (CAR_WIDTH + fWidth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-	//						// 左で止める
-	//						pPos->x = pPolice->pos.x - (CAR_WIDTH + fWidth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-	//					}
-	//				}							//左端の処理
-	//				else if (pPosOld->x - fWidth >= pPolice->posOld.x + CAR_WIDTH
-	//					&& pPos->x - fWidth <= pPolice->pos.x + CAR_WIDTH)
-	//				{ // 前回の位置が車より右かつ、現在の位置が車より左だった場合(右で止める処理)
-	//					switch (collObject)
-	//					{
-	//					case COLLOBJECTTYPE_PLAYER:		// プレイヤーの場合
-
-	//						// 右で止める
-	//						pPos->x = pPolice->pos.x + (CAR_WIDTH + fWidth);
-
-	//						// 車の移動量を0にする
-	//						pPolice->move.x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-	//						// 右で止める
-	//						pPos->x = pPolice->pos.x + (CAR_WIDTH + fWidth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-
-	//					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-	//						// 右で止める
-	//						pPos->x = pPolice->pos.x + (CAR_WIDTH + fWidth);
-
-	//						// 移動量を0にする
-	//						pMove->x = 0.0f;
-
-	//						break;						// 抜け出す
-	//					}
-	//				}							//右端の処理
-	//			}
-	//		}
-	//	}
-	//}
-
-	{ // プレイヤーの当たり判定
-		Player *pPlayer = GetPlayer();	// 車の情報を取得する
-
-		if (pPlayer->bUse == true)
-		{ // 車を使用している場合
-			if (pPos->x - fWidth <= pPlayer->pos.x + PLAY_WIDTH
-				&& pPos->x + fWidth >= pPlayer->pos.x - PLAY_WIDTH)
-			{ // 幅の中だった場合
-				if (pPosOld->z - fDepth >= pPlayer->oldPos.z + PLAY_DEPTH
-					&& pPos->z - fDepth <= pPlayer->pos.z + PLAY_DEPTH)
-				{ // 前回の位置がプレイヤーより奥かつ、現在の位置がプレイヤーより手前だった場合(奥で止める処理)
-
-					switch (collObject)
-					{
-					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-						// 奥で止める
-						pPos->z = pPlayer->pos.z + (PLAY_DEPTH + fDepth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-
-					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-						// 奥で止める
-						pPos->z = pPlayer->pos.z + (PLAY_DEPTH + fDepth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-					}
-				}							//上に立つ処理
-				else if (pPosOld->z + fDepth <= pPlayer->oldPos.z - PLAY_DEPTH
-					&& pPos->z + fDepth >= pPlayer->pos.z - PLAY_DEPTH)
-				{ // 前回の位置がプレイヤーより手前かつ、現在の位置がプレイヤーより奥だった場合(手前で止める処理)
-					switch (collObject)
-					{
-					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-						// 手前で止める
-						pPos->z = pPlayer->pos.z - (PLAY_DEPTH + fDepth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-
-					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-						// 手前で止める
-						pPos->z = pPlayer->pos.z - (PLAY_DEPTH + fDepth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-					}
-				}							//頭をぶつける処理
-			}
-			else if (pPos->z + fDepth >= pPlayer->pos.z - PLAY_DEPTH
-				&& pPos->z - fDepth <= pPlayer->pos.z + PLAY_DEPTH)
-			{ // 奥行の中だった場合
-				if (pPosOld->x + fWidth <= pPlayer->oldPos.x - PLAY_WIDTH
-					&& pPos->x + fWidth >= pPlayer->pos.x - PLAY_WIDTH)
-				{ // 前回の位置がプレイヤーより左かつ、現在の位置がプレイヤーより右だった場合(左で止める処理)
-					switch (collObject)
-					{
-					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-						// 左で止める
-						pPos->x = pPlayer->pos.x - (PLAY_WIDTH + fWidth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-
-					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-						// 左で止める
-						pPos->x = pPlayer->pos.x - (PLAY_WIDTH + fWidth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-					}
-				}							//左端の処理
-				else if (pPosOld->x - fWidth >= pPlayer->oldPos.x + PLAY_WIDTH
-					&& pPos->x - fWidth <= pPlayer->pos.x + PLAY_WIDTH)
-				{ // 前回の位置がプレイヤーより右かつ、現在の位置がプレイヤーより左だった場合(右で止める処理)
-					switch (collObject)
-					{
-					case COLLOBJECTTYPE_POLICE:		// 警察の場合
-
-						// 右で止める
-						pPos->x = pPlayer->pos.x + (PLAY_WIDTH + fWidth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-
-					case COLLOBJECTTYPE_CAR:		// 車の場合
-
-						// 右で止める
-						pPos->x = pPlayer->pos.x + (PLAY_WIDTH + fWidth);
-
-						// 移動量を0にする
-						pMove->x = 0.0f;
-
-						break;						// 抜け出す
-					}
-				}							//右端の処理
-			}
-		}
+	// プレイヤーとの当たり判定
+	CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject);
+
+	if (collObject != COLLOBJECTTYPE_PLAYER)
+	{ // プレイヤー以外の場合
+		// 車との当たり判定
+		CarBodyStopCar(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject);
+
+		// 警察との当たり判定
+		CarBodyStopPolice(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject);
 	}
 }
 
@@ -1480,6 +1044,411 @@ void CarPosRotCorrect(Car *pCar)
 		}
 
 		break;				// 抜け出す
+	}
+}
+
+//============================================================
+// プレイヤーとの当たり判定
+//============================================================
+void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject)
+{
+	Player *pPlayer = GetPlayer();				// 車の情報を取得する
+
+	if (pPlayer->bUse == true)
+	{ // プレイヤーが使用されていた場合
+		if (pPos->x - fWidth <= pPlayer->pos.x + PLAY_WIDTH
+			&& pPos->x + fWidth >= pPlayer->pos.x - PLAY_WIDTH)
+		{ // 車のX幅の中にいた場合
+			if (pPosOld->z + fDepth <= pPlayer->oldPos.z - PLAY_DEPTH
+				&& pPos->z + fDepth >= pPlayer->pos.z - PLAY_DEPTH)
+			{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
+				switch (collObject)
+				{
+				case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+					//位置をずらす
+					pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
+					
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x *= 0.95f;
+
+					break;						// 抜け出す
+
+				case COLLOBJECTTYPE_CAR:		// 車の場合
+
+					//位置をずらす
+					pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
+
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x = 0.0f;
+
+					break;						// 抜け出す
+				}
+			}							//手前で止められる処理
+			else if (pPosOld->z - fDepth >= pPlayer->oldPos.z + PLAY_DEPTH
+				&& pPos->z - fDepth <= pPlayer->pos.z + PLAY_DEPTH)
+			{//前回の位置がプレイヤーの位置よりも奥かつ、現在の位置がプレイヤーの位置よりも手前だった場合(奥で止められる処理)
+				switch (collObject)
+				{
+				case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+					//位置をずらす
+					pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
+
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x *= 0.95f;
+
+					break;						// 抜け出す
+
+				case COLLOBJECTTYPE_CAR:		// 車の場合
+
+					//位置をずらす
+					pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
+
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x = 0.0f;
+
+					break;						// 抜け出す
+				}
+			}							//奥で止められる処理
+		}
+
+		if (pPos->z - fDepth <= pPlayer->pos.z + PLAY_DEPTH
+			&& pPos->z + fDepth >= pPlayer->pos.z - PLAY_DEPTH)
+		{//塔のZ幅の中にいた場合
+			if (pPosOld->x + fWidth <= pPlayer->oldPos.x - PLAY_WIDTH
+				&& pPos->x + fWidth >= pPlayer->pos.x - PLAY_WIDTH)
+			{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
+				switch (collObject)
+				{
+				case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+					//位置をずらす
+					pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
+
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x *= 0.95f;
+
+					break;						// 抜け出す
+
+				case COLLOBJECTTYPE_CAR:		// 車の場合
+
+					//位置をずらす
+					pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
+
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x = 0.0f;
+
+					break;						// 抜け出す
+				}
+			}							//左端の処理
+			else if (pPosOld->x - fWidth >= pPlayer->oldPos.x + PLAY_WIDTH
+				&& pPos->x - fWidth <= pPlayer->pos.x + PLAY_WIDTH)
+			{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
+				switch (collObject)
+				{
+				case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+					//位置をずらす
+					pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
+
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x *= 0.95f;
+
+					break;						// 抜け出す
+
+				case COLLOBJECTTYPE_CAR:		// 車の場合
+
+					//位置をずらす
+					pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
+
+					//プレイヤーの移動量を削除
+					pPlayer->move.x *= 0.95f;
+
+					// 移動量を削除
+					pMove->x = 0.0f;
+
+					break;						// 抜け出す
+				}
+			}							//右端の処理
+		}
+	}
+}
+
+//============================================================
+// 車との当たり判定
+//============================================================
+void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject)
+{
+	Car *pCar = GetCarData();				// 車の情報を取得する
+
+	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++, pCar++)
+	{
+		if (pCar->bUse == true)
+		{ // 車が使用されていた場合
+			if (pPos->x - fWidth <= pCar->pos.x + CAR_WIDTH
+				&& pPos->x + fWidth >= pCar->pos.x - CAR_WIDTH)
+			{ // 車のX幅の中にいた場合
+				if (pPosOld->z + fDepth < pCar->posOld.z - CAR_DEPTH
+					&& pPos->z + fDepth > pCar->pos.z - CAR_DEPTH)
+				{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+						//位置をずらす
+						pCar->pos.z = pPos->z + (CAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+						//位置をずらす
+						pCar->pos.z = pPos->z + (CAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//手前で止められる処理
+				else if (pPosOld->z - fDepth >= pCar->posOld.z + CAR_DEPTH
+					&& pPos->z - fDepth <= pCar->pos.z + CAR_DEPTH)
+				{//前回の位置がプレイヤーの位置よりも奥かつ、現在の位置がプレイヤーの位置よりも手前だった場合(奥で止められる処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+						//位置をずらす
+						pCar->pos.z = pPos->z - (CAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+						//位置をずらす
+						pCar->pos.z = pPos->z - (CAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//奥で止められる処理
+			}
+
+			if (pPos->z - fDepth <= pCar->pos.z + CAR_DEPTH
+				&& pPos->z + fDepth >= pCar->pos.z - CAR_DEPTH)
+			{//塔のZ幅の中にいた場合
+				if (pPosOld->x + fWidth <= pCar->posOld.x - CAR_WIDTH
+					&& pPos->x + fWidth >= pCar->pos.x - CAR_WIDTH)
+				{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+						//位置をずらす
+						pCar->pos.x = pPos->x + (CAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+						//位置をずらす
+						pCar->pos.x = pPos->x + (CAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//左端の処理
+				else if (pPosOld->x - fWidth >= pCar->posOld.x + CAR_WIDTH
+					&& pPos->x - fWidth <= pCar->pos.x + CAR_WIDTH)
+				{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+						//位置をずらす
+						pCar->pos.x = pPos->x - (CAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+						//位置をずらす
+						pCar->pos.x = pPos->x - (CAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//右端の処理
+			}
+		}
+	}
+}
+
+//============================================================
+// 警察との当たり判定
+//============================================================
+void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject)
+{
+	Police *pPolice = GetPoliceData();			// 警察の情報を取得する
+
+	for (int nCnt = 0; nCnt < MAX_POLICE; nCnt++, pPolice++)
+	{
+		if (pPolice->bUse == true)
+		{ // 車が使用されていた場合
+			if (pPos->x - fWidth <= pPolice->pos.x + POLICAR_WIDTH
+				&& pPos->x + fWidth >= pPolice->pos.x - POLICAR_WIDTH)
+			{ // 車のX幅の中にいた場合
+				if (pPosOld->z + fDepth < pPolice->posOld.z - POLICAR_DEPTH
+					&& pPos->z + fDepth > pPolice->pos.z - POLICAR_DEPTH)
+				{//前回の位置がブロックより手前かつ、現在の位置がブロックよりも奥かつだった場合(手前で止められる処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+													//位置をずらす
+						pPolice->pos.z = pPos->z + (POLICAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+													//位置をずらす
+						pPolice->pos.z = pPos->z + (POLICAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//手前で止められる処理
+				else if (pPosOld->z - fDepth >= pPolice->posOld.z + POLICAR_DEPTH
+					&& pPos->z - fDepth <= pPolice->pos.z + POLICAR_DEPTH)
+				{//前回の位置がプレイヤーの位置よりも奥かつ、現在の位置がプレイヤーの位置よりも手前だった場合(奥で止められる処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+													//位置をずらす
+						pPolice->pos.z = pPos->z - (POLICAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+													//位置をずらす
+						pPolice->pos.z = pPos->z - (POLICAR_DEPTH + fDepth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//奥で止められる処理
+			}
+
+			if (pPos->z - fDepth <= pPolice->pos.z + POLICAR_DEPTH
+				&& pPos->z + fDepth >= pPolice->pos.z - POLICAR_DEPTH)
+			{//塔のZ幅の中にいた場合
+				if (pPosOld->x + fWidth <= pPolice->posOld.x - POLICAR_WIDTH
+					&& pPos->x + fWidth >= pPolice->pos.x - POLICAR_WIDTH)
+				{//前回の位置がブロックの左端より左かつ、現在の位置がブロックの左側より右だった場合(左の処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+													//位置をずらす
+						pPolice->pos.x = pPos->x + (POLICAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+													//位置をずらす
+						pPolice->pos.x = pPos->x + (POLICAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//左端の処理
+				else if (pPosOld->x - fWidth >= pPolice->posOld.x + POLICAR_WIDTH
+					&& pPos->x - fWidth <= pPolice->pos.x + POLICAR_WIDTH)
+				{//前回の位置がブロックの右端より右かつ、現在の位置がブロックの左側より右だった場合(右の処理)
+					switch (collObject)
+					{
+					case COLLOBJECTTYPE_POLICE:		// 警察の場合
+
+													//位置をずらす
+						pPolice->pos.x = pPos->x - (POLICAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+
+					case COLLOBJECTTYPE_CAR:		// 車の場合
+
+													//位置をずらす
+						pPolice->pos.x = pPos->x - (POLICAR_WIDTH + fWidth);
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						break;						// 抜け出す
+					}
+				}							//右端の処理
+			}
+		}
 	}
 }
 

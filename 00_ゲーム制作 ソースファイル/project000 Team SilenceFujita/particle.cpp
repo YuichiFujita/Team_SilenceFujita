@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "particle.h"
 #include "effect.h"
+#include "player.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -285,6 +286,7 @@ void ParticleSpark(Particle *pParticle)
 	D3DXVECTOR3 move;		// エフェクトの移動量の代入用
 	float fRadius;			// エフェクトの半径の代入用
 	int nLife;				// エフェクトの寿命の代入用
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
 
 	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
 	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
@@ -298,9 +300,9 @@ void ParticleSpark(Particle *pParticle)
 		D3DXVec3Normalize(&move, &move);
 
 		// 移動量を乗算
-		move.x *= 3.0f;
-		move.y *= 4.0f;
-		move.z *= 3.0f;
+		move.x *= 5.0f;
+		move.y *= 9.0f;
+		move.z *= 5.0f;
 
 		// ずらす位置を設定する
 		shiftPos.x = (float)((rand() % 600) / 100.0f);
@@ -308,10 +310,10 @@ void ParticleSpark(Particle *pParticle)
 		shiftPos.z = (float)((rand() % 600) / 100.0f);
 
 		// 半径をランダムに設定
-		fRadius = (float)((rand() % 900) / 100.0f) + 5.0f;
+		fRadius = (float)((rand() % 900) / 100.0f) + (pPlayer->move.x * 0.1f);
 
 		// 寿命をランダムに設定
-		nLife = rand() % 2 + 8;
+		nLife = rand() % 5 + 10;
 
 		// エフェクトの設定
 		SetEffect
