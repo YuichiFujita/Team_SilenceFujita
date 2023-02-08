@@ -593,7 +593,6 @@ void DrawGame(void)
 
 	// 天気の描画処理
 	DrawWeather();
-
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードの場合
@@ -623,6 +622,7 @@ void DrawGame(void)
 	SetCamera(CAMERATYPE_UI);
 
 #if 1
+
 	// 体力バーの描画
 	DrawLife();
 
