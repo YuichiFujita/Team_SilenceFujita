@@ -53,6 +53,10 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\HOSPITAL.x",		// 病院
 	"data\\MODEL_OBJECT\\711parking.x",		// コンビニの駐車場
 	"data\\MODEL_OBJECT\\FujiCamera.x",		// 家電量販店（フジカメラ）
+	"data\\MODEL_OBJECT\\roof.x",			// 商店街（屋根）
+	"data\\MODEL_OBJECT\\obarafood.x",		// 商店街（食堂）
+	"data\\MODEL_OBJECT\\obamart.x",		// 商店街（半額店）
+	"data\\MODEL_OBJECT\\obarastation.x",	// 商店街（ゲームセンター）
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー

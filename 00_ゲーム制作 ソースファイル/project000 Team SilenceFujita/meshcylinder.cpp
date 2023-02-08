@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "meshcylinder.h"
+#include "weather.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -80,6 +81,7 @@ void InitMeshCylinder(void)
 	D3DXVECTOR3 vecPos;							// 頂点位置の計算用
 	D3DXVECTOR3 vecNor;							// 法線ベクトルの計算用
 	int         nNumVtx = 0;					// 頂点数の計測用
+	WEATHERTYPE weather = GetWeather();			// 天気
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -176,8 +178,36 @@ void InitMeshCylinder(void)
 					// 法線ベクトルの設定
 					pVtx[0].nor = vecNor;
 
-					// 頂点カラーの設定
-					pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+					switch (weather)
+					{
+					case WEATHERTYPE_SUNNY:		// 晴れ
+
+						// 頂点カラーの設定
+						pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+						break;					// 抜け出す
+
+					case WEATHERTYPE_RAIN:		// 雨
+
+						// 頂点カラーの設定
+						pVtx[0].col = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+
+						break;					// 抜け出す
+
+					case WEATHERTYPE_SNOW:		// 雪
+
+						// 頂点カラーの設定
+						pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+						break;					// 抜け出す
+
+					case WEATHERTYPE_THUNDER:	// 雷雨
+
+						// 頂点カラーの設定
+						pVtx[0].col = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+						break;					// 抜け出す
+					}
 
 					// テクスチャ座標の設定
 					pVtx[0].tex = D3DXVECTOR2(1.0f * (nCntWidth % 2), 1.0f * nCntHeight);

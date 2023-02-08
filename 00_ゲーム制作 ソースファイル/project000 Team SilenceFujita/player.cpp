@@ -13,6 +13,7 @@
 #include "calculation.h"
 
 #include "camera.h"
+#include "gate.h"
 #include "object.h"
 #include "particle.h"
 #include "player.h"
@@ -242,6 +243,16 @@ void UpdatePlayer(void)
 			PLAY_WIDTH,			// 横幅
 			PLAY_DEPTH			// 奥行
 		);
+
+		//	オブジェクトとの当たり判定
+		CollisionGate
+		(
+			&g_player.pos,		// 現在の位置
+			&g_player.oldPos,	// 前回の位置
+			&g_player.move,		// 移動量
+			PLAY_WIDTH,			// 横幅
+			PLAY_DEPTH			// 奥行
+		);	
 
 		// 車の停止処理
 		CollisionStopCar
