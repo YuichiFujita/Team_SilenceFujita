@@ -41,6 +41,9 @@
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
 
+#define POLICAR_TRAFFIC_CNT			(240)		// 渋滞が起きたときに改善する用のカウント
+#define POLICAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
+
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
 //**********************************************************************************************************************
@@ -66,6 +69,8 @@ void SetPolicePosRot(Police *pPolice);					// 警察の位置と向きの設定処理
 void PolicePosRotCorrect(Police *pPolice);				// 警察の位置の補正処理
 void PoliceTackle(Police *pPolice);						// 警察のタックル処理
 
+void PoliceTrafficImprove(Police *pPolice);				// 警察の渋滞改善処理
+
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
@@ -84,18 +89,19 @@ void InitPolice(void)
 	{ // オブジェクトの最大表示数分繰り返す
 
 		// 基本情報を初期化
-		g_aPolice[nCntPolice].pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aPolice[nCntPolice].posOld	= g_aPolice[nCntPolice].pos;		// 前回の位置
-		g_aPolice[nCntPolice].posCopy	= g_aPolice[nCntPolice].pos;		// 最初の位置
-		g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aPolice[nCntPolice].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
-		g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// 警察の状態
-		g_aPolice[nCntPolice].bombState = BOMBSTATE_NONE;					// ボムの状態
-		g_aPolice[nCntPolice].nLife		= 0;								// 体力
-		g_aPolice[nCntPolice].nShadowID = NONE_SHADOW;						// 影のインデックス
-		g_aPolice[nCntPolice].bJump		= false;							// ジャンプしていない
-		g_aPolice[nCntPolice].bUse		= false;							// 使用状況
+		g_aPolice[nCntPolice].pos		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aPolice[nCntPolice].posOld	  = g_aPolice[nCntPolice].pos;		// 前回の位置
+		g_aPolice[nCntPolice].posCopy	  = g_aPolice[nCntPolice].pos;		// 最初の位置
+		g_aPolice[nCntPolice].move		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aPolice[nCntPolice].rot		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aPolice[nCntPolice].rotDest	  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
+		g_aPolice[nCntPolice].state		  = POLICESTATE_PATROL;				// 警察の状態
+		g_aPolice[nCntPolice].bombState   = BOMBSTATE_NONE;					// ボムの状態
+		g_aPolice[nCntPolice].nLife		  = 0;								// 体力
+		g_aPolice[nCntPolice].nShadowID   = NONE_SHADOW;					// 影のインデックス
+		g_aPolice[nCntPolice].bJump		  = false;							// ジャンプしていない
+		g_aPolice[nCntPolice].nTrafficCnt = 0;								// 渋滞カウント
+		g_aPolice[nCntPolice].bUse		  = false;							// 使用状況
 
 		// 曲がり角関係を初期化
 		g_aPolice[nCntPolice].policeCurve.curveInfo.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 曲がり角の位置
@@ -142,8 +148,6 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
-	int nCnt = 0;
-
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
@@ -173,38 +177,47 @@ void UpdatePolice(void)
 
 				switch (g_aPolice[nCntPolice].state)
 				{//状態で判断する
-				case POLICESTATE_PATROL:				//パトロール状態
+				case POLICESTATE_PATROL:		// パトロール状態
 
 					// 警察のパトロール行動処理
 					PatrolPoliceAct(&g_aPolice[nCntPolice]);
 
-					break;						//抜け出す
+					break;						// 抜け出す
 
-				case POLICESTATE_CHASE:			//追跡処理
+				case POLICESTATE_CHASE:			// 追跡処理
 
 					// 警察の追跡処理
 					ChasePoliceAct(&g_aPolice[nCntPolice]);
 
-					break;						//抜け出す
+					break;						// 抜け出す
 
-				case POLICESTATE_PATBACK:		//パトロールへ戻る処理			
+				case POLICESTATE_PATBACK:		// パトロールへ戻る処理			
 
-					break;						//抜け出す
+					break;						// 抜け出す
 
-				case POLICESTATE_POSBACK:		//最初の座標に戻る処理
+				case POLICESTATE_POSBACK:		// 最初の座標に戻る処理
 
 					// 最初の移動量を元に戻す
 					g_aPolice[nCntPolice].move.x = 0.0f;
 
-					break;						//抜け出す
+					break;						// 抜け出す
 
-				case POLICESTATE_TACKLE:		//タックル状態
+				case POLICESTATE_TACKLE:		// タックル状態
 
 					// 警察のタックル処理
 					PoliceTackle(&g_aPolice[nCntPolice]);
 
-					break;						//抜け出す
+					break;						// 抜け出す
+
+				case POLICESTATE_TRAFFIC:		// 渋滞状態
+					
+					// 警察車両の渋滞改善処理
+					PoliceTrafficImprove(&g_aPolice[nCntPolice]);
+
+					break;						// 抜け出す
 				}
+
+			}
 
 				//----------------------------------------------------
 				//	当たり判定
@@ -221,6 +234,7 @@ void UpdatePolice(void)
 
 				if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
 				{ // 警察がパトロール状態の場合
+
 					// 車の停止処理
 					CollisionStopCar
 					( // 引数
@@ -229,12 +243,13 @@ void UpdatePolice(void)
 						&g_aPolice[nCntPolice].move,	//移動量
 						g_aPolice[nCntPolice].modelData.fRadius,	//半径
 						COLLOBJECTTYPE_POLICE,			//対象のサイズ
-						&nCnt
+						&g_aPolice[nCntPolice].nTrafficCnt
 					);
 				}
 
 				if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
 				{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
+
 					// 車同士の当たり判定
 					CollisionCarBody
 					( // 引数
@@ -245,22 +260,25 @@ void UpdatePolice(void)
 						POLICAR_WIDTH,
 						POLICAR_DEPTH,
 						COLLOBJECTTYPE_POLICE,
-						&nCnt
+						&g_aPolice[nCntPolice].nTrafficCnt
 					);
 				}
 
-				if (g_aPolice[nCntPolice].pos.y < 0.0f)
-				{//Y軸の位置が0.0fだった場合
-					//縦への移動量を0.0fにする
-					g_aPolice[nCntPolice].move.y = 0.0f;
+				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
+				{ // バリア内状態ではない場合
 
-					//位置を0.0fに戻す
-					g_aPolice[nCntPolice].pos.y = 0.0f;
+					if (g_aPolice[nCntPolice].pos.y < 0.0f)
+					{//Y軸の位置が0.0fだった場合
+						//縦への移動量を0.0fにする
+						g_aPolice[nCntPolice].move.y = 0.0f;
+
+						//位置を0.0fに戻す
+						g_aPolice[nCntPolice].pos.y = 0.0f;
+					}
+
+					// プレイヤーの補正の更新処理
+					RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 				}
-
-				// プレイヤーの補正の更新処理
-				RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
-			}
 		}
 	}
 }
@@ -428,16 +446,17 @@ void SetPolice(D3DXVECTOR3 pos)
 		if (g_aPolice[nCntPolice].bUse == false)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
-			g_aPolice[nCntPolice].pos		= pos;								// 現在の位置
-			g_aPolice[nCntPolice].posCopy   = g_aPolice[nCntPolice].pos;		// 最初の位置
-			g_aPolice[nCntPolice].posOld	= g_aPolice[nCntPolice].pos;		// 前回の位置
-			g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
-			g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aPolice[nCntPolice].state		= POLICESTATE_PATROL;				// パトロール状態にする
-			g_aPolice[nCntPolice].bombState = BOMBSTATE_NONE;					// 何もしていない状態にする
-			g_aPolice[nCntPolice].nLife		= POLI_LIFE;						// 体力
-			g_aPolice[nCntPolice].bJump		= false;							// ジャンプしていない
-			g_aPolice[nCntPolice].bMove		= false;							// 移動していない
+			g_aPolice[nCntPolice].pos		  = pos;							// 現在の位置
+			g_aPolice[nCntPolice].posCopy     = g_aPolice[nCntPolice].pos;		// 最初の位置
+			g_aPolice[nCntPolice].posOld	  = g_aPolice[nCntPolice].pos;		// 前回の位置
+			g_aPolice[nCntPolice].rotDest	  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
+			g_aPolice[nCntPolice].move		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aPolice[nCntPolice].state		  = POLICESTATE_PATROL;				// パトロール状態にする
+			g_aPolice[nCntPolice].bombState   = BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aPolice[nCntPolice].nLife		  = POLI_LIFE;						// 体力
+			g_aPolice[nCntPolice].bJump		  = false;							// ジャンプしていない
+			g_aPolice[nCntPolice].nTrafficCnt = 0;								// 渋滞カウント
+			g_aPolice[nCntPolice].bMove		  = false;							// 移動していない
 
 			// 使用している状態にする
 			g_aPolice[nCntPolice].bUse = true;
@@ -1264,6 +1283,24 @@ void PoliceTackle(Police *pPolice)
 	//--------------------------------------------------------
 	pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
 	pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+}
+
+//============================================================
+// 警察の渋滞改善処理
+//============================================================
+void PoliceTrafficImprove(Police *pPolice)
+{
+	// 渋滞カウントを加算する
+	pPolice->nTrafficCnt++;
+
+	if (pPolice->nTrafficCnt >= POLICAR_TRAFFIC_IMPROVE_CNT)
+	{ // 渋滞カウントが解除状態に入った場合
+		// カウントを0にする
+		pPolice->nTrafficCnt = 0;
+
+		// パトロール状態にする
+		pPolice->state = POLICESTATE_PATROL;
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理

@@ -871,6 +871,9 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 						// 目標の移動量をセーブする
 						move->x += (0.0f - move->x) * 0.5f;
 
+						// カウントを加算する
+						*pTraCnt += 1;
+
 						break;						//抜け出す
 
 					case COLLOBJECTTYPE_CAR:		//車の場合
@@ -947,6 +950,9 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 
 						// 目標の移動量をセーブする
 						move->x += (0.0f - move->x) * 0.5f;
+
+						// カウントを加算する
+						*pTraCnt += 1;
 
 						break;						//抜け出す
 
@@ -1260,6 +1266,9 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
+						// カウントを加算する
+						*pTraCnt += 1;
+
 						break;						// 抜け出す
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
@@ -1288,6 +1297,9 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
+
+						// カウントを加算する
+						*pTraCnt += 1;
 
 						break;						// 抜け出す
 
@@ -1323,6 +1335,9 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
+						// カウントを加算する
+						*pTraCnt += 1;
+
 						break;						// 抜け出す
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
@@ -1351,6 +1366,9 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
+
+						// カウントを加算する
+						*pTraCnt += 1;
 
 						break;						// 抜け出す
 
@@ -1400,6 +1418,9 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
+						// カウントを加算する
+						*pTraCnt += 1;
+
 						break;						// 抜け出す
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
@@ -1428,6 +1449,9 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
+
+						// カウントを加算する
+						*pTraCnt += 1;
 
 						break;						// 抜け出す
 
@@ -1463,6 +1487,9 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
+						// カウントを加算する
+						*pTraCnt += 1;
+
 						break;						// 抜け出す
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
@@ -1491,6 +1518,9 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 						// 移動量を削除
 						pMove->x *= 0.95f;
+
+						// カウントを加算する
+						*pTraCnt += 1;
 
 						break;						// 抜け出す
 
