@@ -47,12 +47,12 @@ typedef enum
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void InitBomb(void);					// 爆弾の初期化処理
-void UninitBomb(void);					// 爆弾の終了処理
-void UpdateBomb(void);					// 爆弾の更新処理
-void DrawBomb(void);					// 爆弾の描画処理
-void ShotBarrier(void);					// バリアの発射処理
-BARRIERSTATE GetBarrier(void *pCar);	// バリアの状態の取得処理
+void InitBomb(void);						// 爆弾の初期化処理
+void UninitBomb(void);						// 爆弾の終了処理
+void UpdateBomb(void);						// 爆弾の更新処理
+void DrawBomb(void);						// 爆弾の描画処理
+void ShotBarrier(void);						// バリアの発射処理
+BARRIERSTATE GetBarrierState(void *pCar);	// バリアの状態の取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

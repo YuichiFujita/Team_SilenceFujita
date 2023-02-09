@@ -342,7 +342,7 @@ void ShotBarrier(void)
 //======================================================================================================================
 //	バリアの状態の取得処理
 //======================================================================================================================
-BARRIERSTATE GetBarrier(void *pCar)
+BARRIERSTATE GetBarrierState(void *pCar)
 {
 	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
 	{ // バリアの最大表示数分繰り返す
@@ -1050,9 +1050,9 @@ bool DownBarrier(int nCntBarrier)
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
 	{ // 車の最大表示数分繰り返す
 
-		if (pCar->bUse == true							// 車が使用されている
-		&&  g_aBarrier[nCntBarrier].pCar != pCar		// 車アドレスが同じではない
-		&&  GetBarrier(pCar) == BARRIERSTATE_NONE)		// 車のバリア状態が何もしない状態の場合
+		if (pCar->bUse == true								// 車が使用されている
+		&&  g_aBarrier[nCntBarrier].pCar != pCar			// 車アドレスが同じではない
+		&&  GetBarrierState(pCar) != BARRIERSTATE_SET)		// 車のバリア状態が完成状態ではない
 		{ // 上記を満たしている場合
 
 			// 検知範囲と検知車の距離を求める
@@ -1072,9 +1072,9 @@ bool DownBarrier(int nCntBarrier)
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++, pPolice++)
 	{ // 警察の最大表示数分繰り返す
 
-		if (pPolice->bUse == true						// 警察が使用されている
-		&&  g_aBarrier[nCntBarrier].pCar != pCar		// 車アドレスが同じではない
-		&&  GetBarrier(pPolice) == BARRIERSTATE_NONE)	// 警察のバリア状態が何もしない状態の場合
+		if (pPolice->bUse == true							// 警察が使用されている
+		&&  g_aBarrier[nCntBarrier].pCar != pCar			// 車アドレスが同じではない
+		&&  GetBarrierState(pPolice) != BARRIERSTATE_SET)	// 警察のバリア状態が完成状態ではない
 		{ // 上記を満たしている場合
 
 			// 検知範囲と検知車の距離を求める
