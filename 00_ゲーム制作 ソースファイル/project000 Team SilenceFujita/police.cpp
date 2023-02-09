@@ -41,8 +41,8 @@
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
 
-#define POLICAR_TRAFFIC_CNT			(240)		// 渋滞が起きたときに改善する用のカウント
-#define POLICAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
+#define POLICAR_TRAFFIC_CNT			(240)	// 渋滞が起きたときに改善する用のカウント
+#define POLICAR_TRAFFIC_IMPROVE_CNT	(540)	// 渋滞状態の解除のカウント
 
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
@@ -68,7 +68,7 @@ void DashPoliceAction(Police *pPolice);					// 警察の走行処理
 void SetPolicePosRot(Police *pPolice);					// 警察の位置と向きの設定処理
 void PolicePosRotCorrect(Police *pPolice);				// 警察の位置の補正処理
 void PoliceTackle(Police *pPolice);						// 警察のタックル処理
-
+void PoliceCollisionTackle(Police *pPolice);			// 警察のタックルの当たり判定処理
 void PoliceTrafficImprove(Police *pPolice);				// 警察の渋滞改善処理
 
 //**********************************************************************************************************************
@@ -131,8 +131,14 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
 	}
 
-	//// 警察の設定処理
-	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+	// 警察の設定処理
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
+
 }
 
 //======================================================================================================================
@@ -222,10 +228,10 @@ void UpdatePolice(void)
 			if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
 			{ // 警察がパトロール状態の場合
 
-			  //----------------------------------------------------
-			  //	当たり判定
-			  //----------------------------------------------------
-			  // オブジェクトとの当たり判定
+				//----------------------------------------------------
+				//	当たり判定
+				//----------------------------------------------------
+				// オブジェクトとの当たり判定
 				CollisionObject
 				( // 引数
 					&g_aPolice[nCntPolice].pos,		// 現在の位置
@@ -1275,20 +1281,52 @@ void PoliceTackle(Police *pPolice)
 			// 移動量を0にする
 			pPolice->tackle.Tacklemove.x = 0.0f;
 
-			//警察車両の探知処理
+			// 警察車両の探知処理
 			PatrolCarSearch(pPolice);
 		}
-	}
 
-	//--------------------------------------------------------
-	//	位置の更新
-	//--------------------------------------------------------
-	pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
-	pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+		// 位置の更新
+		pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+		pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+
+		// 警察のタックルの当たり判定
+		PoliceCollisionTackle(pPolice);
+	}
 }
 
 //============================================================
-// 警察の渋滞改善処理
+//	警察のタックルの当たり判定処理
+//============================================================
+void PoliceCollisionTackle(Police *pPolice)
+{
+#define PLAY_TACKLE_RAD	(40.0f)	// 警察のタックル時の判定の半径 (プレイヤー)
+#define POLI_TACKLE_RAD	(40.0f)	// 警察のタックル時の判定の半径 (警察)
+#define TACKLE_DMG		(20)	// 警察のタックル時のダメージ
+
+	// 変数を宣言
+	float fLength;	// プレイヤーと警察の距離
+
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+
+	if (pPlayer->bUse == true)
+	{ // プレイヤーが使用されている場合
+
+		// プレイヤーと警察の距離を求める
+		fLength = (pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x)
+				+ (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z);
+
+		if (fLength < ((PLAY_TACKLE_RAD + POLI_TACKLE_RAD) * (PLAY_TACKLE_RAD + POLI_TACKLE_RAD)))
+		{ // あたっている場合
+
+			// プレイヤーのダメージ判定
+			HitPlayer(pPlayer, int TACKLE_DMG);
+		}
+	}
+}
+
+//============================================================
+//	警察の渋滞改善処理
 //============================================================
 void PoliceTrafficImprove(Police *pPolice)
 {
@@ -1297,6 +1335,7 @@ void PoliceTrafficImprove(Police *pPolice)
 
 	if (pPolice->nTrafficCnt >= POLICAR_TRAFFIC_IMPROVE_CNT)
 	{ // 渋滞カウントが解除状態に入った場合
+
 		// カウントを0にする
 		pPolice->nTrafficCnt = 0;
 
@@ -1323,7 +1362,7 @@ int GetNumPolice(void)
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
 
-		  // カウンターを加算
+			 // カウンターを加算
 			nNumPolice++;
 		}
 	}

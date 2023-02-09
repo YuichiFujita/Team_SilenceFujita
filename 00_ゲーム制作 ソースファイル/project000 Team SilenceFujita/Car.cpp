@@ -175,7 +175,7 @@ void UpdateCar(void)
 				}
 			}
 
-			if (GetBarrier(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
+			if (GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
 			{ // バリアセット状態じゃなかった場合
 				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC)
 				{ // 渋滞状態じゃない場合

@@ -42,8 +42,8 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 Tacklemove;					// タックル時の追加移動量
-	int nTackleCnt;							// タックル状態に移行する
+	D3DXVECTOR3 Tacklemove;				// タックル時の追加移動量
+	int nTackleCnt;						// タックル状態に移行する
 }PoliTackle;
 
 //**********************************************************************************************************************
@@ -82,8 +82,8 @@ void UninitPolice(void);				// 警察の終了処理
 void UpdatePolice(void);				// 警察の更新処理
 void DrawPolice(void);					// 警察の描画処理
 void SetPolice(D3DXVECTOR3 pos);		// 警察の設定処理
-void HitPolice(Police *pPolice, int nDamage);												// 警察のダメージ判定
-Police *GetPoliceData(void);																// 警察の取得処理
+void HitPolice(Police *pPolice, int nDamage);	// 警察のダメージ判定
+Police *GetPoliceData(void);					// 警察の取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
