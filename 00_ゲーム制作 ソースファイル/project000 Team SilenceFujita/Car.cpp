@@ -56,7 +56,7 @@ void DashCarAction(Car *pCar);						// 車の走行処理
 void SetCarPosRot(Car *pCar);						// 車の位置と向きの設定処理
 void CarPosRotCorrect(Car *pCar);					// 車の位置の補正処理
 void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// プレイヤーとの当たり判定
-void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// 車との当たり判定
+void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);			// 車との当たり判定
 void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// 警察との当たり判定
 
 void CarTrafficImprove(Car *pCar);					// 車の渋滞改善処理
@@ -175,21 +175,23 @@ void UpdateCar(void)
 				}
 			}
 
-				//----------------------------------------------------
-				//	当たり判定
-				//----------------------------------------------------
-				// オブジェクトとの当たり判定
-				CollisionObject
-				( // 引数
-					&g_aCar[nCntCar].pos,		// 現在の位置
-					&g_aCar[nCntCar].posOld,	// 前回の位置
-					&g_aCar[nCntCar].move,		// 移動量
-					CAR_WIDTH,					// 横幅
-					CAR_DEPTH					// 奥行
-				);
-
-				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC && GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
-				{ // 渋滞状態じゃないかつ、バリアセット状態じゃなかった場合
+			if (GetBarrier(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
+			{ // バリアセット状態じゃなかった場合
+				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC)
+				{ // 渋滞状態じゃない場合
+					//----------------------------------------------------
+					//	当たり判定
+					//----------------------------------------------------
+					// オブジェクトとの当たり判定
+					CollisionObject
+					( // 引数
+						&g_aCar[nCntCar].pos,		// 現在の位置
+						&g_aCar[nCntCar].posOld,	// 前回の位置
+						&g_aCar[nCntCar].move,		// 移動量
+						CAR_WIDTH,					// 横幅
+						CAR_DEPTH,					// 奥行
+						&g_aCar[nCntCar].nTrafficCnt// 渋滞カウント
+					);
 
 					// 車の停止処理
 					CollisionStopCar
@@ -204,29 +206,31 @@ void UpdateCar(void)
 
 					if (g_aCar[nCntCar].nTrafficCnt >= CAR_TRAFFIC_CNT)
 					{ // 渋滞に巻き込まれた場合
-						// 渋滞状態にする
+					  // 渋滞状態にする
 						g_aCar[nCntCar].state = CARSTATE_TRAFFIC;
 					}
-
-					// 車同士の当たり判定
-					CollisionCarBody
-					( // 引数
-						&g_aCar[nCntCar].pos,
-						&g_aCar[nCntCar].posOld,
-						g_aCar[nCntCar].rot,
-						&g_aCar[nCntCar].move,
-						CAR_WIDTH,
-						CAR_DEPTH,
-						COLLOBJECTTYPE_CAR,
-						&g_aCar[nCntCar].nTrafficCnt
-					);
 				}
 
-				if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
-				{ // バリア内状態ではない場合
-					// 車の補正の更新処理
-					RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
-				}
+				// 車同士の当たり判定
+				CollisionCarBody
+				( // 引数
+					&g_aCar[nCntCar].pos,				// 現在の位置
+					&g_aCar[nCntCar].posOld,			// 前回の位置
+					g_aCar[nCntCar].rot,				// 向き
+					&g_aCar[nCntCar].move,				// 移動量
+					CAR_WIDTH,							// 横幅
+					CAR_DEPTH,							// 奥行
+					COLLOBJECTTYPE_CAR,					// 対象
+					&g_aCar[nCntCar].nTrafficCnt,		// 渋滞カウント
+					(int)(g_aCar[nCntCar].state)		// 状態
+				);
+			}
+
+			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
+			{ // バリア内状態ではない場合
+				// 車の補正の更新処理
+				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
+			}
 		}
 	}
 }
@@ -975,18 +979,50 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 // 車同士の当たり判定
 //============================================================
-void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt)
+void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, int state)
 {
-	// プレイヤーとの当たり判定
-	CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+	switch (collObject)
+	{
+	case COLLOBJECTTYPE_PLAYER:		// プレイヤー
 
-	if (collObject != COLLOBJECTTYPE_PLAYER)
-	{ // プレイヤー以外の場合
-		// 車との当たり判定
-		CarBodyStopCar(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+		// プレイヤーとの当たり判定
+		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
 
-		// 警察との当たり判定
-		CarBodyStopPolice(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+		break;						// 抜け出す
+
+	case COLLOBJECTTYPE_CAR:		// 車
+
+		// プレイヤーとの当たり判定
+		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+
+		if (state != CARSTATE_TRAFFIC)
+		{ // 渋滞状態じゃなかった場合
+
+			// 車との当たり判定
+			CarBodyStopCar(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+
+			// 警察との当たり判定
+			CarBodyStopPolice(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+		}
+
+		break;						// 抜け出す
+
+	case COLLOBJECTTYPE_POLICE:		// 警察
+
+		// プレイヤーとの当たり判定
+		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+
+		if (state != POLICESTATE_TRAFFIC)
+		{ // 渋滞状態じゃなかった場合
+
+			// 車との当たり判定
+			CarBodyStopCar(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+
+			// 警察との当たり判定
+			CarBodyStopPolice(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+		}
+
+		break;						// 抜け出す
 	}
 }
 

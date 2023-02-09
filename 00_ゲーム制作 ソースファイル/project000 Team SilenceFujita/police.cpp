@@ -210,7 +210,7 @@ void UpdatePolice(void)
 					break;						// 抜け出す
 
 				case POLICESTATE_TRAFFIC:		// 渋滞状態
-					
+
 					// 警察車両の渋滞改善処理
 					PoliceTrafficImprove(&g_aPolice[nCntPolice]);
 
@@ -219,66 +219,68 @@ void UpdatePolice(void)
 
 			}
 
-				//----------------------------------------------------
-				//	当たり判定
-				//----------------------------------------------------
-				// オブジェクトとの当たり判定
+			if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
+			{ // 警察がパトロール状態の場合
+
+			  //----------------------------------------------------
+			  //	当たり判定
+			  //----------------------------------------------------
+			  // オブジェクトとの当たり判定
 				CollisionObject
 				( // 引数
 					&g_aPolice[nCntPolice].pos,		// 現在の位置
 					&g_aPolice[nCntPolice].posOld,	// 前回の位置
 					&g_aPolice[nCntPolice].move,	// 移動量
-					POLICAR_WIDTH,			// 横幅
-					POLICAR_DEPTH			// 奥行
+					POLICAR_WIDTH,					// 横幅
+					POLICAR_DEPTH,					// 奥行
+					&g_aPolice[nCntPolice].nTrafficCnt	// 渋滞カウント
 				);
 
-				if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
-				{ // 警察がパトロール状態の場合
+				// 車の停止処理
+				CollisionStopCar
+				( // 引数
+					g_aPolice[nCntPolice].pos,		//位置
+					g_aPolice[nCntPolice].rot,		//向き
+					&g_aPolice[nCntPolice].move,	//移動量
+					g_aPolice[nCntPolice].modelData.fRadius,	//半径
+					COLLOBJECTTYPE_POLICE,			//対象のサイズ
+					&g_aPolice[nCntPolice].nTrafficCnt
+				);
+			}
 
-					// 車の停止処理
-					CollisionStopCar
-					( // 引数
-						g_aPolice[nCntPolice].pos,		//位置
-						g_aPolice[nCntPolice].rot,		//向き
-						&g_aPolice[nCntPolice].move,	//移動量
-						g_aPolice[nCntPolice].modelData.fRadius,	//半径
-						COLLOBJECTTYPE_POLICE,			//対象のサイズ
-						&g_aPolice[nCntPolice].nTrafficCnt
-					);
+			if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
+			{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
+
+				// 車同士の当たり判定
+				CollisionCarBody
+				( // 引数
+					&g_aPolice[nCntPolice].pos,
+					&g_aPolice[nCntPolice].posOld,
+					g_aPolice[nCntPolice].rot,
+					&g_aPolice[nCntPolice].move,
+					POLICAR_WIDTH,
+					POLICAR_DEPTH,
+					COLLOBJECTTYPE_POLICE,
+					&g_aPolice[nCntPolice].nTrafficCnt,
+					(int)(g_aPolice[nCntPolice].state)
+				);
+			}
+
+			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
+			{ // バリア内状態ではない場合
+
+				if (g_aPolice[nCntPolice].pos.y < 0.0f)
+				{//Y軸の位置が0.0fだった場合
+					//縦への移動量を0.0fにする
+					g_aPolice[nCntPolice].move.y = 0.0f;
+
+					//位置を0.0fに戻す
+					g_aPolice[nCntPolice].pos.y = 0.0f;
 				}
 
-				if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
-				{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
-
-					// 車同士の当たり判定
-					CollisionCarBody
-					( // 引数
-						&g_aPolice[nCntPolice].pos,
-						&g_aPolice[nCntPolice].posOld,
-						g_aPolice[nCntPolice].rot,
-						&g_aPolice[nCntPolice].move,
-						POLICAR_WIDTH,
-						POLICAR_DEPTH,
-						COLLOBJECTTYPE_POLICE,
-						&g_aPolice[nCntPolice].nTrafficCnt
-					);
-				}
-
-				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
-				{ // バリア内状態ではない場合
-
-					if (g_aPolice[nCntPolice].pos.y < 0.0f)
-					{//Y軸の位置が0.0fだった場合
-						//縦への移動量を0.0fにする
-						g_aPolice[nCntPolice].move.y = 0.0f;
-
-						//位置を0.0fに戻す
-						g_aPolice[nCntPolice].pos.y = 0.0f;
-					}
-
-					// プレイヤーの補正の更新処理
-					RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
-				}
+				// プレイヤーの補正の更新処理
+				RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
+			}
 		}
 	}
 }
