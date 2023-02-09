@@ -41,8 +41,8 @@
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
 
-#define POLICAR_TRAFFIC_CNT			(240)	// 渋滞が起きたときに改善する用のカウント
-#define POLICAR_TRAFFIC_IMPROVE_CNT	(540)	// 渋滞状態の解除のカウント
+#define POLICAR_TRAFFIC_CNT			(240)		// 渋滞が起きたときに改善する用のカウント
+#define POLICAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
@@ -68,7 +68,7 @@ void DashPoliceAction(Police *pPolice);					// 警察の走行処理
 void SetPolicePosRot(Police *pPolice);					// 警察の位置と向きの設定処理
 void PolicePosRotCorrect(Police *pPolice);				// 警察の位置の補正処理
 void PoliceTackle(Police *pPolice);						// 警察のタックル処理
-void PoliceCollisionTackle(Police *pPolice);			// 警察のタックルの当たり判定処理
+
 void PoliceTrafficImprove(Police *pPolice);				// 警察の渋滞改善処理
 
 //**********************************************************************************************************************
@@ -131,14 +131,8 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
 	}
 
-	// 警察の設定処理
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
-	SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
-
+	//// 警察の設定処理
+	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
 }
 
 //======================================================================================================================
@@ -188,6 +182,17 @@ void UpdatePolice(void)
 					// 警察のパトロール行動処理
 					PatrolPoliceAct(&g_aPolice[nCntPolice]);
 
+					// 車の停止処理
+					CollisionStopCar
+					( // 引数
+						g_aPolice[nCntPolice].pos,		//位置
+						g_aPolice[nCntPolice].rot,		//向き
+						&g_aPolice[nCntPolice].move,	//移動量
+						g_aPolice[nCntPolice].modelData.fRadius,	//半径
+						COLLOBJECTTYPE_POLICE,			//対象のサイズ
+						&g_aPolice[nCntPolice].nTrafficCnt
+					);
+
 					break;						// 抜け出す
 
 				case POLICESTATE_CHASE:			// 追跡処理
@@ -225,51 +230,42 @@ void UpdatePolice(void)
 
 			}
 
-			if (g_aPolice[nCntPolice].state == POLICESTATE_PATROL)
-			{ // 警察がパトロール状態の場合
+			if (GetBarrierState(&g_aPolice[nCntPolice]) != BARRIERSTATE_SET)
+			{ // バリアセット状態じゃなかった場合
+				if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC)
+				{ // 渋滞状態じゃない場合
+					//----------------------------------------------------
+					//	当たり判定
+					//----------------------------------------------------
+					// オブジェクトとの当たり判定
+					CollisionObject
+					( // 引数
+						&g_aPolice[nCntPolice].pos,		// 現在の位置
+						&g_aPolice[nCntPolice].posOld,	// 前回の位置
+						&g_aPolice[nCntPolice].move,	// 移動量
+						POLICAR_WIDTH,					// 横幅
+						POLICAR_DEPTH,					// 奥行
+						&g_aPolice[nCntPolice].nTrafficCnt	// 渋滞カウント
+					);
+				}
 
-				//----------------------------------------------------
-				//	当たり判定
-				//----------------------------------------------------
-				// オブジェクトとの当たり判定
-				CollisionObject
-				( // 引数
-					&g_aPolice[nCntPolice].pos,		// 現在の位置
-					&g_aPolice[nCntPolice].posOld,	// 前回の位置
-					&g_aPolice[nCntPolice].move,	// 移動量
-					POLICAR_WIDTH,					// 横幅
-					POLICAR_DEPTH,					// 奥行
-					&g_aPolice[nCntPolice].nTrafficCnt	// 渋滞カウント
-				);
+				if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
+				{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
 
-				// 車の停止処理
-				CollisionStopCar
-				( // 引数
-					g_aPolice[nCntPolice].pos,		//位置
-					g_aPolice[nCntPolice].rot,		//向き
-					&g_aPolice[nCntPolice].move,	//移動量
-					g_aPolice[nCntPolice].modelData.fRadius,	//半径
-					COLLOBJECTTYPE_POLICE,			//対象のサイズ
-					&g_aPolice[nCntPolice].nTrafficCnt
-				);
-			}
-
-			if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
-			{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
-
-				// 車同士の当たり判定
-				CollisionCarBody
-				( // 引数
-					&g_aPolice[nCntPolice].pos,
-					&g_aPolice[nCntPolice].posOld,
-					g_aPolice[nCntPolice].rot,
-					&g_aPolice[nCntPolice].move,
-					POLICAR_WIDTH,
-					POLICAR_DEPTH,
-					COLLOBJECTTYPE_POLICE,
-					&g_aPolice[nCntPolice].nTrafficCnt,
-					(int)(g_aPolice[nCntPolice].state)
-				);
+					// 車同士の当たり判定
+					CollisionCarBody
+					( // 引数
+						&g_aPolice[nCntPolice].pos,
+						&g_aPolice[nCntPolice].posOld,
+						g_aPolice[nCntPolice].rot,
+						&g_aPolice[nCntPolice].move,
+						POLICAR_WIDTH,
+						POLICAR_DEPTH,
+						COLLOBJECTTYPE_POLICE,
+						&g_aPolice[nCntPolice].nTrafficCnt,
+						(int)(g_aPolice[nCntPolice].state)
+					);
+				}
 			}
 
 			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
@@ -1281,52 +1277,20 @@ void PoliceTackle(Police *pPolice)
 			// 移動量を0にする
 			pPolice->tackle.Tacklemove.x = 0.0f;
 
-			// 警察車両の探知処理
+			//警察車両の探知処理
 			PatrolCarSearch(pPolice);
 		}
-
-		// 位置の更新
-		pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
-		pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
-
-		// 警察のタックルの当たり判定
-		PoliceCollisionTackle(pPolice);
 	}
+
+	//--------------------------------------------------------
+	//	位置の更新
+	//--------------------------------------------------------
+	pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+	pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
 }
 
 //============================================================
-//	警察のタックルの当たり判定処理
-//============================================================
-void PoliceCollisionTackle(Police *pPolice)
-{
-#define PLAY_TACKLE_RAD	(40.0f)	// 警察のタックル時の判定の半径 (プレイヤー)
-#define POLI_TACKLE_RAD	(40.0f)	// 警察のタックル時の判定の半径 (警察)
-#define TACKLE_DMG		(20)	// 警察のタックル時のダメージ
-
-	// 変数を宣言
-	float fLength;	// プレイヤーと警察の距離
-
-	// ポインタを宣言
-	Player *pPlayer = GetPlayer();	// プレイヤーの情報
-
-	if (pPlayer->bUse == true)
-	{ // プレイヤーが使用されている場合
-
-		// プレイヤーと警察の距離を求める
-		fLength = (pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x)
-				+ (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z);
-
-		if (fLength < ((PLAY_TACKLE_RAD + POLI_TACKLE_RAD) * (PLAY_TACKLE_RAD + POLI_TACKLE_RAD)))
-		{ // あたっている場合
-
-			// プレイヤーのダメージ判定
-			HitPlayer(pPlayer, int TACKLE_DMG);
-		}
-	}
-}
-
-//============================================================
-//	警察の渋滞改善処理
+// 警察の渋滞改善処理
 //============================================================
 void PoliceTrafficImprove(Police *pPolice)
 {
@@ -1335,7 +1299,6 @@ void PoliceTrafficImprove(Police *pPolice)
 
 	if (pPolice->nTrafficCnt >= POLICAR_TRAFFIC_IMPROVE_CNT)
 	{ // 渋滞カウントが解除状態に入った場合
-
 		// カウントを0にする
 		pPolice->nTrafficCnt = 0;
 
@@ -1362,7 +1325,7 @@ int GetNumPolice(void)
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
 
-			 // カウンターを加算
+		  // カウンターを加算
 			nNumPolice++;
 		}
 	}

@@ -37,15 +37,18 @@
 #define REV_HUMAN_MOVE_ROT			(0.1f)		// 移動量による向き変更量の補正係数
 #define SUB_HUMAN_MOVE_VALUE		(15.0f)		// 向き変更時の減速が行われる移動量
 #define SUB_HUMAN_MOVE				(0.05f)		// 向き変更時の減速量
-#define MAX_HUMAN_FORWARD			(10.0f)		// 前進時の最高速度
 #define MAX_HUMAN_BACKWARD			(8.0f)		// 後退時の最高速度
 #define REV_HUMAN_MOVE_SUB			(0.04f)		// 移動量の減速係数
 #define HUMAN_CURVE_ADD				(0.03f)		// 曲がり角での向きの加算数
+#define HUMAN_RANDAM_MOVE			(6)		// 人間の移動量のランダム
+#define HUMAN_MOVE_LEAST			(4)			// 人間の移動量の最低限
+#define HUMAN_PASS_SHIFT			(40.0f)		// すれ違った時のずらす幅
+#define HUMAN_RADIUS				(40.0f)		// 人間の幅
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);		// 人間の位置の更新処理
+void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove, float fMaxMove);		// 人間の位置の更新処理
 void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 人間の補正の更新処理
 void CurveHuman(Human *pHuman);						// 人間のカーブ処理
 void StopHuman(Human *pHuman);						// 人間の停止処理
@@ -53,6 +56,7 @@ void ReactionHuman(Human *pHuman);					// 人間のリアクション処理
 void CollisionCarHuman(Human *pHuman);				// 人間と車の当たり判定
 void CurveRotHuman(Human *pHuman);					// 人間の角度更新処理
 void WalkHuman(Human *pHuman);						// 人間の歩く処理
+void PassingHuman(Human *pHuman);					// 人間のすれ違い処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -72,8 +76,9 @@ void InitHuman(void)
 	{ // オブジェクトの最大表示数分繰り返す
 
 		g_aHuman[nCntHuman].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;			// 前回の位置
+		g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;		// 前回の位置
 		g_aHuman[nCntHuman].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aHuman[nCntHuman].fMaxMove = 0.0f;						// 移動量の最大数
 		g_aHuman[nCntHuman].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aHuman[nCntHuman].nShadowID = NONE_SHADOW;				// 影のインデックス
 		g_aHuman[nCntHuman].bJump = false;							// ジャンプしているかどうか
@@ -97,17 +102,17 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].curveInfo.rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の位置
 		g_aHuman[nCntHuman].curveInfo.curveInfo.nCurveTime = 0;		// 曲がり角の数
 		g_aHuman[nCntHuman].curveInfo.curveInfo.nNowCurve = 0;		// 現在の曲がり角
-		g_aHuman[nCntHuman].curveInfo.fWalkRand = 0.0f;				// 歩く時の差異
 
 		for (int nCntCur = 0; nCntCur < MAX_HUMAN_CURVE; nCntCur++)
 		{
 			g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[nCntCur] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 曲がり角の位置
 			g_aHuman[nCntHuman].curveInfo.curveInfo.curveAngle[nCntCur] = CURVE_RIGHT;							// 右に曲がる
-			g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[nCntCur] = DASH_RIGHT;								// 右に向かって走っている
+			g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[nCntCur]  = DASH_RIGHT;							// 右に向かって走っている
 		}
 	}
 
 	SetHuman(D3DXVECTOR3(0.0f, 0.0f, 1800.0f));
+	SetHuman(D3DXVECTOR3(0.0f, 0.0f, 1000.0f));
 }
 
 //======================================================================================================================
@@ -142,14 +147,21 @@ void UpdateHuman(void)
 			// 影の位置設定
 			SetPositionShadow
 			( // 引数
-				g_aHuman[nCntHuman].nShadowID,	// 影のインデックス
+				g_aHuman[nCntHuman].nShadowID,		// 影のインデックス
 				g_aHuman[nCntHuman].pos,			// 位置
 				g_aHuman[nCntHuman].rot,			// 向き
 				NONE_SCALE							// 拡大率
 			);
 
 			// プレイヤーの位置の更新
-			PosHuman(&g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].rot, g_aHuman[nCntHuman].bMove);
+			PosHuman
+			(
+				&g_aHuman[nCntHuman].move,			// 移動量
+				&g_aHuman[nCntHuman].pos,			// 位置
+				&g_aHuman[nCntHuman].rot,			// 向き
+				g_aHuman[nCntHuman].bMove,			// 移動しているか
+				g_aHuman[nCntHuman].fMaxMove		// 移動量の最大数
+			);
 
 			//人間のリアクション処理
 			ReactionHuman(&g_aHuman[nCntHuman]);
@@ -320,9 +332,10 @@ void SetHuman(D3DXVECTOR3 pos)
 			g_aHuman[nCntHuman].pos = pos;								// 現在の位置
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;		// 前回の位置
 			g_aHuman[nCntHuman].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aHuman[nCntHuman].fMaxMove = (float)(rand() % HUMAN_RANDAM_MOVE + HUMAN_MOVE_LEAST);		// 移動量の最大数
 			g_aHuman[nCntHuman].bJump = false;							// ジャンプしているかどうか
 			g_aHuman[nCntHuman].bMove = false;							// 移動していない
-			g_aHuman[nCntHuman].state = HUMANSTATE_WALK;				//歩き状態
+			g_aHuman[nCntHuman].state = HUMANSTATE_WALK;				// 歩き状態
 
 			// 使用している状態にする
 			g_aHuman[nCntHuman].bUse = true;
@@ -345,7 +358,6 @@ void SetHuman(D3DXVECTOR3 pos)
 			g_aHuman[nCntHuman].curveInfo.actionState = HUMANACT_WALK;			// 状態
 			g_aHuman[nCntHuman].curveInfo.nRandamRoute = 0;						// ルートの種類
 			g_aHuman[nCntHuman].curveInfo.rotDest = g_aHuman[nCntHuman].rot;	// 目標の向き
-			g_aHuman[nCntHuman].curveInfo.fWalkRand = 0.0f;						// 歩く際の差異
 			g_aHuman[nCntHuman].rot.y = GetDefaultRot(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// 初期の向き
 			g_aHuman[nCntHuman].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// ルート
 
@@ -458,7 +470,7 @@ Human *GetHumanData(void)
 //============================================================
 //	プレイヤーの位置の更新処理
 //============================================================
-void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove)
+void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove, float fMaxMove)
 {
 	//--------------------------------------------------------
 	//	重力の更新
@@ -468,11 +480,11 @@ void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove)
 	//--------------------------------------------------------
 	//	移動量の補正
 	//--------------------------------------------------------
-	if (move->x > MAX_HUMAN_FORWARD)
+	if (move->x > fMaxMove)
 	{ // プレイヤーの移動量 (x) が一定値以上の場合
 
 	  // プレイヤーの移動量 (x) を補正
-		move->x = MAX_HUMAN_FORWARD;
+		move->x = fMaxMove;
 	}
 	else if (move->x < -MAX_HUMAN_BACKWARD)
 	{ // プレイヤーの移動量 (x) が一定値以下の場合
@@ -554,8 +566,8 @@ void CurveHuman(Human *pHuman)
 	{
 	case HUMANACT_WALK:		// 歩き状態
 
-		// 人間の歩く処理
-		WalkHuman(pHuman);
+		// 人間のすれ違い処理
+		PassingHuman(pHuman);
 
 		break;				// 抜け出す
 
@@ -567,11 +579,11 @@ void CurveHuman(Human *pHuman)
 		break;				// 抜け出す
 	}
 
-	if (pHuman->move.x > MAX_HUMAN_FORWARD)
+	if (pHuman->move.x > pHuman->fMaxMove)
 	{ // プレイヤーの移動量 (x) が一定値以上の場合
 
 		// プレイヤーの移動量 (x) を補正
-		pHuman->move.x = MAX_HUMAN_FORWARD;
+		pHuman->move.x = pHuman->fMaxMove;
 	}
 }
 
@@ -1017,6 +1029,97 @@ void CurveRotHuman(Human *pHuman)
 
 	// 向きの正規化
 	RotNormalize(&pHuman->rot.y);
+}
+
+//============================================================
+// 人間のすれ違い処理
+//============================================================
+void PassingHuman(Human *pHuman)
+{
+	Human *pPassHuman = GetHumanData();		// 人間の情報
+	float fLength;							// 距離
+	float posDest;							// 目標の位置
+	float posDiff;							// 位置の差分
+
+	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++,pPassHuman++)
+	{
+		if (pPassHuman != pHuman)
+		{ // 比較する人間が自分自身じゃない場合
+			if (pPassHuman->bUse == true)
+			{ // 人間が使用されていた場合
+				//長さを測る
+				fLength = (pPassHuman->pos.x - pHuman->pos.x) * (pPassHuman->pos.x - pHuman->pos.x)
+					+ (pPassHuman->pos.z - pHuman->pos.z) * (pPassHuman->pos.z - pHuman->pos.z);
+
+				if (fLength <= (30.0f * 30.0f))
+				{ // オブジェクトが当たっている
+					if (pHuman->move.x >= pPassHuman->move.x)
+					{ // 移動量が速い場合
+						switch (pHuman->curveInfo.curveInfo.dashAngle[pHuman->curveInfo.curveInfo.nNowCurve])
+						{
+						case DASH_RIGHT:		// 右
+
+							// 目標の位置を設定
+							posDest = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z - HUMAN_PASS_SHIFT;
+
+							// 位置の差分を求める
+							posDiff = posDest - pHuman->pos.z;
+
+							// 幅をずらす
+							pHuman->pos.z += posDiff * 0.06f;
+
+							break;				// 抜け出す
+
+						case DASH_LEFT:			// 左
+
+							// 目標の位置を設定
+							posDest = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].z + HUMAN_PASS_SHIFT;
+
+							// 位置の差分を求める
+							posDiff = posDest - pHuman->pos.z;
+
+							// 幅をずらす
+							pHuman->pos.z += posDiff * 0.06f;
+
+							break;				// 抜け出す
+
+						case DASH_FAR:			// 奥
+
+							// 目標の位置を設定
+							posDest = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x + HUMAN_PASS_SHIFT;
+
+							// 位置の差分を求める
+							posDiff = posDest - pHuman->pos.x;
+
+							// 幅をずらす
+							pHuman->pos.x += posDiff * 0.06f;
+
+							break;				// 抜け出す
+
+						case DASH_NEAR:			// 手前
+
+							// 目標の位置を設定
+							posDest = pHuman->curveInfo.curveInfo.curvePoint[pHuman->curveInfo.curveInfo.nNowCurve].x - HUMAN_PASS_SHIFT;
+
+							// 位置の差分を求める
+							posDiff = posDest - pHuman->pos.x;
+
+							// 幅をずらす
+							pHuman->pos.x += posDiff * 0.06f;
+
+							break;				// 抜け出す
+						}
+					}
+				}
+				else
+				{ // オブジェクトが当たっている
+
+					// 人間の歩く処理
+					WalkHuman(pHuman);
+				}
+			}
+		}
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理

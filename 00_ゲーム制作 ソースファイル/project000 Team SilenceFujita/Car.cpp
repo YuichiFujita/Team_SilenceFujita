@@ -985,9 +985,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	{
 	case COLLOBJECTTYPE_PLAYER:		// プレイヤー
 
-		// プレイヤーとの当たり判定
-		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
-
 		break;						// 抜け出す
 
 	case COLLOBJECTTYPE_CAR:		// 車
