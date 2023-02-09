@@ -528,7 +528,7 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 //	ƒIƒuƒWƒFƒNƒg‚Æ‚Ì“–‚½‚è”»’è
 //======================================================================================================================
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth)
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt)
 {
 	// •Ï”‚ðéŒ¾
 	D3DXVECTOR3 collPos;	// “–‚½‚è”»’è‚Ì’†SÀ•W
@@ -575,6 +575,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
+						// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+						*pTraCnt += 1;
+
 						// ˆÚ“®—Ê‚ðíœ
 						pMove->x *= 0.95f;
 					}
@@ -597,6 +600,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								2													// Žõ–½
 							);
 						}
+
+						// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+						*pTraCnt += 1;
 
 						// ˆÚ“®—Ê‚ðíœ
 						pMove->x *= 0.95f;
@@ -628,6 +634,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
+						// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+						*pTraCnt += 1;
+
 						// ˆÚ“®—Ê‚ðíœ
 						pMove->x *= 0.95f;
 					}
@@ -650,6 +659,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								2													// Žõ–½
 							);
 						}
+
+						// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+						*pTraCnt += 1;
 
 						// ˆÚ“®—Ê‚ðíœ
 						pMove->x *= 0.95f;
@@ -692,6 +704,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
+							// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+							*pTraCnt += 1;
+
 							// ˆÚ“®—Ê‚ðíœ
 							pMove->x *= 0.95f;
 						}
@@ -714,6 +729,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									2													// Žõ–½
 								);
 							}
+
+							// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+							*pTraCnt += 1;
 
 							// ˆÚ“®—Ê‚ðíœ
 							pMove->x *= 0.95f;
@@ -745,6 +763,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
+							// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+							*pTraCnt += 1;
+
 							// ˆÚ“®—Ê‚ðíœ
 							pMove->x *= 0.95f;
 						}
@@ -767,6 +788,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									2													// Žõ–½
 								);
 							}
+
+							// a‘ØƒJƒEƒ“ƒg‚ð‰ÁŽZ‚·‚é
+							*pTraCnt += 1;
 
 							// ˆÚ“®—Ê‚ðíœ
 							pMove->x *= 0.95f;

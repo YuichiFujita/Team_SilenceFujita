@@ -123,6 +123,8 @@ void UninitHuman(void)
 //======================================================================================================================
 void UpdateHuman(void)
 {
+	int nCnt = 0;
+
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aHuman[nCntHuman].bUse == true)
@@ -214,7 +216,8 @@ void UpdateHuman(void)
 				&g_aHuman[nCntHuman].posOld,	// 前回の位置
 				&g_aHuman[nCntHuman].move,		// 移動量
 				HUMAN_WIDTH,					// 横幅
-				HUMAN_DEPTH						// 奥行
+				HUMAN_DEPTH,					// 奥行
+				&nCnt							// 渋滞カウント
 			);
 
 			// プレイヤーの補正の更新処理

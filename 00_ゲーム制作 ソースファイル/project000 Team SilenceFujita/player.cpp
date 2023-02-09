@@ -243,7 +243,8 @@ void UpdatePlayer(void)
 			&g_player.oldPos,	// 前回の位置
 			&g_player.move,		// 移動量
 			PLAY_WIDTH,			// 横幅
-			PLAY_DEPTH			// 奥行
+			PLAY_DEPTH,			// 奥行
+			&nCnt				// 渋滞カウント
 		);
 
 		//	オブジェクトとの当たり判定
@@ -277,7 +278,8 @@ void UpdatePlayer(void)
 			PLAY_WIDTH,
 			PLAY_DEPTH,
 			COLLOBJECTTYPE_PLAYER,
-			&nCnt
+			&nCnt,
+			nCnt
 		);
 
 		//----------------------------------------------------
