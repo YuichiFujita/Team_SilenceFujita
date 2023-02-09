@@ -277,6 +277,8 @@ void UninitGame(void)
 //======================================================================================================================
 void UpdateGame(void)
 {
+	FADE Fade = GetFade();
+
 	switch (g_gameState)
 	{ // 状態ごとの処理
 	case GAMESTATE_NORMAL:
@@ -463,6 +465,13 @@ void UpdateGame(void)
 		// 当たり判定の保存
 		TxtSaveCollision();
 	}
+
+	if (GetKeyboardTrigger(DIK_SPACE) == true)
+	{ // 決定の操作が行われた場合
+		// リザルト画面に遷移
+		SetFade(MODE_RESULT);
+	}
+
 #else
 	if (g_bPause == false)
 	{ // ポーズ状態ではない場合
