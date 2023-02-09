@@ -151,6 +151,8 @@ void UninitPlayer(void)
 //============================================================
 void UpdatePlayer(void)
 {
+	int nCnt = 0;
+
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
 
@@ -261,7 +263,8 @@ void UpdatePlayer(void)
 			g_player.rot,				//向き
 			&g_player.move,				//移動量
 			g_player.modelData.fRadius,	//半径
-			COLLOBJECTTYPE_PLAYER		//対象のタイプ
+			COLLOBJECTTYPE_PLAYER,		//対象のタイプ
+			&nCnt
 		);
 
 		// 車同士の当たり判定

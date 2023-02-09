@@ -142,6 +142,8 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
+	int nCnt = 0;
+
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aPolice[nCntPolice].bUse == true)
@@ -226,7 +228,8 @@ void UpdatePolice(void)
 						g_aPolice[nCntPolice].rot,		//向き
 						&g_aPolice[nCntPolice].move,	//移動量
 						g_aPolice[nCntPolice].modelData.fRadius,	//半径
-						COLLOBJECTTYPE_POLICE			//対象のサイズ
+						COLLOBJECTTYPE_POLICE,			//対象のサイズ
+						&nCnt
 					);
 				}
 

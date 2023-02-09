@@ -12,6 +12,7 @@
 #include "player.h"
 #include "calculation.h"
 
+#include "camera.h"
 #include "input.h"
 #include "particle.h"
 #include "object.h"
@@ -379,6 +380,9 @@ void CollisionWind(Human *pHuman)
 
 				// lŠÔ‚ª‚«”ò‚Î‚³‚ê‚éˆ—
 				FlyAwayHuman(pHuman, *pPlayer);
+
+				// ƒJƒƒ‰‚Ìó‘Ô‚ğ•Ï‚¦‚é
+				*GetCameraState() = CAMERASTATE_GOODJOB;
 			}
 		}
 	}

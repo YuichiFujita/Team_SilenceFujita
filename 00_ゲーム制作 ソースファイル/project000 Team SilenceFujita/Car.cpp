@@ -43,6 +43,9 @@
 #define CAR_STOP_RADIUS_DIST	(300.0f)	// 車の止まる指標の円のずらす距離
 #define CAR_STOP_ADD_RADIUS		(50.0f)		// 車の止まる半径の追加分
 
+#define CAR_TRAFFIC_CNT			(240)		// 渋滞が起きたときに改善する用のカウント
+#define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
+
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
@@ -58,6 +61,8 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 	D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject);		// 車との当たり判定
 void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 	D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject);		// 警察との当たり判定
+
+void CarTrafficImprove(Car *pCar);					// 車の渋滞改善処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -76,15 +81,17 @@ void InitCar(void)
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		g_aCar[nCntCar].pos       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCar[nCntCar].posOld    = g_aCar[nCntCar].pos;			// 前回の位置
-		g_aCar[nCntCar].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aCar[nCntCar].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCar[nCntCar].nShadowID = NONE_SHADOW;					// 影のインデックス
-		g_aCar[nCntCar].bombState = BOMBSTATE_NONE;					// ボムの状態
-		g_aCar[nCntCar].bJump     = false;							// ジャンプしているかどうか
-		g_aCar[nCntCar].bMove     = false;							// 移動しているか
-		g_aCar[nCntCar].bUse      = false;							// 使用状況
+		g_aCar[nCntCar].pos         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCar[nCntCar].posOld      = g_aCar[nCntCar].pos;				// 前回の位置
+		g_aCar[nCntCar].move        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aCar[nCntCar].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
+		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
+		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
+		g_aCar[nCntCar].bMove       = false;							// 移動しているか
+		g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
+		g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態
+		g_aCar[nCntCar].bUse		= false;							// 使用状況
 
 		//曲がり角の情報の初期化
 		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle   = CURVE_LEFT;	// 左に曲がる
@@ -104,8 +111,11 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.fRadius  = 0.0f;					// 半径
 	}
 	
-	//車の設定処理
-	SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	for (int n = 0; n < MAX_CAR; n++)
+	{
+		//車の設定処理
+		SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
+	}
 }
 
 //======================================================================================================================
@@ -151,6 +161,12 @@ void UpdateCar(void)
 				//車のカーブ処理
 				CurveCar(&g_aCar[nCntCar]);
 
+				if (g_aCar[nCntCar].state == CARSTATE_TRAFFIC)
+				{ // 渋滞状態だった場合
+					// 車の渋滞改善処理
+					CarTrafficImprove(&g_aCar[nCntCar]);
+				}
+
 				if (g_aCar[nCntCar].pos.y < 0.0f)
 				{//Y軸の位置が0.0fだった場合
 					//縦への移動量を0.0fにする
@@ -173,27 +189,38 @@ void UpdateCar(void)
 					CAR_DEPTH					// 奥行
 				);
 
-				// 車の停止処理
-				CollisionStopCar
-				( // 引数
-					g_aCar[nCntCar].pos,				//位置
-					g_aCar[nCntCar].rot,				//向き
-					&g_aCar[nCntCar].move,				//移動量
-					g_aCar[nCntCar].modelData.fRadius,	//半径
-					COLLOBJECTTYPE_CAR					//対象のサイズ
-				);
+				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC)
+				{ // 渋滞状態じゃ無かった場合
 
-				// 車同士の当たり判定
-				CollisionCarBody
-				( // 引数
-					&g_aCar[nCntCar].pos,
-					&g_aCar[nCntCar].posOld,
-					g_aCar[nCntCar].rot,
-					&g_aCar[nCntCar].move,
-					CAR_WIDTH,
-					CAR_DEPTH,
-					COLLOBJECTTYPE_CAR
-				);
+					// 車の停止処理
+					CollisionStopCar
+					( // 引数
+						g_aCar[nCntCar].pos,				// 位置
+						g_aCar[nCntCar].rot,				// 向き
+						&g_aCar[nCntCar].move,				// 移動量
+						g_aCar[nCntCar].modelData.fRadius,	// 半径
+						COLLOBJECTTYPE_CAR,					// 対象のサイズ
+						&g_aCar[nCntCar].nTrafficCnt		// 渋滞カウント
+					);
+
+					if (g_aCar[nCntCar].nTrafficCnt >= CAR_TRAFFIC_CNT)
+					{ // 渋滞に巻き込まれた場合
+						// 渋滞状態にする
+						g_aCar[nCntCar].state = CARSTATE_TRAFFIC;
+					}
+
+					// 車同士の当たり判定
+					CollisionCarBody
+					( // 引数
+						&g_aCar[nCntCar].pos,
+						&g_aCar[nCntCar].posOld,
+						g_aCar[nCntCar].rot,
+						&g_aCar[nCntCar].move,
+						CAR_WIDTH,
+						CAR_DEPTH,
+						COLLOBJECTTYPE_CAR
+					);
+				}
 
 				// 車の補正の更新処理
 				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
@@ -312,12 +339,14 @@ void SetCar(D3DXVECTOR3 pos)
 		if (g_aCar[nCntCar].bUse == false)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
-			g_aCar[nCntCar].pos       = pos;							// 現在の位置
-			g_aCar[nCntCar].posOld    = g_aCar[nCntCar].pos;			// 前回の位置
-			g_aCar[nCntCar].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aCar[nCntCar].bombState = BOMBSTATE_NONE;					// 何もしていない状態にする
-			g_aCar[nCntCar].bJump     = false;							// ジャンプしているかどうか
-			g_aCar[nCntCar].bMove     = false;							// 移動していない
+			g_aCar[nCntCar].pos			= pos;								// 現在の位置
+			g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;				// 前回の位置
+			g_aCar[nCntCar].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aCar[nCntCar].bombState	= BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aCar[nCntCar].bJump		= false;							// ジャンプしているかどうか
+			g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
+			g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態
+			g_aCar[nCntCar].bMove		= false;							// 移動していない
 
 			// 使用している状態にする
 			g_aCar[nCntCar].bUse = true;
@@ -805,7 +834,7 @@ void DashCarAction(Car *pCar)
 //============================================================
 // 車の停止処理
 //============================================================
-void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject)
+void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject, int *pTraCnt)
 {
 	D3DXVECTOR3 stopCarpos =
 		D3DXVECTOR3(
@@ -847,6 +876,9 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 						// 目標の移動量をセーブする
 						move->x = 0.0f;
 
+						// カウントを加算する
+						*pTraCnt += 1;
+
 						break;						//抜け出す
 					}
 				}
@@ -884,6 +916,9 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 					// 目標の移動量をセーブする
 					move->x = sinf(targetrot.y) * -8.0f;
 
+					// カウントを加算する
+					*pTraCnt += 1;
+
 					break;						//抜け出す
 				}
 			}
@@ -920,6 +955,9 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 
 						// 目標の移動量をセーブする
 						move->x = 0.0f;
+
+						// カウントを加算する
+						*pTraCnt += 1;
 
 						break;						//抜け出す
 					}
@@ -1345,7 +1383,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.z = pPos->z + (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
@@ -1355,7 +1393,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.z = pPos->z + (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
@@ -1371,7 +1409,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.z = pPos->z - (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
@@ -1381,7 +1419,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.z = pPos->z - (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
@@ -1402,7 +1440,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.x = pPos->x + (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
@@ -1412,7 +1450,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.x = pPos->x + (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
@@ -1428,7 +1466,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{
 					case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.x = pPos->x - (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
@@ -1438,7 +1476,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					case COLLOBJECTTYPE_CAR:		// 車の場合
 
-													//位置をずらす
+						//位置をずらす
 						pPolice->pos.x = pPos->x - (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
@@ -1449,6 +1487,24 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				}							//右端の処理
 			}
 		}
+	}
+}
+
+//============================================================
+// 車の渋滞改善処理
+//============================================================
+void CarTrafficImprove(Car *pCar)
+{
+	// 渋滞カウントを加算する
+	pCar->nTrafficCnt++;
+
+	if (pCar->nTrafficCnt >= CAR_TRAFFIC_IMPROVE_CNT)
+	{ // 渋滞カウントが解除状態に入った場合
+		// カウントを0にする
+		pCar->nTrafficCnt = 0;
+
+		// 通常状態にする
+		pCar->state = CARSTATE_NORMAL;
 	}
 }
 
