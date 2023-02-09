@@ -39,27 +39,15 @@
 
 #define BARRIER_GRAVITY	(0.5f)		// 発射されたバリアにかかる重力
 #define LAND_CNT		(5)			// 着弾時のカウント
+#define REV_UP_POS		(450.0f)	// 上昇時の補正値
+#define REV_DOWN_POS	(0.0f)		// 下降時の補正値
+#define POS_Y_CHANGE	(1.0f)		// 位置の変更量
+#define MOVEPOS_ADD		(0.2f)		// 上昇・下降時の加算量
+#define CARPOS_MUL		(0.9f)		// 車の位置の乗算量
 #define SET_CNT			(240)		// 完成時のカウント
-#define ENLARGE_SCALE	(6.5f)		// 拡大率の補正値
+#define ENLARGE_SCALE	(6.0f)		// 拡大率の補正値
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
-
-//**********************************************************************************************************************
-//	列挙型定義 (BARRIERSTATE)
-//**********************************************************************************************************************
-typedef enum
-{
-	BARRIERSTATE_NONE = 0,	// 何もしない状態
-	BARRIERSTATE_FLY,		// 発射状態
-	BARRIERSTATE_HOMING,	// 追尾状態
-	BARRIERSTATE_LAND,		// 着弾状態
-	BARRIERSTATE_ENLARGE,	// 拡大状態
-	BARRIERSTATE_UP,		// 上昇状態
-	BARRIERSTATE_SET,		// 完成状態
-	BARRIERSTATE_DOWN,		// 下降状態
-	BARRIERSTATE_REDUCE,	// 縮小状態
-	BARRIERSTATE_MAX,		// この列挙型の総数
-} BARRIERSTATE;
 
 //**********************************************************************************************************************
 //	列挙型定義 (BOMBTYPE)
@@ -106,6 +94,9 @@ typedef struct
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void SetBomb(D3DXVECTOR3 pos, BOMBTYPE type, void *pCar);	// ボムの設定
+
+//void UpdateBomb(void);		// ボムの情報の更新
+//void UpdateBarrier(void);	// 
 
 void ResetBomb(void);		// ボムの再設定
 void CollisionBomb(void);	// ボム検知範囲の当たり判定
@@ -214,10 +205,6 @@ void UpdateBomb(void)
 		g_pCurrentAim = NULL;
 	}
 
-#define REV_UP_POS		(400.0f)	// 上昇時の補正値
-#define REV_DOWN_POS	(0.0f)		// 下降時の補正値
-#define POS_Y_CHANGE	(2.0f)		// 位置の変更量
-
 	// バリアの情報の更新
 	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
 	{ // バリアの最大表示数分繰り返す
@@ -245,8 +232,8 @@ void UpdateBomb(void)
 				if (g_aBarrier[nCntBarrier].move.y <= 0.0f)
 				{ // y移動量が 0.0f以下の場合 (下降)
 
-					// y移動量を補正
-					g_aBarrier[nCntBarrier].move.y = 0.0f;
+					// 移動量を初期化
+					g_aBarrier[nCntBarrier].move = D3DXVECTOR3(0.0f, 0.0f, 0.0);
 
 					// 追尾状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_HOMING;
@@ -314,16 +301,22 @@ void UpdateBomb(void)
 				if (g_aBarrier[nCntBarrier].pos.y < REV_UP_POS)
 				{ // バリアの位置が一定座標より下の場合
 
+					// 移動量を加算
+					g_aBarrier[nCntBarrier].move.y += MOVEPOS_ADD;
+
 					// 位置を上昇
-					g_aBarrier[nCntBarrier].pos.y      += POS_Y_CHANGE;	// バリアの位置
-					g_aBarrier[nCntBarrier].pCarPos->y += POS_Y_CHANGE;	// 車の位置
+					g_aBarrier[nCntBarrier].pos.y      += g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
+					g_aBarrier[nCntBarrier].pCarPos->y += (g_aBarrier[nCntBarrier].move.y * CARPOS_MUL) + POS_Y_CHANGE;	// 車の位置
 				}
 				else
 				{ // バリアの位置が一定座標以上の場合
 
 					// 位置を補正
-					g_aBarrier[nCntBarrier].pos.y      = REV_UP_POS;	// バリアの位置
-					g_aBarrier[nCntBarrier].pCarPos->y = REV_UP_POS;	// 車の位置
+					g_aBarrier[nCntBarrier].pos.y      = REV_UP_POS;					// バリアの位置
+					g_aBarrier[nCntBarrier].pCarPos->y = REV_UP_POS * CARPOS_MUL;		// 車の位置
+
+					// 移動量を初期化
+					g_aBarrier[nCntBarrier].move = D3DXVECTOR3(0.0f, 0.0f, 0.0);
 
 					// 完成状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_SET;
@@ -355,9 +348,12 @@ void UpdateBomb(void)
 				if (g_aBarrier[nCntBarrier].pos.y > REV_DOWN_POS)
 				{ // バリアの位置が一定座標より上の場合
 
+					// 移動量を加算
+					g_aBarrier[nCntBarrier].move.y += MOVEPOS_ADD;
+
 					// 位置を下降
-					g_aBarrier[nCntBarrier].pos.y      -= POS_Y_CHANGE;	// バリアの位置
-					g_aBarrier[nCntBarrier].pCarPos->y -= POS_Y_CHANGE;	// 車の位置
+					g_aBarrier[nCntBarrier].pos.y      -= g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
+					g_aBarrier[nCntBarrier].pCarPos->y -= (g_aBarrier[nCntBarrier].move.y * CARPOS_MUL) + POS_Y_CHANGE;	// 車の位置
 				}
 				else
 				{ // バリアの位置が一定座標以下の場合
@@ -365,6 +361,9 @@ void UpdateBomb(void)
 					// 位置を補正
 					g_aBarrier[nCntBarrier].pos.y      = REV_DOWN_POS;	// バリアの位置
 					g_aBarrier[nCntBarrier].pCarPos->y = REV_DOWN_POS;	// 車の位置
+
+					// 移動量を初期化
+					g_aBarrier[nCntBarrier].move = D3DXVECTOR3(0.0f, 0.0f, 0.0);
 
 					// 縮小状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_REDUCE;
@@ -496,6 +495,190 @@ void DrawBomb(void)
 
 	// 頂点法線の自動正規化を無効にする
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
+}
+
+//======================================================================================================================
+//	バリアの発射処理
+//======================================================================================================================
+void ShotBarrier(void)
+{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+	Car    *pCar;					// 車の情報
+	Police *pPolice;				// 警察の情報
+
+	if (g_pCurrentAim != NULL)
+	{ // 現在狙っている車のアドレスが NULLではない場合
+
+		if (g_aBomb[g_nID].bUse == true)
+		{ // 現在狙い中の車が使用されている場合
+
+			for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
+			{ // バリアの最大表示数分繰り返す
+
+				if (g_aBarrier[nCntBarrier].bUse == false)
+				{ // バリアが使用されていない場合
+
+					// 発射位置を設定
+					g_aBarrier[nCntBarrier].pos.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * BOMB_XZ_ADD;	// x
+					g_aBarrier[nCntBarrier].pos.y = pPlayer->pos.y + BOMB_Y_ADD;							// y
+					g_aBarrier[nCntBarrier].pos.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * BOMB_XZ_ADD;	// z
+
+					// 移動量を設定
+					g_aBarrier[nCntBarrier].move.x = sinf(pPlayer->rot.y) * (SHOT_BAR_POS_XZ + pPlayer->move.x + pPlayer->boost.plusMove.x);	// x
+					g_aBarrier[nCntBarrier].move.y = SHOT_BAR_POS_Y;																			// y
+					g_aBarrier[nCntBarrier].move.z = cosf(pPlayer->rot.y) * (SHOT_BAR_POS_XZ + pPlayer->move.x + pPlayer->boost.plusMove.x);	// z
+
+					// ボムの情報を代入
+					g_aBarrier[nCntBarrier].type = g_aBomb[g_nID].type;	// 種類
+					g_aBarrier[nCntBarrier].pCar = g_aBomb[g_nID].pCar;	// 車アドレス
+
+					// 構造体の情報を初期化
+					g_aBarrier[nCntBarrier].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
+					g_aBarrier[nCntBarrier].nCounter = 0;								// バリアカウンター
+
+					// 発射状態にする
+					g_aBarrier[nCntBarrier].state = BARRIERSTATE_FLY;
+
+					switch (g_aBomb[g_nID].type)
+					{ // 現在狙い中の車の種類ごとの処理	
+					case BOMBTYPE_CAR:		// 車
+
+						// 狙っている車のアドレスを代入
+						pCar = (Car*)g_aBomb[g_nID].pCar;
+
+						// 車の位置アドレスを設定
+						g_aBarrier[nCntBarrier].pCarPos = &pCar->pos;
+
+						// バリア接近状態にする
+						pCar->bombState = BOMBSTATE_BAR_NEAR;
+
+						// 処理を抜ける
+						break;
+
+					case BOMBTYPE_POLICE:	// 警察
+
+						// 狙っている警察のアドレスを代入
+						pPolice = (Police*)g_aBomb[g_nID].pCar;
+
+						// 警察の位置アドレスを設定
+						g_aBarrier[nCntBarrier].pCarPos = &pPolice->pos;
+
+						// バリア接近状態にする
+						pPolice->bombState = BOMBSTATE_BAR_NEAR;
+
+						// 処理を抜ける
+						break;
+					}
+
+					// 攻撃モードを通常状態に変更
+					pPlayer->atkState = ATTACKSTATE_NORMAL;
+
+					// 使用している状態にする
+					g_aBarrier[nCntBarrier].bUse = true;
+
+					// 処理を抜ける
+					break;
+				}
+			}
+		}
+	}
+}
+
+//======================================================================================================================
+//	バリアの状態の取得処理
+//======================================================================================================================
+BARRIERSTATE GetBarrier(void *pCar)
+{
+	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
+	{ // バリアの最大表示数分繰り返す
+
+		if (g_aBarrier[nCntBarrier].bUse == true)
+		{ // バリアが使用されている場合
+
+			if (g_aBarrier[nCntBarrier].pCar == pCar)
+			{ // 引数の車アドレスとバリアの車アドレスが同じ場合
+
+				// 現在の車のバリア状態を返す
+				return g_aBarrier[nCntBarrier].state;
+			}
+		}
+	}
+
+	// 同じアドレスの車がなかった場合
+	return BARRIERSTATE_NONE;			// 何もしない状態を返す
+}
+
+//======================================================================================================================
+//	バリアのホーミング
+//======================================================================================================================
+void HomingBarrier(int nCntBarrier)
+{
+	// 変数を宣言
+	D3DXVECTOR3 destPos;	// ホーミング目標位置
+	D3DXVECTOR2 destRot;	// ホーミング計算用
+
+	// ポインタを宣言
+	Car    *pCar;			// 車の情報
+	Police *pPolice;		// 警察の情報
+
+	// 目標位置を設定
+	destPos = *g_aBarrier[nCntBarrier].pCarPos;
+
+	// 目標の移動方向を求める
+	destRot.x = atan2f(destPos.x - g_aBarrier[nCntBarrier].pos.x, destPos.z - g_aBarrier[nCntBarrier].pos.z);
+	destRot.y = atan2f(destPos.x - g_aBarrier[nCntBarrier].pos.x, destPos.y - g_aBarrier[nCntBarrier].pos.y);
+
+	// 移動量を設定
+	g_aBarrier[nCntBarrier].move.x = HORIZONTAL_MOVE * sinf(destRot.x);	// x
+	g_aBarrier[nCntBarrier].move.y = VERTICAL_MOVE   * cosf(destRot.y);	// y
+	g_aBarrier[nCntBarrier].move.z = HORIZONTAL_MOVE * cosf(destRot.x);	// z
+
+	// 位置を移動
+	g_aBarrier[nCntBarrier].pos += g_aBarrier[nCntBarrier].move;
+
+	if (g_aBarrier[nCntBarrier].pos.y <= 0.0f)
+	{ // y座標が 0.0f以下の場合 (着弾)
+
+		switch (g_aBomb[g_nID].type)
+		{ // 現在狙い中の車の種類ごとの処理	
+		case BOMBTYPE_CAR:		// 車
+
+			// 狙っている車のアドレスを代入
+			pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
+
+			// バリア内状態にする
+			pCar->bombState = BOMBSTATE_BAR_IN;
+
+			// 処理を抜ける
+			break;
+
+		case BOMBTYPE_POLICE:	// 警察
+
+			// 狙っている警察のアドレスを代入
+			pPolice = (Police*)g_aBarrier[nCntBarrier].pCar;
+
+			// バリア内状態にする
+			pPolice->bombState = BOMBSTATE_BAR_IN;
+
+			// 処理を抜ける
+			break;
+		}
+
+		// 座標を補正
+		g_aBarrier[nCntBarrier].pos.x = destPos.x;
+		g_aBarrier[nCntBarrier].pos.y = 0.0f;
+		g_aBarrier[nCntBarrier].pos.z = destPos.z;
+
+		// 移動量を初期化
+		g_aBarrier[nCntBarrier].move = D3DXVECTOR3(0.0f, 0.0f, 0.0);
+
+		// カウンターを設定
+		g_aBarrier[nCntBarrier].nCounter = LAND_CNT;
+
+		// 着弾状態にする
+		g_aBarrier[nCntBarrier].state = BARRIERSTATE_LAND;
+	}
 }
 
 //======================================================================================================================
@@ -804,164 +987,6 @@ void SetAim(void)
 			// 処理を抜ける
 			break;
 		}
-	}
-}
-
-
-//======================================================================================================================
-//	バリアの発射処理
-//======================================================================================================================
-void ShotBarrier(void)
-{
-	// ポインタを宣言
-	Player *pPlayer = GetPlayer();	// プレイヤーの情報
-	Car    *pCar;					// 車の情報
-	Police *pPolice;				// 警察の情報
-
-	if (g_pCurrentAim != NULL)
-	{ // 現在狙っている車のアドレスが NULLではない場合
-
-		if (g_aBomb[g_nID].bUse == true)
-		{ // 現在狙い中の車が使用されている場合
-
-			for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
-			{ // バリアの最大表示数分繰り返す
-
-				if (g_aBarrier[nCntBarrier].bUse == false)
-				{ // バリアが使用されていない場合
-
-					// 発射位置を設定
-					g_aBarrier[nCntBarrier].pos.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * BOMB_XZ_ADD;	// x
-					g_aBarrier[nCntBarrier].pos.y = pPlayer->pos.y + BOMB_Y_ADD;							// y
-					g_aBarrier[nCntBarrier].pos.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * BOMB_XZ_ADD;	// z
-
-					// 移動量を設定
-					g_aBarrier[nCntBarrier].move.x = sinf(pPlayer->rot.y) * (SHOT_BAR_POS_XZ + pPlayer->move.x + pPlayer->boost.plusMove.x);	// x
-					g_aBarrier[nCntBarrier].move.y = SHOT_BAR_POS_Y;																			// y
-					g_aBarrier[nCntBarrier].move.z = cosf(pPlayer->rot.y) * (SHOT_BAR_POS_XZ + pPlayer->move.x + pPlayer->boost.plusMove.x);	// z
-
-					// ボムの情報を代入
-					g_aBarrier[nCntBarrier].type = g_aBomb[g_nID].type;	// 種類
-					g_aBarrier[nCntBarrier].pCar = g_aBomb[g_nID].pCar;	// 車アドレス
-
-					// 構造体の情報を初期化
-					g_aBarrier[nCntBarrier].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
-					g_aBarrier[nCntBarrier].nCounter = 0;								// バリアカウンター
-
-					// 発射状態にする
-					g_aBarrier[nCntBarrier].state = BARRIERSTATE_FLY;
-
-					switch (g_aBomb[g_nID].type)
-					{ // 現在狙い中の車の種類ごとの処理	
-					case BOMBTYPE_CAR:		// 車
-
-						// 狙っている車のアドレスを代入
-						pCar = (Car*)g_aBomb[g_nID].pCar;
-
-						// 車の位置アドレスを設定
-						g_aBarrier[nCntBarrier].pCarPos = &pCar->pos;
-
-						// バリア接近状態にする
-						pCar->bombState = BOMBSTATE_BAR_NEAR;
-
-						// 処理を抜ける
-						break;
-
-					case BOMBTYPE_POLICE:	// 警察
-
-						// 狙っている警察のアドレスを代入
-						pPolice = (Police*)g_aBomb[g_nID].pCar;
-
-						// 警察の位置アドレスを設定
-						g_aBarrier[nCntBarrier].pCarPos = &pPolice->pos;
-
-						// バリア接近状態にする
-						pPolice->bombState = BOMBSTATE_BAR_NEAR;
-
-						// 処理を抜ける
-						break;
-					}
-
-					// 攻撃モードを通常状態に変更
-					pPlayer->atkState = ATTACKSTATE_NORMAL;
-
-					// 使用している状態にする
-					g_aBarrier[nCntBarrier].bUse = true;
-
-					// 処理を抜ける
-					break;
-				}
-			}
-		}
-	}
-}
-
-//======================================================================================================================
-//	バリアのホーミング
-//======================================================================================================================
-void HomingBarrier(int nCntBarrier)
-{
-	// 変数を宣言
-	D3DXVECTOR3 destPos;	// ホーミング目標位置
-	D3DXVECTOR2 destRot;	// ホーミング計算用
-
-	// ポインタを宣言
-	Car    *pCar;			// 車の情報
-	Police *pPolice;		// 警察の情報
-
-	// 目標位置を設定
-	destPos = *g_aBarrier[nCntBarrier].pCarPos;
-
-	// 目標の移動方向を求める
-	destRot.x = atan2f(destPos.x - g_aBarrier[nCntBarrier].pos.x, destPos.z - g_aBarrier[nCntBarrier].pos.z);
-	destRot.y = atan2f(destPos.x - g_aBarrier[nCntBarrier].pos.x, destPos.y - g_aBarrier[nCntBarrier].pos.y);
-
-	// 移動量を設定
-	g_aBarrier[nCntBarrier].move.x = HORIZONTAL_MOVE * sinf(destRot.x);	// x
-	g_aBarrier[nCntBarrier].move.y = VERTICAL_MOVE   * cosf(destRot.y);	// y
-	g_aBarrier[nCntBarrier].move.z = HORIZONTAL_MOVE * cosf(destRot.x);	// z
-
-	// 位置を移動
-	g_aBarrier[nCntBarrier].pos += g_aBarrier[nCntBarrier].move;
-
-	if (g_aBarrier[nCntBarrier].pos.y <= 0.0f)
-	{ // y座標が 0.0f以下の場合 (着弾)
-
-		switch (g_aBomb[g_nID].type)
-		{ // 現在狙い中の車の種類ごとの処理	
-		case BOMBTYPE_CAR:		// 車
-
-			// 狙っている車のアドレスを代入
-			pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
-
-			// バリア内状態にする
-			pCar->bombState = BOMBSTATE_BAR_IN;
-
-			// 処理を抜ける
-			break;
-
-		case BOMBTYPE_POLICE:	// 警察
-
-			// 狙っている警察のアドレスを代入
-			pPolice = (Police*)g_aBarrier[nCntBarrier].pCar;
-
-			// バリア内状態にする
-			pPolice->bombState = BOMBSTATE_BAR_IN;
-
-			// 処理を抜ける
-			break;
-		}
-
-		// 座標を補正
-		g_aBarrier[nCntBarrier].pos.x = destPos.x;
-		g_aBarrier[nCntBarrier].pos.y = 0.0f;
-		g_aBarrier[nCntBarrier].pos.z = destPos.z;
-
-		// カウンターを設定
-		g_aBarrier[nCntBarrier].nCounter = LAND_CNT;
-
-		// 着弾状態にする
-		g_aBarrier[nCntBarrier].state = BARRIERSTATE_LAND;
 	}
 }
 
