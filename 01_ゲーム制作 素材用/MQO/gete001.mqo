@@ -1,0 +1,61 @@
+Metasequoia Document
+Format Text Ver 1.0
+
+Scene {
+	pos 17.2014 13.4205 2809.1099
+	lookat -0.0489 143.4000 -17.4843
+	head 81.3858
+	pich 0.0992
+	bank -0.0200
+	ortho 0
+	zoom2 2.6698
+	amb 0.250 0.250 0.250
+	dirlights 1 {
+		light {
+			dir 0.408 0.408 0.816
+			color 1.000 1.000 1.000
+		}
+	}
+}
+Material 13 {
+	"íåZ" col(0.710 0.710 0.710 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\hasi.jpg") proj_type(1) proj_pos(0.000 0.000 0.000) proj_scale(100.000 100.000 100.000) proj_angle(0.000 0.000 0.000)
+	"íåX" col(0.710 0.710 0.710 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\hasi.jpg") proj_type(1) proj_pos(0.000 0.000 0.000) proj_scale(100.000 100.000 100.000) proj_angle(90.000 0.000 0.000)
+	"íåY" col(0.710 0.710 0.710 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\hasi.jpg") proj_type(1) proj_pos(0.000 0.000 0.000) proj_scale(100.000 100.000 100.000) proj_angle(90.000 90.000 0.000)
+	"éxíåZ" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\hasi.jpg") proj_type(1) proj_pos(0.000 0.000 0.000) proj_scale(100.000 100.000 100.000) proj_angle(0.000 0.000 0.000)
+	"éxíåX" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\hasi.jpg") proj_type(1) proj_pos(0.000 0.000 0.000) proj_scale(100.000 100.000 100.000) proj_angle(90.000 0.000 0.000)
+	"éxíåY" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\hasi.jpg") proj_type(1) proj_pos(0.000 0.000 0.000) proj_scale(100.000 100.000 100.000) proj_angle(90.000 90.000 0.000)
+	"âÆç™Z" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\kawara001.jpg") proj_type(1) proj_pos(0.000 450.935 0.000) proj_scale(100.000 100.000 100.000) proj_angle(0.000 0.000 0.000)
+	"âÆç™X" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\kawara001.jpg") proj_type(1) proj_pos(0.000 450.900 0.000) proj_scale(100.000 100.000 100.000) proj_angle(90.000 0.000 0.000)
+	"âÆç™Y" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\kawara001.jpg") proj_type(1) proj_pos(0.000 450.900 0.000) proj_scale(100.000 100.000 100.000) proj_angle(90.000 90.000 0.000)
+	"âÆç™ÇªÇÃëº" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\kawara002.jpg") proj_type(1) proj_pos(0.000 0.000 0.000) proj_scale(614.351 255.350 29.057) proj_angle(0.000 90.000 0.000)
+	"ìSî¬Z" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\metal000.jpg") proj_type(1) proj_pos(0.000 118.407 0.000) proj_scale(183.764 170.517 239.365) proj_angle(0.000 0.000 0.000)
+	"ìSî¬X" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\metal000.jpg") proj_type(1) proj_pos(0.000 118.400 -214.249) proj_scale(183.800 170.500 239.400) proj_angle(90.000 0.000 0.000)
+	"ìSî¬Y" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\metal000.jpg") proj_type(1) proj_pos(0.000 118.400 0.000) proj_scale(183.800 170.500 239.400) proj_angle(0.000 90.000 0.000)
+}
+Object "obj5" {
+	visible 15
+	locking 0
+	shading 1
+	facet 59.5
+	color 0.898 0.498 0.698
+	color_type 0
+	vertex 8 {
+		-181.3241 235.7157 -20.0000
+		181.3435 235.7157 -20.0000
+		181.3341 235.7157 20.0000
+		-181.3335 235.7157 20.0000
+		-181.3200 0.0008 -20.0000
+		181.3477 0.0008 -20.0000
+		181.3383 0.0008 20.0000
+		-181.3294 0.0008 20.0000
+	}
+	face 6 {
+		4 V(7 4 0 3) M(11) UV(-0.13724 0.84721 -0.02842 0.84721 -0.02842 0.15597 -0.13724 0.15597)
+		4 V(6 7 3 2) M(10) UV(0.99340 0.84720 0.00662 0.84720 0.00661 0.15602 0.99339 0.15602)
+		4 V(5 6 2 1) M(11) UV(-0.02842 0.84721 -0.13724 0.84721 -0.13724 0.15597 -0.02842 0.15597)
+		4 V(4 5 1 0) M(10) UV(0.00665 0.84720 0.99343 0.84720 0.99341 0.15602 0.00664 0.15602)
+		4 V(4 7 6 5) M(12) UV(0.00675 0.55865 0.00672 0.44135 0.99330 0.44135 0.99333 0.55865)
+		4 V(3 0 1 2) M(12) UV(0.00671 0.44135 0.00674 0.55865 0.99332 0.55865 0.99329 0.44135)
+	}
+}
+Eof
