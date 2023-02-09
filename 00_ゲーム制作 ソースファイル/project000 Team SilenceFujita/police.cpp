@@ -244,7 +244,8 @@ void UpdatePolice(void)
 						&g_aPolice[nCntPolice].move,
 						POLICAR_WIDTH,
 						POLICAR_DEPTH,
-						COLLOBJECTTYPE_POLICE
+						COLLOBJECTTYPE_POLICE,
+						&nCnt
 					);
 				}
 

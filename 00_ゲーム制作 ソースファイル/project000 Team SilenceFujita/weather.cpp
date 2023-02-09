@@ -65,7 +65,7 @@ void InitWeather(void)
 	int nRandWeather;		// 天気の変数
 
 	// 天気を設定する
-	nRandWeather = rand() % 10;
+	nRandWeather = rand() % WEATHER_RAND;
 
 	if (nRandWeather <= SUNNY_RAND)
 	{ // 晴れの場合
