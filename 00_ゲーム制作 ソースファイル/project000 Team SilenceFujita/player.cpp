@@ -276,7 +276,8 @@ void UpdatePlayer(void)
 			&g_player.move,
 			PLAY_WIDTH,
 			PLAY_DEPTH,
-			COLLOBJECTTYPE_PLAYER
+			COLLOBJECTTYPE_PLAYER,
+			&nCnt
 		);
 
 		//----------------------------------------------------
