@@ -20,7 +20,7 @@
 #define MAX_HUMAN_CURVE		(20)		// 人が曲がれる最大数
 #define MAX_HUMAN_ROUTE		(1)			// 人が歩くルート
 #define SHIFT_CAR_CURVE		(45.0f)		// 車のカーブでずらす幅
-#define SHIFT_HUMAN_CURVE	(100.0f)	// 人のカーブでずらす幅
+#define SHIFT_HUMAN_CURVE	(80.0f)		// 人のカーブでずらす幅
 
 //**********************************************************************************************************************
 //	曲がり角で曲がる角度(CURVEANGLE)
@@ -127,7 +127,6 @@ typedef struct
 	int					nRandamRoute;				// 走るルート
 	D3DXVECTOR3			rotDest;					// 目標の向き
 	HUMANACTIONSTATE	actionState;				// 行動パターン
-	float				fWalkRand;					// 歩く幅の差異
 }HUMANCURVE;
 
 //**********************************************************************************************************************

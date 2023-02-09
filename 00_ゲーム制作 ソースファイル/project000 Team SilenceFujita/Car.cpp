@@ -175,7 +175,7 @@ void UpdateCar(void)
 				}
 			}
 
-			if (GetBarrier(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
+			if (GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
 			{ // バリアセット状態じゃなかった場合
 				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC)
 				{ // 渋滞状態じゃない場合
@@ -984,9 +984,6 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	switch (collObject)
 	{
 	case COLLOBJECTTYPE_PLAYER:		// プレイヤー
-
-		// プレイヤーとの当たり判定
-		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
 
 		break;						// 抜け出す
 
