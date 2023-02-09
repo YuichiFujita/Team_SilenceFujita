@@ -43,9 +43,9 @@
 #define REV_DOWN_POS	(0.0f)		// 下降時の補正値
 #define POS_Y_CHANGE	(1.0f)		// 位置の変更量
 #define MOVEPOS_ADD		(0.2f)		// 上昇・下降時の加算量
-#define DOWN_RADIUS		(120.0f)	// 下降時の下の車の確認半径
+#define DOWN_RADIUS		(240.0f)	// 下降時の下の車の確認半径
 #define CARPOS_MUL		(0.9f)		// 車の位置の乗算量
-#define SET_CNT			(240)		// 完成時のカウント
+#define SET_CNT			(2400)		// 完成時のカウント
 #define ENLARGE_SCALE	(6.0f)		// 拡大率の補正値
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
@@ -508,15 +508,15 @@ void UpdateBarrierData(void)
 					g_aBarrier[nCntBarrier].move.y += MOVEPOS_ADD;
 
 					// 位置を上昇
-					g_aBarrier[nCntBarrier].pos.y      += g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
+					g_aBarrier[nCntBarrier].pos.y      +=  g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
 					g_aBarrier[nCntBarrier].pCarPos->y += (g_aBarrier[nCntBarrier].move.y * CARPOS_MUL) + POS_Y_CHANGE;	// 車の位置
 				}
 				else
 				{ // バリアの位置が一定座標以上の場合
 
 					// 位置を補正
-					g_aBarrier[nCntBarrier].pos.y      = REV_UP_POS;					// バリアの位置
-					g_aBarrier[nCntBarrier].pCarPos->y = REV_UP_POS * CARPOS_MUL;		// 車の位置
+					g_aBarrier[nCntBarrier].pos.y      = REV_UP_POS;				// バリアの位置
+					g_aBarrier[nCntBarrier].pCarPos->y = REV_UP_POS * CARPOS_MUL;	// 車の位置
 
 					// 移動量を初期化
 					g_aBarrier[nCntBarrier].move = D3DXVECTOR3(0.0f, 0.0f, 0.0);
@@ -540,7 +540,7 @@ void UpdateBarrierData(void)
 				{ // カウンターが 0以下の場合
 
 					if (DownBarrier(nCntBarrier) == true)
-					{ // 下降可能な場合
+					{ // 下降可能だった場合
 
 						// 下降状態にする
 						g_aBarrier[nCntBarrier].state = BARRIERSTATE_DOWN;
@@ -559,7 +559,7 @@ void UpdateBarrierData(void)
 					g_aBarrier[nCntBarrier].move.y += MOVEPOS_ADD;
 
 					// 位置を下降
-					g_aBarrier[nCntBarrier].pos.y      -= g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
+					g_aBarrier[nCntBarrier].pos.y      -=  g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
 					g_aBarrier[nCntBarrier].pCarPos->y -= (g_aBarrier[nCntBarrier].move.y * CARPOS_MUL) + POS_Y_CHANGE;	// 車の位置
 				}
 				else
@@ -604,6 +604,12 @@ void UpdateBarrierData(void)
 						// バリア内の車のアドレスを代入
 						pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
 
+						// 車の状態を通常状態にする
+						pCar->state = CARSTATE_NORMAL;
+
+						// 渋滞カウントを初期化
+						pCar->nTrafficCnt = 0;
+
 						// ボムの状態を何もしない状態にする
 						pCar->bombState = BOMBSTATE_NONE;
 
@@ -614,6 +620,12 @@ void UpdateBarrierData(void)
 
 						// バリア内の警察のアドレスを代入
 						pPolice = (Police*)g_aBarrier[nCntBarrier].pCar;
+
+						// 警察の状態をパトロール状態にする
+						pPolice->state = POLICESTATE_PATROL;
+
+						// 渋滞カウントを初期化
+						pPolice->nTrafficCnt = 0;
 
 						// ボムの状態を何もしない状態にする
 						pPolice->bombState = BOMBSTATE_NONE;
@@ -819,7 +831,7 @@ void SortBomb(void)
 		if (nCntBomb != nNowMaxID)
 		{ // 最大値の要素番号に変動があった場合
 
-			// 値の入れ替え
+			// 要素の入れ替え
 			keepBomb           = g_aBomb[nCntBomb];
 			g_aBomb[nCntBomb]  = g_aBomb[nNowMaxID];
 			g_aBomb[nNowMaxID] = keepBomb;
