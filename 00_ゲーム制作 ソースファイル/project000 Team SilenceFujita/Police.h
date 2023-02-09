@@ -33,6 +33,7 @@ typedef enum
 	POLICESTATE_PATBACK,				// パトロールに戻るときの処理
 	POLICESTATE_POSBACK,				// 最初の座標に戻る
 	POLICESTATE_TACKLE,					// タックル状態
+	POLICESTATE_TRAFFIC,				// 渋滞状態
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
 
@@ -69,7 +70,8 @@ typedef struct
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
 	CARCURVE	policeCurve;			// 曲がり角関係の情報
 	CARCURVE	policeCurveCopy;		// 曲がり角の情報のコピー
-	PoliTackle tackle;					// タックル関係の変数
+	PoliTackle  tackle;					// タックル関係の変数
+	int			nTrafficCnt;			// 渋滞カウント
 }Police;
 
 //**********************************************************************************************************************
