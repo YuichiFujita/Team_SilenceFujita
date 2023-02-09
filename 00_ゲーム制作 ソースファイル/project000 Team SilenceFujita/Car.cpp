@@ -188,7 +188,7 @@ void UpdateCar(void)
 					CAR_DEPTH					// 奥行
 				);
 
-				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC && GetBarrier(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
+				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC && GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
 				{ // 渋滞状態じゃないかつ、バリアセット状態じゃなかった場合
 
 					// 車の停止処理
