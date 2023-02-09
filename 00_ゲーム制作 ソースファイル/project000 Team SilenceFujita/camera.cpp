@@ -26,11 +26,11 @@
 
 // メインカメラ
 #define FIRST_ROT		(1.45f)		// 開始時の視点と注視点の間の向き (x)
-#define FIRST_DIS		(-280.0f)	// 開始時の視点と注視点の間の距離
+#define FIRST_DIS		(-240.0f)	// 開始時の視点と注視点の間の距離
 
 #define POS_R_PLUS		(25.0f)		// プレイヤーの位置と注視点の位置の距離 (x, z)
 #define POS_R_PLUS_Y	(110.0f)	// プレイヤーの位置と注視点の位置の距離 (y)
-#define POS_V_Y			(165.0f)	// 追従時の視点の位置 (y)
+#define POS_V_Y			(140.0f)	// 追従時の視点の位置 (y)
 #define REV_ROT_FOLLOW	(0.05f)		// 追従時の回り込みの補正係数
 #define REV_POS_V		(0.225f)	// 視点の位置の補正係数 (x, z)
 #define REV_POS_R		(0.25f)		// 注視点の位置の補正係数 (x, z)
@@ -58,10 +58,10 @@
 #define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)
 
 // 一人称視点カメラ
-#define CAMERA_FORWARD_SHIFT	(18.5f)		// 前にカメラをずらす距離
-#define CAMERA_UP_SHIFT			(80.0f)		// 上にカメラをずらす距離
-#define CAMERA_RIGHT_SHIFT		(7.0f)		// 右にカメラをずらす距離
-#define CAMERA_BACK_SHIFT		(35.0f)		// 後ろにカメラをずらす距離
+#define CAMERA_FORWARD_SHIFT	(18.5f)			// 前にカメラをずらす距離
+#define CAMERA_UP_SHIFT			(80.0f)			// 上にカメラをずらす距離
+#define CAMERA_RIGHT_SHIFT		(7.0f)			// 右にカメラをずらす距離
+#define CAMERA_BACK_SHIFT		(35.0f)			// 後ろにカメラをずらす距離
 
 //************************************************************
 //	プロトタイプ宣言
