@@ -132,13 +132,9 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void InitCurveInfo(void);				// カーブの情報の初期化処理
 void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DXVECTOR3 *pPos);				// 車の角度更新・補正処理
 CURVEINFO GetCurveInfo(int nID);		// 曲がり角の位置の取得処理
-void LoadCurveTxt(void);				// カーブテキストのロード処理
 
-void SetCurvePoint(void);				// 曲がり角の設定処理
-void LoadHumanCurveTxt(void);			// 人間のルートのロード処理
 HUMANCURVEINFO GetHumanRoute(int nID);	// 人間のルートの取得処理
 float GetDefaultRot(int nID);			// 人間の初期向きの取得処理
 

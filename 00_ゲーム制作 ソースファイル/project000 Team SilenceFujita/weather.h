@@ -40,6 +40,7 @@
 //**********************************************************************************************************************
 #define MAX_THUNDER			(128)						// —‹‚ÌÅ‘å”
 #define THUNDER_INTERVAL	(100)						// —‹‚ÌŠÔŠu
+#define THUNDER_RSL_INTERVAL	(30)					// ƒŠƒUƒ‹ƒgŽž‚Ì—‹‚ÌŠÔŠu
 #define THUNDER_RANGE		(900)						// —‹‚Ì~‚é”ÍˆÍ
 #define SHIFT_THUNDER		(40000.0f)					// —‹‚Ì‚¸‚ç‚·•
 #define THUNDER_RADIUS_X	(150.0f)					// —‹‚Ì”¼Œa(XŽ²)

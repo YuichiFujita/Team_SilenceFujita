@@ -110,9 +110,6 @@ void InitHuman(void)
 			g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[nCntCur]  = DASH_RIGHT;							// ‰E‚ÉŒü‚©‚Á‚Ä‘–‚Á‚Ä‚¢‚é
 		}
 	}
-
-	SetHuman(D3DXVECTOR3(0.0f, 0.0f, 1800.0f));
-	SetHuman(D3DXVECTOR3(0.0f, 0.0f, 1000.0f));
 }
 
 //======================================================================================================================

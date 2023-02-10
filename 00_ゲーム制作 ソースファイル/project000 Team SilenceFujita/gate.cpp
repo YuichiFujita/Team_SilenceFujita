@@ -28,7 +28,8 @@
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Gate    g_aGate[MAX_GATE];				// オブジェクトの情報
+Gate      g_aGate[MAX_GATE];			// オブジェクトの情報
+Collision g_aCollGate[MODEL_GATE_MAX];	// 当たり判定の情報
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -49,6 +50,15 @@ void InitGate(void)
 		g_aGate[nCntGate].state = GATESTATE_FLY;					// 状態
 		g_aGate[nCntGate].bUse = false;								// 使用状況
 
+		// 当たり判定情報の初期化
+		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+		{ // 当たり判定の最大数分繰り返す
+
+			g_aGate[nCntGate].collInfo.vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+			g_aGate[nCntGate].collInfo.fWidth[nCntColl] = 0.0f;								// 横幅
+			g_aGate[nCntGate].collInfo.fDepth[nCntColl] = 0.0f;								// 奥行
+		}
+
 		// モデル情報の初期化
 		g_aGate[nCntGate].modelData.dwNumMat = 0;					// マテリアルの数
 		g_aGate[nCntGate].modelData.pTexture = NULL;				// テクスチャへのポインタ
@@ -58,6 +68,23 @@ void InitGate(void)
 		g_aGate[nCntGate].modelData.vtxMax = INIT_VTX_MAX;			// 最大の頂点座標
 		g_aGate[nCntGate].modelData.size = INIT_SIZE;				// 大きさ
 		g_aGate[nCntGate].modelData.fRadius = 0.0f;					// 半径
+	}
+
+	// 当たり判定の情報の初期化
+	for (int nCntGate = 0; nCntGate < MODEL_GATE_MAX; nCntGate++)
+	{ // ゲートの種類の総数分繰り返す
+
+		// 当たり判定の総数を初期化
+		g_aCollGate[nCntGate].nNumColl = 1;
+
+		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
+		{ // 当たり判定の最大数分繰り返す
+
+			g_aCollGate[nCntGate].vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
+			g_aCollGate[nCntGate].scale[nCntColl]  = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
+			g_aCollGate[nCntGate].fWidth[nCntColl] = 0.0f;							// 横幅
+			g_aCollGate[nCntGate].fDepth[nCntColl] = 0.0f;							// 奥行
+		}
 	}
 
 	// ゲートの設定処理
@@ -319,6 +346,15 @@ Gate *GetGateData(void)
 {
 	// オブジェクトの情報の先頭アドレスを返す
 	return &g_aGate[0];
+}
+
+//======================================================================================================================
+//	ゲートの当たり判定の取得処理
+//======================================================================================================================
+Collision *GetCollGate(void)
+{
+	// ゲートの当たり判定の情報の先頭アドレスを返す
+	return &g_aCollGate[0];
 }
 
 #ifdef _DEBUG	// デバッグ処理

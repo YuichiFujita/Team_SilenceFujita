@@ -10,6 +10,22 @@
 #include "calculation.h"
 #include "meshfield.h"
 
+#include "billboard.h"
+#include "camera.h"
+#include "Car.h"
+#include "effect.h"
+#include "gate.h"
+#include "Human.h"
+#include "light.h"
+#include "meshdome.h"
+#include "meshcylinder.h"
+#include "meshwall.h"
+#include "particle.h"
+#include "shadow.h"
+#include "object.h"
+#include "Police.h"
+#include "weather.h"
+
 //==================================================================================
 //	四頂点の位置の計算処理
 //==================================================================================
@@ -100,4 +116,244 @@ void RotNormalize(float *rot)
 	//--------------------------------------------------------
 	if (*rot > D3DX_PI) { *rot -= D3DX_PI * 2; }
 	else if (*rot < -D3DX_PI) { *rot += D3DX_PI * 2; }
+}
+
+//==================================================================================
+// ファイルをロードする全体処理
+//==================================================================================
+void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bObject, bool bAI)
+{
+	// カーブの情報の初期化処理
+	InitCurveInfo();
+
+	if (bCurve == true)
+	{ // カーブを読み込む場合
+		// カーブテキストのロード処理
+		LoadCurveTxt();
+	}
+
+	if (bHumanCurve == true)
+	{ // 人間の曲がり角を読み込む場合
+		// 人間のルートのロード処理
+		LoadHumanCurveTxt();
+
+		// 曲がり角の設定処理
+		SetCurvePoint();
+	}
+
+	if (bStage == true)
+	{ // ステージを読み込む場合
+		// ステージのセットアップ
+		TxtSetStage();
+	}
+
+	if (bObject == true)
+	{ // オブジェクトを読み込む場合
+		// オブジェクトのセットアップ
+		TxtSetObject();
+	}
+
+	if (bAI == true)
+	{ // AIを読み込む場合
+		// AI系のセットアップ
+		TxtSetAI();
+	}
+}
+
+//==================================================================================
+// 万能初期化の全体処理
+//==================================================================================
+void InitAllAroundChunk(void)
+{
+	// 天気の初期化処理
+	InitWeather();
+
+	// 影の初期化
+	InitShadow();
+
+	// 警察の初期化
+	InitPolice();
+
+	// オブジェクトの初期化
+	InitObject();
+
+	// 車の初期化
+	InitCar();
+
+	// 人間の初期化
+	InitHuman();
+
+	// ゲートの初期化
+	InitGate();
+
+	// カメラの初期化
+	InitCamera();
+
+	// ライトの初期化
+	InitLight();
+
+	// メッシュドームの初期化
+	InitMeshDome();
+
+	// メッシュシリンダーの初期化
+	InitMeshCylinder();
+
+	// メッシュフィールドの初期化
+	InitMeshField();
+
+	// メッシュウォールの初期化
+	InitMeshWall();
+
+	// ビルボードの初期化
+	InitBillboard();
+
+	// エフェクトの初期化
+	InitEffect();
+
+	// パーティクルの初期化
+	InitParticle();
+}
+
+//==================================================================================
+// 万能終了の全体処理
+//==================================================================================
+void UninitAllAroundChunk(void)
+{
+	// 天気の初期化処理
+	UninitWeather();
+
+	// 影の初期化
+	UninitShadow();
+
+	// 警察の初期化
+	UninitPolice();
+
+	// オブジェクトの初期化
+	UninitObject();
+
+	// 車の初期化
+	UninitCar();
+
+	// 人間の初期化
+	UninitHuman();
+
+	// ゲートの初期化
+	UninitGate();
+
+	// カメラの初期化
+	UninitCamera();
+
+	// ライトの初期化
+	UninitLight();
+
+	// メッシュドームの初期化
+	UninitMeshDome();
+
+	// メッシュシリンダーの初期化
+	UninitMeshCylinder();
+
+	// メッシュフィールドの初期化
+	UninitMeshField();
+
+	// メッシュウォールの初期化
+	UninitMeshWall();
+
+	// ビルボードの初期化
+	UninitBillboard();
+
+	// エフェクトの初期化
+	UninitEffect();
+
+	// パーティクルの初期化
+	UninitParticle();
+}
+
+//==================================================================================
+// 万能描画の全体処理
+//==================================================================================
+void DrawAllAroundChunk(void)
+{
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	メインカメラの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// カメラの設定
+	SetCamera(CAMERATYPE_MAIN);
+
+	// メッシュドームの描画
+	DrawMeshDome();
+
+	// 雷の描画処理
+	DrawThunder();
+
+	// メッシュシリンダーの描画
+	DrawMeshCylinder();
+
+	// メッシュフィールドの描画
+	DrawMeshField(false);
+
+	// メッシュウォールの描画
+	DrawMeshWall();
+
+	// 影の描画
+	DrawShadow();
+
+	// オブジェクトの描画
+	DrawObject();
+
+	// 警察の描画
+	DrawPolice();
+
+	// 車の描画処理
+	DrawCar();
+
+	// 人間の描画
+	DrawHuman();
+
+	// ゲートの描画
+	DrawGate();
+
+	// ビルボードの描画
+	DrawBillboard();
+
+	// 爆弾の描画
+	DrawBomb();
+
+	// エフェクトの描画
+	DrawEffect();
+
+	// パーティクルの描画
+	DrawParticle();
+
+	// 天気の描画処理
+	DrawWeather();
+}
+
+//==================================================================================
+// リザルトの初期化全体処理
+//==================================================================================
+void InitResultChunk(void)
+{
+	// 万能初期化の全体処理
+	InitAllAroundChunk();
+}
+
+//==================================================================================
+// リザルトの終了全体処理
+//==================================================================================
+void UninitResultChunk(void)
+{
+	// 万能終了の全体処理
+	UninitAllAroundChunk();
+}
+
+//==================================================================================
+// リザルトの描画全体処理
+//==================================================================================
+void DrawResultChunk(void)
+{
+	// 万能描画の全体処理
+	DrawAllAroundChunk();
 }

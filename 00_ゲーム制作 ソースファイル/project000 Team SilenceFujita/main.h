@@ -36,6 +36,7 @@
 #define FVF_VERTEX_3D		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 頂点フォーマット [3D]
 
 #define STAGE_SETUP_TXT		"data\\TXT\\stage.txt"		// ステージセットアップ用のテキストファイルの相対パス
+#define COLL_SETUP_TXT		"data\\TXT\\collision.txt"	// 当たり判定セットアップ用のテキストファイルの相対パス
 
 #define SCREEN_WIDTH		(1280)			// ウインドウの幅
 #define SCREEN_HEIGHT		(720)			// ウインドウの高さ
@@ -128,6 +129,14 @@ typedef struct
 void TxtSetStage(void);					// ステージのセットアップ処理
 void TxtSetObject(void);				// オブジェクトのセットアップ処理
 void TxtSetAI(void);					// AI系のセットアップ処理
+void TxtSetCollision(void);				// 当たり判定のセットアップ処理
+void TxtSetShadow(void);				// 影の半径のセットアップ処理
+
+void InitCurveInfo(void);				// カーブの情報の初期化処理
+void LoadCurveTxt(void);				// カーブテキストのロード処理
+void SetCurvePoint(void);				// 曲がり角の設定処理
+void LoadHumanCurveTxt(void);			// 人間のルートのロード処理
+
 void SetMode(MODE mode);				// モードの設定処理
 MODE GetMode(void);						// モードの取得処理
 void SetLimitStage(StageLimit limit);	// ステージの移動範囲の設定処理
