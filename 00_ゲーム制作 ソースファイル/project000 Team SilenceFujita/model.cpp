@@ -60,6 +60,21 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\swing000.x",		// 公園（ブランコ）
 	"data\\MODEL_OBJECT\\fujidora.x",		// フジドラ
 	"data\\MODEL_OBJECT\\fence000.x",		// 公園（フェンス）
+	"data\\MODEL_OBJECT\\obarakurabu000.x",		// 商店街（雑貨店）	
+	"data\\MODEL_OBJECT\\obarameat000.x",		// 商店街（精肉店）	
+	"data\\MODEL_OBJECT\\obaravegetable000.x",	// 商店街（青果店）	
+	"data\\MODEL_OBJECT\\obaraflour000.x",		// 商店街（花屋）	
+	"data\\MODEL_OBJECT\\obaraclothes000.x",	// 商店街（服屋）	
+	"data\\MODEL_OBJECT\\obarakaraoke000.x",	// 商店街（汎用・カラオケ）
+	"data\\MODEL_OBJECT\\obaracleaning000.x",	// 商店街（汎用・クリーニング）
+	"data\\MODEL_OBJECT\\obaraclinic000.x",		// 商店街（汎用・クリニック）	
+	"data\\MODEL_OBJECT\\obararamen000.x",		// 商店街（汎用・ラーメン）	
+	"data\\MODEL_OBJECT\\obaracoffee000.x",		// 商店街（汎用・喫茶店）	
+	"data\\MODEL_OBJECT\\obaramobile000.x",		// 商店街（汎用・携帯ショップ）	
+	"data\\MODEL_OBJECT\\obarabone000.x",		// 商店街（汎用・整骨院）	
+	"data\\MODEL_OBJECT\\obaratempura000.x",	// 商店街（汎用・天ぷら）	
+	"data\\MODEL_OBJECT\\obarapharmacy000.x",	// 商店街（汎用・薬局）	
+	"data\\MODEL_OBJECT\\obarashutter000.x",	// 商店街（汎用・シャッター）	
 	"data\\MODEL_OBJECT\\bill003.x",		// ビルver3
 
 	// プレイヤーモデル
