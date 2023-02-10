@@ -60,7 +60,7 @@ const char *apModelData[] =		// モデルの相対パス
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
-	"data\\MODEL_EDIT\\barrier000.x",		// バリア
+	"data\\MODEL_PLAYER\\barrier000.x",		// バリア
 
 	// 車モデル
 	"data\\MODEL_OBJECT\\policecar.x",		// パトカー
@@ -68,6 +68,10 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\car001.x",			// 自動車
 	"data\\MODEL_OBJECT\\yakiimocar.x",		// 焼き芋屋
 	"data\\MODEL_OBJECT\\senkyoCar000.x",	// 選挙カー
+
+	// ゲートモデル
+	"data\\MODEL_GATE\\gate000.x",			// ゲート (建物)
+	"data\\MODEL_GATE\\gate001.x",			// ゲート (鉄板)
 
 	// エディットモデル
 	"data\\MODEL_EDIT\\collision000.x",		// 当たり判定

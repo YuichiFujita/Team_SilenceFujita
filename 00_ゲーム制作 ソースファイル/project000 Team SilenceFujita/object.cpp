@@ -24,17 +24,9 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define SHADOW_SETUP_TXT	"data\\TXT\\shadow.txt"		// ステージセットアップ用のテキストファイルの相対パス
-
-#define OBJ_LIFE			(50)						// オブジェクトの体力
-#define DAMAGE_TIME_OBJ		(20)						// ダメージ状態を保つ時間
-#define UNR_TIME_OBJ		(DAMAGE_TIME_OBJ - 10)		// 無敵状態に変更する時間
-
-//**********************************************************************************************************************
-//	プロトタイプ宣言
-//**********************************************************************************************************************
-void TxtSetCollision(void);		// 当たり判定のセットアップ処理
-void TxtSetShadow(void);		// 影の半径のセットアップ処理
+#define OBJ_LIFE		(50)					// オブジェクトの体力
+#define DAMAGE_TIME_OBJ	(20)					// ダメージ状態を保つ時間
+#define UNR_TIME_OBJ	(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -824,177 +816,12 @@ Collision *GetCollision(void)
 }
 
 //======================================================================================================================
-//	当たり判定のセットアップ処理
+//	影の半径の取得処理
 //======================================================================================================================
-void TxtSetCollision(void)
+float *GetShadowRadius(void)
 {
-	// 変数を宣言
-	int nEnd;					// テキスト読み込み終了の確認用
-	int nType;					// 種類の代入用
-
-	// 変数配列を宣言
-	char aString[MAX_STRING];	// テキストの文字列の代入用
-
-	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
-
-	// ファイルを読み込み形式で開く
-	pFile = fopen(COLLISION_SETUP_TXT, "r");
-
-	if (pFile != NULL)
-	{ // ファイルが開けた場合
-
-		do
-		{ // 読み込んだ文字列が EOF ではない場合ループ
-
-			// ファイルから文字列を読み込む
-			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
-
-			if (strcmp(&aString[0], "SETCOLL_OBJECT") == 0)
-			{ // 読み込んだ文字列が SETCOLL_OBJECT の場合
-
-				do
-				{ // 読み込んだ文字列が END_SETCOLL_OBJECT ではない場合ループ
-
-					// ファイルから文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (strcmp(&aString[0], "SET_COLLISION") == 0)
-					{ // 読み込んだ文字列が SET_COLLISION の場合
-
-						do
-						{ // 読み込んだ文字列が END_SET_COLLISION ではない場合ループ
-
-							// ファイルから文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
-
-							if (strcmp(&aString[0], "TYPE") == 0)
-							{ // 読み込んだ文字列が TYPE の場合
-								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-								fscanf(pFile, "%d", &nType);		// 種類を読み込む
-							}
-							else if (strcmp(&aString[0], "NUMCOLL") == 0)
-							{ // 読み込んだ文字列が NUMCOLL の場合
-								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
-								fscanf(pFile, "%d", &g_aCollision[nType].nNumColl);	// 当たり判定数を読み込む
-
-								for (int nCntColl = 0; nCntColl < g_aCollision[nType].nNumColl; nCntColl++)
-								{ // 当たり判定数分繰り返す
-
-									fscanf(pFile, "%s", &aString[0]);			// 当たり判定の番号・要素を読み込む (不要)
-									fscanf(pFile, "%s", &aString[0]);			// = を読み込む (不要)
-
-									fscanf(pFile, "%f%f%f",
-									&g_aCollision[nType].vecPos[nCntColl].x,	// 位置ベクトル (x) を読み込む
-									&g_aCollision[nType].vecPos[nCntColl].y,	// 位置ベクトル (y) を読み込む
-									&g_aCollision[nType].vecPos[nCntColl].z);	// 位置ベクトル (z) を読み込む
-									
-									fscanf(pFile, "%s", &aString[0]);			// 当たり判定の番号・要素を読み込む (不要)
-									fscanf(pFile, "%s", &aString[0]);			// = を読み込む (不要)
-
-									fscanf(pFile, "%f%f%f",
-									&g_aCollision[nType].scale[nCntColl].x,		// 拡大率 (x) を読み込む
-									&g_aCollision[nType].scale[nCntColl].y,		// 拡大率 (y) を読み込む
-									&g_aCollision[nType].scale[nCntColl].z);	// 拡大率 (z) を読み込む
-
-									fscanf(pFile, "%s", &aString[0]);							// 当たり判定の番号・要素を読み込む (不要)
-									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-
-									fscanf(pFile, "%f", &g_aCollision[nType].fWidth[nCntColl]);	// 横幅を読み込む
-
-									fscanf(pFile, "%s", &aString[0]);							// 当たり判定の番号・要素を読み込む (不要)
-									fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-
-									fscanf(pFile, "%f", &g_aCollision[nType].fDepth[nCntColl]);	// 奥行を読み込む
-								}
-							}
-						} while (strcmp(&aString[0], "END_SET_COLLISION") != 0);	// 読み込んだ文字列が END_SET_COLLISION ではない場合ループ
-					}
-				} while (strcmp(&aString[0], "END_SETCOLL_OBJECT") != 0);			// 読み込んだ文字列が END_SETCOLL_OBJECT ではない場合ループ
-			}
-		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
-		
-		// ファイルを閉じる
-		fclose(pFile);
-	}
-	else
-	{ // ファイルが開けなかった場合
-
-		// エラーメッセージボックス
-		MessageBox(NULL, "当たり判定ファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
-	}
-}
-
-//======================================================================================================================
-//	影の半径のセットアップ処理
-//======================================================================================================================
-void TxtSetShadow(void)
-{
-	// 変数を宣言
-	int nEnd;					// テキスト読み込み終了の確認用
-	int nType;					// 種類の代入用
-
-	// 変数配列を宣言
-	char aString[MAX_STRING];	// テキストの文字列の代入用
-
-	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
-
-	// ファイルを読み込み形式で開く
-	pFile = fopen(SHADOW_SETUP_TXT, "r");
-
-	if (pFile != NULL)
-	{ // ファイルが開けた場合
-
-		do
-		{ // 読み込んだ文字列が EOF ではない場合ループ
-
-			// ファイルから文字列を読み込む
-			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
-
-			if (strcmp(&aString[0], "SETSHADOW_OBJECT") == 0)
-			{ // 読み込んだ文字列が SETSHADOW_OBJECT の場合
-
-				do
-				{ // 読み込んだ文字列が END_SETSHADOW_OBJECT ではない場合ループ
-
-					// ファイルから文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (strcmp(&aString[0], "SET_SHADOW") == 0)
-					{ // 読み込んだ文字列が SET_SHADOW の場合
-
-						do
-						{ // 読み込んだ文字列が END_SET_SHADOW ではない場合ループ
-
-							// ファイルから文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
-
-							if (strcmp(&aString[0], "TYPE") == 0)
-							{ // 読み込んだ文字列が TYPE の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%d", &nType);					// 種類を読み込む
-							}
-							else if (strcmp(&aString[0], "RADIUS") == 0)
-							{ // 読み込んだ文字列が RADIUS の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%f", &g_aShadowRadius[nType]);	// 影の半径を読み込む
-							}
-						} while (strcmp(&aString[0], "END_SET_SHADOW") != 0);	// 読み込んだ文字列が END_SET_SHADOW ではない場合ループ
-					}
-				} while (strcmp(&aString[0], "END_SETSHADOW_OBJECT") != 0);		// 読み込んだ文字列が END_SETSHADOW_OBJECT ではない場合ループ
-			}
-		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
-		
-		// ファイルを閉じる
-		fclose(pFile);
-	}
-	else
-	{ // ファイルが開けなかった場合
-
-		// エラーメッセージボックス
-		MessageBox(NULL, "影の半径ファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
-	}
+	// 影の半径の情報の先頭アドレスを返す
+	return &g_aShadowRadius[0];
 }
 
 #ifdef _DEBUG	// デバッグ処理
