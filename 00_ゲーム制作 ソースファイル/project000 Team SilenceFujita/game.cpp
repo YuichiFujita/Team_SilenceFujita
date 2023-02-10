@@ -766,3 +766,12 @@ void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3
 		}
 	}
 }
+
+//=======================================
+// ƒQ[ƒ€ó‘Ô‚Ìæ“¾ˆ—
+//=======================================
+RESULTSTATE GetResultState(void)
+{
+	// ƒQ[ƒ€I—¹‚Ìó‘Ô‚ğ•Ô‚·
+	return RESULTSTATE_CLEAR;
+}

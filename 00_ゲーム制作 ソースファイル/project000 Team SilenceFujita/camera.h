@@ -39,6 +39,7 @@ typedef enum
 typedef struct
 {
 	D3DXVECTOR3  posV;				// 現在の視点
+	D3DXVECTOR3  posVOld;			// 前回の視点
 	D3DXVECTOR3  posR;				// 現在の注視点
 	D3DXVECTOR3  destPosV;			// 目標の視点
 	D3DXVECTOR3  destPosR;			// 目標の注視点

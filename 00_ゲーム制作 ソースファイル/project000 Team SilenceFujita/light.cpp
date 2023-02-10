@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
+#include "game.h"
 #include "light.h"
 #include "weather.h"
 
@@ -26,6 +27,9 @@ D3DLIGHT9 g_aLight[MAX_LIGHT];		// ライトの情報
 //======================================================================================================================
 void InitLight(void)
 {
+	MODE mode = GetMode();			// モード
+	RESULTSTATE ResultState = GetResultState();	// ゲームの状態を取得する
+
 	// 変数配列を宣言
 	D3DXCOLOR   aDiffuse[MAX_LIGHT];			// 設定用拡散光カラー
 	D3DXVECTOR3 aVecDir[MAX_LIGHT];				// 設定用方向ベクトル
@@ -34,43 +38,75 @@ void InitLight(void)
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
-	switch (weather)
+	switch (mode)
 	{
-	case WEATHERTYPE_SUNNY:		// 晴れ
+	case MODE_GAME:		// ゲーム
 
-		// 拡散光カラーを設定
-		aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
-		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+		switch (weather)
+		{
+		case WEATHERTYPE_SUNNY:		// 晴れ
 
-		break;					// 抜け出す
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-	case WEATHERTYPE_RAIN:		// 雨
+			break;					// 抜け出す
 
-		// 拡散光カラーを設定
-		aDiffuse[0] = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
-		aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
-		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+		case WEATHERTYPE_RAIN:		// 雨
 
-		break;					// 抜け出す
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-	case WEATHERTYPE_SNOW:		// 雪
+			break;					// 抜け出す
 
-		// 拡散光カラーを設定
-		aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
-		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+		case WEATHERTYPE_SNOW:		// 雪
 
-		break;					// 抜け出す
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-	case WEATHERTYPE_THUNDER:	// 雷雨
+			break;					// 抜け出す
 
-		// 拡散光カラーを設定
-		aDiffuse[0] = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
-		aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
-		aDiffuse[2] = D3DXCOLOR(0.1f, 0.1f, 0.1f, 1.0f);
+		case WEATHERTYPE_THUNDER:	// 雷雨
 
-		break;					// 抜け出す
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.1f, 0.1f, 0.1f, 1.0f);
+
+			break;					// 抜け出す
+		}
+
+		break;			// 抜け出す
+
+	case MODE_RESULT:	// リザルト
+
+		switch (ResultState)
+		{
+		case RESULTSTATE_CLEAR:		// クリア状態
+
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+			break;					// 抜け出す
+
+		case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(1.0f, 0.3f, 0.3f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.7f, 0.2f, 0.2f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.3f, 0.1f, 0.1f, 1.0f);
+
+			break;					// 抜け出す
+		}
+
+		break;			// 抜け出す
 	}
 
 	// 方向ベクトルを設定

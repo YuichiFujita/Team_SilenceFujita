@@ -187,6 +187,7 @@
     <ClCompile Include="result.cpp" />
     <ClCompile Include="score.cpp" />
     <ClCompile Include="shadow.cpp" />
+    <ClCompile Include="shining.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="SoundDJ.cpp" />
     <ClCompile Include="timer.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="result.h" />
     <ClInclude Include="score.h" />
     <ClInclude Include="shadow.h" />
+    <ClInclude Include="shining.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="SoundDJ.h" />
     <ClInclude Include="timer.h" />

@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "weather.h"
+#include "game.h"
 #include "camera.h"
 #include "player.h"
 
@@ -56,6 +57,7 @@ Thunder g_aThunder[MAX_THUNDER];	// 雷の情報
 WEATHERTYPE g_Weather;				// 天気の状態
 int g_NumWeather;					// 降っている数を取得する
 int g_nThunderCount;				// 雷のカウント
+MODE g_WeatherMode;					// モード(天気専用)
 
 //======================================================================================================================
 //	天気の初期化処理
@@ -64,28 +66,59 @@ void InitWeather(void)
 {
 	int nRandWeather;		// 天気の変数
 
-	// 天気を設定する
-	nRandWeather = rand() % WEATHER_RAND;
+	g_WeatherMode = GetMode();	// モード
+	RESULTSTATE resultState = GetResultState();	// ゲームの状態
 
-	if (nRandWeather <= SUNNY_RAND)
-	{ // 晴れの場合
-		// 天気を晴れに設定する
-		g_Weather = WEATHERTYPE_SUNNY;
-	}
-	else if (nRandWeather <= RAIN_RAND)
-	{ // 雨の場合
-		// 天気を雨に設定する
-		g_Weather = WEATHERTYPE_RAIN;
-	}
-	else if (nRandWeather <= SNOW_RAND)
-	{ // 雪の場合
-		// 天気を雪に設定する
-		g_Weather = WEATHERTYPE_SNOW;
-	}
-	else if (nRandWeather <= THUNDER_RAND)
-	{ // 雷雨の場合
-		// 天気を雷雨に設定する
-		g_Weather = WEATHERTYPE_THUNDER;
+	switch (g_WeatherMode)
+	{
+	case MODE_GAME:		// ゲーム
+
+		// 天気を設定する
+		nRandWeather = rand() % WEATHER_RAND;
+
+		if (nRandWeather <= SUNNY_RAND)
+		{ // 晴れの場合
+			// 天気を晴れに設定する
+			g_Weather = WEATHERTYPE_SUNNY;
+		}
+		else if (nRandWeather <= RAIN_RAND)
+		{ // 雨の場合
+			// 天気を雨に設定する
+			g_Weather = WEATHERTYPE_RAIN;
+		}
+		else if (nRandWeather <= SNOW_RAND)
+		{ // 雪の場合
+			// 天気を雪に設定する
+			g_Weather = WEATHERTYPE_SNOW;
+		}
+		else if (nRandWeather <= THUNDER_RAND)
+		{ // 雷雨の場合
+			// 天気を雷雨に設定する
+			g_Weather = WEATHERTYPE_THUNDER;
+		}
+
+		break;			// 抜け出す
+
+	case MODE_RESULT:	// リザルト
+
+		switch (resultState)
+		{
+		case RESULTSTATE_CLEAR:		// クリア状態
+
+			// 天気を晴れに設定する
+			g_Weather = WEATHERTYPE_SUNNY;
+
+			break;					// 抜け出す
+
+		case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+			// 天気を雷雨に設定する
+			g_Weather = WEATHERTYPE_THUNDER;
+
+			break;					// 抜け出す
+		}
+
+		break;			// 抜け出す
 	}
 
 	// 総数を初期化する
@@ -438,6 +471,7 @@ void UpdateRain(void)
 	// ポインタを宣言
 	VERTEX_3D *pVtx;		// 頂点情報へのポインタ
 	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+	Camera *pCamera = GetCamera();		// カメラの情報
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
@@ -448,12 +482,27 @@ void UpdateRain(void)
 		if (g_aRain[nCntWeather].bUse == true)
 		{ // エフェクトが使用されている場合
 
+			switch (g_WeatherMode)
+			{
+			case MODE_GAME:		// ゲーム
+
+				// プレイヤー分の移動量を足す
+				g_aRain[nCntWeather].pos.x += pPlayer->pos.x - pPlayer->oldPos.x;
+				g_aRain[nCntWeather].pos.z += pPlayer->pos.z - pPlayer->oldPos.z;
+
+				break;			// 抜け出す
+
+			case MODE_RESULT:	// リザルト
+
+				// プレイヤー分の移動量を足す
+				g_aRain[nCntWeather].pos.x += pCamera->posV.x - pCamera->posVOld.x;
+				g_aRain[nCntWeather].pos.z += pCamera->posV.z - pCamera->posVOld.z;
+
+				break;			// 抜け出す
+			}
+
 			// 降っているものの総数を加算する
 			nNumWeather++;
-
-			// プレイヤー分の移動量を足す
-			g_aRain[nCntWeather].pos.x += pPlayer->pos.x - pPlayer->oldPos.x;
-			g_aRain[nCntWeather].pos.z += pPlayer->pos.z - pPlayer->oldPos.z;
 
 			// 移動の更新
 			g_aRain[nCntWeather].pos -= g_aRain[nCntWeather].move;
@@ -486,10 +535,27 @@ void UpdateRain(void)
 			pVtx[2].col = RAIN_COL;
 			pVtx[3].col = RAIN_COL;
 
-			if (g_aRain[nCntWeather].pos.y <= 0.0f)
-			{ // 雨が地面に落ちたとき
-				// 使用しない
-				g_aRain[nCntWeather].bUse = false;
+			switch (g_WeatherMode)
+			{
+			case MODE_GAME:		// ゲーム
+
+				if (g_aRain[nCntWeather].pos.y <= 0.0f)
+				{ // 雨が地面に落ちたとき
+					// 使用しない
+					g_aRain[nCntWeather].bUse = false;
+				}
+
+				break;			// 抜け出す
+
+			case MODE_RESULT:	// リザルト
+
+				if (g_aRain[nCntWeather].pos.y <= RESULT_RAIN_LINE)
+				{ // 雨が地面に落ちたとき
+					// 使用しない
+					g_aRain[nCntWeather].bUse = false;
+				}
+
+				break;			// 抜け出す
 			}
 		}
 
@@ -1117,9 +1183,28 @@ void WeatherThunder(void)
 {
 	D3DXVECTOR3 posThunder;						// 雷の降る位置
 	float rotThunder;							// 雷の降っている方向
+	int nThunderGene;							// 生産率
 
-	if (g_nThunderCount % THUNDER_INTERVAL == 0)
+	switch (g_WeatherMode)
+	{
+	case MODE_GAME:			// ゲーム
+
+		// 雷の間隔を設定する
+		nThunderGene = THUNDER_INTERVAL;
+
+		break;				// 抜け出す
+
+	case MODE_RESULT:		// リザルト
+
+		// 雷の間隔を設定する
+		nThunderGene = THUNDER_RSL_INTERVAL;
+
+		break;				// 抜け出す
+	}
+
+	if (g_nThunderCount % nThunderGene == 0)
 	{ // 雷の降る間隔が経過した場合
+
 		// 雷の位置を設定する
 		posThunder.x = (float)(rand() % THUNDER_RANGE - (int)(THUNDER_RANGE * 0.5f));
 		posThunder.y = THUNDER_HEIGHT;

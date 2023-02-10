@@ -16,19 +16,29 @@
 #include "camera.h"
 #include "light.h"
 #include "score.h"
+#include "weather.h"
 
-//マクロ定義
-#define WHEEL_RADIUS		(300.0f)		// タイヤの半径
-#define RESULT_FINISH_COUNT	(30)			// リザルトが終了するまでのカウント
-#define RESULT_SCORE_WIDTH	(20.0f)			// 値の縦幅
-#define RESULT_SCORE_HEIGHT	(30.0f)			// 値の横幅
-#define RESULT_SCORE_SHIFT	(50.0f)			// 値の横幅
-#define ADD_DISP_SCORE		(1000)			// スコアの増加率
+//**********************************************************************************************************************
+// マクロ定義
+//**********************************************************************************************************************
+#define WHEEL_RADIUS			(300.0f)		// タイヤの半径
+#define RESULT_FINISH_COUNT		(30)			// リザルトが終了するまでのカウント
+#define RESULT_SCORE_WIDTH		(70.0f)			// 値の縦幅
+#define RESULT_SCORE_HEIGHT		(100.0f)			// 値の横幅
+#define RESULT_SCORE_SHIFT		(110.0f)		// 値の横幅
+#define ADD_DISP_SCORE			(1000)			// スコアの増加率
 
-//ランキング画面のテクスチャ
+#define RESULT_WORD_RADIUS_X	(500.0f)		// 言葉の半径(X軸)
+#define RESULT_WORD_RADIUS_Y	(100.0f)		// 言葉の半径(Y軸)
+
+//**********************************************************************************************************************
+// リザルト画面のテクスチャ
+//**********************************************************************************************************************
 typedef enum
 {
 	RSL_WHEEL = 0,			// タイヤ
+	RSL_GAMECLEAR,			// ゲームクリア
+	RSL_GAMEOVER,			// ゲームオーバー
 	RSL_MAX					// この列挙型の総数
 }RSLTEXTURE;
 
@@ -44,20 +54,45 @@ typedef struct
 	float		fLength;	// 長さ
 }WHEEL;
 
-//グローバル変数宣言
+//**********************************************************************************************************************
+//	構造体定義 (WORD)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3 pos;		// 中心
+	D3DXVECTOR3 move;		// 移動量
+	D3DXVECTOR2 radius;		// 半径
+}RSLWORD;
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void WheelUpdateRsl(void);			// タイヤの更新処理
+void RslWordUpdateRsl(void);		// 言葉の更新処理
+
+//**********************************************************************************************************************
+// グローバル変数宣言
+//**********************************************************************************************************************
 LPDIRECT3DTEXTURE9 g_apTextureResult[RSL_MAX] = {};			// テクスチャ(2枚分)へのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWheel = NULL;		// 画面の頂点バッファへのポインタ(タイヤ)
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWord = NULL;		// 画面の頂点バッファへのポインタ(タイヤ)
 int g_nResultCounter;										// リザルトカウンター
 WHEEL g_Wheel;												// タイヤの情報
 int g_nResultScore;											// リザルト画面のスコア
 int g_nDispRslScore;										// 表示用のスコア
 bool g_bRslFade;											// リザルトから遷移するかどうか
 D3DLIGHT9 g_RslLight;										// リザルトのライト
+RESULTSTATE g_ResultState;									// ゲーム終了時の状態
+RSLWORD g_RslWord;											// 文字の情報
 
-//テクスチャファイル名
+//**********************************************************************************************************************
+// テクスチャファイル名
+//**********************************************************************************************************************
 const char *c_apFilenameResult[RSL_MAX] =
 {
 	"data/TEXTURE/ResultWheel.png",							// タイヤ
+	"data/TEXTURE/GAMECLEAR.png",							// ゲームクリア
+	"data/TEXTURE/GAMEOVER.png",							// ゲームオーバー
 };
 
 //===============================
@@ -83,15 +118,22 @@ void InitResult(void)
 		// リザルトカウンターを初期化する
 		g_nResultCounter = 0;
 
+		// タイヤの情報を初期化
 		g_Wheel.pos = D3DXVECTOR3(400.0f, 300.0f, 0.0f);		// 位置
 		g_Wheel.fRot = 0.0f;									// 向き
 		g_Wheel.fLength = sqrtf(WHEEL_RADIUS * WHEEL_RADIUS + WHEEL_RADIUS * WHEEL_RADIUS) * 0.5f;			// 長さ
 		g_Wheel.fAngle = atan2f(WHEEL_RADIUS, WHEEL_RADIUS);	// 方向
 		g_Wheel.fRotMove = 0.2f;								// 向きの移動量
 
+		// 言葉の情報を初期化
+		g_RslWord.pos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f,150.0f, 0.0f);		// 中心
+		g_RslWord.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
+
 		g_nResultScore = 30000;				// リザルトのスコア
 		g_nDispRslScore = 0;				// 表示用のスコア
 		g_bRslFade = false;					// リザルトから遷移するかどうか
+
+		g_ResultState = GetResultState();	// ゲームの状態
 	}
 
 	{ // タイヤ
@@ -142,25 +184,96 @@ void InitResult(void)
 		g_pVtxBuffResultWheel->Unlock();
 	}
 
+	{ // 言葉
+		// 頂点バッファの生成
+		pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4,
+			D3DUSAGE_WRITEONLY,
+			FVF_VERTEX_2D,
+			D3DPOOL_MANAGED,
+			&g_pVtxBuffResultWord,
+			NULL);
+
+		//頂点バッファをロックし、頂点情報へのポインタを取得
+		g_pVtxBuffResultWord->Lock(0, 0, (void**)&pVtx, 0);
+
+		//頂点座標の設定
+		pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+
+		//rhwの設定
+		pVtx[0].rhw = 1.0f;
+		pVtx[1].rhw = 1.0f;
+		pVtx[2].rhw = 1.0f;
+		pVtx[3].rhw = 1.0f;
+
+		switch (g_ResultState)
+		{
+		case RESULTSTATE_CLEAR:		// クリア状態
+
+			//頂点カラーの設定
+			pVtx[0].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			pVtx[1].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			pVtx[2].col = D3DXCOLOR(0.8f, 0.0f, 0.0f, 1.0f);
+			pVtx[3].col = D3DXCOLOR(0.8f, 0.0f, 0.0f, 1.0f);
+
+			break;					// 抜け出す
+
+		case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+			//頂点カラーの設定
+			pVtx[0].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+			pVtx[1].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+			pVtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
+			pVtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
+
+			break;					//　抜け出す	
+		}
+
+		//テクスチャ座標の設定
+		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+		//頂点バッファをアンロックする
+		g_pVtxBuffResultWord->Unlock();
+	}
+
 	// リザルトの初期化全体処理
 	InitResultChunk();
 
-	// ファイルをロードする全体処理
-	LoadFileChunk
-	(
-		false,
-		false,
-		true,
-		true,
-		false
-	);
+	switch (g_ResultState)
+	{
+	case RESULTSTATE_CLEAR:		// クリア状態
 
-	// ライトの取得処理
-	pDevice->GetLight(CAMERATYPE_MAIN, &g_RslLight);
+		// ファイルをロードする全体処理
+		LoadFileChunk
+		(
+			true,
+			true,
+			true,
+			true,
+			true
+		);
 
-	// 色を赤に設定する
-	g_RslLight.Diffuse = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-	g_RslLight.Ambient = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+		break;					// 抜け出す
+
+	case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+		// ファイルをロードする全体処理
+		LoadFileChunk
+		(
+			false,
+			false,
+			true,
+			true,
+			false
+		);
+
+		break;					// 抜け出す
+	}
 }
 
 //======================================
@@ -190,6 +303,12 @@ void UninitResult(void)
 		g_pVtxBuffResultWheel->Release();
 		g_pVtxBuffResultWheel = NULL;
 	}
+
+	if (g_pVtxBuffResultWord != NULL)
+	{
+		g_pVtxBuffResultWord->Release();
+		g_pVtxBuffResultWord = NULL;
+	}
 }
 
 //=======================================
@@ -198,7 +317,12 @@ void UninitResult(void)
 void UpdateResult(void)
 {
 	FADE pFade = GetFade();									//フェードの状態を取得する
-	VERTEX_2D * pVtx;										//頂点情報へのポインタ
+
+	// 天気の設定処理
+	SetWeather();
+
+	// 天気の更新処理
+	UpdateWeather();
 
 	// カメラの更新処理
 	UpdateCamera();
@@ -206,46 +330,25 @@ void UpdateResult(void)
 	// ライトの更新処理
 	UpdateLight();
 
+	// タイヤの更新処理
+	WheelUpdateRsl();	
+
 	if (g_bRslFade == true)
 	{ // フェードしない場合
 		// リザルト画面になった瞬間加算し始める
 		g_nResultCounter++;
 	}
 
-	if (g_nDispRslScore <= g_nResultScore)
+	if (g_nDispRslScore < g_nResultScore)
 	{ // 表示スコアがほんとのスコアになるまで
 		// 表示スコアを加算する
 		g_nDispRslScore += ADD_DISP_SCORE;
 	}
-
-	if (g_nDispRslScore > g_nResultScore)
+	else
 	{ // 表示スコアが本当のスコアを超えた場合
 		// スコアを固定する
 		g_nDispRslScore = g_nResultScore;
 	}
-
-	// 向きを移動させる
-	g_Wheel.fRot += g_Wheel.fRotMove;
-
-	//頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffResultWheel->Lock(0, 0, (void**)&pVtx, 0);
-
-	//頂点座標の設定
-	pVtx[0].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot - D3DX_PI + g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[0].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot - D3DX_PI + g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[0].pos.z = 0.0f;
-	pVtx[1].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot + D3DX_PI - g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[1].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot + D3DX_PI - g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[1].pos.z = 0.0f;
-	pVtx[2].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot - g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[2].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot - g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[2].pos.z = 0.0f;
-	pVtx[3].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot + g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[3].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot + g_Wheel.fAngle) * g_Wheel.fLength;
-	pVtx[3].pos.z = 0.0f;
-
-	//頂点バッファをアンロックする
-	g_pVtxBuffResultWheel->Unlock();
 
 	if (GetKeyboardTrigger(DIK_RETURN) == true || GetKeyboardTrigger(DIK_SPACE) == true
 		|| GetJoyKeyTrigger(JOYKEY_A, 0) == true || GetJoyKeyTrigger(JOYKEY_B, 0) == true
@@ -285,15 +388,45 @@ void DrawResult(void)
 	//頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	{ // タイヤ
+	//{ // タイヤ
+	//	//頂点バッファをデータストリームに設定
+	//	pDevice->SetStreamSource(0,
+	//		g_pVtxBuffResultWheel,						//頂点バッファへのポインタ
+	//		0,
+	//		sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
+
+	//	//テクスチャの設定
+	//	pDevice->SetTexture(0, g_apTextureResult[RSL_WHEEL]);
+
+	//	//ポリゴンの描画
+	//	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
+	//		0,											//描画する最初の頂点インデックス
+	//		2);											//描画するプリミティブ数
+	//}
+
+	{ // 言葉
 		//頂点バッファをデータストリームに設定
 		pDevice->SetStreamSource(0,
-			g_pVtxBuffResultWheel,						//頂点バッファへのポインタ
+			g_pVtxBuffResultWord,						//頂点バッファへのポインタ
 			0,
 			sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
 
-		//テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureResult[RSL_WHEEL]);
+		switch (g_ResultState)
+		{
+		case RESULTSTATE_CLEAR:		// クリア状態
+
+			//テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureResult[RSL_GAMECLEAR]);
+
+			break;					// 抜け出す
+
+		case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+			//テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureResult[RSL_GAMEOVER]);
+
+			break;					// 抜け出す
+		}
 
 		//ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
@@ -309,8 +442,8 @@ void DrawResult(void)
 	( // 引数
 		D3DXVECTOR3
 		( // 引数
-			SCREEN_WIDTH * 0.5f,	// 位置 (x)
-			SCREEN_HEIGHT * 0.5f,	// 位置 (y)
+			1100.0f,				// 位置 (x)
+			500.0f,					// 位置 (y)
 			0.0f					// 位置 (z)
 		),
 		g_nDispRslScore,			// 値
@@ -323,4 +456,57 @@ void DrawResult(void)
 
 	// 数値の描画
 	DrawValue(VAL_SCO_DIGIT, VALUETYPE_NORMAL);
+}
+
+//=======================================
+// タイヤの更新処理
+//=======================================
+void WheelUpdateRsl(void)
+{
+	VERTEX_2D * pVtx;										//頂点情報へのポインタ
+
+	// 向きを移動させる
+	g_Wheel.fRot += g_Wheel.fRotMove;
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	g_pVtxBuffResultWheel->Lock(0, 0, (void**)&pVtx, 0);
+
+	//頂点座標の設定
+	pVtx[0].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot - D3DX_PI + g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[0].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot - D3DX_PI + g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[0].pos.z = 0.0f;
+	pVtx[1].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot + D3DX_PI - g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[1].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot + D3DX_PI - g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[1].pos.z = 0.0f;
+	pVtx[2].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot - g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[2].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot - g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[2].pos.z = 0.0f;
+	pVtx[3].pos.x = g_Wheel.pos.x + sinf(g_Wheel.fRot + g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[3].pos.y = g_Wheel.pos.y + cosf(g_Wheel.fRot + g_Wheel.fAngle) * g_Wheel.fLength;
+	pVtx[3].pos.z = 0.0f;
+
+	//頂点バッファをアンロックする
+	g_pVtxBuffResultWheel->Unlock();
+}
+
+//=======================================
+// 言葉の更新処理
+//=======================================
+void RslWordUpdateRsl(void)
+{
+	VERTEX_2D * pVtx;										//頂点情報へのポインタ
+
+	g_RslWord.pos.x += 
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	g_pVtxBuffResultWord->Lock(0, 0, (void**)&pVtx, 0);
+
+	//頂点座標の設定
+	pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+
+	//頂点バッファをアンロックする
+	g_pVtxBuffResultWord->Unlock();
 }

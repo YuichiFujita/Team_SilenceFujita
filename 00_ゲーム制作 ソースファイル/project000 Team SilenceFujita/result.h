@@ -12,9 +12,9 @@
 //マクロ定義
 
 //プロトタイプ宣言
-void InitResult(void);										//リザルト画面の初期化処理
-void UninitResult(void);									//リザルト画面の終了処理
-void UpdateResult(void);									//リザルト画面の更新処理
-void DrawResult(void);										//リザルト画面の描画処理
+void InitResult(void);										// リザルト画面の初期化処理
+void UninitResult(void);									// リザルト画面の終了処理
+void UpdateResult(void);									// リザルト画面の更新処理
+void DrawResult(void);										// リザルト画面の描画処理
 
 #endif

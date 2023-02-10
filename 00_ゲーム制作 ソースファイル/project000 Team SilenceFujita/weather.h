@@ -21,6 +21,7 @@
 #define RAIN_RADIUS_Y		(4.0f)						// 雨の半径(Y軸)
 #define RAIN_HEIGHT			(300.0f)					// 雨の降る高さ
 #define RAIN_MOVE_LEAST		(9.0f)						// 移動量の最低限
+#define RESULT_RAIN_LINE	(4200.0f)					// リザルト時の雨の寿命ライン
 
 //**********************************************************************************************************************
 //	マクロ定義(雪)
@@ -40,6 +41,7 @@
 //**********************************************************************************************************************
 #define MAX_THUNDER			(128)						// 雷の最大数
 #define THUNDER_INTERVAL	(100)						// 雷の間隔
+#define THUNDER_RSL_INTERVAL	(30)					// リザルト時の雷の間隔
 #define THUNDER_RANGE		(900)						// 雷の降る範囲
 #define SHIFT_THUNDER		(40000.0f)					// 雷のずらす幅
 #define THUNDER_RADIUS_X	(150.0f)					// 雷の半径(X軸)
