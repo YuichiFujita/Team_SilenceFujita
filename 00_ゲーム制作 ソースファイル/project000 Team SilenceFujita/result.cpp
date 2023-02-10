@@ -16,6 +16,7 @@
 #include "camera.h"
 #include "light.h"
 #include "score.h"
+#include "weather.h"
 
 //マクロ定義
 #define WHEEL_RADIUS		(300.0f)		// タイヤの半径
@@ -154,13 +155,6 @@ void InitResult(void)
 		true,
 		false
 	);
-
-	// ライトの取得処理
-	pDevice->GetLight(CAMERATYPE_MAIN, &g_RslLight);
-
-	// 色を赤に設定する
-	g_RslLight.Diffuse = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-	g_RslLight.Ambient = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
 //======================================
@@ -199,6 +193,12 @@ void UpdateResult(void)
 {
 	FADE pFade = GetFade();									//フェードの状態を取得する
 	VERTEX_2D * pVtx;										//頂点情報へのポインタ
+
+	// 天気の設定処理
+	SetWeather();
+
+	// 天気の更新処理
+	UpdateWeather();
 
 	// カメラの更新処理
 	UpdateCamera();
@@ -285,21 +285,21 @@ void DrawResult(void)
 	//頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	{ // タイヤ
-		//頂点バッファをデータストリームに設定
-		pDevice->SetStreamSource(0,
-			g_pVtxBuffResultWheel,						//頂点バッファへのポインタ
-			0,
-			sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
+	//{ // タイヤ
+	//	//頂点バッファをデータストリームに設定
+	//	pDevice->SetStreamSource(0,
+	//		g_pVtxBuffResultWheel,						//頂点バッファへのポインタ
+	//		0,
+	//		sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
 
-		//テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureResult[RSL_WHEEL]);
+	//	//テクスチャの設定
+	//	pDevice->SetTexture(0, g_apTextureResult[RSL_WHEEL]);
 
-		//ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
-			0,											//描画する最初の頂点インデックス
-			2);											//描画するプリミティブ数
-	}
+	//	//ポリゴンの描画
+	//	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
+	//		0,											//描画する最初の頂点インデックス
+	//		2);											//描画するプリミティブ数
+	//}
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	数値の描画

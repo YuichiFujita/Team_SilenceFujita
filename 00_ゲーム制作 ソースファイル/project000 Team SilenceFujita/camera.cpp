@@ -65,6 +65,11 @@
 #define CAMERA_RIGHT_SHIFT		(7.0f)			// 右にカメラをずらす距離
 #define CAMERA_BACK_SHIFT		(35.0f)			// 後ろにカメラをずらす距離
 
+// リザルトカメラ
+#define CAMERA_RSL_ROT_MOVE		(0.003f)		// カメラの向きの移動量
+#define TITLE_DISTANCE			(10000.0f)		// タイトル時のカメラの距離
+#define TITLE_INIT_POS_Y		(4500.0f)		// タイトル時のカメラの初期位置(Y軸)
+	
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
@@ -91,65 +96,143 @@ CAMERASTATE g_CameraState;			// カメラの状態
 //============================================================
 void InitCamera(void)
 {
-	//--------------------------------------------------------
-	//	メインカメラの初期化
-	//--------------------------------------------------------
-	// 基本情報を初期化
-	g_aCamera[CAMERATYPE_MAIN].posV     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の視点
-	g_aCamera[CAMERATYPE_MAIN].posR     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の注視点
-	g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の視点
-	g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の注視点
-	g_aCamera[CAMERATYPE_MAIN].vecU     = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトル
-	g_aCamera[CAMERATYPE_MAIN].rot      = D3DXVECTOR3(FIRST_ROT, 0.0f, 0.0f);	// 向き
-	g_aCamera[CAMERATYPE_MAIN].fDis     = FIRST_DIS;							// 視点と注視点の距離
+	MODE mode = GetMode();			// モードの状態
 
-	// ビューポート情報を初期化
-	g_aCamera[CAMERATYPE_MAIN].viewport.X      = 0;				// 左上隅のピクセル座標 (x)
-	g_aCamera[CAMERATYPE_MAIN].viewport.Y      = 0;				// 左上隅のピクセル座標 (y)
-	g_aCamera[CAMERATYPE_MAIN].viewport.Width  = SCREEN_WIDTH;	// 描画する画面の横幅
-	g_aCamera[CAMERATYPE_MAIN].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
-	g_aCamera[CAMERATYPE_MAIN].viewport.MinZ   = 0.0f;
-	g_aCamera[CAMERATYPE_MAIN].viewport.MaxZ   = 1.0f;
+	switch (mode)
+	{
+	case MODE_GAME:					// ゲーム
 
-	//--------------------------------------------------------
-	//	マップカメラの初期化
-	//--------------------------------------------------------
-	// 基本情報を初期化
-	g_aCamera[CAMERATYPE_MAP].posV     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の視点
-	g_aCamera[CAMERATYPE_MAP].posR     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の注視点
-	g_aCamera[CAMERATYPE_MAP].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 目標の視点
-	g_aCamera[CAMERATYPE_MAP].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 目標の注視点
-	g_aCamera[CAMERATYPE_MAP].vecU     = D3DXVECTOR3(0.0f, 0.0f, 1.0f);			// 上方向ベクトル
-	g_aCamera[CAMERATYPE_MAP].rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
-	g_aCamera[CAMERATYPE_MAP].fDis     = 0.0f;									// 視点と注視点の距離
+		//--------------------------------------------------------
+		//	メインカメラの初期化
+		//--------------------------------------------------------
+		// 基本情報を初期化
+		g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の視点
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;	// 前回の視点
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の注視点
+		g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の視点
+		g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の注視点
+		g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(FIRST_ROT, 0.0f, 0.0f);	// 向き
+		g_aCamera[CAMERATYPE_MAIN].fDis = FIRST_DIS;							// 視点と注視点の距離
 
-	// ビューポート情報を初期化
-	g_aCamera[CAMERATYPE_MAP].viewport.X      = MAPCAM_X;		// 左上隅のピクセル座標 (x)
-	g_aCamera[CAMERATYPE_MAP].viewport.Y      = MAPCAM_Y;		// 左上隅のピクセル座標 (y)
-	g_aCamera[CAMERATYPE_MAP].viewport.Width  = MAPCAM_SIZE_X;	// 描画する画面の横幅
-	g_aCamera[CAMERATYPE_MAP].viewport.Height = MAPCAM_SIZE_Y;	// 描画する画面の縦幅
-	g_aCamera[CAMERATYPE_MAP].viewport.MinZ   = 0.0f;
-	g_aCamera[CAMERATYPE_MAP].viewport.MaxZ   = 1.0f;
+		// ビューポート情報を初期化
+		g_aCamera[CAMERATYPE_MAIN].viewport.X = 0;					// 左上隅のピクセル座標 (x)
+		g_aCamera[CAMERATYPE_MAIN].viewport.Y = 0;					// 左上隅のピクセル座標 (y)
+		g_aCamera[CAMERATYPE_MAIN].viewport.Width = SCREEN_WIDTH;	// 描画する画面の横幅
+		g_aCamera[CAMERATYPE_MAIN].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
+		g_aCamera[CAMERATYPE_MAIN].viewport.MinZ = 0.0f;
+		g_aCamera[CAMERATYPE_MAIN].viewport.MaxZ = 1.0f;
 
-	//--------------------------------------------------------
-	//	UIカメラの初期化
-	//--------------------------------------------------------
-	// 基本情報を初期化
-	g_aCamera[CAMERATYPE_UI].posV     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の視点
-	g_aCamera[CAMERATYPE_UI].posR     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の注視点
-	g_aCamera[CAMERATYPE_UI].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 目標の視点
-	g_aCamera[CAMERATYPE_UI].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 目標の注視点
-	g_aCamera[CAMERATYPE_UI].vecU     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 上方向ベクトル
-	g_aCamera[CAMERATYPE_UI].rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
-	g_aCamera[CAMERATYPE_UI].fDis     = 0.0f;									// 視点と注視点の距離
+		//--------------------------------------------------------
+		//	マップカメラの初期化
+		//--------------------------------------------------------
+		// 基本情報を初期化
+		g_aCamera[CAMERATYPE_MAP].posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の視点
+		g_aCamera[CAMERATYPE_MAP].posVOld = g_aCamera[CAMERATYPE_MAP].posV;		// 前回の視点
+		g_aCamera[CAMERATYPE_MAP].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の注視点
+		g_aCamera[CAMERATYPE_MAP].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の視点
+		g_aCamera[CAMERATYPE_MAP].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の注視点
+		g_aCamera[CAMERATYPE_MAP].vecU = D3DXVECTOR3(0.0f, 0.0f, 1.0f);			// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAP].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
+		g_aCamera[CAMERATYPE_MAP].fDis = 0.0f;									// 視点と注視点の距離
 
-	// ビューポート情報を初期化
-	g_aCamera[CAMERATYPE_UI].viewport.X      = 0;				// 左上隅のピクセル座標 (x)
-	g_aCamera[CAMERATYPE_UI].viewport.Y      = 0;				// 左上隅のピクセル座標 (y)
-	g_aCamera[CAMERATYPE_UI].viewport.Width  = SCREEN_WIDTH;	// 描画する画面の横幅
-	g_aCamera[CAMERATYPE_UI].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
-	g_aCamera[CAMERATYPE_UI].viewport.MinZ   = 0.0f;
-	g_aCamera[CAMERATYPE_UI].viewport.MaxZ   = 1.0f;
+		// ビューポート情報を初期化
+		g_aCamera[CAMERATYPE_MAP].viewport.X = MAPCAM_X;			// 左上隅のピクセル座標 (x)
+		g_aCamera[CAMERATYPE_MAP].viewport.Y = MAPCAM_Y;			// 左上隅のピクセル座標 (y)
+		g_aCamera[CAMERATYPE_MAP].viewport.Width = MAPCAM_SIZE_X;	// 描画する画面の横幅
+		g_aCamera[CAMERATYPE_MAP].viewport.Height = MAPCAM_SIZE_Y;	// 描画する画面の縦幅
+		g_aCamera[CAMERATYPE_MAP].viewport.MinZ = 0.0f;
+		g_aCamera[CAMERATYPE_MAP].viewport.MaxZ = 1.0f;
+
+		//--------------------------------------------------------
+		//	UIカメラの初期化
+		//--------------------------------------------------------
+		// 基本情報を初期化
+		g_aCamera[CAMERATYPE_UI].posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の視点
+		g_aCamera[CAMERATYPE_UI].posVOld = g_aCamera[CAMERATYPE_UI].posV;		// 前回の視点
+		g_aCamera[CAMERATYPE_UI].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の注視点
+		g_aCamera[CAMERATYPE_UI].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の視点
+		g_aCamera[CAMERATYPE_UI].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の注視点
+		g_aCamera[CAMERATYPE_UI].vecU = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 上方向ベクトル
+		g_aCamera[CAMERATYPE_UI].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
+		g_aCamera[CAMERATYPE_UI].fDis = 0.0f;									// 視点と注視点の距離
+
+		// ビューポート情報を初期化
+		g_aCamera[CAMERATYPE_UI].viewport.X = 0;					// 左上隅のピクセル座標 (x)
+		g_aCamera[CAMERATYPE_UI].viewport.Y = 0;					// 左上隅のピクセル座標 (y)
+		g_aCamera[CAMERATYPE_UI].viewport.Width = SCREEN_WIDTH;		// 描画する画面の横幅
+		g_aCamera[CAMERATYPE_UI].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
+		g_aCamera[CAMERATYPE_UI].viewport.MinZ = 0.0f;
+		g_aCamera[CAMERATYPE_UI].viewport.MaxZ = 1.0f;
+
+		break;						// 抜け出す
+
+	case MODE_RESULT:				// リザルト
+		
+		//--------------------------------------------------------
+		//	メインカメラの初期化
+		//--------------------------------------------------------
+		g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;						//視点と注視点の距離
+		g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(0.0f, TITLE_INIT_POS_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);	//視点の位置
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;	// 前回の視点
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 注視点の位置
+		g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の視点
+		g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の注視点
+		g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(FIRST_ROT, 0.0f, 0.0f);	// 向き
+
+		// ビューポート情報を初期化
+		g_aCamera[CAMERATYPE_MAIN].viewport.X = 0;					// 左上隅のピクセル座標 (x)
+		g_aCamera[CAMERATYPE_MAIN].viewport.Y = 0;					// 左上隅のピクセル座標 (y)
+		g_aCamera[CAMERATYPE_MAIN].viewport.Width = SCREEN_WIDTH;	// 描画する画面の横幅
+		g_aCamera[CAMERATYPE_MAIN].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
+		g_aCamera[CAMERATYPE_MAIN].viewport.MinZ = 0.0f;
+		g_aCamera[CAMERATYPE_MAIN].viewport.MaxZ = 1.0f;
+
+		//--------------------------------------------------------
+		//	マップカメラの初期化
+		//--------------------------------------------------------
+		// 基本情報を初期化
+		g_aCamera[CAMERATYPE_MAP].posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の視点
+		g_aCamera[CAMERATYPE_MAP].posVOld = g_aCamera[CAMERATYPE_MAP].posV;		// 前回の視点
+		g_aCamera[CAMERATYPE_MAP].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の注視点
+		g_aCamera[CAMERATYPE_MAP].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の視点
+		g_aCamera[CAMERATYPE_MAP].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の注視点
+		g_aCamera[CAMERATYPE_MAP].vecU = D3DXVECTOR3(0.0f, 0.0f, 1.0f);			// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAP].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
+		g_aCamera[CAMERATYPE_MAP].fDis = 0.0f;									// 視点と注視点の距離
+
+		// ビューポート情報を初期化
+		g_aCamera[CAMERATYPE_MAP].viewport.X = MAPCAM_X;			// 左上隅のピクセル座標 (x)
+		g_aCamera[CAMERATYPE_MAP].viewport.Y = MAPCAM_Y;			// 左上隅のピクセル座標 (y)
+		g_aCamera[CAMERATYPE_MAP].viewport.Width = MAPCAM_SIZE_X;	// 描画する画面の横幅
+		g_aCamera[CAMERATYPE_MAP].viewport.Height = MAPCAM_SIZE_Y;	// 描画する画面の縦幅
+		g_aCamera[CAMERATYPE_MAP].viewport.MinZ = 0.0f;
+		g_aCamera[CAMERATYPE_MAP].viewport.MaxZ = 1.0f;
+
+		//--------------------------------------------------------
+		//	UIカメラの初期化
+		//--------------------------------------------------------
+		// 基本情報を初期化
+		g_aCamera[CAMERATYPE_UI].posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の視点
+		g_aCamera[CAMERATYPE_UI].posVOld = g_aCamera[CAMERATYPE_UI].posV;		// 前回の視点
+		g_aCamera[CAMERATYPE_UI].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の注視点
+		g_aCamera[CAMERATYPE_UI].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の視点
+		g_aCamera[CAMERATYPE_UI].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の注視点
+		g_aCamera[CAMERATYPE_UI].vecU = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 上方向ベクトル
+		g_aCamera[CAMERATYPE_UI].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
+		g_aCamera[CAMERATYPE_UI].fDis = 0.0f;									// 視点と注視点の距離
+
+		// ビューポート情報を初期化
+		g_aCamera[CAMERATYPE_UI].viewport.X = 0;					// 左上隅のピクセル座標 (x)
+		g_aCamera[CAMERATYPE_UI].viewport.Y = 0;					// 左上隅のピクセル座標 (y)
+		g_aCamera[CAMERATYPE_UI].viewport.Width = SCREEN_WIDTH;		// 描画する画面の横幅
+		g_aCamera[CAMERATYPE_UI].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
+		g_aCamera[CAMERATYPE_UI].viewport.MinZ = 0.0f;
+		g_aCamera[CAMERATYPE_UI].viewport.MaxZ = 1.0f;
+
+		break;						// 抜け出す
+	}
 	
 	g_CameraState = CAMERASTATE_NORMAL;							// カメラの状態
 }
@@ -167,18 +250,24 @@ void UninitCamera(void)
 //============================================================
 void UpdateCamera(void)
 {
+	MODE mode = GetMode();			// モードの状態
+
 #ifdef _DEBUG	// デバッグ処理
-	#if 1
+	switch (mode)
+	{
+	case MODE_GAME:					// ゲーム
+#if 1
+
 		switch (GetGameMode())
 		{ // ゲームモードごとの処理
 		case GAMEMODE_PLAY:
-	
+
 			//switch (g_CameraState)
 			//{
 			//case CAMERASTATE_NORMAL:		// 通常カメラ
 
-				// カメラの位置の更新 (追従)
-				MoveFollowCamera();
+			// カメラの位置の更新 (追従)
+			MoveFollowCamera();
 
 			//	break;						// 抜け出す
 
@@ -189,44 +278,84 @@ void UpdateCamera(void)
 
 			//	break;						// 抜け出す
 			//}
-	
+
 			// 処理を抜ける
 			break;
-	
+
 		case GAMEMODE_EDIT:
-	
+
 			// カメラの位置の更新 (操作)
 			MoveCamera();
-	
+
 			// カメラの距離の更新 (操作)
 			DisCamera();
-	
+
 			// カメラの向きの更新 (操作)
 			RotCamera();
-	
+
 			// 処理を抜ける
 			break;
 		}
-	#else
+#else
 		// カメラの位置の更新 (操作)
 		MoveCamera();
-	
+
 		// カメラの距離の更新 (操作)
 		DisCamera();
-	
+
 		// カメラの向きの更新 (操作)
 		RotCamera();
-	#endif
+#endif
+
+		break;						// 抜け出す
+
+	case MODE_RESULT:				// リザルト
+
+		//カメラの注始点の位置を設定する
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+		// 前回の位置を記録する
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;
+
+		//視点を右に回す
+		g_aCamera[CAMERATYPE_MAIN].rot.y += CAMERA_RSL_ROT_MOVE;
+
+		if (g_aCamera[CAMERATYPE_MAIN].rot.y > D3DX_PI)
+		{//角度が3.14fより大きかった場合
+			//角度から1周分減らす
+			g_aCamera[CAMERATYPE_MAIN].rot.y -= (2 * D3DX_PI);
+		}
+		else if (g_aCamera[CAMERATYPE_MAIN].rot.y < -D3DX_PI)
+		{//角度が-3.14fより小さかった場合
+			//角度に1周分加える
+			g_aCamera[CAMERATYPE_MAIN].rot.y += (2 * D3DX_PI);
+		}
+
+		//カメラの視点を更新する
+		g_aCamera[CAMERATYPE_MAIN].posV.x = g_aCamera[CAMERATYPE_MAIN].posR.x + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * -g_aCamera[CAMERATYPE_MAIN].fDis;
+		g_aCamera[CAMERATYPE_MAIN].posV.z = g_aCamera[CAMERATYPE_MAIN].posR.z + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * -g_aCamera[CAMERATYPE_MAIN].fDis;
+
+		//カメラの注視点を更新する
+		g_aCamera[CAMERATYPE_MAIN].posR.x = g_aCamera[CAMERATYPE_MAIN].posV.x + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * g_aCamera[CAMERATYPE_MAIN].fDis;
+		g_aCamera[CAMERATYPE_MAIN].posR.z = g_aCamera[CAMERATYPE_MAIN].posV.z + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * g_aCamera[CAMERATYPE_MAIN].fDis;
+
+		break;						// 抜け出す
+	}
 
 	// マップカメラの位置の更新
 	MoveMiniMap();
 #endif
 
 #ifdef NDEBUG	// リリース処理
-	#if 1
+
+	switch (mode)
+	{
+	case MODE_GAME:					// ゲーム
+
+#if 1
 		// カメラの位置の更新 (追従)
 		MoveFollowCamera();
-	#else
+#else
 		// カメラの位置の更新 (操作)
 		MoveCamera();
 
@@ -235,7 +364,39 @@ void UpdateCamera(void)
 
 		// カメラの向きの更新 (操作)
 		RotCamera();
-	#endif
+#endif
+
+		break;						// 抜け出す
+
+	case MODE_RESULT:				// リザルト
+
+		//カメラの注始点の位置を設定する
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+		//視点を右に回す
+		g_aCamera[CAMERATYPE_MAIN].rot.y += CAMERA_RSL_ROT_MOVE;
+
+		if (g_aCamera[CAMERATYPE_MAIN].rot.y > D3DX_PI)
+		{//角度が3.14fより大きかった場合
+			//角度から1周分減らす
+			g_aCamera[CAMERATYPE_MAIN].rot.y -= (2 * D3DX_PI);
+		}
+		else if (g_aCamera[CAMERATYPE_MAIN].rot.y < -D3DX_PI)
+		{//角度が-3.14fより小さかった場合
+			//角度に1周分加える
+			g_aCamera[CAMERATYPE_MAIN].rot.y += (2 * D3DX_PI);
+		}
+
+		//カメラの視点を更新する
+		g_aCamera[CAMERATYPE_MAIN].posV.x = g_aCamera[CAMERATYPE_MAIN].posR.x + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * -g_aCamera[CAMERATYPE_MAIN].fDis;
+		g_aCamera[CAMERATYPE_MAIN].posV.z = g_aCamera[CAMERATYPE_MAIN].posR.z + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * -g_aCamera[CAMERATYPE_MAIN].fDis;
+
+		//カメラの注視点を更新する
+		g_aCamera[CAMERATYPE_MAIN].posR.x = g_aCamera[CAMERATYPE_MAIN].posV.x + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * g_aCamera[CAMERATYPE_MAIN].fDis;
+		g_aCamera[CAMERATYPE_MAIN].posR.z = g_aCamera[CAMERATYPE_MAIN].posV.z + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * g_aCamera[CAMERATYPE_MAIN].fDis;
+
+		break;						// 抜け出す
+}
 
 	// マップカメラの位置の更新
 	MoveMiniMap();
