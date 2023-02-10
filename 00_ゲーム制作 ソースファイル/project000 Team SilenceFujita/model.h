@@ -56,6 +56,7 @@ typedef enum
 	MODELTYPE_OBJECT_OBASTATION,		// 商店街（ゲームセンター）
 	MODELTYPE_OBJECT_SWING,				// 公園（ブランコ）
 	MODELTYPE_OBJECT_FUJIDORA,			// フジドラ
+	MODELTYPE_OBJECT_FENCE,				// 公園（フェンス）
 
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
