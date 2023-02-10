@@ -54,6 +54,8 @@ typedef enum
 	MODELTYPE_OBJECT_OBARAFOOD,			// 商店街（食堂）
 	MODELTYPE_OBJECT_OBAMART,			// 商店街（半額店）
 	MODELTYPE_OBJECT_OBASTATION,		// 商店街（ゲームセンター）
+	MODELTYPE_OBJECT_SWING,				// 公園（ブランコ）
+	MODELTYPE_OBJECT_FUJIDORA,			// フジドラ
 
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
