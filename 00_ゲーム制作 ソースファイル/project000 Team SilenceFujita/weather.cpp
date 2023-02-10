@@ -549,7 +549,7 @@ void UpdateRain(void)
 
 			case MODE_RESULT:	// リザルト
 
-				if (g_aRain[nCntWeather].pos.y <= 4200.0f)
+				if (g_aRain[nCntWeather].pos.y <= RESULT_RAIN_LINE)
 				{ // 雨が地面に落ちたとき
 					// 使用しない
 					g_aRain[nCntWeather].bUse = false;

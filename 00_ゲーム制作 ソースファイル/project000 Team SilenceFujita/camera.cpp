@@ -67,7 +67,7 @@
 
 // リザルトカメラ
 #define CAMERA_RSL_ROT_MOVE		(0.003f)		// カメラの向きの移動量
-#define TITLE_DISTANCE			(10000.0f)		// タイトル時のカメラの距離
+#define TITLE_DISTANCE			(13000.0f)		// タイトル時のカメラの距離
 #define TITLE_INIT_POS_Y		(4500.0f)		// タイトル時のカメラの初期位置(Y軸)
 	
 //************************************************************
