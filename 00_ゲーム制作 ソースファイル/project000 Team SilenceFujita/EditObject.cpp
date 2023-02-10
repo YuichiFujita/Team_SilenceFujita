@@ -834,12 +834,14 @@ void ResetEdit(void)
 //=======================================
 void EditMaterialCustom(void)
 {
-	D3DMATERIAL9 *pMatEdit;						//マテリアルデータへのポインタ
+	D3DMATERIAL9 *pMatEdit;		//マテリアルデータへのポインタ
 
 	if (g_EditObject.bUse == true)
 	{//設定中か使用している場合
+
 		if (GetKeyboardTrigger(DIK_SPACE) == true)
 		{//SPACEキーを押した場合
+
 			//マテリアルを変更する
 			g_EditObject.nCntMaterial = (g_EditObject.nCntMaterial + 1) % (int)(g_EditObject.modelData.dwNumMat);
 		}
@@ -851,20 +853,25 @@ void EditMaterialCustom(void)
 
 			if (nCntMat == g_EditObject.nCntMaterial)
 			{//選択中のマテリアルだった場合
+
 				if (GetKeyboardPress(DIK_LSHIFT) == true)
 				{//左シフトキーを押した場合
+
 					if (GetKeyboardPress(DIK_R) == true)
 					{//Rキーを押した場合
+
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
 						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
+
 							//R値を増やす
 							pMatEdit->Ambient.r += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.r > 1.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Ambient.r = 0.0f;
 							}
@@ -873,6 +880,7 @@ void EditMaterialCustom(void)
 
 							if (pMatEdit->Diffuse.r > 1.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Diffuse.r = 0.0f;
 							}
@@ -880,16 +888,19 @@ void EditMaterialCustom(void)
 					}
 					else if (GetKeyboardPress(DIK_F) == true)
 					{//Fキーを押した場合
+
 					 //カウントを加算する
 						g_EditObject.nColorCount++;
 
 						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
+
 							//R値を増やす
 							pMatEdit->Ambient.r -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.r < 0.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Ambient.r = 1.0f;
 							}
@@ -898,6 +909,7 @@ void EditMaterialCustom(void)
 
 							if (pMatEdit->Diffuse.r < 0.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Diffuse.r = 1.0f;
 							}
@@ -906,16 +918,19 @@ void EditMaterialCustom(void)
 
 					if (GetKeyboardPress(DIK_T) == true)
 					{//Tキーを押した場合
+
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
 						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
+
 							//G値を増やす
 							pMatEdit->Ambient.g += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.g > 1.0f)
 							{//G値が限界を超えたら
+
 								//G値を0に戻す
 								pMatEdit->Ambient.g = 0.0f;
 							}
@@ -925,6 +940,7 @@ void EditMaterialCustom(void)
 
 							if (pMatEdit->Diffuse.g > 1.0f)
 							{//G値が限界を超えたら
+
 								//G値を0に戻す
 								pMatEdit->Diffuse.g = 0.0f;
 							}
@@ -932,16 +948,19 @@ void EditMaterialCustom(void)
 					}
 					else if (GetKeyboardPress(DIK_G) == true)
 					{//Gキーを押した場合
+
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
 						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
+
 							//R値を増やす
 							pMatEdit->Ambient.g -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.g < 0.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Ambient.g = 1.0f;
 							}
@@ -951,6 +970,7 @@ void EditMaterialCustom(void)
 
 							if (pMatEdit->Diffuse.g < 0.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Diffuse.g = 1.0f;
 							}
@@ -959,16 +979,19 @@ void EditMaterialCustom(void)
 
 					if (GetKeyboardPress(DIK_Y) == true)
 					{//Yキーを押した場合
+
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
 						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
+
 							//B値を増やす
 							pMatEdit->Ambient.b += EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.b > 1.0f)
 							{//B値が限界を超えたら
+
 								//B値を0に戻す
 								pMatEdit->Ambient.b = 0.0f;
 							}
@@ -978,6 +1001,7 @@ void EditMaterialCustom(void)
 
 							if (pMatEdit->Diffuse.b > 1.0f)
 							{//B値が限界を超えたら
+
 								//B値を0に戻す
 								pMatEdit->Diffuse.b = 0.0f;
 							}
@@ -985,16 +1009,19 @@ void EditMaterialCustom(void)
 					}
 					else if (GetKeyboardPress(DIK_H) == true)
 					{//Hキーを押した場合
+
 						//カウントを加算する
 						g_EditObject.nColorCount++;
 
 						if (g_EditObject.nColorCount % EDITOBJ_COL_CHANGE_CNT == 0)
 						{//20Fごとに
+
 							//R値を増やす
 							pMatEdit->Ambient.b -= EDITOBJ_COL_CONVERSION;
 
 							if (pMatEdit->Ambient.b < 0.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Ambient.b = 1.0f;
 							}
@@ -1003,6 +1030,7 @@ void EditMaterialCustom(void)
 
 							if (pMatEdit->Diffuse.b < 0.0f)
 							{//R値が限界を超えたら
+
 								//R値を0に戻す
 								pMatEdit->Diffuse.b = 1.0f;
 							}
@@ -1014,6 +1042,7 @@ void EditMaterialCustom(void)
 
 					if (GetKeyboardPress(DIK_V) == true)
 					{//Vキーを押した場合
+
 						//R値のリセット
 						pMatEdit->Ambient.r = pMatOriginal->Ambient.r;
 						pMatEdit->Diffuse.r = pMatOriginal->Diffuse.r;
@@ -1021,6 +1050,7 @@ void EditMaterialCustom(void)
 
 					if (GetKeyboardPress(DIK_B) == true)
 					{//Bキーを押した場合
+
 						//G値のリセット
 						pMatEdit->Ambient.g = pMatOriginal->Ambient.g;
 						pMatEdit->Diffuse.g = pMatOriginal->Diffuse.g;
@@ -1028,6 +1058,7 @@ void EditMaterialCustom(void)
 
 					if (GetKeyboardPress(DIK_N) == true)
 					{//Nキーを押した場合
+
 						//B値のリセット
 						pMatEdit->Ambient.b = pMatOriginal->Ambient.b;
 						pMatEdit->Diffuse.b = pMatOriginal->Diffuse.b;
