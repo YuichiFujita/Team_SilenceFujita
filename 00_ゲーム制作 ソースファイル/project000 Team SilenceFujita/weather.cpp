@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "weather.h"
+#include "game.h"
 #include "camera.h"
 #include "player.h"
 
@@ -66,6 +67,7 @@ void InitWeather(void)
 	int nRandWeather;		// 天気の変数
 
 	g_WeatherMode = GetMode();	// モード
+	RESULTSTATE resultState = GetResultState();	// ゲームの状態
 
 	switch (g_WeatherMode)
 	{
@@ -99,8 +101,22 @@ void InitWeather(void)
 
 	case MODE_RESULT:	// リザルト
 
-		// 天気を晴れに設定する
-		g_Weather = WEATHERTYPE_THUNDER;
+		switch (resultState)
+		{
+		case RESULTSTATE_CLEAR:		// クリア状態
+
+			// 天気を晴れに設定する
+			g_Weather = WEATHERTYPE_SUNNY;
+
+			break;					// 抜け出す
+
+		case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+			// 天気を雷雨に設定する
+			g_Weather = WEATHERTYPE_THUNDER;
+
+			break;					// 抜け出す
+		}
 
 		break;			// 抜け出す
 	}

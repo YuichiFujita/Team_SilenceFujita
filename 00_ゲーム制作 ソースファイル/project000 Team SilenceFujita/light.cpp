@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
+#include "game.h"
 #include "light.h"
 #include "weather.h"
 
@@ -26,7 +27,8 @@ D3DLIGHT9 g_aLight[MAX_LIGHT];		// ライトの情報
 //======================================================================================================================
 void InitLight(void)
 {
-	MODE mode = GetMode();
+	MODE mode = GetMode();			// モード
+	RESULTSTATE ResultState = GetResultState();	// ゲームの状態を取得する
 
 	// 変数配列を宣言
 	D3DXCOLOR   aDiffuse[MAX_LIGHT];			// 設定用拡散光カラー
@@ -83,10 +85,26 @@ void InitLight(void)
 
 	case MODE_RESULT:	// リザルト
 
-		// 拡散光カラーを設定
-		aDiffuse[0] = D3DXCOLOR(1.0f, 0.3f, 0.3f, 1.0f);
-		aDiffuse[1] = D3DXCOLOR(0.7f, 0.2f, 0.2f, 1.0f);
-		aDiffuse[2] = D3DXCOLOR(0.3f, 0.1f, 0.1f, 1.0f);
+		switch (ResultState)
+		{
+		case RESULTSTATE_CLEAR:		// クリア状態
+
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+			break;					// 抜け出す
+
+		case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+			// 拡散光カラーを設定
+			aDiffuse[0] = D3DXCOLOR(1.0f, 0.3f, 0.3f, 1.0f);
+			aDiffuse[1] = D3DXCOLOR(0.7f, 0.2f, 0.2f, 1.0f);
+			aDiffuse[2] = D3DXCOLOR(0.3f, 0.1f, 0.1f, 1.0f);
+
+			break;					// 抜け出す
+		}
 
 		break;			// 抜け出す
 	}

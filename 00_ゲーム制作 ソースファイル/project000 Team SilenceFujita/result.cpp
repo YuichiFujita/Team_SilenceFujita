@@ -18,7 +18,9 @@
 #include "score.h"
 #include "weather.h"
 
+//**********************************************************************************************************************
 //マクロ定義
+//**********************************************************************************************************************
 #define WHEEL_RADIUS		(300.0f)		// タイヤの半径
 #define RESULT_FINISH_COUNT	(30)			// リザルトが終了するまでのカウント
 #define RESULT_SCORE_WIDTH	(20.0f)			// 値の縦幅
@@ -26,7 +28,9 @@
 #define RESULT_SCORE_SHIFT	(50.0f)			// 値の横幅
 #define ADD_DISP_SCORE		(1000)			// スコアの増加率
 
+//**********************************************************************************************************************
 //ランキング画面のテクスチャ
+//**********************************************************************************************************************
 typedef enum
 {
 	RSL_WHEEL = 0,			// タイヤ
@@ -45,7 +49,9 @@ typedef struct
 	float		fLength;	// 長さ
 }WHEEL;
 
+//**********************************************************************************************************************
 //グローバル変数宣言
+//**********************************************************************************************************************
 LPDIRECT3DTEXTURE9 g_apTextureResult[RSL_MAX] = {};			// テクスチャ(2枚分)へのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWheel = NULL;		// 画面の頂点バッファへのポインタ(タイヤ)
 int g_nResultCounter;										// リザルトカウンター
@@ -54,8 +60,11 @@ int g_nResultScore;											// リザルト画面のスコア
 int g_nDispRslScore;										// 表示用のスコア
 bool g_bRslFade;											// リザルトから遷移するかどうか
 D3DLIGHT9 g_RslLight;										// リザルトのライト
+RESULTSTATE g_ResultState;									// ゲーム終了時の状態
 
+//**********************************************************************************************************************
 //テクスチャファイル名
+//**********************************************************************************************************************
 const char *c_apFilenameResult[RSL_MAX] =
 {
 	"data/TEXTURE/ResultWheel.png",							// タイヤ
@@ -93,6 +102,8 @@ void InitResult(void)
 		g_nResultScore = 30000;				// リザルトのスコア
 		g_nDispRslScore = 0;				// 表示用のスコア
 		g_bRslFade = false;					// リザルトから遷移するかどうか
+
+		g_ResultState = GetResultState();	// ゲームの状態
 	}
 
 	{ // タイヤ
@@ -146,15 +157,36 @@ void InitResult(void)
 	// リザルトの初期化全体処理
 	InitResultChunk();
 
-	// ファイルをロードする全体処理
-	LoadFileChunk
-	(
-		false,
-		false,
-		true,
-		true,
-		false
-	);
+	switch (g_ResultState)
+	{
+	case RESULTSTATE_CLEAR:		// クリア状態
+
+		// ファイルをロードする全体処理
+		LoadFileChunk
+		(
+			true,
+			true,
+			true,
+			true,
+			true
+		);
+
+		break;					// 抜け出す
+
+	case RESULTSTATE_OVER:		// ゲームオーバー状態
+
+		// ファイルをロードする全体処理
+		LoadFileChunk
+		(
+			false,
+			false,
+			true,
+			true,
+			false
+		);
+
+		break;					// 抜け出す
+	}
 }
 
 //======================================
