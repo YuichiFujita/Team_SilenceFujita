@@ -72,7 +72,7 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\obaracoffee000.x",		// 商店街（汎用・喫茶店）	
 	"data\\MODEL_OBJECT\\obaramobile000.x",		// 商店街（汎用・携帯ショップ）	
 	"data\\MODEL_OBJECT\\obarabone000.x",		// 商店街（汎用・整骨院）	
-	"data\\MODEL_OBJECT\\obaracleaning000.x",	// 商店街（汎用・天ぷら）	
+	"data\\MODEL_OBJECT\\obaratempura000.x",	// 商店街（汎用・天ぷら）	
 	"data\\MODEL_OBJECT\\obarapharmacy000.x",	// 商店街（汎用・薬局）	
 	"data\\MODEL_OBJECT\\obarashutter000.x",	// 商店街（汎用・シャッター）	
 
