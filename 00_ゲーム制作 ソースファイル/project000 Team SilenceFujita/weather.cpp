@@ -15,49 +15,49 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define SNOW_TEXTURE	"data\\TEXTURE\\effect000.jpg"	//雪のテクスチャ
+#define SNOW_TEXTURE	"data\\TEXTURE\\effect000.jpg"			// 雪のテクスチャ
 
 #define RAIN_COL		(D3DXCOLOR(0.5f, 0.5f, 0.95f, 1.0f))	// 雨の頂点カラー
 #define SNOW_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// 雪の頂点カラー
 #define THUNDER_COL		(D3DXCOLOR(1.0f, 1.0f, 0.5f, 1.0f))		// 雷の頂点カラー
 
-#define WEATHER_RAND	(10)									// 天気のランダムの範囲
-#define SUNNY_RAND		(6)										// ランダムでの晴れの範囲
-#define RAIN_RAND		(7)										// ランダムでの雨の範囲
-#define SNOW_RAND		(8)										// ランダムでの雪の範囲
-#define THUNDER_RAND	(9)										// ランダムでの雷雨の範囲
+#define WEATHER_RAND	(10)	// 天気のランダムの範囲
+#define SUNNY_RAND		(6)		// ランダムでの晴れの範囲
+#define RAIN_RAND		(7)		// ランダムでの雨の範囲
+#define SNOW_RAND		(8)		// ランダムでの雪の範囲
+#define THUNDER_RAND	(9)		// ランダムでの雷雨の範囲
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 // 雨
-void InitRain(void);									// 雨の初期化処理
-void UpdateRain(void);									// 雨の更新処理
-void DrawRain(void);									// 雨の描画処理
+void InitRain(void);			// 雨の初期化処理
+void UpdateRain(void);			// 雨の更新処理
+void DrawRain(void);			// 雨の描画処理
 
 // 雪
-void InitSnow(void);									// 雪の初期化処理
-void UpdateSnow(void);									// 雪の更新処理
-void DrawSnow(void);									// 雪の描画処理
+void InitSnow(void);			// 雪の初期化処理
+void UpdateSnow(void);			// 雪の更新処理
+void DrawSnow(void);			// 雪の描画処理
 
 // 雷
-void InitThunder(void);									// 雷の初期化処理
-void UpdateThunder(void);								// 雷の更新処理
+void InitThunder(void);			// 雷の初期化処理
+void UpdateThunder(void);		// 雷の更新処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-LPDIRECT3DTEXTURE9		g_apTextureWeather = NULL;		// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWeather = NULL;		// 頂点バッファへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffThunder = NULL;		// 頂点バッファへのポインタ(雷)
+LPDIRECT3DTEXTURE9      g_apTextureWeather = NULL;		// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWeather  = NULL;		// 頂点バッファへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffThunder  = NULL;		// 頂点バッファへのポインタ(雷)
 
-Rain g_aRain[MAX_RAIN];		// 雨の情報
-Snow g_aSnow[MAX_SNOW];		// 雪の情報
-Thunder g_aThunder[MAX_THUNDER];		// 雷の情報
-WEATHERTYPE g_Weather;		// 天気の状態
-int g_NumWeather;			// 降っている数を取得する
-int g_nThunderCount;		// 雷のカウント
-MODE g_WeatherMode;			// モード(天気専用)
+Rain g_aRain[MAX_RAIN];				// 雨の情報
+Snow g_aSnow[MAX_SNOW];				// 雪の情報
+Thunder g_aThunder[MAX_THUNDER];	// 雷の情報
+WEATHERTYPE g_Weather;				// 天気の状態
+int g_NumWeather;					// 降っている数を取得する
+int g_nThunderCount;				// 雷のカウント
+MODE g_WeatherMode;					// モード(天気専用)
 
 //======================================================================================================================
 //	天気の初期化処理
