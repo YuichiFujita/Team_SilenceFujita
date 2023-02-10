@@ -20,6 +20,7 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
+#include "gate.h"
 #include "life.h"
 #include "light.h"
 #include "meshdome.h"
@@ -113,6 +114,9 @@ void InitGame(void)
 	// 人間の初期化
 	InitHuman();
 
+	// ゲートの初期化
+	InitGate();
+
 	// カメラの初期化
 	InitCamera();
 
@@ -205,6 +209,9 @@ void UninitGame(void)
 	// 人間の終了
 	UninitHuman();
 
+	// ゲートの終了
+	UninitGate();
+
 	// カメラの終了
 	UninitCamera();
 
@@ -270,6 +277,8 @@ void UninitGame(void)
 //======================================================================================================================
 void UpdateGame(void)
 {
+	FADE Fade = GetFade();
+
 	switch (g_gameState)
 	{ // 状態ごとの処理
 	case GAMESTATE_NORMAL:
@@ -352,8 +361,11 @@ void UpdateGame(void)
 			// メッシュウォールの更新
 			UpdateMeshWall();
 
-			// 風の更新
+			// 送風機の更新
 			UpdateWind();
+
+			// 爆弾の更新
+			UpdateBomb();
 
 			// プレイヤーの更新
 			UpdatePlayer();
@@ -372,6 +384,9 @@ void UpdateGame(void)
 
 			// 人間の更新
 			UpdateHuman();
+
+			// ゲートの更新
+			UpdateGate();
 			
 			// エフェクトの更新
 			UpdateEffect();
@@ -450,6 +465,13 @@ void UpdateGame(void)
 		// 当たり判定の保存
 		TxtSaveCollision();
 	}
+
+	if (GetKeyboardTrigger(DIK_SPACE) == true)
+	{ // 決定の操作が行われた場合
+		// リザルト画面に遷移
+		SetFade(MODE_RESULT);
+	}
+
 #else
 	if (g_bPause == false)
 	{ // ポーズ状態ではない場合
@@ -493,11 +515,17 @@ void UpdateGame(void)
 		// オブジェクトの更新
 		UpdateObject();
 
+		// ゲートの更新
+		UpdateGate();
+
 		// ビルボードの更新
 		UpdateBillboard();
 
-		// 風の更新
+		// 送風機の更新
 		UpdateWind();
+
+		// 爆弾の更新
+		UpdateBomb();
 
 		// カメラの更新
 		UpdateCamera();
@@ -533,10 +561,6 @@ void UpdateGame(void)
 		UpdatePause();
 	}
 #endif
-
-
-	// 爆弾の更新
-	UpdateBomb();
 }
 
 //======================================================================================================================
@@ -555,6 +579,9 @@ void DrawGame(void)
 
 	// メッシュドームの描画
 	DrawMeshDome();
+
+	// 雷の描画処理
+	DrawThunder();
 
 	// メッシュシリンダーの描画
 	DrawMeshCylinder();
@@ -586,10 +613,13 @@ void DrawGame(void)
 	// 人間の描画
 	DrawHuman();
 
+	// ゲートの描画
+	DrawGate();
+
 	// ビルボードの描画
 	DrawBillboard();
 
-	// 風の描画
+	// 送風機の描画
 	DrawWind();
 
 	// 爆弾の描画

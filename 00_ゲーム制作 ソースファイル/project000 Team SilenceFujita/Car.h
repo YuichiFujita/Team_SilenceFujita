@@ -43,6 +43,16 @@ typedef enum
 }CARTYPE;
 
 //**********************************************************************************************************************
+//	列挙型定義(CARSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	CARSTATE_NORMAL = 0,				// 通常状態
+	CARSTATE_TRAFFIC,					// 交通渋滞状態
+	CARSTATE_MAX						// この列挙型の総数
+}CARSTATE;
+
+//**********************************************************************************************************************
 //	構造体定義 (Car)
 //**********************************************************************************************************************
 typedef struct
@@ -59,6 +69,8 @@ typedef struct
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
 	CARCURVE	 carCurveInfo;			// 曲がり角の情報
+	int			 nTrafficCnt;			// 渋滞カウント
+	CARSTATE	 state;					// 状態
 }Car;
 
 //**********************************************************************************************************************
@@ -70,8 +82,8 @@ void UpdateCar(void);				// 車の更新処理
 void DrawCar(void);					// 車の描画処理
 void SetCar(D3DXVECTOR3 pos);		// 車の設定処理
 Car *GetCarData(void);																		// 車の取得処理
-void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject);	// 車の停止処理
-void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject);		// 車同士の当たり判定
+void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject,int *pTraCnt);	// 車の停止処理
+void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, int state);		// 車同士の当たり判定
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

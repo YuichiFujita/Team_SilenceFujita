@@ -17,7 +17,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_HUMAN		(128)		// 使用する人間の最大数
+#define MAX_HUMAN		(256)		// 使用する人間の最大数
 #define HUMAN_WIDTH		(10.0f)		// 人の縦幅
 #define HUMAN_DEPTH		(10.0f)		// 人の奥行
 
@@ -29,6 +29,7 @@ typedef enum
 	HUMANSTATE_WALK = 0,				// 歩き状態
 	HUMANSTATE_STOP,					// ストップ状態
 	HUMANSTATE_FLY,						// 吹き飛ばし状態
+	HUMANSTATE_OTOTO,					// すれ違い状態
 	HUMANSTATE_MAX						// この列挙型の総数
 }HUMANSTATE;
 
@@ -40,6 +41,7 @@ typedef struct
 	D3DXVECTOR3  pos;					// 現在の位置
 	D3DXVECTOR3  posOld;				// 前回の位置
 	D3DXVECTOR3  move;					// 移動量
+	float		 fMaxMove;				// 移動量の最大数
 	D3DXVECTOR3  rot;					// 向き
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報

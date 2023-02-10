@@ -28,13 +28,31 @@ typedef enum
 } BOMBSTATE;
 
 //**********************************************************************************************************************
+//	列挙型定義 (BARRIERSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	BARRIERSTATE_NONE = 0,	// 何もしない状態
+	BARRIERSTATE_FLY,		// 発射状態
+	BARRIERSTATE_HOMING,	// 追尾状態
+	BARRIERSTATE_LAND,		// 着弾状態
+	BARRIERSTATE_ENLARGE,	// 拡大状態
+	BARRIERSTATE_UP,		// 上昇状態
+	BARRIERSTATE_SET,		// 完成状態
+	BARRIERSTATE_DOWN,		// 下降状態
+	BARRIERSTATE_REDUCE,	// 縮小状態
+	BARRIERSTATE_MAX,		// この列挙型の総数
+} BARRIERSTATE;
+
+//**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void InitBomb(void);		// 爆弾の初期化処理
-void UninitBomb(void);		// 爆弾の終了処理
-void UpdateBomb(void);		// 爆弾の更新処理
-void DrawBomb(void);		// 爆弾の描画処理
-void ShotBomb(void);		// 爆弾の発射処理
+void InitBomb(void);						// 爆弾の初期化処理
+void UninitBomb(void);						// 爆弾の終了処理
+void UpdateBomb(void);						// 爆弾の更新処理
+void DrawBomb(void);						// 爆弾の描画処理
+void ShotBarrier(void);						// バリアの発射処理
+BARRIERSTATE GetBarrierState(void *pCar);	// バリアの状態の取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

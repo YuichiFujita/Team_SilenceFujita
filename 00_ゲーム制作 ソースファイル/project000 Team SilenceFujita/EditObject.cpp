@@ -420,8 +420,8 @@ void SaveCurrentEdit(void)
 		pEditCollision->pCollision->fDepth[nCntColl] = (GetModelData(MODELTYPE_EDIT_COLLISION).size.z * pEditCollision->pCollision->scale[nCntColl].z) * 0.5f;
 		
 		// 横幅と縦幅を代入
-		pCollision->fWidth[nCntColl] = pEditCollision->pCollision->fWidth[nCntColl];
-		pCollision->fDepth[nCntColl] = pEditCollision->pCollision->fDepth[nCntColl];
+		pCollision[g_EditObject.nType].fWidth[nCntColl] = pEditCollision->pCollision->fWidth[nCntColl];
+		pCollision[g_EditObject.nType].fDepth[nCntColl] = pEditCollision->pCollision->fDepth[nCntColl];
 	}
 
 	//現在のモデル向きをセーブ
@@ -481,7 +481,7 @@ void TypeChangeEdit(void)
 			g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
 
 			//現在の向きを初期化
-			g_EditObject.CollInfo.rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			g_EditObject.CollInfo.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 			g_EditObject.CollInfo.stateRot = ROTSTATE_0;
 
 			//現在の当たり判定をロード
@@ -491,7 +491,7 @@ void TypeChangeEdit(void)
 			for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
 			{ // 当たり判定の最大数分繰り返す
 
-				pEditCollision->pos[nCntColl]    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 位置
+				pEditCollision->pos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 位置
 				pEditCollision->vecPos[nCntColl] = pEditCollision->pCollision->vecPos[nCntColl];	// 位置ベクトル
 			}
 

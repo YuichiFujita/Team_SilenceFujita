@@ -12,6 +12,8 @@
 #include "camera.h"
 #include "player.h"
 
+#include "Human.h"
+
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
 #endif
@@ -26,11 +28,11 @@
 
 // メインカメラ
 #define FIRST_ROT		(1.45f)		// 開始時の視点と注視点の間の向き (x)
-#define FIRST_DIS		(-280.0f)	// 開始時の視点と注視点の間の距離
+#define FIRST_DIS		(-240.0f)	// 開始時の視点と注視点の間の距離
 
 #define POS_R_PLUS		(25.0f)		// プレイヤーの位置と注視点の位置の距離 (x, z)
 #define POS_R_PLUS_Y	(110.0f)	// プレイヤーの位置と注視点の位置の距離 (y)
-#define POS_V_Y			(165.0f)	// 追従時の視点の位置 (y)
+#define POS_V_Y			(140.0f)	// 追従時の視点の位置 (y)
 #define REV_ROT_FOLLOW	(0.05f)		// 追従時の回り込みの補正係数
 #define REV_POS_V		(0.225f)	// 視点の位置の補正係数 (x, z)
 #define REV_POS_R		(0.25f)		// 注視点の位置の補正係数 (x, z)
@@ -58,10 +60,10 @@
 #define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)
 
 // 一人称視点カメラ
-#define CAMERA_FORWARD_SHIFT	(18.5f)		// 前にカメラをずらす距離
-#define CAMERA_UP_SHIFT			(80.0f)		// 上にカメラをずらす距離
-#define CAMERA_RIGHT_SHIFT		(7.0f)		// 右にカメラをずらす距離
-#define CAMERA_BACK_SHIFT		(35.0f)		// 後ろにカメラをずらす距離
+#define CAMERA_FORWARD_SHIFT	(18.5f)			// 前にカメラをずらす距離
+#define CAMERA_UP_SHIFT			(80.0f)			// 上にカメラをずらす距離
+#define CAMERA_RIGHT_SHIFT		(7.0f)			// 右にカメラをずらす距離
+#define CAMERA_BACK_SHIFT		(35.0f)			// 後ろにカメラをずらす距離
 
 //************************************************************
 //	プロトタイプ宣言
@@ -76,10 +78,13 @@ void MoveMiniMap(void);				// マップカメラの位置の更新処理
 void RevRotXCamera(void);			// カメラの向きの補正処理 (x)
 void RevRotYCamera(void);			// カメラの向きの補正処理 (y)
 
+//void MoveGoodjobCamera(void);		// ミッション成功時のカメラ更新処理(追従)
+
 //************************************************************
 //	グローバル変数
 //************************************************************
 Camera g_aCamera[CAMERATYPE_MAX];	// カメラの情報
+CAMERASTATE g_CameraState;			// カメラの状態
 
 //============================================================
 //	カメラの初期化処理
@@ -145,6 +150,8 @@ void InitCamera(void)
 	g_aCamera[CAMERATYPE_UI].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
 	g_aCamera[CAMERATYPE_UI].viewport.MinZ   = 0.0f;
 	g_aCamera[CAMERATYPE_UI].viewport.MaxZ   = 1.0f;
+	
+	g_CameraState = CAMERASTATE_NORMAL;							// カメラの状態
 }
 
 //============================================================
@@ -166,8 +173,22 @@ void UpdateCamera(void)
 		{ // ゲームモードごとの処理
 		case GAMEMODE_PLAY:
 	
-			// カメラの位置の更新 (追従)
-			MoveFollowCamera();
+			//switch (g_CameraState)
+			//{
+			//case CAMERASTATE_NORMAL:		// 通常カメラ
+
+				// カメラの位置の更新 (追従)
+				MoveFollowCamera();
+
+			//	break;						// 抜け出す
+
+			//case CAMERASTATE_GOODJOB:		// ミッション成功
+
+			//	// ミッション成功時のカメラ更新処理(追従)
+			//	MoveGoodjobCamera();
+
+			//	break;						// 抜け出す
+			//}
 	
 			// 処理を抜ける
 			break;
@@ -373,6 +394,48 @@ void MoveFollowCamera(void)
 	g_aCamera[CAMERATYPE_MAIN].rot.y = pPlayer->rot.y;
 }
 
+////======================================================================================================================
+//// ミッション成功時のカメラ更新処理(追従)
+////======================================================================================================================
+//void MoveGoodjobCamera(void)
+//{
+//	// 変数を宣言
+//	D3DXVECTOR3 diffPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// カメラの視点の位置の計算代入用
+//	D3DXVECTOR3 diffPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// カメラの注視点の位置の計算代入用
+//
+//	// ポインタを宣言
+//	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+//
+//	Human *pHuman = GetHumanData();		// 人間の情報
+//
+//	// 向きを取る
+//	float fRot = atan2f(pHuman->pos.x - pPlayer->pos.x, pHuman->pos.z - pPlayer->pos.z);
+//
+//	// 目標の注視点の位置を更新
+//	g_aCamera[CAMERATYPE_MAIN].destPosR.x = pPlayer->pos.x + sinf(fRot) * POS_R_PLUS;	// プレイヤーの位置より少し前
+//	g_aCamera[CAMERATYPE_MAIN].destPosR.y = pPlayer->pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
+//	g_aCamera[CAMERATYPE_MAIN].destPosR.z = pPlayer->pos.z + cosf(fRot) * POS_R_PLUS;	// プレイヤーの位置より少し前
+//
+//	// 目標の視点の位置を更新
+//	g_aCamera[CAMERATYPE_MAIN].destPosV.x = g_aCamera[CAMERATYPE_MAIN].destPosR.x + (g_aCamera[CAMERATYPE_MAIN].fDis * sinf(fRot));	// 目標注視点から距離分離れた位置
+//	g_aCamera[CAMERATYPE_MAIN].destPosV.y = POS_V_Y;																				// 固定の高さ
+//	g_aCamera[CAMERATYPE_MAIN].destPosV.z = g_aCamera[CAMERATYPE_MAIN].destPosR.z + (g_aCamera[CAMERATYPE_MAIN].fDis * cosf(fRot));	// 目標注視点から距離分離れた位置
+//
+//	// 目標の位置までの差分を計算
+//	diffPosV = g_aCamera[CAMERATYPE_MAIN].destPosV - g_aCamera[CAMERATYPE_MAIN].posV;	// 視点
+//	diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;	// 注視点
+//
+//	// 視点の位置を更新
+//	g_aCamera[CAMERATYPE_MAIN].posV.x += diffPosV.x * REV_POS_V;
+//	g_aCamera[CAMERATYPE_MAIN].posV.y += diffPosV.y * REV_POS_V_Y;
+//	g_aCamera[CAMERATYPE_MAIN].posV.z += diffPosV.z * REV_POS_V;
+//
+//	// 注視点の位置を更新
+//	g_aCamera[CAMERATYPE_MAIN].posR.x += diffPosR.x * REV_POS_R;
+//	g_aCamera[CAMERATYPE_MAIN].posR.y += diffPosR.y * REV_POS_R_Y;
+//	g_aCamera[CAMERATYPE_MAIN].posR.z += diffPosR.z * REV_POS_R;
+//}
+
 //============================================================
 //	メインカメラの位置の更新処理 (操作)
 //============================================================
@@ -560,6 +623,15 @@ Camera *GetCamera(void)
 {
 	// カメラの情報の先頭アドレスを返す
 	return &g_aCamera[0];
+}
+
+//============================================================
+// カメラの状態の取得処理
+//============================================================
+CAMERASTATE *GetCameraState(void)
+{
+	// カメラの状態を返す
+	return &g_CameraState;
 }
 
 #ifdef _DEBUG	// デバッグ処理

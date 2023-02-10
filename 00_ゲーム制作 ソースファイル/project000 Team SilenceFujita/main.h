@@ -49,6 +49,7 @@ typedef enum
 {
 	MODE_TITLE = 0,			// タイトル画面
 	MODE_GAME,				// ゲーム画面
+	MODE_RESULT,			// リザルト画面
 	MODE_MAX,				// この列挙型の総数
 } MODE;
 

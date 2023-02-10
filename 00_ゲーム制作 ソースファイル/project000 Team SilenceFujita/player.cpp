@@ -13,11 +13,14 @@
 #include "calculation.h"
 
 #include "camera.h"
+#include "gate.h"
 #include "object.h"
 #include "particle.h"
 #include "player.h"
 #include "shadow.h"
 #include "sound.h"
+#include "life.h"
+#include "bomb.h"
 #include "wind.h"
 
 #include "meshfield.h"
@@ -150,6 +153,8 @@ void UninitPlayer(void)
 //============================================================
 void UpdatePlayer(void)
 {
+	int nCnt = 0;
+
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
 
@@ -240,8 +245,19 @@ void UpdatePlayer(void)
 			&g_player.oldPos,	// 前回の位置
 			&g_player.move,		// 移動量
 			PLAY_WIDTH,			// 横幅
-			PLAY_DEPTH			// 奥行
+			PLAY_DEPTH,			// 奥行
+			&nCnt				// 渋滞カウント
 		);
+
+		//	オブジェクトとの当たり判定
+		CollisionGate
+		(
+			&g_player.pos,		// 現在の位置
+			&g_player.oldPos,	// 前回の位置
+			&g_player.move,		// 移動量
+			PLAY_WIDTH,			// 横幅
+			PLAY_DEPTH			// 奥行
+		);	
 
 		// 車の停止処理
 		CollisionStopCar
@@ -250,7 +266,8 @@ void UpdatePlayer(void)
 			g_player.rot,				//向き
 			&g_player.move,				//移動量
 			g_player.modelData.fRadius,	//半径
-			COLLOBJECTTYPE_PLAYER		//対象のタイプ
+			COLLOBJECTTYPE_PLAYER,		//対象のタイプ
+			&nCnt
 		);
 
 		// 車同士の当たり判定
@@ -262,7 +279,9 @@ void UpdatePlayer(void)
 			&g_player.move,
 			PLAY_WIDTH,
 			PLAY_DEPTH,
-			COLLOBJECTTYPE_PLAYER
+			COLLOBJECTTYPE_PLAYER,
+			&nCnt,
+			nCnt
 		);
 
 		//----------------------------------------------------
@@ -385,11 +404,10 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	g_player.bUse = true;
 }
 
-#if 0
 //============================================================
 //	プレイヤーの回復判定
 //============================================================
-void HealPlayer(MainPlayer *pPlayer, int nHeal)
+void HealPlayer(Player *pPlayer, int nHeal)
 {
 	if (pPlayer->state == ACTIONSTATE_NORMAL)
 	{ // プレイヤーが通常状態の場合
@@ -408,14 +426,14 @@ void HealPlayer(MainPlayer *pPlayer, int nHeal)
 		}
 
 		// サウンドの再生
-		PlaySound(SOUND_LABEL_SE_HEAL);		// SE (回復)
+		//PlaySound(SOUND_LABEL_SE_HEAL);		// SE (回復)
 	}
 }
 
 //============================================================
 //	プレイヤーのダメージ判定
 //============================================================
-void HitPlayer(MainPlayer *pPlayer, int nDamage)
+void HitPlayer(Player *pPlayer, int nDamage)
 {
 	if (pPlayer->state == ACTIONSTATE_NORMAL)
 	{ // プレイヤーが通常状態の場合
@@ -446,13 +464,10 @@ void HitPlayer(MainPlayer *pPlayer, int nDamage)
 			pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 
 			// サウンドの再生
-			PlaySound(SOUND_LABEL_SE_DMG);			// SE (ダメージ)
+			//PlaySound(SOUND_LABEL_SE_DMG);			// SE (ダメージ)
 		}
 		else
 		{ // 体力が尽きた場合
-
-			// 爆発の設定
-			SetExplosion(pPlayer->pos, SOUNDTYPE_EXPLOSION);
 
 			// パーティクルの設定
 			SetParticle
@@ -469,7 +484,6 @@ void HitPlayer(MainPlayer *pPlayer, int nDamage)
 		}
 	}
 }
-#endif
 
 //============================================================
 //	プレイヤーの移動量の更新処理
@@ -764,8 +778,8 @@ void SilenceWorldPlayer(void)
 	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
 	{ // 爆弾の発射の操作が行われた場合
 
-		// 爆弾の発射
-		ShotBomb();
+		// バリアの発射
+		ShotBarrier();
 	}
 }
 

@@ -23,6 +23,16 @@ typedef enum
 	CAMERATYPE_MAX,					// この列挙型の総数
 } CAMERATYPE;
 
+//************************************************************
+//	カメラの状態(CameraState)
+//************************************************************
+typedef enum
+{
+	CAMERASTATE_NORMAL = 0,		// 通常カメラ
+	CAMERASTATE_GOODJOB,		// ミッション成功
+	CAMERASTATE_MAX				// この列挙型の総数
+}CAMERASTATE;
+
 //**********************************************************************************************************************
 //	構造体定義 (Camera)
 //**********************************************************************************************************************
@@ -57,5 +67,7 @@ D3DXVECTOR3 GetCameraPosR(void);	// 注視点座標の取得処理
 D3DXVECTOR3 GetCameraRot(void);		// 向きの取得処理
 float GetCameraDis(void);			// 距離の取得処理
 void  ResetCamera(void);			// カメラの再設定処理
+
+CAMERASTATE *GetCameraState(void);	// カメラの状態の取得処理
 
 #endif

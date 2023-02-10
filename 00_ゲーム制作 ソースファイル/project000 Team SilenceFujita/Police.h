@@ -33,6 +33,7 @@ typedef enum
 	POLICESTATE_PATBACK,				// パトロールに戻るときの処理
 	POLICESTATE_POSBACK,				// 最初の座標に戻る
 	POLICESTATE_TACKLE,					// タックル状態
+	POLICESTATE_TRAFFIC,				// 渋滞状態
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
 
@@ -41,8 +42,8 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 Tacklemove;					// タックル時の追加移動量
-	int nTackleCnt;							// タックル状態に移行する
+	D3DXVECTOR3 Tacklemove;				// タックル時の追加移動量
+	int nTackleCnt;						// タックル状態に移行する
 }PoliTackle;
 
 //**********************************************************************************************************************
@@ -69,7 +70,8 @@ typedef struct
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
 	CARCURVE	policeCurve;			// 曲がり角関係の情報
 	CARCURVE	policeCurveCopy;		// 曲がり角の情報のコピー
-	PoliTackle tackle;					// タックル関係の変数
+	PoliTackle  tackle;					// タックル関係の変数
+	int			nTrafficCnt;			// 渋滞カウント
 }Police;
 
 //**********************************************************************************************************************
@@ -80,8 +82,8 @@ void UninitPolice(void);				// 警察の終了処理
 void UpdatePolice(void);				// 警察の更新処理
 void DrawPolice(void);					// 警察の描画処理
 void SetPolice(D3DXVECTOR3 pos);		// 警察の設定処理
-void HitPolice(Police *pPolice, int nDamage);												// 警察のダメージ判定
-Police *GetPoliceData(void);																// 警察の取得処理
+void HitPolice(Police *pPolice, int nDamage);	// 警察のダメージ判定
+Police *GetPoliceData(void);					// 警察の取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
