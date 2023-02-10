@@ -249,6 +249,13 @@ void UpdatePlayer(void)
 			&nCnt				// 渋滞カウント
 		);
 
+		// 吹っ飛ぶオブジェクトとの当たり判定
+		SmashCollision
+		(
+			g_player.pos, 
+			g_player.modelData.fRadius
+		);				
+
 		//	オブジェクトとの当たり判定
 		CollisionGate
 		(
