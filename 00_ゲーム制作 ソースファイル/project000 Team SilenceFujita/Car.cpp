@@ -107,13 +107,6 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.size     = INIT_SIZE;				// ‘å‚«‚³
 		g_aCar[nCntCar].modelData.fRadius  = 0.0f;					// ”¼Œa
 	}
-	
-	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++)
-	{
-
-		//ŽÔ‚ÌÝ’èˆ—
-		SetCar(D3DXVECTOR3(-3000.0f, 0.0f, 3000.0f));
-	}
 }
 
 //======================================================================================================================

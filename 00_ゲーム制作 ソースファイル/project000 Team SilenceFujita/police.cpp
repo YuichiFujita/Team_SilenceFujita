@@ -130,9 +130,6 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].tackle.nTackleCnt = 0;						// タックルのカウント
 		g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
 	}
-
-	//// 警察の設定処理
-	//SetPolice(D3DXVECTOR3(3000.0f, 0.0f, -2000.0f));
 }
 
 //======================================================================================================================
