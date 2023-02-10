@@ -81,6 +81,17 @@ void InitGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
 	//------------------------------------------------------------------------------------------------------------------
+	// カーブの情報の初期化処理
+	InitCurveInfo();
+
+	// カーブテキストのロード処理
+	LoadCurveTxt();
+
+	// 人間のルートのロード処理
+	LoadHumanCurveTxt();
+
+	// 曲がり角の設定処理
+	SetCurvePoint();
 
 	// 天気の初期化処理
 	InitWeather();
@@ -160,15 +171,11 @@ void InitGame(void)
 	// ポーズの初期化
 	InitPause();
 
-	// ファイルをロードする全体処理
-	LoadFileChunk
-	(
-		true,
-		true,
-		true,
-		true,
-		true
-	);
+	// ステージのセットアップ
+	TxtSetStage();
+
+	// オブジェクトのセットアップ
+	TxtSetObject();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
@@ -459,11 +466,13 @@ void UpdateGame(void)
 		TxtSaveCollision();
 	}
 
+#if 0
 	if (GetKeyboardTrigger(DIK_SPACE) == true)
 	{ // 決定の操作が行われた場合
 		// リザルト画面に遷移
 		SetFade(MODE_RESULT);
 	}
+#endif
 
 #else
 	if (g_bPause == false)
@@ -625,7 +634,7 @@ void DrawGame(void)
 	DrawParticle();
 
 	// 天気の描画処理
-	DrawWeather();
+	//DrawWeather();
 	
 	
 #ifdef _DEBUG	// デバッグ処理
@@ -652,7 +661,7 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
-#if 1
+#if 0
 
 	// 体力バーの描画
 	DrawLife();

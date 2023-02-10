@@ -54,6 +54,8 @@ typedef enum
 	MODELTYPE_OBJECT_OBARAFOOD,			// 商店街（食堂）
 	MODELTYPE_OBJECT_OBAMART,			// 商店街（半額店）
 	MODELTYPE_OBJECT_OBASTATION,		// 商店街（ゲームセンター）
+	MODELTYPE_OBJECT_SWING,				// 公園（ブランコ）
+	MODELTYPE_OBJECT_FUJIDORA,			// フジドラ
 
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
@@ -65,6 +67,10 @@ typedef enum
 	MODELTYPE_CAR_CAR001,				// 自動車
 	MODELTYPE_CAR_YAKIIMOCAR,			// 石焼き芋屋
 	MODELTYPE_CAR_ELECTIONCAR,			// 選挙カー
+
+	// ゲートモデル
+	MODELTYPE_OBJECT_GATE000,			// ゲート (建物)
+	MODELTYPE_OBJECT_GATE001,			// ゲート (鉄板)
 
 	// エディットモデル
 	MODELTYPE_EDIT_COLLISION,			// 当たり判定
@@ -84,6 +90,8 @@ typedef enum
 #define MODEL_PLAY_MAX	(2)								// プレイヤーのモデルの総数
 #define FROM_CAR		(int(MODELTYPE_CAR_POLICE))		// 車のモデル列挙の開始地点
 #define MODEL_CAR_MAX	(5)								// 車のモデルの総数
+#define FROM_GATE		(int(MODELTYPE_OBJECT_GATE000))	// ゲートのモデル列挙の開始地点
+#define MODEL_GATE_MAX	(2)								// ゲートのモデルの総数
 #define FROM_EDIT		(int(MODELTYPE_EDIT_COLLISION))	// エディットのモデル列挙の開始地点
 #define MODEL_EDIT_MAX	(1)								// エディットのモデルの総数
 
