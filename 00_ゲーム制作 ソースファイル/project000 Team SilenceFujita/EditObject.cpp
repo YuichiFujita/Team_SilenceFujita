@@ -590,8 +590,8 @@ void MoveEdit(void)
 //=======================================
 void RotationEdit(void)
 {
-	if (GetKeyboardPress(DIK_LSHIFT) == true)
-	{//左SHIFTキーを押している場合
+	if (GetKeyboardPress(DIK_LCONTROL) == true)
+	{//左CTRLキーを押している場合
 		//処理を抜ける
 		return;
 	}

@@ -466,11 +466,13 @@ void UpdateGame(void)
 		TxtSaveCollision();
 	}
 
+#if 0
 	if (GetKeyboardTrigger(DIK_SPACE) == true)
 	{ // 決定の操作が行われた場合
 		// リザルト画面に遷移
 		SetFade(MODE_RESULT);
 	}
+#endif
 
 #else
 	if (g_bPause == false)
@@ -632,7 +634,7 @@ void DrawGame(void)
 	DrawParticle();
 
 	// 天気の描画処理
-	DrawWeather();
+	//DrawWeather();
 	
 	
 #ifdef _DEBUG	// デバッグ処理
@@ -659,7 +661,7 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
-#if 1
+#if 0
 
 	// 体力バーの描画
 	DrawLife();

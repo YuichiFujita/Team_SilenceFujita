@@ -16,6 +16,7 @@
 
 #include "title.h"
 #include "game.h"
+#include "result.h"
 
 #include "billboard.h"
 #include "object.h"
@@ -493,6 +494,9 @@ void Uninit(void)
 	// ゲーム画面の終了
 	UninitGame();
 
+	// リザルト画面の終了
+	UninitResult();
+
 	// Direct3D デバイスの破棄
 	if (g_pD3DDevice != NULL)
 	{ // Direct3D デバイスが NULL ではない場合
@@ -550,6 +554,14 @@ void Update(void)
 
 		// 処理から抜ける
 		break;
+
+	case MODE_RESULT:
+
+		// リザルト画面の更新
+		UpdateResult();
+
+		// 処理から抜ける
+		break;
 	}
 
 	// フェードの更新
@@ -604,6 +616,14 @@ void Draw(void)
 
 			// 処理から抜ける
 			break;
+
+		case MODE_RESULT:
+
+			// リザルト画面の描画
+			DrawResult();
+
+			// 処理から抜ける
+			break;
 		}
 
 		// ビューポートを元に戻す
@@ -650,6 +670,14 @@ void SetMode(MODE mode)
 
 		// 処理から抜ける
 		break;
+
+	case MODE_RESULT:		// リザルト画面
+
+		// リザルト画面の終了
+		UninitResult();
+
+		// 処理から抜ける
+		break;
 	}
 
 	//--------------------------------------------------------
@@ -669,6 +697,14 @@ void SetMode(MODE mode)
 
 		// ゲーム画面の初期化
 		InitGame();
+
+		// 処理から抜ける
+		break;
+
+	case MODE_RESULT:	// リザルト画面
+
+		// リザルト画面の初期化
+		InitResult();
 
 		// 処理から抜ける
 		break;
