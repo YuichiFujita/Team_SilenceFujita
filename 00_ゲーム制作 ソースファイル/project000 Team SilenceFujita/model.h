@@ -57,6 +57,7 @@ typedef enum
 	MODELTYPE_OBJECT_SWING,				// 公園（ブランコ）
 	MODELTYPE_OBJECT_FUJIDORA,			// フジドラ
 	MODELTYPE_OBJECT_FENCE,				// 公園（フェンス）
+	MODELTYPE_OBJECT_BILL003,			// ビルver3
 
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー

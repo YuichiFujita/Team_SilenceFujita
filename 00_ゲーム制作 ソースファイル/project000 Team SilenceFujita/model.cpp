@@ -60,6 +60,7 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\swing000.x",		// 公園（ブランコ）
 	"data\\MODEL_OBJECT\\fujidora.x",		// フジドラ
 	"data\\MODEL_OBJECT\\fence000.x",		// 公園（フェンス）
+	"data\\MODEL_OBJECT\\bill003.x",		// ビルver3
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
