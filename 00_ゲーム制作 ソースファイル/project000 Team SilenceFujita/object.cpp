@@ -27,12 +27,18 @@
 #define OBJ_LIFE		(50)					// オブジェクトの体力
 #define DAMAGE_TIME_OBJ	(20)					// ダメージ状態を保つ時間
 #define UNR_TIME_OBJ	(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
+
 #define OBJECT_GRAVITY	(-1.5f)					// オブジェクトの重力
 #define SMASH_WIDTH		(10.0f)					// 吹き飛びの幅
 #define SMASH_HEIGHT	(20.0f)					// 吹き飛びの高さ
 #define SMASH_DEPTH		(10.0f)					// 吹き飛びの奥行
 #define SMASH_ANGLE		(0.3f)					// 吹き飛ぶ高さの角度
+#define SMASH_ANGLE_ADD	(0.3f)					// 吹き飛ぶ角度の追加分
 #define SMASH_ADD_ROT	(0.02f)					// 吹き飛びの回転の加算数
+#define SMASH_DEATH_CNT	(40)					// 吹き飛んだ後に消えるまでのカウント
+#define SMASH_ROTMOVE_X	(0.01f)					// 吹き飛ぶ角度の移動量(X軸)
+#define SMASH_ROTMOVE_Y	(0.2f)					// 吹き飛ぶ角度の移動量(Y軸)
+#define SMASH_ROTMOVE_Z	(0.01f)					// 吹き飛ぶ角度の移動量(Z軸)
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -217,13 +223,13 @@ void UpdateObject(void)
 					g_aObject[nCntObject].rot.y -= g_aObject[nCntObject].smash.rotMove.y + 0.02f;
 					g_aObject[nCntObject].rot.z -= g_aObject[nCntObject].smash.rotMove.z + 0.02f;
 
-					if (g_aObject[nCntObject].smash.nCounter >= 40)
+					if (g_aObject[nCntObject].smash.nCounter >= SMASH_DEATH_CNT)
 					{ // カウントが一定時間経ったら
 						// 使用しない
 						g_aObject[nCntObject].bUse = false;
 					}
 
-					//向きの正規化
+					// 向きの正規化(X軸)
 					if (g_aObject[nCntObject].rot.x >= D3DX_PI * 0.5f)
 					{
 						g_aObject[nCntObject].rot.x = D3DX_PI * 0.5f;
@@ -237,6 +243,7 @@ void UpdateObject(void)
 						g_aObject[nCntObject].smash.rotMove.x = 0.0f;
 					}
 
+					// 向きの正規化(Y軸)
 					if (g_aObject[nCntObject].rot.y >= D3DX_PI * 0.5f) 
 					{
 						g_aObject[nCntObject].rot.y = D3DX_PI * 0.5f; 
@@ -250,6 +257,7 @@ void UpdateObject(void)
 						g_aObject[nCntObject].smash.rotMove.y = 0.0f;
 					}
 
+					// 向きの正規化(Z軸)
 					if (g_aObject[nCntObject].rot.z >= D3DX_PI * 0.5f) 
 					{
 						g_aObject[nCntObject].rot.z = D3DX_PI * 0.5f; 
@@ -945,23 +953,35 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius)
 				g_aObject[nCntObject].smash.State = SMASHSTATE_ON;
 
 				// 向きの移動量を設定する
-				g_aObject[nCntObject].smash.rotMove.x = 0.03f;
-				g_aObject[nCntObject].smash.rotMove.y = 0.03f;
-				g_aObject[nCntObject].smash.rotMove.z = 0.02f;
+				g_aObject[nCntObject].smash.rotMove.x = SMASH_ROTMOVE_X;
+				g_aObject[nCntObject].smash.rotMove.y = SMASH_ROTMOVE_Y;
+				g_aObject[nCntObject].smash.rotMove.z = SMASH_ROTMOVE_Z;
 
 				if (fAngle <= 0.0f)
 				{ // 角度が右側だった場合
+					// 角度を変える
+					fAngle += (D3DX_PI * SMASH_ANGLE_ADD);
+
+					// 向きの正規化
+					RotNormalize(&fAngle);
+
 					//オブジェクトを吹き飛ばす
-					g_aObject[nCntObject].smash.move.x = -sinf(fAngle + (D3DX_PI * 0.5f)) * SMASH_WIDTH;
+					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH;
 					g_aObject[nCntObject].smash.move.y = cosf(D3DX_PI * SMASH_ANGLE) * SMASH_HEIGHT;
-					g_aObject[nCntObject].smash.move.z = -cosf(fAngle + (D3DX_PI * 0.5f)) * SMASH_DEPTH;
+					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH;
 				}
 				else
 				{ // 上記以外
+					// 角度を変える
+					fAngle -= (D3DX_PI * SMASH_ANGLE_ADD);
+
+					// 向きの正規化
+					RotNormalize(&fAngle);
+
 					//オブジェクトを吹き飛ばす
-					g_aObject[nCntObject].smash.move.x = -sinf(fAngle - (D3DX_PI * 0.5f)) * SMASH_WIDTH;
+					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH;
 					g_aObject[nCntObject].smash.move.y = cosf(D3DX_PI * SMASH_ANGLE) * SMASH_HEIGHT;
-					g_aObject[nCntObject].smash.move.z = -cosf(fAngle - (D3DX_PI * 0.5f)) * SMASH_DEPTH;
+					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH;
 				}
 			}
 		}

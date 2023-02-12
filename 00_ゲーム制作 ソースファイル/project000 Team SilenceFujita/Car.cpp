@@ -1135,14 +1135,21 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
-					
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// 位置をずらす
+						pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
+
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						// ダメージ状態にする
+						pPlayer->state = ACTIONSTATE_DAMAGE;
+					}
 
 					break;						// 抜け出す
 
@@ -1167,14 +1174,21 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+						// 位置をずらす
+						pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						// ダメージ状態にする
+						pPlayer->state = ACTIONSTATE_DAMAGE;
+					}
 
 					break;						// 抜け出す
 
@@ -1204,14 +1218,21 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+						// 位置をずらす
+						pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						// ダメージ状態にする
+						pPlayer->state = ACTIONSTATE_DAMAGE;
+					}
 
 					break;						// 抜け出す
 
@@ -1236,14 +1257,21 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+						// 位置をずらす
+						pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						// ダメージ状態にする
+						pPlayer->state = ACTIONSTATE_DAMAGE;
+					}
 
 					break;						// 抜け出す
 
