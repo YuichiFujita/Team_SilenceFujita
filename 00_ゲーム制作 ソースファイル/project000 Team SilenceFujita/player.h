@@ -115,6 +115,7 @@ typedef struct
 	bool		bCameraFirst;		// 一人称カメラの状況
 	bool        bMove;				// 移動状況
 	bool        bJump;				// ジャンプ状況
+	bool		bUnrivaled;			// 透明状況
 	bool        bUse;				// 使用状況
 }Player;
 

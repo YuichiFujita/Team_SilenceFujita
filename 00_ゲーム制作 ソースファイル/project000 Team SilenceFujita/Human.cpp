@@ -40,10 +40,13 @@
 #define MAX_HUMAN_BACKWARD			(8.0f)		// 後退時の最高速度
 #define REV_HUMAN_MOVE_SUB			(0.04f)		// 移動量の減速係数
 #define HUMAN_CURVE_ADD				(0.03f)		// 曲がり角での向きの加算数
-#define HUMAN_RANDAM_MOVE			(6)		// 人間の移動量のランダム
+#define HUMAN_RANDAM_MOVE			(6)			// 人間の移動量のランダム
 #define HUMAN_MOVE_LEAST			(4)			// 人間の移動量の最低限
 #define HUMAN_PASS_SHIFT			(40.0f)		// すれ違った時のずらす幅
-#define HUMAN_RADIUS				(40.0f)		// 人間の幅
+#define HUMAN_RADIUS				(30.0f)		// 人間の幅
+#define HUMAN_PASS_CORRECT			(0.06f)		// 人間のずらす補正倍率
+#define REACTION_HUMAN_RANGE		(170.0f)	// リアクションする人間の範囲
+#define REACTION_CAR_RANGE			(50.0f)		// リアクションする車の範囲
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -751,7 +754,7 @@ void ReactionHuman(Human *pHuman)
 			fLength = (pPlayer->pos.x - pHuman->pos.x) * (pPlayer->pos.x - pHuman->pos.x)
 				+ (pPlayer->pos.z - pHuman->pos.z) * (pPlayer->pos.z - pHuman->pos.z);
 
-			if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * 170.0f)
+			if (fLength <= (pPlayer->modelData.fRadius + REACTION_CAR_RANGE) * REACTION_HUMAN_RANGE)
 			{ // プレイヤーが近くに来た場合
 				//停止処理に移行
 				pHuman->state = HUMANSTATE_STOP;
@@ -1048,7 +1051,7 @@ void PassingHuman(Human *pHuman)
 				fLength = (pPassHuman->pos.x - pHuman->pos.x) * (pPassHuman->pos.x - pHuman->pos.x)
 					+ (pPassHuman->pos.z - pHuman->pos.z) * (pPassHuman->pos.z - pHuman->pos.z);
 
-				if (fLength <= (30.0f * 30.0f))
+				if (fLength <= (HUMAN_RADIUS * HUMAN_RADIUS))
 				{ // オブジェクトが当たっている
 					if (pHuman->move.x >= pPassHuman->move.x)
 					{ // 移動量が速い場合
@@ -1063,7 +1066,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.z;
 
 							// 幅をずらす
-							pHuman->pos.z += posDiff * 0.06f;
+							pHuman->pos.z += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 
@@ -1076,7 +1079,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.z;
 
 							// 幅をずらす
-							pHuman->pos.z += posDiff * 0.06f;
+							pHuman->pos.z += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 
@@ -1089,7 +1092,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.x;
 
 							// 幅をずらす
-							pHuman->pos.x += posDiff * 0.06f;
+							pHuman->pos.x += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 
@@ -1102,7 +1105,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.x;
 
 							// 幅をずらす
-							pHuman->pos.x += posDiff * 0.06f;
+							pHuman->pos.x += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 						}
@@ -1115,6 +1118,12 @@ void PassingHuman(Human *pHuman)
 					WalkHuman(pHuman);
 				}
 			}
+		}
+		else
+		{ // 上記以外
+
+			// 人間の歩く処理
+			WalkHuman(pHuman);
 		}
 	}
 }

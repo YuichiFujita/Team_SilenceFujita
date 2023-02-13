@@ -1218,41 +1218,38 @@ void PoliceTackle(Police *pPolice)
 	}
 	else
 	{ // 上記以外
-
-		float fRotDest;			// 目標の向き
-		float fRotDiff;			// 目標の差分
 		Player *pPlayer = GetPlayer();		// プレイヤーの情報
 
-		// 目的の向きを設定する
-		fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
+		//// 目的の向きを設定する
+		//fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
 
-		// 向きの差分を求める
-		fRotDiff = fRotDest - pPolice->rot.y;
+		//// 向きの差分を求める
+		//fRotDiff = fRotDest - pPolice->rot.y;
 
-		if (fRotDiff > D3DX_PI)
-		{ // 角度が3.14fより大きかった場合
-			// 角度から1周分減らす
-			fRotDiff = -D3DX_PI;
-		}
-		else if (fRotDiff < -D3DX_PI)
-		{ // 角度が-3.14fより小さかった場合
-			// 角度に1周分加える
-			fRotDiff = D3DX_PI;
-		}
+		//if (fRotDiff > D3DX_PI)
+		//{ // 角度が3.14fより大きかった場合
+		//	// 角度から1周分減らす
+		//	fRotDiff = -D3DX_PI;
+		//}
+		//else if (fRotDiff < -D3DX_PI)
+		//{ // 角度が-3.14fより小さかった場合
+		//	// 角度に1周分加える
+		//	fRotDiff = D3DX_PI;
+		//}
 
-		// 角度を補正する
-		pPolice->rot.y += fRotDiff * (pPolice->move.x * REV_POLI_MOVE_ROT);
+		//// 角度を補正する
+		//pPolice->rot.y += fRotDiff * 0.05f;
 
-		if (pPolice->rot.y > D3DX_PI)
-		{ // 角度が3.14fより大きかった場合
-			// 角度から1周分減らす
-			pPolice->rot.y = -D3DX_PI;
-		}
-		else if (pPolice->rot.y < -D3DX_PI)
-		{ // 角度が-3.14fより小さかった場合
-			// 角度に1周分加える
-			pPolice->rot.y = D3DX_PI;
-		}
+		//if (pPolice->rot.y > D3DX_PI)
+		//{ // 角度が3.14fより大きかった場合
+		//	// 角度から1周分減らす
+		//	pPolice->rot.y = -D3DX_PI;
+		//}
+		//else if (pPolice->rot.y < -D3DX_PI)
+		//{ // 角度が-3.14fより小さかった場合
+		//	// 角度に1周分加える
+		//	pPolice->rot.y = D3DX_PI;
+		//}
 
 		// 追加移動量を加算していく
 		pPolice->tackle.Tacklemove.x += POLICAR_TACKLE_ADD;
