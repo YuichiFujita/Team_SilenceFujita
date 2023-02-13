@@ -1147,8 +1147,12 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
-						// ダメージ状態にする
-						pPlayer->state = ACTIONSTATE_DAMAGE;
+						// プレイヤーのダメージ判定
+						HitPlayer
+						(
+							pPlayer,		// プレイヤーのアドレス
+							PLAY_DAMAGE		// プレイヤーのダメージ量
+						);
 					}
 
 					break;						// 抜け出す
@@ -1186,8 +1190,12 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
-						// ダメージ状態にする
-						pPlayer->state = ACTIONSTATE_DAMAGE;
+						// プレイヤーのダメージ判定
+						HitPlayer
+						(
+							pPlayer,		// プレイヤーのアドレス
+							PLAY_DAMAGE		// プレイヤーのダメージ量
+						);
 					}
 
 					break;						// 抜け出す
@@ -1230,8 +1238,12 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
-						// ダメージ状態にする
-						pPlayer->state = ACTIONSTATE_DAMAGE;
+						// プレイヤーのダメージ判定
+						HitPlayer
+						(
+							pPlayer,		// プレイヤーのアドレス
+							PLAY_DAMAGE		// プレイヤーのダメージ量
+						);
 					}
 
 					break;						// 抜け出す
@@ -1269,8 +1281,12 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						// 移動量を削除
 						pMove->x *= 0.95f;
 
-						// ダメージ状態にする
-						pPlayer->state = ACTIONSTATE_DAMAGE;
+						// プレイヤーのダメージ判定
+						HitPlayer
+						(
+							pPlayer,		// プレイヤーのアドレス
+							PLAY_DAMAGE		// プレイヤーのダメージ量
+						);
 					}
 
 					break;						// 抜け出す

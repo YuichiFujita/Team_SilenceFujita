@@ -42,6 +42,7 @@
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
+#define UNRIVALED_CNT	(10)		// 無敵時にチカチカさせるカウント
 
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -109,6 +110,7 @@ void InitPlayer(void)
 	g_player.bJump         = false;								// ジャンプ状況
 	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
 	g_player.bCameraFirst  = false;								// 一人称カメラの状況
+	g_player.bUnrivaled	   = false;								// 透明状況
 	g_player.bUse          = false;								// 使用状況
 
 	// モデル情報の初期化
@@ -327,6 +329,7 @@ void DrawPlayer(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
 	D3DXMATERIAL      redMat;					// マテリアルデータ (赤)
+	D3DXMATERIAL      flashMat;					// マテリアルデータ (透明)
 
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
@@ -369,13 +372,51 @@ void DrawPlayer(void)
 				// マテリアルの設定
 				pDevice->SetMaterial(&redMat.MatD3D);			// 赤
 
+				// 透明状態をOFFにする
+				g_player.bUnrivaled = false;
+
 				// 処理を抜ける
 				break;
+
+			case ACTIONSTATE_UNRIVALED:	// 無敵状態
+
+				if (g_player.nCounterState % UNRIVALED_CNT == 0)
+				{ // 一定時間経過時
+
+					// 透明状況の入れ替え
+					g_player.bUnrivaled = g_player.bUnrivaled ? false : true;
+				}
+
+				if (g_player.bUnrivaled == true)
+				{ // 透明状況の場合
+
+					// 構造体の要素をクリア
+					ZeroMemory(&flashMat, sizeof(D3DXMATERIAL));
+
+					// 拡散光・環境光・自己発光を透明にする
+					flashMat.MatD3D.Diffuse  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+					flashMat.MatD3D.Ambient  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+					flashMat.MatD3D.Emissive = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&flashMat.MatD3D);			// 透明
+				}
+				else
+				{ // 透明状況じゃない場合
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+				}
+
+				break;					// 抜け出す
 
 			default:					// それ以外の状態
 
 				// マテリアルの設定
 				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+
+				// 透明状態をOFFにする
+				g_player.bUnrivaled = false;
 
 				// 処理を抜ける
 				break;
