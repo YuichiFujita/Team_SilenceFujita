@@ -15,8 +15,11 @@
 
 #include "game.h"
 
+#include "2Deffect.h"
+#include "2Dparticle.h"
 #include "ability.h"
 #include "billboard.h"
+#include "bonus.h"
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
@@ -131,6 +134,15 @@ void InitGame(void)
 	// ビルボードの初期化
 	InitBillboard();
 
+	// ボーナスの初期化
+	InitBonus();
+
+	// 2Dエフェクトの初期化
+	Init2DEffect();
+
+	// 2Dパーティクルの初期化
+	Init2DParticle();
+
 	// タイヤ痕の初期化
 	InitTireMark();
 
@@ -234,6 +246,15 @@ void UninitGame(void)
 
 	// ビルボードの終了
 	UninitBillboard();
+
+	// ボーナスの終了
+	UninitBonus();
+
+	// 2Dエフェクトの終了
+	Uninit2DEffect();
+
+	// 2Dパーティクルの終了
+	Uninit2DParticle();
 
 	// タイヤ痕の終了
 	UninitTireMark();
@@ -360,8 +381,11 @@ void UpdateGame(void)
 		else
 		{ // カウンターが 0以下の場合
 
-			// モード選択 (リザルト画面に移行)
-			SetFade(MODE_RESULT);
+			if (UpdateAllClear() == true)
+			{ // 全てのアップデートが終わっていた場合
+				// モード選択 (リザルト画面に移行)
+				SetFade(MODE_RESULT);
+			}
 		}
 
 		// 処理を抜ける
@@ -437,6 +461,12 @@ void UpdateGame(void)
 
 			// パーティクルの更新
 			UpdateParticle();
+
+			// 2Dエフェクトの更新
+			Update2DEffect();
+
+			// 2Dパーティクルの更新
+			Update2DParticle();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -466,6 +496,9 @@ void UpdateGame(void)
 
 	// スコアの更新
 	UpdateScore();
+
+	// ボーナスの更新処理
+	UpdateBonus();
 
 	// 影の更新
 	UpdateShadow();
@@ -573,6 +606,12 @@ void UpdateGame(void)
 		// パーティクルの更新
 		UpdateParticle();
 
+		// 2Dエフェクトの更新
+		Update2DEffect();
+
+		// 2Dパーティクルの更新
+		Update2DParticle();
+
 		// 体力バーの更新
 		UpdateLife();
 
@@ -587,6 +626,9 @@ void UpdateGame(void)
 
 		// スコアの更新
 		UpdateScore();
+
+		// ボーナスの更新処理
+		UpdateBonus();
 
 		// 影の更新
 		UpdateShadow();
@@ -712,6 +754,15 @@ void DrawGame(void)
 
 	// スコアの描画
 	DrawScore();
+
+	// ボーナスの描画
+	DrawBonus();
+
+	// 2Dエフェクトの描画
+	Draw2DEffect();
+
+	// 2Dパーティクルの描画
+	Draw2DParticle();
 #endif
 
 	if (g_bPause == true)

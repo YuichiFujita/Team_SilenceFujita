@@ -22,5 +22,6 @@ void UpdateScore(void);				// スコアの更新処理
 void DrawScore(void);				// スコアの描画処理
 void AddScore(int nValue);			// スコアの加算処理
 int  GetScore(void);				// スコアの取得処理
+D3DXVECTOR3 GetScorePos(void);		// スコアの位置取得処理
 
 #endif

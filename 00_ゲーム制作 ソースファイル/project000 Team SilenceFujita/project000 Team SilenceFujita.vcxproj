@@ -154,9 +154,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="2Deffect.cpp" />
+    <ClCompile Include="2Dparticle.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
+    <ClCompile Include="bonus.cpp" />
     <ClCompile Include="calculation.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Car.cpp" />
@@ -199,9 +202,12 @@
     <ClCompile Include="wind.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="2Deffect.h" />
+    <ClInclude Include="2Dparticle.h" />
     <ClInclude Include="ability.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />
+    <ClInclude Include="bonus.h" />
     <ClInclude Include="calculation.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="Car.h" />
