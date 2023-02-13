@@ -503,7 +503,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				}
 			}
 
-			//吹っ飛び関係の設定
+			// 吹っ飛び関係の設定
 			g_aObject[nCntObject].smash.nCounter = 0;									// カウンター
 			g_aObject[nCntObject].smash.State = SMASHSTATE_NONE;						// 状態
 			g_aObject[nCntObject].smash.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量

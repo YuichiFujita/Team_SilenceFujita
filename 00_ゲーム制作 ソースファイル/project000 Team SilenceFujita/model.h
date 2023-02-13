@@ -73,7 +73,6 @@ typedef enum
 	MODELTYPE_OBJECT_OBARAYAKKYOKU,		// 商店街（汎用・薬局）
 	MODELTYPE_OBJECT_OBARASHUTTER,		// 商店街（汎用・シャッター）
 
-
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
 	MODELTYPE_PLAYER_BARRIER,			// バリア
