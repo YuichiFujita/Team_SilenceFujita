@@ -1149,6 +1149,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 						// ダメージ状態にする
 						pPlayer->state = ACTIONSTATE_DAMAGE;
+
+						// ダメージカウントを設定する
+						pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 					}
 
 					break;						// 抜け出す
@@ -1188,6 +1191,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 						// ダメージ状態にする
 						pPlayer->state = ACTIONSTATE_DAMAGE;
+
+						// ダメージカウントを設定する
+						pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 					}
 
 					break;						// 抜け出す
@@ -1232,6 +1238,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 						// ダメージ状態にする
 						pPlayer->state = ACTIONSTATE_DAMAGE;
+
+						// ダメージカウントを設定する
+						pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 					}
 
 					break;						// 抜け出す
@@ -1271,6 +1280,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 						// ダメージ状態にする
 						pPlayer->state = ACTIONSTATE_DAMAGE;
+
+						// ダメージカウントを設定する
+						pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 					}
 
 					break;						// 抜け出す
