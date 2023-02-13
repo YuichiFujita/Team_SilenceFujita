@@ -27,8 +27,8 @@
 #define BOOST_WAIT_CNT		(180)		// ブーストの再使用までの時間
 #define WIND_OVERHEAT_CNT	(180)		// ウィンドのオーバーヒートまでの時間
 
-#define DAMAGE_TIME_PLAY	(30)		// ダメージ状態を保つ時間
-#define UNR_TIME_PLAY		(60)		// 無敵状態に変更する時間
+#define DAMAGE_TIME_PLAY	(90)		// ダメージ状態を保つ時間
+#define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)		// 無敵状態に変更する時間
 
 //************************************************************
 //	列挙型定義 (ATTACKSTATE)

@@ -356,7 +356,7 @@ void SetHuman(D3DXVECTOR3 pos)
 
 			// 曲がり角情報の設置
 			g_aHuman[nCntHuman].curveInfo.actionState = HUMANACT_WALK;			// 状態
-			g_aHuman[nCntHuman].curveInfo.nRandamRoute = 0;						// ルートの種類
+			g_aHuman[nCntHuman].curveInfo.nRandamRoute = rand() % MAX_HUMAN_ROUTE;		// ルートの種類
 			g_aHuman[nCntHuman].curveInfo.rotDest = g_aHuman[nCntHuman].rot;	// 目標の向き
 			g_aHuman[nCntHuman].rot.y = GetDefaultRot(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// 初期の向き
 			g_aHuman[nCntHuman].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// ルート

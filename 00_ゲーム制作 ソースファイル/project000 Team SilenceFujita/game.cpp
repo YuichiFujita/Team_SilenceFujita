@@ -280,34 +280,34 @@ void UpdateGame(void)
 	if (g_bGameEnd == false)
 	{ // 遷移設定がされていない場合
 
-		if (GetTime() == 0 || GetPlayer()->bUse == false)
-		{ // リザルトに遷移する条件が整った場合
+		//if (GetTime() == 0 || GetPlayer()->bUse == false)
+		//{ // リザルトに遷移する条件が整った場合
 
-			// 遷移設定がされた状態にする
-			g_bGameEnd = true;
+		//	// 遷移設定がされた状態にする
+		//	g_bGameEnd = true;
 
-			// ゲーム画面の状態設定
-			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
+		//	// ゲーム画面の状態設定
+		//	SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
 
-			//if ()
-			//{ // クリアに成功した場合
+		//	//if ()
+		//	//{ // クリアに成功した場合
 
-			//	// リザルトをクリア成功状態にする
-			//	g_resultState = RESULTSTATE_CLEAR;
+		//	//	// リザルトをクリア成功状態にする
+		//	//	g_resultState = RESULTSTATE_CLEAR;
 
-			//	// サウンドの再生
-			//	//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
-			//}
-			/*else*/ if (GetTime() == 0 || GetPlayer()->bUse == false)
-			{ // クリアに失敗した場合
+		//	//	// サウンドの再生
+		//	//	//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
+		//	//}
+		//	/*else*/ if (GetTime() == 0 || GetPlayer()->bUse == false)
+		//	{ // クリアに失敗した場合
 
-				// リザルトをクリア失敗状態にする
-				g_resultState = RESULTSTATE_OVER;
+		//		// リザルトをクリア失敗状態にする
+		//		g_resultState = RESULTSTATE_OVER;
 
-				// サウンドの再生
-				//PlaySound(SOUND_LABEL_SE_RES_01);		// SE (リザルト移行01)
-			}
-		}
+		//		// サウンドの再生
+		//		//PlaySound(SOUND_LABEL_SE_RES_01);		// SE (リザルト移行01)
+		//	}
+		//}
 	}
 
 	switch (g_gameState)
