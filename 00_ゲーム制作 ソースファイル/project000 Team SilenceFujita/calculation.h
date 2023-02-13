@@ -21,7 +21,7 @@ void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump);									//
 void RotNormalize(float *rot);			// 向きの正規化
 
 // 万能シリーズ
-void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bObject, bool bAI);					// ファイルをロードする全体処理
+void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI);	// ファイルをロードする全体処理
 
 void InitAllAroundChunk(void);			// 万能初期化の全体処理
 void UninitAllAroundChunk(void);		// 万能終了の全体処理

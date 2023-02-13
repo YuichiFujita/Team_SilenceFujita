@@ -118,19 +118,21 @@ void RotNormalize(float *rot)
 //==================================================================================
 //	ファイルをロードする全体処理
 //==================================================================================
-void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bObject, bool bAI)
+void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI)
 {
 	// カーブの情報の初期化処理
 	InitCurveInfo();
 
 	if (bCurve == true)
 	{ // カーブを読み込む場合
+
 		// カーブテキストのロード処理
 		LoadCurveTxt();
 	}
 
 	if (bHumanCurve == true)
 	{ // 人間の曲がり角を読み込む場合
+
 		// 人間のルートのロード処理
 		LoadHumanCurveTxt();
 
@@ -140,18 +142,35 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bObject, boo
 
 	if (bStage == true)
 	{ // ステージを読み込む場合
+
 		// ステージのセットアップ
 		TxtSetStage();
 	}
 
+	if (bCollision == true)
+	{ // 当たり判定を読み込む場合
+
+		// 当たり判定のセットアップ
+		TxtSetCollision();
+	}
+
+	if (bShadow == true)
+	{ // 影を読み込む場合
+
+		// 影の半径のセットアップ
+		TxtSetShadow();
+	}
+
 	if (bObject == true)
 	{ // オブジェクトを読み込む場合
+
 		// オブジェクトのセットアップ
 		TxtSetObject();
 	}
 
 	if (bAI == true)
 	{ // AIを読み込む場合
+
 		// AI系のセットアップ
 		TxtSetAI();
 	}

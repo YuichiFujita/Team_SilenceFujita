@@ -48,17 +48,20 @@
 #include "bomb.h"
 
 //**********************************************************************************************************************
-//	プロトタイプ宣言
+//	マクロ定義
 //**********************************************************************************************************************
+#define RESULT_TIME		(40)		// リザルトまでの余韻フレーム
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-GAMESTATE g_gameState;			// ゲームの状態
-int       g_nCounterGameState;	// 状態管理カウンター
-bool      g_bPause;				// ポーズ状態の ON / OFF
-int       g_nGameMode;			// エディットの ON / OFF
-int		  g_nSoundDJ;			//現在流れているサウンド
+GAMESTATE   g_gameState;			// ゲームの状態
+RESULTSTATE g_resultState;			// リザルトの状態
+int         g_nCounterGameState;	// 状態管理カウンター
+bool        g_bPause;				// ポーズ状態の ON / OFF
+bool        g_bGameEnd;				// モードの遷移状況
+int         g_nGameMode;			// エディットの ON / OFF
+int		    g_nSoundDJ;				// 現在流れているサウンド
 
 //======================================================================================================================
 //	ゲーム画面の初期化処理
@@ -70,8 +73,10 @@ void InitGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	// グローバル変数を初期化
 	g_gameState         = GAMESTATE_NORMAL;		// ゲームの状態
+	g_resultState       = RESULTSTATE_CLEAR;	// リザルトの状態
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
+	g_bGameEnd          = false;				// モードの遷移状況
 	g_nGameMode         = GAMEMODE_PLAY;		// エディットの ON / OFF
 
 #ifdef _DEBUG	// デバッグ処理
@@ -162,12 +167,14 @@ void InitGame(void)
 
 	// ファイルをロードする全体処理
 	LoadFileChunk
-	(
-		true,
-		true,
-		true,
-		true,
-		true
+	( // 引数
+		true,	// 車のカーブ
+		true,	// 人間のカーブ
+		true,	// ステージ
+		true,	// 当たり判定
+		true,	// 影
+		true,	// オブジェクト
+		true	// AI
 	);
 
 #ifdef _DEBUG	// デバッグ処理
@@ -270,7 +277,38 @@ void UninitGame(void)
 //======================================================================================================================
 void UpdateGame(void)
 {
-	FADE Fade = GetFade();
+	if (g_bGameEnd == false)
+	{ // 遷移設定がされていない場合
+
+		if (GetTime() == 0 || GetPlayer()->bUse == false)
+		{ // リザルトに遷移する条件が整った場合
+
+			// 遷移設定がされた状態にする
+			g_bGameEnd = true;
+
+			// ゲーム画面の状態設定
+			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
+
+			//if ()
+			//{ // クリアに成功した場合
+
+			//	// リザルトをクリア成功状態にする
+			//	g_resultState = RESULTSTATE_CLEAR;
+
+			//	// サウンドの再生
+			//	//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
+			//}
+			/*else*/ if (GetTime() == 0 || GetPlayer()->bUse == false)
+			{ // クリアに失敗した場合
+
+				// リザルトをクリア失敗状態にする
+				g_resultState = RESULTSTATE_OVER;
+
+				// サウンドの再生
+				//PlaySound(SOUND_LABEL_SE_RES_01);		// SE (リザルト移行01)
+			}
+		}
+	}
 
 	switch (g_gameState)
 	{ // 状態ごとの処理
@@ -311,7 +349,8 @@ void UpdateGame(void)
 
 	case GAMESTATE_END:
 
-		// 無し
+		// モード選択 (リザルト画面に移行)
+		SetFade(MODE_RESULT);
 
 		// 処理を抜ける
 		break;
@@ -458,13 +497,6 @@ void UpdateGame(void)
 		// 当たり判定の保存
 		TxtSaveCollision();
 	}
-
-	if (GetKeyboardTrigger(DIK_SPACE) == true)
-	{ // 決定の操作が行われた場合
-		// リザルト画面に遷移
-		SetFade(MODE_RESULT);
-	}
-
 #else
 	if (g_bPause == false)
 	{ // ポーズ状態ではない場合
@@ -773,5 +805,5 @@ void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3
 RESULTSTATE GetResultState(void)
 {
 	// ゲーム終了時の状態を返す
-	return RESULTSTATE_CLEAR;
+	return g_resultState;
 }

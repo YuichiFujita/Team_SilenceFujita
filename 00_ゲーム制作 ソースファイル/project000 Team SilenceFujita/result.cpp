@@ -31,6 +31,8 @@
 #define RESULT_WORD_RADIUS_X	(500.0f)		// 言葉の半径(X軸)
 #define RESULT_WORD_RADIUS_Y	(100.0f)		// 言葉の半径(Y軸)
 
+#define TIT_CHANGE_CNT			(600)			// 自動遷移のカウント
+
 //**********************************************************************************************************************
 // リザルト画面のテクスチャ
 //**********************************************************************************************************************
@@ -76,6 +78,7 @@ void RslWordUpdateRsl(void);		// 言葉の更新処理
 LPDIRECT3DTEXTURE9 g_apTextureResult[RSL_MAX] = {};			// テクスチャ(2枚分)へのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWheel = NULL;		// 画面の頂点バッファへのポインタ(タイヤ)
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWord = NULL;		// 画面の頂点バッファへのポインタ(タイヤ)
+int g_nFadeTitleCounter;									// タイトル遷移カウンター
 int g_nResultCounter;										// リザルトカウンター
 WHEEL g_Wheel;												// タイヤの情報
 int g_nResultScore;											// リザルト画面のスコア
@@ -115,6 +118,9 @@ void InitResult(void)
 	}
 
 	{ // 情報の初期化
+		// タイトル遷移カウンターを初期化する
+		g_nFadeTitleCounter = TIT_CHANGE_CNT;
+
 		// リザルトカウンターを初期化する
 		g_nResultCounter = 0;
 
@@ -129,7 +135,7 @@ void InitResult(void)
 		g_RslWord.pos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f,150.0f, 0.0f);		// 中心
 		g_RslWord.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
 
-		g_nResultScore = 30000;				// リザルトのスコア
+		g_nResultScore = GetScore();		// リザルトのスコア
 		g_nDispRslScore = 0;				// 表示用のスコア
 		g_bRslFade = false;					// リザルトから遷移するかどうか
 
@@ -246,33 +252,37 @@ void InitResult(void)
 
 	switch (g_ResultState)
 	{
-	case RESULTSTATE_CLEAR:		// クリア状態
+	case RESULTSTATE_CLEAR:	// クリア状態
 
 		// ファイルをロードする全体処理
 		LoadFileChunk
-		(
-			true,
-			true,
-			true,
-			true,
-			true
+		( // 引数
+			true,	// 車のカーブ
+			true,	// 人間のカーブ
+			true,	// ステージ
+			false,	// 当たり判定
+			true,	// 影
+			true,	// オブジェクト
+			true	// AI
 		);
 
-		break;					// 抜け出す
+		break;				// 抜け出す
 
-	case RESULTSTATE_OVER:		// ゲームオーバー状態
+	case RESULTSTATE_OVER:	// ゲームオーバー状態
 
 		// ファイルをロードする全体処理
 		LoadFileChunk
-		(
-			false,
-			false,
-			true,
-			true,
-			false
+		( // 引数
+			false,	// 車のカーブ
+			false,	// 人間のカーブ
+			true,	// ステージ
+			false,	// 当たり判定
+			true,	// 影
+			true,	// オブジェクト
+			false	// AI
 		);
 
-		break;					// 抜け出す
+		break;				// 抜け出す
 	}
 }
 
@@ -316,7 +326,8 @@ void UninitResult(void)
 //=======================================
 void UpdateResult(void)
 {
-	FADE pFade = GetFade();									//フェードの状態を取得する
+	// ポインタを宣言
+	FADE pFade = GetFade();	//フェードの状態を取得する
 
 	// 天気の設定処理
 	SetWeather();
@@ -350,10 +361,15 @@ void UpdateResult(void)
 		g_nDispRslScore = g_nResultScore;
 	}
 
+	// タイマーを加算
+	g_nFadeTitleCounter--;
+
 	if (GetKeyboardTrigger(DIK_RETURN) == true || GetKeyboardTrigger(DIK_SPACE) == true
-		|| GetJoyKeyTrigger(JOYKEY_A, 0) == true || GetJoyKeyTrigger(JOYKEY_B, 0) == true
-		|| GetJoyKeyTrigger(JOYKEY_X, 0) == true || GetJoyKeyTrigger(JOYKEY_Y, 0) == true)
-	{ // 決定の操作が行われた場合
+	||  GetJoyKeyTrigger(JOYKEY_A, 0)  == true || GetJoyKeyTrigger(JOYKEY_B, 0) == true
+	||  GetJoyKeyTrigger(JOYKEY_X, 0)  == true || GetJoyKeyTrigger(JOYKEY_Y, 0) == true
+	||  g_nFadeTitleCounter <= 0)
+	{ // 決定の操作が行われた場合 (もしくは時間経過)
+
 		// フェードする
 		g_bRslFade = true;
 
@@ -362,6 +378,7 @@ void UpdateResult(void)
 
 		if (g_nResultCounter >= RESULT_FINISH_COUNT)
 		{ // カウントが一定数に達した場合
+
 			if (pFade == FADE_NONE)
 			{ // フェードしていない場合
 
@@ -496,7 +513,7 @@ void RslWordUpdateRsl(void)
 {
 	VERTEX_2D * pVtx;										//頂点情報へのポインタ
 
-	g_RslWord.pos.x += 
+	//g_RslWord.pos.x += 
 
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffResultWord->Lock(0, 0, (void**)&pVtx, 0);
