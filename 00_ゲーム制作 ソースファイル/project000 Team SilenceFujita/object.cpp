@@ -28,6 +28,22 @@
 #define DAMAGE_TIME_OBJ	(20)					// ダメージ状態を保つ時間
 #define UNR_TIME_OBJ	(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
 
+#define OBJECT_GRAVITY	(-1.5f)					// オブジェクトの重力
+#define SMASH_WIDTH		(10.0f)					// 吹き飛びの幅
+#define SMASH_HEIGHT	(20.0f)					// 吹き飛びの高さ
+#define SMASH_DEPTH		(10.0f)					// 吹き飛びの奥行
+#define SMASH_ANGLE		(0.3f)					// 吹き飛ぶ高さの角度
+#define SMASH_ANGLE_ADD	(0.3f)					// 吹き飛ぶ角度の追加分
+#define SMASH_ADD_ROT	(0.02f)					// 吹き飛びの回転の加算数
+#define SMASH_DEATH_CNT	(40)					// 吹き飛んだ後に消えるまでのカウント
+#define SMASH_ROTMOVE_X	(0.01f)					// 吹き飛ぶ角度の移動量(X軸)
+#define SMASH_ROTMOVE_Y	(0.2f)					// 吹き飛ぶ角度の移動量(Y軸)
+#define SMASH_ROTMOVE_Z	(0.01f)					// 吹き飛ぶ角度の移動量(Z軸)
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
@@ -70,6 +86,14 @@ void InitObject(void)
 			g_aObject[nCntObject].collInfo.fDepth[nCntColl] = 0.0f;								// 奥行
 		}
 
+		//吹っ飛び関係の初期化
+		g_aObject[nCntObject].smash.nCounter = 0;									// カウンター
+		g_aObject[nCntObject].smash.State = SMASHSTATE_NONE;						// 状態
+		g_aObject[nCntObject].smash.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
+		g_aObject[nCntObject].smash.bJump = false;									// ジャンプの状態
+		g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
+		g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
+			
 		// 向き状態を初期化
 		g_aObject[nCntObject].collInfo.stateRot = ROTSTATE_0;
 
@@ -175,6 +199,101 @@ void UpdateObject(void)
 
 				// 処理を抜ける
 				break;
+
+			case BREAKTYPE_SMASH:		// 吹っ飛ぶ種類
+
+				switch (g_aObject[nCntObject].smash.State)
+				{
+				case SMASHSTATE_NONE:	// 吹っ飛び状態
+					
+					break;				// 抜け出す
+
+				case SMASHSTATE_ON:		// 吹っ飛んでいる状態
+
+					// 重力をかける
+					g_aObject[nCntObject].smash.move.y += OBJECT_GRAVITY;
+
+					// 移動量を足す
+					g_aObject[nCntObject].pos += g_aObject[nCntObject].smash.move;
+
+					// カウントを加算する
+					g_aObject[nCntObject].smash.nCounter++;
+
+					g_aObject[nCntObject].rot.x += g_aObject[nCntObject].smash.rotMove.x + 0.02f;
+					g_aObject[nCntObject].rot.y -= g_aObject[nCntObject].smash.rotMove.y + 0.02f;
+					g_aObject[nCntObject].rot.z -= g_aObject[nCntObject].smash.rotMove.z + 0.02f;
+
+					if (g_aObject[nCntObject].smash.nCounter >= SMASH_DEATH_CNT)
+					{ // カウントが一定時間経ったら
+						// 使用しない
+						g_aObject[nCntObject].bUse = false;
+					}
+
+					// 向きの正規化(X軸)
+					if (g_aObject[nCntObject].rot.x >= D3DX_PI * 0.5f)
+					{
+						g_aObject[nCntObject].rot.x = D3DX_PI * 0.5f;
+
+						g_aObject[nCntObject].smash.rotMove.x = 0.0f;
+					}
+					else if (g_aObject[nCntObject].rot.x <= (-D3DX_PI * 0.5f))
+					{
+						g_aObject[nCntObject].rot.x = -(D3DX_PI * 0.5f);
+
+						g_aObject[nCntObject].smash.rotMove.x = 0.0f;
+					}
+
+					// 向きの正規化(Y軸)
+					if (g_aObject[nCntObject].rot.y >= D3DX_PI * 0.5f) 
+					{
+						g_aObject[nCntObject].rot.y = D3DX_PI * 0.5f; 
+
+						g_aObject[nCntObject].smash.rotMove.y = 0.0f;
+					}
+					else if (g_aObject[nCntObject].rot.y <= (-D3DX_PI * 0.5f)) 
+					{
+						g_aObject[nCntObject].rot.y = -(D3DX_PI * 0.5f);
+
+						g_aObject[nCntObject].smash.rotMove.y = 0.0f;
+					}
+
+					// 向きの正規化(Z軸)
+					if (g_aObject[nCntObject].rot.z >= D3DX_PI * 0.5f) 
+					{
+						g_aObject[nCntObject].rot.z = D3DX_PI * 0.5f; 
+
+						g_aObject[nCntObject].smash.rotMove.z = 0.0f;
+					}
+					else if (g_aObject[nCntObject].rot.z <= (-D3DX_PI * 0.5f)) 
+					{
+						g_aObject[nCntObject].rot.z = -(D3DX_PI * 0.5f); 
+
+						g_aObject[nCntObject].smash.rotMove.z = 0.0f;
+					}
+
+					if (g_aObject[nCntObject].pos.y <= 0.0f)
+					{ // 地面よりも下に行ったら
+
+						// 移動量を0にする
+						g_aObject[nCntObject].smash.move.x = 0.0f;
+						g_aObject[nCntObject].smash.move.z = 0.0f;
+					}
+
+					break;				// 抜け出す
+				}
+
+				// 地面に接しているか
+				LandObject(&g_aObject[nCntObject].pos, &g_aObject[nCntObject].smash.move, &g_aObject[nCntObject].smash.bJump);
+
+				if (g_aObject[nCntObject].pos.y <= 0.0f)
+				{ // 地面よりも下に行ったら
+					
+					// 位置を0にする
+					g_aObject[nCntObject].pos.y = 0.0f;
+				}
+
+				// 処理を抜ける
+				break;				
 			}
 		}
 	}
@@ -383,6 +502,14 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 					);
 				}
 			}
+
+			//吹っ飛び関係の設定
+			g_aObject[nCntObject].smash.nCounter = 0;									// カウンター
+			g_aObject[nCntObject].smash.State = SMASHSTATE_NONE;						// 状態
+			g_aObject[nCntObject].smash.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
+			g_aObject[nCntObject].smash.bJump = false;									// ジャンプの状態
+			g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
+			g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
 
 			// モデル情報を設定
 			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
@@ -792,6 +919,70 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 				// 処理を抜ける
 				break;
+			}
+		}
+	}
+}
+
+//======================================================================================================================
+// 吹っ飛ぶオブジェクトとの当たり判定
+//======================================================================================================================
+void SmashCollision(D3DXVECTOR3 pos, float fRadius)
+{
+	float fLength;			// 長さ
+	float fAngle;			// 向き
+
+	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+	{
+		if (g_aObject[nCntObject].bUse == true && g_aObject[nCntObject].nBreakType == BREAKTYPE_SMASH && g_aObject[nCntObject].smash.State != SMASHSTATE_ON)
+		{ // 使用していないかつ、吹っ飛ばす種類かつ、吹っ飛ばし中ではない場合だった場合
+			
+			//目標の向きを設定する
+			fAngle = atan2f(pos.x - g_aObject[nCntObject].pos.x, pos.z - g_aObject[nCntObject].pos.z);
+
+			// 向きの正規化
+			RotNormalize(&fAngle);
+
+			//長さを測る
+			fLength = (g_aObject[nCntObject].pos.x - pos.x) * (g_aObject[nCntObject].pos.x - pos.x)
+				+ (g_aObject[nCntObject].pos.z - pos.z) * (g_aObject[nCntObject].pos.z - pos.z);
+			
+			if (fLength <= ((g_aObject[nCntObject].modelData.fRadius + fRadius) * (g_aObject[nCntObject].modelData.fRadius + fRadius)))
+			{ // オブジェクトが当たっている
+				// 吹っ飛ばし状態にする
+				g_aObject[nCntObject].smash.State = SMASHSTATE_ON;
+
+				// 向きの移動量を設定する
+				g_aObject[nCntObject].smash.rotMove.x = SMASH_ROTMOVE_X;
+				g_aObject[nCntObject].smash.rotMove.y = SMASH_ROTMOVE_Y;
+				g_aObject[nCntObject].smash.rotMove.z = SMASH_ROTMOVE_Z;
+
+				if (fAngle <= 0.0f)
+				{ // 角度が右側だった場合
+					// 角度を変える
+					fAngle += (D3DX_PI * SMASH_ANGLE_ADD);
+
+					// 向きの正規化
+					RotNormalize(&fAngle);
+
+					//オブジェクトを吹き飛ばす
+					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH;
+					g_aObject[nCntObject].smash.move.y = cosf(D3DX_PI * SMASH_ANGLE) * SMASH_HEIGHT;
+					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH;
+				}
+				else
+				{ // 上記以外
+					// 角度を変える
+					fAngle -= (D3DX_PI * SMASH_ANGLE_ADD);
+
+					// 向きの正規化
+					RotNormalize(&fAngle);
+
+					//オブジェクトを吹き飛ばす
+					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH;
+					g_aObject[nCntObject].smash.move.y = cosf(D3DX_PI * SMASH_ANGLE) * SMASH_HEIGHT;
+					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH;
+				}
 			}
 		}
 	}

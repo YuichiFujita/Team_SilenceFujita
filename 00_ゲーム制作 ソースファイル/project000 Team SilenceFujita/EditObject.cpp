@@ -58,6 +58,7 @@ const char *c_apBreakmodename[BREAKTYPE_MAX] =
 {
 	"破壊不可",
 	"一撃破壊",
+	"吹き飛ぶ",
 };
 
 //影モードの表記
