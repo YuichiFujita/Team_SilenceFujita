@@ -249,7 +249,7 @@ void UpdateTitle(void)
 				//// サウンドの再生
 				//PlaySound(SOUND_LABEL_SE_DECISION_00);	// 決定音00 (システム)
 
-				// モード選択 (ステージセレクト画面に移行)
+				// モード選択 (ゲーム画面に移行)
 				SetFade(MODE_GAME);
 			}
 

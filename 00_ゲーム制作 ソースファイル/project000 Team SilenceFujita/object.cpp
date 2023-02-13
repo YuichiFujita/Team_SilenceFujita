@@ -140,11 +140,11 @@ void InitObject(void)
 		g_aShadowRadius[nCntObject] = FIRST_RADIUS;
 	}
 
-	// 当たり判定のセットアップ
-	TxtSetCollision();
+	//// 当たり判定のセットアップ
+	//TxtSetCollision();
 
-	// 影の半径のセットアップ
-	TxtSetShadow();
+	//// 影の半径のセットアップ
+	//TxtSetShadow();
 }
 
 //======================================================================================================================
