@@ -177,7 +177,7 @@ void InitGame(void)
 	);
 
 	// ゲートの設定処理
-	SetGate(D3DXVECTOR3(0.0f, 10.0f, 100.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
+	SetGate(D3DXVECTOR3(0.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
@@ -282,7 +282,7 @@ void UpdateGame(void)
 	if (g_bGameEnd == false)
 	{ // 遷移設定がされていない場合
 
-		if (GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
+		if (GetExit() == true || GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
 		{ // リザルトに遷移する条件が整った場合
 
 			// 遷移設定がされた状態にする
@@ -291,16 +291,16 @@ void UpdateGame(void)
 			// ゲーム画面の状態設定
 			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
 
-			//if ()
-			//{ // クリアに成功した場合
+			if (GetExit() == true)
+			{ // クリアに成功した場合
 
-			//	// リザルトをクリア成功状態にする
-			//	g_resultState = RESULTSTATE_CLEAR;
+				// リザルトをクリア成功状態にする
+				g_resultState = RESULTSTATE_CLEAR;
 
-			//	// サウンドの再生
-			//	//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
-			//}
-			/*else*/ if (GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
+				// サウンドの再生
+				//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
+			}
+			else if (GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
 			{ // クリアに失敗した場合
 
 				// リザルトをクリア失敗状態にする

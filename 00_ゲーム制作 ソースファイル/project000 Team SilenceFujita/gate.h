@@ -71,11 +71,12 @@ void DrawGate(void);			// オブジェクトの描画処理
 
 void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot);												// オブジェクトの設定処理
 void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
+void CollisionExitGate(Gate *pGate);																			// ゲートの脱出判定
 
-void CollisionExitGate(void);	// ゲートの脱出判定
 void AllShutOutGate(void);		// ゲートの全閉め処理
 Gate *GetGateData(void);		// オブジェクトの取得処理
 Collision *GetCollGate(void);	// ゲートの当たり判定の取得処理
+bool GetExit(void);				// 脱出状況の取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
