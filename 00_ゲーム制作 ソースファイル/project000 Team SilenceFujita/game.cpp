@@ -381,8 +381,11 @@ void UpdateGame(void)
 		else
 		{ // カウンターが 0以下の場合
 
-			// モード選択 (リザルト画面に移行)
-			SetFade(MODE_RESULT);
+			if (UpdateAllClear() == true)
+			{ // 全てのアップデートが終わっていた場合
+				// モード選択 (リザルト画面に移行)
+				SetFade(MODE_RESULT);
+			}
 		}
 
 		// 処理を抜ける

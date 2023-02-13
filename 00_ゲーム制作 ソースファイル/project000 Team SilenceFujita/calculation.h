@@ -19,6 +19,7 @@ void VecSizePos(D3DXVECTOR3 *sizePos, D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fW
 float LineOuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 pos);						// 外積の左右判断処理
 void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump);									// モデルの着地の更新処理
 void RotNormalize(float *rot);			// 向きの正規化
+bool UpdateAllClear(void);				// 全てのアップデートが終わっているかどうかの判断処理
 
 // 万能シリーズ
 void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI);	// ファイルをロードする全体処理

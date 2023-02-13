@@ -13,15 +13,25 @@
 //**********************************************************************************************************************
 //マクロ定義
 //**********************************************************************************************************************
-#define MAX_BONUS		(10)		// ボーナスの最大数
-#define BONUS_MAX_VALUE	(9999)		// ボーナスの最大値
-#define BONUS_WIDTH		(20.0f)		// ボーナスの幅
-#define BONUS_HEIGHT	(30.0f)		// ボーナスの高さ
-#define BONUS_SHIFT		(35.0f)		// ボーナスのずらす幅
-#define BONUS_ALPHA		(1.0f)		// ボーナスの透明度
-#define PLUS_WIDTH		(30.0f)		// プラスの幅
-#define PLUS_HEIGHT		(30.0f)		// プラスの高さ
-#define PLUS_SHIFT		(40.0f)		// プラスのずらす幅
+#define BONUS_MAX_VALUE		(9999)		// ボーナスの最大値
+#define BONUS_WIDTH			(20.0f)		// ボーナスの幅
+#define BONUS_HEIGHT		(30.0f)		// ボーナスの高さ
+#define BONUS_SHIFT			(35.0f)		// ボーナスのずらす幅
+#define BONUS_ALPHA			(1.0f)		// ボーナスの透明度
+#define PLUS_WIDTH			(30.0f)		// プラスの幅
+#define PLUS_HEIGHT			(30.0f)		// プラスの高さ
+#define PLUS_SHIFT			(40.0f)		// プラスのずらす幅
+
+#define BONUS_MOVE_MAGNI	(0.02f)		// プラスの移動量の倍率
+#define BONUS_STATE_CNT		(120)		// 加算状態になるまでのカウント
+#define BONUS_ADD_ALPHA		(0.02f)		// ボーナスの透明度に加算する値
+
+#define BONUS_EFFECT_LIFE	(8)			// ボーナスのエフェクトの寿命
+#define BONUS_EFFECT_RADIUS	(40.0f)		// ボーナスのエフェクトの半径
+#define BONUS_EFFECT_SUB	(0.15f)		// ボーナスのエフェクトの減衰係数
+
+#define SCORE_HUMAN			(500)		// 人を吹き飛ばした時のスコア
+#define DIGIT_HUMAN			(3)			// 人を吹き飛ばした時の桁数
 
 //**********************************************************************************************************************
 //グローバル変数
@@ -166,7 +176,7 @@ void UpdateBonus(void)
 			case BONUSSTATE_FADE:		// フェード状態
 
 				// 色を加算する
-				g_aBonus[nCntBonus].col.a += 0.02f;
+				g_aBonus[nCntBonus].col.a += BONUS_ADD_ALPHA;
 
 				if (g_aBonus[nCntBonus].col.a >= 1.0f)
 				{ // 透明度が1.0fになった場合
@@ -185,12 +195,12 @@ void UpdateBonus(void)
 				// 状態カウンターを加算する
 				g_aBonus[nCntBonus].nStateCounter++;
 
-				if (g_aBonus[nCntBonus].nStateCounter >= 120)
+				if (g_aBonus[nCntBonus].nStateCounter >= BONUS_STATE_CNT)
 				{ // 状態カウンターが一定以上になったら
 
 					// 移動量を計算する
-					g_aBonus[nCntBonus].move.x = (ScorePos.x - g_aBonus[nCntBonus].pos.x) * 0.02f;
-					g_aBonus[nCntBonus].move.y = (ScorePos.y - g_aBonus[nCntBonus].pos.y) * 0.02f;
+					g_aBonus[nCntBonus].move.x = (ScorePos.x - g_aBonus[nCntBonus].pos.x) * BONUS_MOVE_MAGNI;
+					g_aBonus[nCntBonus].move.y = (ScorePos.y - g_aBonus[nCntBonus].pos.y) * BONUS_MOVE_MAGNI;
 
 					// 透明度を設定する
 					g_aBonus[nCntBonus].col.a = 0.0f;
@@ -237,9 +247,9 @@ void UpdateBonus(void)
 					g_aBonus[nCntBonus].pos,
 					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 					D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
-					8,
-					40.0f,
-					0.15f
+					BONUS_EFFECT_LIFE,
+					BONUS_EFFECT_RADIUS,
+					BONUS_EFFECT_SUB
 				);
 
 				break;					// 抜け出す
@@ -344,13 +354,13 @@ void SetBonus(ADDSCORETYPE Reason, D3DXVECTOR3 pos)
 
 			switch (Reason)
 			{
-			case ADDSCORE_HUMAN:	// 人間
+			case ADDSCORE_HUMAN:	// 人間を吹き飛ばした時
 
 				// スコアを設定する
-				g_aBonus[nCntBonus].nScore = 500;
+				g_aBonus[nCntBonus].nScore = SCORE_HUMAN;
 
 				// 桁数を設定する
-				g_aBonus[nCntBonus].nDigit = 3;									// 桁数
+				g_aBonus[nCntBonus].nDigit = DIGIT_HUMAN;
 
 				break;				// 抜け出す
 			}
@@ -379,4 +389,13 @@ void SetBonus(ADDSCORETYPE Reason, D3DXVECTOR3 pos)
 
 	//頂点バッファをアンロックする
 	g_pVtxBuffBonus->Unlock();
+}
+
+//========================================
+// ボーナスの取得処理
+//========================================
+Bonus *GetBonus(void)
+{
+	// ボーナスの情報を返す
+	return &g_aBonus[0];
 }
