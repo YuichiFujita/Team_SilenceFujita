@@ -62,7 +62,7 @@ void InitCurveInfo(void)
 			g_aCurveHuman[nCnt].dashAngle[nCntCur] = DASH_RIGHT;						// ‘–‚Á‚Ä‚¢‚é•ûŒü
 			g_aCurveHuman[nCnt].roadPos[nCntCur] = ROADPOS_RIGHT;						// ‹È‚ª‚èŠp‚æ‚è‚Ç‚Á‚¿‘¤‚É•à‚¢‚Ä‚¢‚é‚©
 			g_aCurveHuman[nCnt].nNowCurve = 0;											// Œ»İ‚Ì‹È‚ª‚èŠp‚Ì”Ô†
-			g_aCurveHuman[nCnt].nCurveTime = 0;											// ‹È‚ª‚é‰ñ”
+			g_aCurveHuman[nCnt].nCurveTime = 1;											// ‹È‚ª‚é‰ñ”
 		}
 	}
 }

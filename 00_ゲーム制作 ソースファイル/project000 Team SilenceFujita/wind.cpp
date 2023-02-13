@@ -17,6 +17,8 @@
 #include "particle.h"
 #include "object.h"
 #include "Human.h"
+#include "score.h"
+#include "bonus.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -380,6 +382,13 @@ void CollisionWind(Human *pHuman)
 
 				// 人間が吹き飛ばされる処理
 				FlyAwayHuman(pHuman, *pPlayer);
+
+				// ボーナスの設定処理
+				SetBonus
+				(
+					ADDSCORE_HUMAN,						// 理由
+					D3DXVECTOR3(300.0f, 50.0f, 0.0f)	// 位置
+				);
 
 				// カメラの状態を変える
 				*GetCameraState() = CAMERASTATE_GOODJOB;
