@@ -32,5 +32,6 @@ void UninitTimer(void);			// タイマーの終了処理
 void UpdateTimer(void);			// タイマーの更新処理
 void DrawTimer(void);			// タイマーの描画処理
 int  GetTime(void);				// タイムの取得処理
+TIMERSTATE GetTimerState(void);	// タイマーの状態の取得処理
 
 #endif

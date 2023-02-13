@@ -53,7 +53,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define RESULT_TIME		(40)		// リザルトまでの余韻フレーム
+#define RESULT_TIME		(120)		// リザルトまでの余韻フレーム
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -89,7 +89,6 @@ void InitGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
 	//------------------------------------------------------------------------------------------------------------------
-
 	// 天気の初期化処理
 	InitWeather();
 
@@ -188,6 +187,9 @@ void InitGame(void)
 		true,	// オブジェクト
 		true	// AI
 	);
+
+	// ゲートの設定処理
+	SetGate(D3DXVECTOR3(0.0f, 10.0f, 100.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
@@ -301,34 +303,34 @@ void UpdateGame(void)
 	if (g_bGameEnd == false)
 	{ // 遷移設定がされていない場合
 
-		//if (GetTime() == 0 || GetPlayer()->bUse == false)
-		//{ // リザルトに遷移する条件が整った場合
+		if (GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
+		{ // リザルトに遷移する条件が整った場合
 
-		//	// 遷移設定がされた状態にする
-		//	g_bGameEnd = true;
+			// 遷移設定がされた状態にする
+			g_bGameEnd = true;
 
-		//	// ゲーム画面の状態設定
-		//	SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
+			// ゲーム画面の状態設定
+			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
 
-		//	//if ()
-		//	//{ // クリアに成功した場合
+			//if ()
+			//{ // クリアに成功した場合
 
-		//	//	// リザルトをクリア成功状態にする
-		//	//	g_resultState = RESULTSTATE_CLEAR;
+			//	// リザルトをクリア成功状態にする
+			//	g_resultState = RESULTSTATE_CLEAR;
 
-		//	//	// サウンドの再生
-		//	//	//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
-		//	//}
-		//	/*else*/ if (GetTime() == 0 || GetPlayer()->bUse == false)
-		//	{ // クリアに失敗した場合
+			//	// サウンドの再生
+			//	//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
+			//}
+			/*else*/ if (GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
+			{ // クリアに失敗した場合
 
-		//		// リザルトをクリア失敗状態にする
-		//		g_resultState = RESULTSTATE_OVER;
+				// リザルトをクリア失敗状態にする
+				g_resultState = RESULTSTATE_OVER;
 
-		//		// サウンドの再生
-		//		//PlaySound(SOUND_LABEL_SE_RES_01);		// SE (リザルト移行01)
-		//	}
-		//}
+				// サウンドの再生
+				//PlaySound(SOUND_LABEL_SE_RES_01);		// SE (リザルト移行01)
+			}
+		}
 	}
 
 	switch (g_gameState)
@@ -370,8 +372,18 @@ void UpdateGame(void)
 
 	case GAMESTATE_END:
 
-		// モード選択 (リザルト画面に移行)
-		SetFade(MODE_RESULT);
+		if (g_nCounterGameState > 0)
+		{ // カウンターが 0より大きい場合
+
+			// カウンターを減算
+			g_nCounterGameState--;
+		}
+		else
+		{ // カウンターが 0以下の場合
+
+			// モード選択 (リザルト画面に移行)
+			SetFade(MODE_RESULT);
+		}
 
 		// 処理を抜ける
 		break;

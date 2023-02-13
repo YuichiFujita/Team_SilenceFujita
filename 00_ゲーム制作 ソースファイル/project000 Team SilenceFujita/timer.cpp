@@ -10,6 +10,7 @@
 #include "main.h"
 #include "fade.h"
 #include "game.h"
+#include "gate.h"
 #include "timer.h"
 #include "value.h"
 
@@ -174,6 +175,9 @@ void UpdateTimer(void)
 			else
 			{ // カウンターが 0以下の場合
 
+				// ゲートの全閉め処理
+				AllShutOutGate();
+
 				// カウント終了状態にする
 				g_timerState = TIMERSTATE_END;
 			}
@@ -274,4 +278,13 @@ int GetTime(void)
 {
 	// タイムの値 (秒換算) を返す
 	return g_nTime / 60;
+}
+
+//======================================================================================================================
+//	タイマーの状態の取得処理
+//======================================================================================================================
+TIMERSTATE GetTimerState(void)
+{
+	// タイマーの状態を返す
+	return g_timerState;
 }

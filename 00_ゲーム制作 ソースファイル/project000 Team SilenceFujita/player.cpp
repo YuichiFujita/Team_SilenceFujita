@@ -258,9 +258,9 @@ void UpdatePlayer(void)
 			g_player.modelData.fRadius
 		);				
 
-		//	オブジェクトとの当たり判定
+		// ゲートとの当たり判定
 		CollisionGate
-		(
+		( // 引数
 			&g_player.pos,		// 現在の位置
 			&g_player.oldPos,	// 前回の位置
 			&g_player.move,		// 移動量
@@ -291,6 +291,12 @@ void UpdatePlayer(void)
 			COLLOBJECTTYPE_PLAYER,
 			&nCnt,
 			nCnt
+		);
+
+		// ゲートの脱出判定
+		CollisionExitGate
+		( // 引数
+
 		);
 
 		//----------------------------------------------------
