@@ -35,8 +35,9 @@ typedef enum
 typedef enum
 {
 	RESULTSTATE_NONE = 0,	// 初期化状態
-	RESULTSTATE_CLEAR,		// ゲームクリア状態
-	RESULTSTATE_OVER,		// ゲームオーバー状態
+	RESULTSTATE_CLEAR,		// クリア状態
+	RESULTSTATE_TIMEOVER,	// タイムオーバー状態
+	RESULTSTATE_LIFEOVER,	// ライフオーバー状態
 	RESULTSTATE_MAX			// この列挙型の総数
 }RESULTSTATE;
 

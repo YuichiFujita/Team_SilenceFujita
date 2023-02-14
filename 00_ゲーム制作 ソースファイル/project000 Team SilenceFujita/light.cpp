@@ -85,25 +85,22 @@ void InitLight(void)
 
 	case MODE_RESULT:	// リザルト
 
-		switch (ResultState)
-		{
-		case RESULTSTATE_CLEAR:		// クリア状態
-
+		if (ResultState == RESULTSTATE_CLEAR)
+		{ // ゲームクリア状態の場合
+	
 			// 拡散光カラーを設定
 			aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
 			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
-
-			break;					// 抜け出す
-
-		case RESULTSTATE_OVER:		// ゲームオーバー状態
-
+		}
+		else if (ResultState == RESULTSTATE_TIMEOVER
+			 ||  ResultState == RESULTSTATE_LIFEOVER)
+		{ // ゲームオーバー状態の場合
+	
 			// 拡散光カラーを設定
 			aDiffuse[0] = D3DXCOLOR(1.0f, 0.3f, 0.3f, 1.0f);
 			aDiffuse[1] = D3DXCOLOR(0.7f, 0.2f, 0.2f, 1.0f);
 			aDiffuse[2] = D3DXCOLOR(0.3f, 0.1f, 0.1f, 1.0f);
-
-			break;					// 抜け出す
 		}
 
 		break;			// 抜け出す

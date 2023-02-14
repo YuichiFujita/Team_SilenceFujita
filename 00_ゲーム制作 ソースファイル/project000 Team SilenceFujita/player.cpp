@@ -178,7 +178,7 @@ void UpdatePlayer(void)
 			// クリア成功時のプレイヤー更新
 			UpdateClearPlayer();
 		}
-		else if (GetResultState() == RESULTSTATE_OVER)
+		else if (GetResultState() == RESULTSTATE_TIMEOVER)
 		{ // リザルトがクリア失敗状態の場合
 
 			// クリア失敗時のプレイヤー更新

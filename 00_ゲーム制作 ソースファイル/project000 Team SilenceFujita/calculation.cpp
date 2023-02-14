@@ -450,14 +450,14 @@ bool UpdateAllClear(RESULTSTATE state)
 
 	switch (state)
 	{ // リザルトの状態ごとの処理
-	case RESULTSTATE_CLEAR:	// ゲームクリア状態
+	case RESULTSTATE_CLEAR:		// クリア状態
 
 		// 無し
 
 		// 処理を抜ける
 		break;
 
-	case RESULTSTATE_OVER:	// ゲームオーバー状態
+	case RESULTSTATE_TIMEOVER:	// タイムオーバー状態
 
 		for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++, pGate++)
 		{ // ゲートの最大表示数分繰り返す
@@ -479,6 +479,13 @@ bool UpdateAllClear(RESULTSTATE state)
 				}
 			}
 		}
+
+		// 処理を抜ける
+		break;
+
+	case RESULTSTATE_LIFEOVER:	// ライフオーバー状態
+
+		// 無し
 
 		// 処理を抜ける
 		break;

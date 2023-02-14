@@ -321,11 +321,20 @@ void UpdateGame(void)
 				// サウンドの再生
 				//PlaySound(SOUND_LABEL_SE_RES_00);		// SE (リザルト移行00)
 			}
-			else if (GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
-			{ // クリアに失敗した場合
+			else if (GetTimerState() == TIMERSTATE_END)
+			{ // タイムアウトしている場合
 
 				// リザルトをクリア失敗状態にする
-				g_resultState = RESULTSTATE_OVER;
+				g_resultState = RESULTSTATE_TIMEOVER;
+
+				// サウンドの再生
+				//PlaySound(SOUND_LABEL_SE_RES_01);		// SE (リザルト移行01)
+			}
+			else if (GetPlayer()->bUse == false)
+			{ // プレイヤーが死亡している場合
+
+				// リザルトをクリア失敗状態にする
+				g_resultState = RESULTSTATE_LIFEOVER;
 
 				// サウンドの再生
 				//PlaySound(SOUND_LABEL_SE_RES_01);		// SE (リザルト移行01)
@@ -476,7 +485,7 @@ void UpdateGame(void)
 			// 体力バーの更新
 			UpdateLife();
 
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif

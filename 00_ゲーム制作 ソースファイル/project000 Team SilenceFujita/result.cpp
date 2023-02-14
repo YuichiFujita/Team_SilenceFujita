@@ -214,27 +214,24 @@ void InitResult(void)
 		pVtx[2].rhw = 1.0f;
 		pVtx[3].rhw = 1.0f;
 
-		switch (g_ResultState)
-		{
-		case RESULTSTATE_CLEAR:		// クリア状態
+		if (g_ResultState == RESULTSTATE_CLEAR)
+		{ // ゲームクリア状態の場合
 
 			//頂点カラーの設定
 			pVtx[0].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 			pVtx[1].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 			pVtx[2].col = D3DXCOLOR(0.8f, 0.0f, 0.0f, 1.0f);
 			pVtx[3].col = D3DXCOLOR(0.8f, 0.0f, 0.0f, 1.0f);
-
-			break;					// 抜け出す
-
-		case RESULTSTATE_OVER:		// ゲームオーバー状態
+		}
+		else if (g_ResultState == RESULTSTATE_TIMEOVER
+			 ||  g_ResultState == RESULTSTATE_LIFEOVER)
+		{ // ゲームオーバー状態の場合
 
 			//頂点カラーの設定
 			pVtx[0].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
 			pVtx[1].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
 			pVtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
 			pVtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
-
-			break;					//　抜け出す	
 		}
 
 		//テクスチャ座標の設定
@@ -250,9 +247,8 @@ void InitResult(void)
 	// リザルトの初期化全体処理
 	InitResultChunk();
 
-	switch (g_ResultState)
-	{
-	case RESULTSTATE_CLEAR:	// クリア状態
+	if (g_ResultState == RESULTSTATE_CLEAR)
+	{ // ゲームクリア状態の場合
 
 		// ファイルをロードする全体処理
 		LoadFileChunk
@@ -265,10 +261,10 @@ void InitResult(void)
 			true,	// オブジェクト
 			true	// AI
 		);
-
-		break;				// 抜け出す
-
-	case RESULTSTATE_OVER:	// ゲームオーバー状態
+	}
+	else if (g_ResultState == RESULTSTATE_TIMEOVER
+		 ||  g_ResultState == RESULTSTATE_LIFEOVER)
+	{ // ゲームオーバー状態の場合
 
 		// ファイルをロードする全体処理
 		LoadFileChunk
@@ -281,8 +277,6 @@ void InitResult(void)
 			true,	// オブジェクト
 			false	// AI
 		);
-
-		break;				// 抜け出す
 	}
 }
 
@@ -428,21 +422,19 @@ void DrawResult(void)
 			0,
 			sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
 
-		switch (g_ResultState)
-		{
-		case RESULTSTATE_CLEAR:		// クリア状態
 
-			//テクスチャの設定
+		if (g_ResultState == RESULTSTATE_CLEAR)
+		{ // ゲームクリア状態の場合
+	
+			// テクスチャの設定
 			pDevice->SetTexture(0, g_apTextureResult[RSL_GAMECLEAR]);
-
-			break;					// 抜け出す
-
-		case RESULTSTATE_OVER:		// ゲームオーバー状態
-
-			//テクスチャの設定
+		}
+		else if (g_ResultState == RESULTSTATE_TIMEOVER
+			 ||  g_ResultState == RESULTSTATE_LIFEOVER)
+		{ // ゲームオーバー状態の場合
+	
+			// テクスチャの設定
 			pDevice->SetTexture(0, g_apTextureResult[RSL_GAMEOVER]);
-
-			break;					// 抜け出す
 		}
 
 		//ポリゴンの描画
