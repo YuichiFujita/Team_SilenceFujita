@@ -13,6 +13,7 @@
 #include "calculation.h"
  
 #include "Car.h"
+#include "gate.h"
 #include "Police.h"
 #include "shadow.h"
 #include "sound.h"
@@ -236,6 +237,7 @@ void UpdatePolice(void)
 			{ // バリアセット状態じゃなかった場合
 				if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC)
 				{ // 渋滞状態じゃない場合
+
 					//----------------------------------------------------
 					//	当たり判定
 					//----------------------------------------------------
@@ -250,6 +252,16 @@ void UpdatePolice(void)
 						&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
 						BOOSTSTATE_NONE,					// ブーストの状態
 						&g_aPolice[nCntPolice].state		// 警察の状態
+					);
+
+					// ゲートとの当たり判定
+					CollisionGate
+					( // 引数
+						&g_aPolice[nCntPolice].pos,			// 現在の位置
+						&g_aPolice[nCntPolice].posOld,		// 前回の位置
+						&g_aPolice[nCntPolice].move,		// 移動量
+						POLICAR_WIDTH,						// 横幅
+						POLICAR_DEPTH						// 奥行
 					);
 				}
 
