@@ -363,7 +363,7 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].bUse = true;
 
 			// モデル情報を設定
-			g_aCar[nCntCar].modelData = GetModelData(/*(rand() % MODEL_CAR_MAX) + FROM_CAR*/MODELTYPE_CAR_CAR001);	// モデル情報
+			g_aCar[nCntCar].modelData = GetModelData((rand() % MODEL_CAR_MAX) + FROM_CAR);	// モデル情報
 
 			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
 
