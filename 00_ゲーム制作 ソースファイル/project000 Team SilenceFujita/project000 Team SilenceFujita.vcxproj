@@ -174,6 +174,7 @@
     <ClCompile Include="gate.cpp" />
     <ClCompile Include="Human.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="junk.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="gate.h" />
     <ClInclude Include="Human.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="junk.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
