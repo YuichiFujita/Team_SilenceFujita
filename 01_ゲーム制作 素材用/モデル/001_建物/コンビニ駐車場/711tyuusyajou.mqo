@@ -1,0 +1,59 @@
+Metasequoia Document
+Format Text Ver 1.0
+
+Scene {
+	pos 0.0000 0.0000 5960.4697
+	lookat 0.0000 0.0000 0.0000
+	head 26.2767
+	pich 0.5408
+	bank 0.0000
+	ortho 0
+	zoom2 1.2583
+	amb 0.250 0.250 0.250
+	dirlights 1 {
+		light {
+			dir 0.408 0.408 0.816
+			color 1.000 1.000 1.000
+		}
+	}
+}
+Material 2 {
+	"mat9" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\Student\team_Texture\tyuusyajou ÇÃÉRÉsÅ[.jpg") proj_type(1) proj_pos(47.900 0.000 302.439) proj_scale(196.100 91.400 100.000) proj_angle(0.000 -90.000 0.000)
+	"mat7" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\Student\team_Texture\tyuusyajouGround.jpg")
+}
+Object "obj1" {
+	visible 15
+	locking 0
+	shading 1
+	facet 59.5
+	color 0.898 0.498 0.698
+	color_type 0
+	vertex 0 {
+	}
+	face 0 {
+	}
+}
+Object "obj3" {
+	visible 15
+	locking 0
+	shading 1
+	facet 59.5
+	color 0.898 0.498 0.698
+	color_type 0
+	vertex 8 {
+		-353.1942 0.0000 -200.3450
+		353.1942 0.0000 -200.3450
+		353.1942 0.0000 -15.3797
+		-353.1942 0.0000 -15.3797
+		353.1942 0.0000 200.9194
+		-353.1942 0.0000 200.9194
+		-353.1942 0.0000 -154.0745
+		353.1942 0.0000 -154.0745
+	}
+	face 3 {
+		4 V(4 5 3 2) M(1) UV(1.27872 0.77996 -0.52262 0.77996 -0.52262 2.14317 1.27872 2.14317)
+		4 V(6 0 1 7) M(1) UV(-0.52268 0.20502 -0.52268 -0.04810 1.27841 -0.04810 1.27841 0.20502)
+		4 V(6 7 2 3) M(0) UV(-0.52268 -1.99734 1.27841 -1.99734 1.27841 -1.23862 -0.52268 -1.23862)
+	}
+}
+Eof

@@ -189,7 +189,7 @@ void InitGame(void)
 	);
 
 	// ゲートの設定処理
-	SetGate(D3DXVECTOR3(0.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
+	SetGate(D3DXVECTOR3(1500.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
