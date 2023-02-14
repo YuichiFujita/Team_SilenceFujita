@@ -101,21 +101,18 @@ void InitWeather(void)
 
 	case MODE_RESULT:	// リザルト
 
-		switch (resultState)
-		{
-		case RESULTSTATE_CLEAR:		// クリア状態
-
+		if (resultState == RESULTSTATE_CLEAR)
+		{ // ゲームクリア状態の場合
+	
 			// 天気を晴れに設定する
 			g_Weather = WEATHERTYPE_SUNNY;
-
-			break;					// 抜け出す
-
-		case RESULTSTATE_OVER:		// ゲームオーバー状態
-
+		}
+		else if (resultState == RESULTSTATE_TIMEOVER
+			 ||  resultState == RESULTSTATE_LIFEOVER)
+		{ // ゲームオーバー状態の場合
+	
 			// 天気を雷雨に設定する
 			g_Weather = WEATHERTYPE_THUNDER;
-
-			break;					// 抜け出す
 		}
 
 		break;			// 抜け出す
