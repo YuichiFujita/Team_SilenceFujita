@@ -227,6 +227,12 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 		// AI系のセットアップ
 		TxtSetAI();
 	}
+
+	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++)
+	{
+		// 車の設定処理
+		SetCar(D3DXVECTOR3(200.0f, 0.0f, 200.0f));
+	}
 }
 
 //==================================================================================

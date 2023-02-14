@@ -374,8 +374,8 @@ void CollisionWind(Human *pHuman)
 		&&  LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
 		{ // 四辺の内側にいる場合 (当たっている場合)
 
-			if (pPlayer->wind.bUseWind == true)
-			{ // 風を使用している場合
+			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY)
+			{ // 風を使用しているかつ、人が吹き飛んでいない場合
 
 				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;

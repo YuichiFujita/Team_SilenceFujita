@@ -41,8 +41,9 @@
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
 
-#define POLICAR_TRAFFIC_CNT			(240)		// 渋滞が起きたときに改善する用のカウント
+#define POLICAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define POLICAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
+#define POLICAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
 
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
@@ -408,6 +409,16 @@ void DrawPolice(void)
 
 						// 処理を抜ける
 						break;
+
+					case POLICESTATE_TRAFFIC:	// 渋滞時
+
+						// 車を薄くする
+						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a = POLICAR_TRAFFIC_ALPHA;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D);
+
+						break;					// 抜け出す
 
 					default:					// 上記以外
 
