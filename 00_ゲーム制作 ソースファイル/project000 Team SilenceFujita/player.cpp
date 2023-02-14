@@ -41,11 +41,12 @@
 #define DEL_MOVE_ABS	(1.9f)		// 移動量の削除範囲の絶対値
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
-#define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
+#define REV_MOVE_SUB	(0.08f)		// 移動量の減速係数
 #define UNRIVALED_CNT	(10)		// 無敵時にチカチカさせるカウント
 
 #define PLAY_CLEAR_MOVE		(4.0f)	// クリア成功時のプレイヤーの自動移動量
-#define REV_PLAY_OVER_MOVE	(0.05f)	// クリア失敗時のプレイヤーの減速係数
+#define REV_PLAY_CLEAR_MOVE	(0.1f)	// クリア成功時のプレイヤーの減速係数
+#define REV_PLAY_OVER_MOVE	(0.02f)	// クリア失敗時のプレイヤーの減速係数
 
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -450,7 +451,7 @@ void UpdateNormalPlayer(void)
 	// プレイヤーの位置の更新
 	PosPlayer();
 
-	// プレイヤーの着地の更新処
+	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 	
 	// プレイヤーのドリフト
@@ -555,13 +556,24 @@ void UpdateClearPlayer(void)
 	// 角度をゲートの向きに設定
 	g_player.rot.y = GetExit().pGate->rot.y;
 
+	// 移動量を減速
+	g_player.move.x += (PLAY_CLEAR_MOVE - g_player.move.x) * REV_PLAY_CLEAR_MOVE;
+
+	// 追加移動量を減速
+	g_player.boost.plusMove.x += (0.0f - g_player.boost.plusMove.x) * REV_PLAY_CLEAR_MOVE;
+
 	// 前回位置の更新
 	g_player.oldPos = g_player.pos;
 
-	// プレイヤーを移動
-	g_player.pos.x += sinf(g_player.rot.y) * PLAY_CLEAR_MOVE;
-	g_player.pos.z += cosf(g_player.rot.y) * PLAY_CLEAR_MOVE;
+	// プレイヤーの位置の更新
+	PosPlayer();
 
+	// プレイヤーの着地の更新
+	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
+
+	//--------------------------------------------------------
+	//	影の更新
+	//--------------------------------------------------------
 	// 影の位置設定
 	SetPositionShadow
 	( // 引数
@@ -580,6 +592,10 @@ void UpdateOverPlayer(void)
 	// 変数を宣言
 	int nTrafficCnt = 0;	// 引数設定用
 
+	// カメラの状態を通常状態に設定
+	g_player.bCameraFirst = false;
+	g_player.nCameraState = PLAYCAMESTATE_NORMAL;
+
 	// 移動していない状態にする
 	g_player.bMove = false;
 
@@ -595,7 +611,7 @@ void UpdateOverPlayer(void)
 	// プレイヤーの位置の更新
 	PosPlayer();
 
-	// プレイヤーの着地の更新処
+	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 
 	//--------------------------------------------------------
