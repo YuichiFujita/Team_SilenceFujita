@@ -12,6 +12,7 @@
 #include "input.h"
 #include "model.h"
 
+#include "junk.h"
 #include "object.h"
 #include "particle.h"
 #include "shadow.h"
@@ -584,7 +585,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 	}
 }
 
-#if 0
+#if 1
 //======================================================================================================================
 //	オブジェクトのダメージ判定
 //======================================================================================================================
@@ -615,14 +616,14 @@ void HitObject(Object *pObject, int nDamage)
 			// カウンターを設定
 			pObject->nCounterState = DAMAGE_TIME_OBJ;
 
-			// サウンドの再生
-			PlaySound(SOUND_LABEL_SE_DMG);			// SE (ダメージ)
+			//// サウンドの再生
+			//PlaySound(SOUND_LABEL_SE_DMG);			// SE (ダメージ)
 		}
 		else
 		{ // 体力が尽きた場合
 
-			// 爆発の設定
-			SetExplosion(pObject->pos, SOUNDTYPE_BREAK);
+			//// 爆発の設定
+			//SetExplosion(pObject->pos, SOUNDTYPE_BREAK);
 
 			// パーティクルの設定
 			SetParticle
@@ -634,8 +635,22 @@ void HitObject(Object *pObject, int nDamage)
 				2									// 寿命
 			);
 
-			// アイテムの設定
-			SetItem(pObject->pos, ITEMTYPE_HEAL);
+			//// サイズに応じてがれきを生み出す
+			//for (int nCntColl = 0; nCntColl < g_aCollision[pObject->nType].nNumColl; nCntColl++)
+			//{
+			//	// 位置
+			//	D3DXVECTOR3 pos = pObject->pos + g_aCollision[pObject->nType].vecPos[nCntColl];
+
+			//	// がれきの設定処理
+			//	SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			//	SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			//	SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			//	SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			//	SetJunk(D3DXVECTOR3(pos.x, pObject->modelData.vtxMax.y, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			//}
+
+			//// アイテムの設定
+			//SetItem(pObject->pos, ITEMTYPE_HEAL);
 
 			// 使用していない状態にする
 			pObject->bUse = false;
@@ -647,7 +662,7 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 //	オブジェクトとの当たり判定
 //======================================================================================================================
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt)
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state)
 {
 	// 変数を宣言
 	D3DXVECTOR3 collPos;	// 当たり判定の中心座標
@@ -694,6 +709,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
+						if (state == BOOSTSTATE_UP)
+						{ // ブースト中の場合
+
+							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+							{ // 壊れる種類のオブジェクトだった場合
+
+								// オブジェクトのダメージ判定
+								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+							}
+						}
+
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
 
@@ -718,6 +744,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+
+						if (state == BOOSTSTATE_UP)
+						{ // ブースト中の場合
+
+							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+							{ // 壊れる種類のオブジェクトだった場合
+
+								// オブジェクトのダメージ判定
+								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+							}
 						}
 
 						// 渋滞カウントを加算する
@@ -753,6 +790,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
+						if (state == BOOSTSTATE_UP)
+						{ // ブースト中の場合
+
+							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+							{ // 壊れる種類のオブジェクトだった場合
+
+								// オブジェクトのダメージ判定
+								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+							}
+						}
+
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
 
@@ -777,6 +825,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+
+						if (state == BOOSTSTATE_UP)
+						{ // ブースト中の場合
+
+							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+							{ // 壊れる種類のオブジェクトだった場合
+
+								// オブジェクトのダメージ判定
+								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+							}
 						}
 
 						// 渋滞カウントを加算する
@@ -823,6 +882,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
+							if (state == BOOSTSTATE_UP)
+							{ // ブースト中の場合
+
+								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+								{ // 壊れる種類のオブジェクトだった場合
+
+									// オブジェクトのダメージ判定
+									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+								}
+							}
+
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
 
@@ -847,6 +917,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+
+							if (state == BOOSTSTATE_UP)
+							{ // ブースト中の場合
+
+								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+								{ // 壊れる種類のオブジェクトだった場合
+
+									// オブジェクトのダメージ判定
+									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+								}
 							}
 
 							// 渋滞カウントを加算する
@@ -882,6 +963,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
+							if (state == BOOSTSTATE_UP)
+							{ // ブースト中の場合
+
+								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+								{ // 壊れる種類のオブジェクトだった場合
+
+									// オブジェクトのダメージ判定
+									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+								}
+							}
+
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
 
@@ -906,6 +998,17 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+
+							if (state == BOOSTSTATE_UP)
+							{ // ブースト中の場合
+
+								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+								{ // 壊れる種類のオブジェクトだった場合
+
+									// オブジェクトのダメージ判定
+									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
+								}
 							}
 
 							// 渋滞カウントを加算する

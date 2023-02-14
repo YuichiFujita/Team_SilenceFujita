@@ -24,6 +24,7 @@
 #include "Car.h"
 #include "effect.h"
 #include "gate.h"
+#include "junk.h"
 #include "life.h"
 #include "light.h"
 #include "meshdome.h"
@@ -112,6 +113,9 @@ void InitGame(void)
 
 	// ゲートの初期化
 	InitGate();
+
+	// がれきの初期化
+	InitJunk();
 
 	// カメラの初期化
 	InitCamera();
@@ -225,6 +229,9 @@ void UninitGame(void)
 
 	// ゲートの終了
 	UninitGate();
+
+	// がれきの終了
+	UninitJunk();
 
 	// カメラの終了
 	UninitCamera();
@@ -381,11 +388,11 @@ void UpdateGame(void)
 		else
 		{ // カウンターが 0以下の場合
 
-			if (UpdateAllClear() == true)
-			{ // 全てのアップデートが終わっていた場合
-				// モード選択 (リザルト画面に移行)
-				SetFade(MODE_RESULT);
-			}
+			//if (UpdateAllClear() == true)
+			//{ // 全てのアップデートが終わっていた場合
+			//	// モード選択 (リザルト画面に移行)
+			//	SetFade(MODE_RESULT);
+			//}
 		}
 
 		// 処理を抜ける
@@ -446,6 +453,9 @@ void UpdateGame(void)
 
 			// オブジェクトの更新
 			UpdateObject();
+
+			// がれきの更新
+			UpdateJunk();
 
 			// 車の更新処理
 			UpdateCar();
@@ -585,6 +595,9 @@ void UpdateGame(void)
 		// オブジェクトの更新
 		UpdateObject();
 
+		// がれきの更新
+		UpdateJunk();
+
 		// ゲートの更新
 		UpdateGate();
 
@@ -682,6 +695,9 @@ void DrawGame(void)
 
 	// オブジェクトの描画
 	DrawObject();
+
+	// がれきの描画
+	DrawJunk();
 
 	// 警察の描画
 	DrawPolice();

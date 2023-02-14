@@ -243,12 +243,13 @@ void UpdatePlayer(void)
 		// オブジェクトとの当たり判定
 		CollisionObject
 		( // 引数
-			&g_player.pos,		// 現在の位置
-			&g_player.oldPos,	// 前回の位置
-			&g_player.move,		// 移動量
-			PLAY_WIDTH,			// 横幅
-			PLAY_DEPTH,			// 奥行
-			&nCnt				// 渋滞カウント
+			&g_player.pos,			// 現在の位置
+			&g_player.oldPos,		// 前回の位置
+			&g_player.move,			// 移動量
+			PLAY_WIDTH,				// 横幅
+			PLAY_DEPTH,				// 奥行
+			&nCnt,					// 渋滞カウント
+			g_player.boost.state	// ブーストの状態
 		);
 
 		// 吹っ飛ぶオブジェクトとの当たり判定

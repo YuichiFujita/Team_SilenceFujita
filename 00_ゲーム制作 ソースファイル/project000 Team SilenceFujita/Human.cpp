@@ -229,7 +229,8 @@ void UpdateHuman(void)
 				&g_aHuman[nCntHuman].move,		// 移動量
 				HUMAN_WIDTH,					// 横幅
 				HUMAN_DEPTH,					// 奥行
-				&nCnt							// 渋滞カウント
+				&nCnt,							// 渋滞カウント
+				BOOSTSTATE_NONE					// ブースト状態
 			);
 
 			// プレイヤーの補正の更新処理
