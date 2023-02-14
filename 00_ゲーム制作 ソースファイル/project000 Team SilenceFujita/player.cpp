@@ -261,13 +261,11 @@ void DrawPlayer(void)
 				if (g_player.bUnrivaled == true)
 				{ // 透明状況の場合
 
-					// 構造体の要素をクリア
-					ZeroMemory(&UnrivaledMat, sizeof(D3DXMATERIAL));
+					// マテリアルを代入する
+					UnrivaledMat = pMat[nCntMat];
 
-					// 拡散光・環境光・自己発光を透明にする
-					UnrivaledMat.MatD3D.Diffuse  = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
-					UnrivaledMat.MatD3D.Ambient  = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
-					UnrivaledMat.MatD3D.Emissive = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
+					// 自己発光を透明にする
+					UnrivaledMat.MatD3D.Emissive = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
 					// マテリアルの設定
 					pDevice->SetMaterial(&UnrivaledMat.MatD3D);			// 透明

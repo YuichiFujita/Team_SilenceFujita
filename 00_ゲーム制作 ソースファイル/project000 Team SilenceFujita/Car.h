@@ -64,6 +64,7 @@ typedef struct
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報
 	BOMBSTATE    bombState;				// ボムの状態
+	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
 	int			 nShadowID;				// 影のインデックス
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか

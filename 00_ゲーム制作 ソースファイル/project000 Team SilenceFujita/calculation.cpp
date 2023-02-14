@@ -226,7 +226,13 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 
 		// AI系のセットアップ
 		TxtSetAI();
-	}	
+	}
+
+	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++)
+	{
+		// 車の設定処理
+		SetCar(D3DXVECTOR3(200.0f, 0.0f, 200.0f));
+	}
 }
 
 //==================================================================================
@@ -434,44 +440,67 @@ void DrawResultChunk(void)
 //==================================================================================
 bool UpdateAllClear(RESULTSTATE state)
 {
-	bool bAllClear = true;			// 返り値用の変数(全てのアップデートが終了している)
-	
-	Bonus *pBonus = GetBonus();		// ボーナスの情報
+	// 変数を宣言
+	bool bAllClear = true;				// 更新の終了確認用
 
-	for (int nCnt = 0; nCnt < MAX_BONUS; nCnt++, pBonus++)
-	{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+	Gate   *pGate   = GetGateData();	// ゲートの情報
+	Bonus  *pBonus  = GetBonus();		// ボーナスの情報
+
+	switch (state)
+	{ // リザルトの状態ごとの処理
+	case RESULTSTATE_CLEAR:	// ゲームクリア状態
+
+		// 無し
+
+		// 処理を抜ける
+		break;
+
+	case RESULTSTATE_OVER:	// ゲームオーバー状態
+
+		for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++, pGate++)
+		{ // ゲートの最大表示数分繰り返す
+
+			if (pGate->bUse == true)
+			{ // ゲートが使用されている場合
+
+				if (pGate->state != GATESTATE_STOP)
+				{ // 停止状態ではない場合
+
+					// ゲートの更新
+					UpdateGate();
+
+					// 更新を終了していない状態にする
+					bAllClear = false;
+
+					// 処理を抜ける
+					break;
+				}
+			}
+		}
+
+		// 処理を抜ける
+		break;
+	}
+
+	for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++, pBonus++)
+	{ // ボーナスの最大表示数分繰り返す
+
 		if (pBonus->bUse == true)
 		{ // 使用されている場合
-
-			// 全ての更新が完了していない
-			bAllClear = false;
 
 			// ボーナスの更新
 			UpdateBonus();
 
-			break;		// 抜け出す
+			// 更新を終了していない状態にする
+			bAllClear = false;
+
+			// 処理を抜ける
+			break;
 		}
 	}
 
-	//Gate *pGate = GetGateData();	// ゲートの情報
-
-	//for (int nCnt = 0; nCnt < MAX_GATE; nCnt++, pGate++)
-	//{
-	//	if (pGate->bUse == true)
-	//	{ // 使用している場合
-	//		if (pGate->state != GATESTATE_STOP)
-	//		{ // 停止状態じゃない場合
-
-	//			// 全ての更新が完了していない
-	//			bAllClear = false;
-
-	//			// ゲートの更新
-	//			UpdateGate();
-
-	//			break;	// 抜け出す
-	//		}
-	//	}
-	//}
-
-	return bAllClear;		// 全てのアップデートの返り値
+	// 更新状況を返す
+	return bAllClear;
 }

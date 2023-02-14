@@ -372,17 +372,18 @@ void UpdateGame(void)
 
 	case GAMESTATE_END:
 
-		if (g_nCounterGameState > 0)
-		{ // カウンターが 0より大きい場合
+		if (UpdateAllClear(g_resultState) == true)
+		{ // 全てのアップデートが終わっていた場合
 
-			// カウンターを減算
-			g_nCounterGameState--;
-		}
-		else
-		{ // カウンターが 0以下の場合
+			if (g_nCounterGameState > 0)
+			{ // カウンターが 0より大きい場合
 
-			if (UpdateAllClear(RESULTSTATE_NONE) == true)
-			{ // 全てのアップデートが終わっていた場合
+				// カウンターを減算
+				g_nCounterGameState--;
+			}
+			else
+			{ // カウンターが 0以下の場合
+
 				// モード選択 (リザルト画面に移行)
 				SetFade(MODE_RESULT);
 			}
@@ -395,14 +396,16 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
+	// カメラの更新
+	UpdateCamera();
+
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
+#ifdef _DEBUG	// デバッグ処理
 		// エディットメインの更新
 		UpdateEditmain();
-
-		// カメラの更新
-		UpdateCamera();
+#endif
 	}
 	else
 	{ // ゲームモードだった場合
@@ -467,16 +470,13 @@ void UpdateGame(void)
 			// 2Dパーティクルの更新
 			Update2DParticle();
 
-			// カメラの更新
-			UpdateCamera();
-
 			// ビルボードの更新
 			UpdateBillboard();
 
 			// 体力バーの更新
 			UpdateLife();
 
-#if 1
+#if 0
 			// タイマーの更新
 			UpdateTimer();
 #endif
