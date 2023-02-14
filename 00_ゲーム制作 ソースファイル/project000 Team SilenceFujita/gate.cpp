@@ -14,6 +14,7 @@
 
 #include "gate.h"
 #include "player.h"
+#include "timer.h"
 #include "particle.h"
 #include "shadow.h"
 #include "sound.h"
@@ -21,14 +22,17 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define GATE_GRAVITY		(1.0f)		// 重力
-#define GATE_DOOR_PLUSPOS	(285.0f)	// ドアの初期位置の y座標加算量
+#define GATE_GRAVITY			(1.0f)		// 重力
+#define GATE_DOOR_PLUSPOS		(285.0f)	// ドアの初期位置の y座標加算量
+#define GATE_EXIT_WIDESIZE_MUL	(0.3f)		// 脱出口の横位置加算量の倍率
+#define GATE_EXIT_FORWARDPLUS	(150.0f)	// 脱出口の前方加算量
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Gate      g_aGate[MAX_GATE];			// オブジェクトの情報
-Collision g_aCollGate[MODEL_GATE_MAX];	// 当たり判定の情報
+Gate      g_aGate[MAX_GATE];				// オブジェクトの情報
+Collision g_aCollGate[MODEL_GATE_MAX];		// 当たり判定の情報
+bool      g_bExit;							// 脱出状況
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -37,6 +41,9 @@ void InitGate(void)
 {
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+
+	// グローバル変数を初期化
+	g_bExit = false;			// 脱出状況
 
 	// オブジェクトの情報の初期化
 	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
@@ -123,13 +130,6 @@ void UninitGate(void)
 //======================================================================================================================
 void UpdateGate(void)
 {
-	if (GetKeyboardTrigger(DIK_RSHIFT) == true)
-	{ // 右シフトキーを押した場合
-
-		// 落下状態にする
-		g_aGate[0].state = GATESTATE_LAND;
-	}
-
 	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -140,7 +140,8 @@ void UpdateGate(void)
 			{ // 状態ごとの処理
 			case GATESTATE_FLY:		// 未閉状態
 
-				// 無し
+				// ゲートの脱出判定
+				CollisionExitGate(&g_aGate[nCntGate]);
 
 				// 処理を抜ける
 				break;
@@ -529,45 +530,55 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 //======================================================================================================================
 //	ゲートの脱出判定
 //======================================================================================================================
-void CollisionExitGate(void)
+void CollisionExitGate(Gate *pGate)
 {
 	// 変数を宣言
-	D3DXVECTOR3 leftPos;	// ゲートの左位置
-	D3DXVECTOR3 rightPos;	// ゲートの左位置
-	D3DXVECTOR3 vecGate;	// ゲートの境界線
+	D3DXVECTOR3 leftPos;			// ゲートの左位置
+	D3DXVECTOR3 rightPos;			// ゲートの右位置
+	D3DXVECTOR3 leftForwardPos;		// ゲートの左の前方位置
+	D3DXVECTOR3 rightForwardPos;	// ゲートの右の前方位置
+	float       fSideSize;			// ゲートの横幅
 
 	// プレイヤーを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーを宣言
 
-	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
-	{ // オブジェクトの最大表示数分繰り返す
+	if (GetTimerState() != TIMERSTATE_END)
+	{ // タイマーがカウント終了状態ではない場合
 
-		if (g_aGate[nCntGate].bUse == true)
-		{ // オブジェクトが使用されている場合
+		// ゲートの横幅加算量を設定
+		fSideSize = pGate->modelData.size.x * GATE_EXIT_WIDESIZE_MUL;
 
-			// 左位置を求める
-			leftPos.x = sinf(g_aGate[nCntGate].rot.y - (D3DX_PI * 0.5f)) * 50.0f;	// x
-			leftPos.y = 0.0f;														// y
-			leftPos.z = cosf(g_aGate[nCntGate].rot.y - (D3DX_PI * 0.5f)) * 50.0f;	// z
+		// 左位置を求める
+		leftPos.x = pGate->pos.x - sinf(pGate->rot.y + (D3DX_PI * 0.5f)) * fSideSize;	// x
+		leftPos.y = 0.0f;																// y
+		leftPos.z = pGate->pos.z - cosf(pGate->rot.y + (D3DX_PI * 0.5f)) * fSideSize;	// z
+		leftPos.x -= sinf(pGate->rot.y) * GATE_EXIT_FORWARDPLUS;	// x
+		leftPos.z -= cosf(pGate->rot.y) * GATE_EXIT_FORWARDPLUS;	// z
 
-			// 右位置を求める
-			rightPos.x = sinf(g_aGate[nCntGate].rot.y + (D3DX_PI * 0.5f)) * 50.0f;	// x
-			rightPos.y = 0.0f;														// y
-			rightPos.z = cosf(g_aGate[nCntGate].rot.y + (D3DX_PI * 0.5f)) * 50.0f;	// z
+		// 左の前方位置を求める
+		leftForwardPos = leftPos;
+		leftForwardPos.x -= sinf(pGate->rot.y) * 1.0f;	// x
+		leftForwardPos.z -= cosf(pGate->rot.y) * 1.0f;	// z
 
-			if (LineOuterProduct(leftPos, rightPos, pPlayer->pos) < 0.0f)
-			{ // ゲートを通った場合
+		// 右位置を求める
+		rightPos.x = pGate->pos.x + sinf(pGate->rot.y + (D3DX_PI * 0.5f)) * fSideSize;	// x
+		rightPos.y = 0.0f;																// y
+		rightPos.z = pGate->pos.z + cosf(pGate->rot.y + (D3DX_PI * 0.5f)) * fSideSize;	// z
+		rightPos.x -= sinf(pGate->rot.y) * GATE_EXIT_FORWARDPLUS;	// x
+		rightPos.z -= cosf(pGate->rot.y) * GATE_EXIT_FORWARDPLUS;	// z
 
-				// パーティクルの設定
-				SetParticle
-				( // 引数
-					pPlayer->pos,						// 位置
-					D3DXCOLOR(0.8f, 0.0f, 0.3f, 1.0f),	// 色
-					PARTICLETYPE_DAMAGE,				// 種類
-					SPAWN_PARTICLE_DAMAGE,				// エフェクト数
-					2									// 寿命
-				);
-			}
+		// 右の前方位置を求める
+		rightForwardPos = rightPos;
+		rightForwardPos.x -= sinf(pGate->rot.y) * 1.0f;	// x
+		rightForwardPos.z -= cosf(pGate->rot.y) * 1.0f;	// z
+
+		if (LineOuterProduct(leftPos,  rightPos,        pPlayer->pos) < 0
+		&&  LineOuterProduct(leftPos,  leftForwardPos,  pPlayer->pos) < 0
+		&&  LineOuterProduct(rightPos, rightForwardPos, pPlayer->pos) > 0)
+		{ // ゲートを通った場合
+
+			// 脱出した状態にする
+			g_bExit = true;
 		}
 	}
 }
@@ -605,6 +616,15 @@ Collision *GetCollGate(void)
 {
 	// ゲートの当たり判定の情報の先頭アドレスを返す
 	return &g_aCollGate[0];
+}
+
+//======================================================================================================================
+//	脱出状況の取得処理
+//======================================================================================================================
+bool GetExit(void)
+{
+	// 脱出状況の真偽を返す
+	return g_bExit;
 }
 
 #ifdef _DEBUG	// デバッグ処理
