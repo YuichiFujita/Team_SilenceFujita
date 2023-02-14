@@ -123,6 +123,8 @@ void UninitCar(void)
 //======================================================================================================================
 void UpdateCar(void)
 {
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
+
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aCar[nCntCar].bUse == true)
@@ -185,7 +187,8 @@ void UpdateCar(void)
 						CAR_WIDTH,						// 横幅
 						CAR_DEPTH,						// 奥行
 						&g_aCar[nCntCar].nTrafficCnt,	// 渋滞カウント
-						BOOSTSTATE_NONE					// ブースト状態
+						BOOSTSTATE_NONE,				// ブースト状態
+						&policeState					// 警察の状態
 					);
 
 					// 車の停止処理
@@ -1162,7 +1165,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
 						// 位置をずらす
-						pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
+						//pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
 
 						// プレイヤーの移動量を削除
 						pPlayer->move.x *= 0.95f;
@@ -1208,7 +1211,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
 						// 位置をずらす
-						pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
+						//pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
 
 						// プレイヤーの移動量を削除
 						pPlayer->move.x *= 0.95f;
@@ -1259,7 +1262,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
 						// 位置をずらす
-						pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
+						//pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
 
 						// プレイヤーの移動量を削除
 						pPlayer->move.x *= 0.95f;
@@ -1305,7 +1308,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
 						// 位置をずらす
-						pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
+						//pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
 
 						// プレイヤーの移動量を削除
 						pPlayer->move.x *= 0.95f;

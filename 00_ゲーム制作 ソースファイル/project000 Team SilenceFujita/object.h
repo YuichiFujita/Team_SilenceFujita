@@ -12,6 +12,7 @@
 //**********************************************************************************************************************
 #include "model.h"
 #include "player.h"
+#include "Police.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -141,7 +142,7 @@ void DrawObject(void);			// オブジェクトの描画処理
 
 void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot);	// オブジェクトの設定処理
 void HitObject(Object *pObject, int nDamage);																					// オブジェクトのダメージ判定
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state);	// オブジェクトとの当たり判定
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice);	// オブジェクトとの当たり判定
 void SmashCollision(D3DXVECTOR3 pos, float fRadius);				// 吹っ飛ぶオブジェクトとの当たり判定
 
 Object *GetObjectData(void);	// オブジェクトの取得処理

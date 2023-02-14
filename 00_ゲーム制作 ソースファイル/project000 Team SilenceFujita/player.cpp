@@ -415,6 +415,7 @@ void UpdateNormalPlayer(void)
 {
 	// 変数を宣言
 	int nTrafficCnt = 0;	// 引数設定用
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	// 前回位置の更新
 	g_player.oldPos = g_player.pos;
@@ -482,7 +483,8 @@ void UpdateNormalPlayer(void)
 		PLAY_WIDTH,				// 横幅
 		PLAY_DEPTH,				// 奥行
 		&nTrafficCnt,			// 渋滞カウント
-		g_player.boost.state	// ブーストの状態
+		g_player.boost.state,	// ブーストの状態
+		&policeState			// 警察の状態
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -591,6 +593,8 @@ void UpdateOverPlayer(void)
 	// 変数を宣言
 	int nTrafficCnt = 0;	// 引数設定用
 
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
+
 	// カメラの状態を通常状態に設定
 	g_player.bCameraFirst = false;
 	g_player.nCameraState = PLAYCAMESTATE_NORMAL;
@@ -625,7 +629,8 @@ void UpdateOverPlayer(void)
 		PLAY_WIDTH,				// 横幅
 		PLAY_DEPTH,				// 奥行
 		&nTrafficCnt,			// 渋滞カウント
-		g_player.boost.state	// ブーストの状態
+		g_player.boost.state,	// ブーストの状態
+		&policeState			// 警察の状態
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定

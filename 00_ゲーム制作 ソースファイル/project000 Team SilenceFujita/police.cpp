@@ -41,18 +41,21 @@
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
 
-#define POLICAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
-#define POLICAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
-#define POLICAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
+#define POLICAR_TRAFFIC_CNT			(400)	// 渋滞が起きたときに改善する用のカウント
+#define POLICAR_TRAFFIC_IMPROVE_CNT	(540)	// 渋滞状態の解除のカウント
+#define POLICAR_TRAFFIC_ALPHA		(0.5f)	// 渋滞時の透明度
+
+#define POLICAR_CHASE_RANGE		(3000.0f)	// 追跡状態になる範囲
+#define POLICAR_TACKLE_RANGE	(500.0f)	// タックル状態になる範囲
 
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
 //**********************************************************************************************************************
-#define POLICAR_TACKLE_CNT		(60)		// タックル状態に移行するまでのカウント
 #define POLICAR_TACKLE_ADD		(3.35f)		// 増していく移動量
 #define MAX_POLICAR_TACKLE_MOVE	(50.0f)		// 追加移動量の最大数
-#define FINISH_POLICAR_TACKLE	(90)		// タックル終了するまでの時間
+#define FINISH_POLICAR_TACKLE	(80)		// タックル終了するまでの時間
 #define STOP_POLICAR_CNT		(40)		// 止まっている間のカウント数
+#define STOP_POLICAR_ROT		(0.01f)		// 車が止まっている間の向きの増加係数
 #define POLICAR_ATTEN_STOP		(0.1f)		// 追加移動量の減衰係数
 
 //**********************************************************************************************************************
@@ -129,7 +132,8 @@ void InitPolice(void)
 
 		// タックル関係の情報の初期化
 		g_aPolice[nCntPolice].tackle.nTackleCnt = 0;						// タックルのカウント
-		g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
+		g_aPolice[nCntPolice].tackle.tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
+		g_aPolice[nCntPolice].tackle.tackleState = TACKLESTATE_CHARGE;		// タックルの状態
 	}
 }
 
@@ -244,7 +248,8 @@ void UpdatePolice(void)
 						POLICAR_WIDTH,						// 横幅
 						POLICAR_DEPTH,						// 奥行
 						&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
-						BOOSTSTATE_NONE						// ブーストの状態
+						BOOSTSTATE_NONE,					// ブーストの状態
+						&g_aPolice[nCntPolice].state		// 警察の状態
 					);
 				}
 
@@ -511,7 +516,8 @@ void SetPolice(D3DXVECTOR3 pos)
 
 			// タックル関係の変数の初期化
 			g_aPolice[nCntPolice].tackle.nTackleCnt = 0;			// タックルのカウント
-			g_aPolice[nCntPolice].tackle.Tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// タックル時の追加移動量
+			g_aPolice[nCntPolice].tackle.tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// タックル時の追加移動量
+			g_aPolice[nCntPolice].tackle.tackleState = TACKLESTATE_CHARGE;						// タックル時の状態
 
 			// 処理を抜ける
 			break;
@@ -734,49 +740,38 @@ void PatrolCarSearch(Police *pPolice)
 	// 目的の向きを設定する
 	fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
 
-	if (fDist <= 3000.0f)
+	if (fDist <= POLICAR_CHASE_RANGE)
 	{ // 目的の距離が一定以内に入ったら
-		// 追跡状態に移行する
-		pPolice->state = POLICESTATE_CHASE;
 
-		// タックルカウントを加算する
-		pPolice->tackle.nTackleCnt++;
+		if (fDist <= POLICAR_TACKLE_RANGE)
+		{ // 目的の距離が一定以内に入った場合
 
-		if (pPolice->tackle.nTackleCnt >= POLICAR_TACKLE_CNT)
-		{ // 一定時間経ったら
 			// タックルのカウントを0にする
 			pPolice->tackle.nTackleCnt = 0;
 
 			// タックル状態に移行
 			pPolice->state = POLICESTATE_TACKLE;
-		}
 
-		// 向きの差分を求める
-		fRotDiff = fRotDest - pPolice->rot.y;
-
-		if (fRotDiff > D3DX_PI)
-		{ // 角度が3.14fより大きかった場合
-			// 角度から1周分減らす
-			fRotDiff = -D3DX_PI;
+			// チャージ状態にする
+			pPolice->tackle.tackleState = TACKLESTATE_CHARGE;
 		}
-		else if (fRotDiff < -D3DX_PI)
-		{ // 角度が-3.14fより小さかった場合
-			// 角度に1周分加える
-			fRotDiff = D3DX_PI;
-		}
+		else
+		{ // 目的の距離が一定以内に入らなかった場合
 
-		// 角度を補正する
-		pPolice->rot.y += fRotDiff * 0.1f;
+			// 追跡状態に移行する
+			pPolice->state = POLICESTATE_CHASE;
 
-		if (pPolice->rot.y > D3DX_PI)
-		{ // 角度が3.14fより大きかった場合
-			// 角度から1周分減らす
-			pPolice->rot.y = -D3DX_PI;
-		}
-		else if (pPolice->rot.y < -D3DX_PI)
-		{ // 角度が-3.14fより小さかった場合
-			// 角度に1周分加える
-			pPolice->rot.y = D3DX_PI;
+			// 向きの差分を求める
+			fRotDiff = fRotDest - pPolice->rot.y;
+
+			// 向きの正規化
+			RotNormalize(&fRotDiff);
+
+			// 角度を補正する
+			pPolice->rot.y += fRotDiff * 0.1f;
+
+			// 向きの正規化
+			RotNormalize(&pPolice->rot.y);
 		}
 	}
 	else
@@ -800,10 +795,10 @@ void ChasePoliceAct(Police *pPolice)
 	//警察車両の探知処理
 	PatrolCarSearch(pPolice);
 
-	if (pPolice->move.x >= 20.0f)
+	if (pPolice->move.x >= MAX_POLI_FORWARD)
 	{ // 移動量が一定値以上の場合
 		// 移動量を更新
-		pPolice->move.x = 20.0f;
+		pPolice->move.x = MAX_POLI_FORWARD;
 	}
 }
 
@@ -1217,82 +1212,84 @@ void PoliceTackle(Police *pPolice)
 	// タックルのカウントを加算する
 	pPolice->tackle.nTackleCnt++;
 
-	if (pPolice->tackle.nTackleCnt <= STOP_POLICAR_CNT)
-	{ // 車を止めるカウント数の時
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+
+	float fRotDest, fRotDiff;		// 向きの補正用変数
+
+	switch (pPolice->tackle.tackleState)
+	{
+	case TACKLESTATE_CHARGE:	// チャージ中
+
+		// 目的の向きを設定する
+		fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
+
+		// 向きの差分を求める
+		fRotDiff = fRotDest - pPolice->rot.y;
+
+		// 向きの正規化
+		RotNormalize(&fRotDiff);
+
+		// 角度を補正する
+		pPolice->rot.y += fRotDiff * STOP_POLICAR_ROT;
+
+		// 向きの正規化
+		RotNormalize(&pPolice->rot.y);
+
 		// 移動量を減衰させていく
 		pPolice->move.x *= POLICAR_ATTEN_STOP;
 
 		if (pPolice->move.x <= 0.0f)
 		{ // 移動量が0.0f以下になった場合
+
 			// 移動量を0に設定する
 			pPolice->move.x = 0.0f;
 		}
-	}
-	else
-	{ // 上記以外
-		Player *pPlayer = GetPlayer();		// プレイヤーの情報
 
-		//// 目的の向きを設定する
-		//fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
+		if (pPolice->tackle.nTackleCnt >= STOP_POLICAR_CNT)
+		{ // タックルのカウントになった場合
 
-		//// 向きの差分を求める
-		//fRotDiff = fRotDest - pPolice->rot.y;
+			// タックル状態にする
+			pPolice->tackle.tackleState = TACKLESTATE_BOOST;
+		}
 
-		//if (fRotDiff > D3DX_PI)
-		//{ // 角度が3.14fより大きかった場合
-		//	// 角度から1周分減らす
-		//	fRotDiff = -D3DX_PI;
-		//}
-		//else if (fRotDiff < -D3DX_PI)
-		//{ // 角度が-3.14fより小さかった場合
-		//	// 角度に1周分加える
-		//	fRotDiff = D3DX_PI;
-		//}
+		break;					// 抜け出す
 
-		//// 角度を補正する
-		//pPolice->rot.y += fRotDiff * 0.05f;
-
-		//if (pPolice->rot.y > D3DX_PI)
-		//{ // 角度が3.14fより大きかった場合
-		//	// 角度から1周分減らす
-		//	pPolice->rot.y = -D3DX_PI;
-		//}
-		//else if (pPolice->rot.y < -D3DX_PI)
-		//{ // 角度が-3.14fより小さかった場合
-		//	// 角度に1周分加える
-		//	pPolice->rot.y = D3DX_PI;
-		//}
+	case TACKLESTATE_BOOST:		// ブースト中
 
 		// 追加移動量を加算していく
-		pPolice->tackle.Tacklemove.x += POLICAR_TACKLE_ADD;
+		pPolice->tackle.tacklemove.x += POLICAR_TACKLE_ADD;
 
 		// 移動量を加算していく
 		pPolice->move.x += POLI_MOVE_FORWARD;
 
-		if (pPolice->tackle.Tacklemove.x >= MAX_POLICAR_TACKLE_MOVE)
+		if (pPolice->tackle.tacklemove.x >= MAX_POLICAR_TACKLE_MOVE)
 		{ // 追加分の移動量が一定を超えた場合
+
 			// 移動量を補正する
-			pPolice->tackle.Tacklemove.x = MAX_POLICAR_TACKLE_MOVE;
+			pPolice->tackle.tacklemove.x = MAX_POLICAR_TACKLE_MOVE;
 		}
 
 		if (pPolice->tackle.nTackleCnt >= FINISH_POLICAR_TACKLE)
 		{ // タックルのカウントが一定数以上になった場合
+
 			// タックルのカウントを0にする
 			pPolice->tackle.nTackleCnt = 0;
 
 			// 移動量を0にする
-			pPolice->tackle.Tacklemove.x = 0.0f;
+			pPolice->tackle.tacklemove.x = 0.0f;
 
 			//警察車両の探知処理
 			PatrolCarSearch(pPolice);
 		}
+
+		break;					// 抜け出す
 	}
 
 	//--------------------------------------------------------
 	//	位置の更新
 	//--------------------------------------------------------
-	pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
-	pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.Tacklemove.x;
+	pPolice->pos.x += sinf(pPolice->rot.y) * pPolice->tackle.tacklemove.x;
+	pPolice->pos.z += cosf(pPolice->rot.y) * pPolice->tackle.tacklemove.x;
 }
 
 //============================================================
@@ -1305,6 +1302,7 @@ void PoliceTrafficImprove(Police *pPolice)
 
 	if (pPolice->nTrafficCnt >= POLICAR_TRAFFIC_IMPROVE_CNT)
 	{ // 渋滞カウントが解除状態に入った場合
+
 		// カウントを0にする
 		pPolice->nTrafficCnt = 0;
 
