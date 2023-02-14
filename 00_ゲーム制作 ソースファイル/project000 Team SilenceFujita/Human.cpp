@@ -129,6 +129,7 @@ void UninitHuman(void)
 void UpdateHuman(void)
 {
 	int nCnt = 0;
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -230,7 +231,8 @@ void UpdateHuman(void)
 				HUMAN_WIDTH,					// 横幅
 				HUMAN_DEPTH,					// 奥行
 				&nCnt,							// 渋滞カウント
-				BOOSTSTATE_NONE					// ブースト状態
+				BOOSTSTATE_NONE,				// ブースト状態
+				&policeState					// 警察の状態
 			);
 
 			// プレイヤーの補正の更新処理

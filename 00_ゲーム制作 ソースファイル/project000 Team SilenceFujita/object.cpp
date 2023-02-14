@@ -662,7 +662,7 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 //	オブジェクトとの当たり判定
 //======================================================================================================================
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state)
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice)
 {
 	// 変数を宣言
 	D3DXVECTOR3 collPos;	// 当たり判定の中心座標
@@ -720,6 +720,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							}
 						}
 
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
+						}
+
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
 
@@ -755,6 +762,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+						}
+
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
 						}
 
 						// 渋滞カウントを加算する
@@ -801,6 +815,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							}
 						}
 
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
+						}
+
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
 
@@ -836,6 +857,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+						}
+
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
 						}
 
 						// 渋滞カウントを加算する
@@ -893,6 +921,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								}
 							}
 
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
+							}
+
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
 
@@ -928,6 +963,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+							}
+
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
 							}
 
 							// 渋滞カウントを加算する
@@ -974,6 +1016,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								}
 							}
 
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
+							}
+
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
 
@@ -1009,6 +1058,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+							}
+
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
 							}
 
 							// 渋滞カウントを加算する
