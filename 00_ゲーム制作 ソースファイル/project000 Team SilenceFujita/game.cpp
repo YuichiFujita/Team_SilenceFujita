@@ -24,7 +24,6 @@
 #include "Car.h"
 #include "effect.h"
 #include "gate.h"
-#include "junk.h"
 #include "life.h"
 #include "light.h"
 #include "meshdome.h"
@@ -77,7 +76,7 @@ void InitGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	// グローバル変数を初期化
 	g_gameState         = GAMESTATE_NORMAL;		// ゲームの状態
-	g_resultState       = RESULTSTATE_CLEAR;	// リザルトの状態
+	g_resultState       = RESULTSTATE_NONE;		// リザルトの状態
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
 	g_bGameEnd          = false;				// モードの遷移状況
@@ -113,9 +112,6 @@ void InitGame(void)
 
 	// ゲートの初期化
 	InitGate();
-
-	// がれきの初期化
-	InitJunk();
 
 	// カメラの初期化
 	InitCamera();
@@ -230,9 +226,6 @@ void UninitGame(void)
 	// ゲートの終了
 	UninitGate();
 
-	// がれきの終了
-	UninitJunk();
-
 	// カメラの終了
 	UninitCamera();
 
@@ -310,7 +303,7 @@ void UpdateGame(void)
 	if (g_bGameEnd == false)
 	{ // 遷移設定がされていない場合
 
-		if (GetExit() == true || GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
+		if (GetExit().bExit == true || GetTimerState() == TIMERSTATE_END || GetPlayer()->bUse == false)
 		{ // リザルトに遷移する条件が整った場合
 
 			// 遷移設定がされた状態にする
@@ -319,7 +312,7 @@ void UpdateGame(void)
 			// ゲーム画面の状態設定
 			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
 
-			if (GetExit() == true)
+			if (GetExit().bExit == true)
 			{ // クリアに成功した場合
 
 				// リザルトをクリア成功状態にする
@@ -388,18 +381,17 @@ void UpdateGame(void)
 		else
 		{ // カウンターが 0以下の場合
 
-			//if (UpdateAllClear() == true)
-			//{ // 全てのアップデートが終わっていた場合
-			//	// モード選択 (リザルト画面に移行)
-			//	SetFade(MODE_RESULT);
-			//}
+			if (UpdateAllClear() == true)
+			{ // 全てのアップデートが終わっていた場合
+				// モード選択 (リザルト画面に移行)
+				SetFade(MODE_RESULT);
+			}
 		}
 
 		// 処理を抜ける
 		break;
 	}
 
-#ifdef _DEBUG	// デバッグ処理
 	// ライトの更新
 	UpdateLight();
 
@@ -454,9 +446,6 @@ void UpdateGame(void)
 			// オブジェクトの更新
 			UpdateObject();
 
-			// がれきの更新
-			UpdateJunk();
-
 			// 車の更新処理
 			UpdateCar();
 
@@ -477,6 +466,35 @@ void UpdateGame(void)
 
 			// 2Dパーティクルの更新
 			Update2DParticle();
+
+			// カメラの更新
+			UpdateCamera();
+
+			// ビルボードの更新
+			UpdateBillboard();
+
+			// 体力バーの更新
+			UpdateLife();
+
+#if 1
+			// タイマーの更新
+			UpdateTimer();
+#endif
+
+			// 能力バーの更新
+			UpdateAbility();
+
+			// 速度バーの更新
+			UpdateVelocity();
+
+			// スコアの更新
+			UpdateScore();
+
+			// ボーナスの更新処理
+			UpdateBonus();
+
+			// 影の更新
+			UpdateShadow();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -486,33 +504,7 @@ void UpdateGame(void)
 		}
 	}
 
-	// カメラの更新
-	UpdateCamera();
-
-	// ビルボードの更新
-	UpdateBillboard();
-
-	// 体力バーの更新
-	UpdateLife();
-
-	// タイマーの更新
-	UpdateTimer();
-
-	// 能力バーの更新
-	UpdateAbility();
-
-	// 速度バーの更新
-	UpdateVelocity();
-
-	// スコアの更新
-	UpdateScore();
-
-	// ボーナスの更新処理
-	UpdateBonus();
-
-	// 影の更新
-	UpdateShadow();
-
+#ifdef _DEBUG	// デバッグ処理
 	if (GetKeyboardTrigger(DIK_F2) == true)
 	{ // [F2] が押された場合
 
@@ -551,106 +543,6 @@ void UpdateGame(void)
 
 		// 当たり判定の保存
 		TxtSaveCollision();
-	}
-#else
-	if (g_bPause == false)
-	{ // ポーズ状態ではない場合
-
-		// ライトの更新
-		UpdateLight();
-
-		// 天気の設定処理
-		SetWeather();
-
-		// 天気の更新処理
-		UpdateWeather();
-
-		// メッシュドームの更新
-		UpdateMeshDome();
-
-		// メッシュシリンダーの更新
-		UpdateMeshCylinder();
-
-		// メッシュフィールドの更新
-		UpdateMeshField();
-
-		// メッシュウォールの更新
-		UpdateMeshWall();
-
-		// プレイヤーの更新
-		UpdatePlayer();
-
-		// タイヤ痕の更新
-		UpdateTireMark();
-
-		// 警察の更新
-		UpdatePolice();
-
-		// 車の更新処理
-		UpdateCar();
-
-		// 人間の更新
-		UpdateHuman();
-
-		// オブジェクトの更新
-		UpdateObject();
-
-		// がれきの更新
-		UpdateJunk();
-
-		// ゲートの更新
-		UpdateGate();
-
-		// ビルボードの更新
-		UpdateBillboard();
-
-		// 送風機の更新
-		UpdateWind();
-
-		// 爆弾の更新
-		UpdateBomb();
-
-		// カメラの更新
-		UpdateCamera();
-
-		// エフェクトの更新
-		UpdateEffect();
-
-		// パーティクルの更新
-		UpdateParticle();
-
-		// 2Dエフェクトの更新
-		Update2DEffect();
-
-		// 2Dパーティクルの更新
-		Update2DParticle();
-
-		// 体力バーの更新
-		UpdateLife();
-
-		// タイマーの更新
-		UpdateTimer();
-
-		// 能力バーの更新
-		UpdateAbility();
-
-		// 速度バーの更新
-		UpdateVelocity();
-
-		// スコアの更新
-		UpdateScore();
-
-		// ボーナスの更新処理
-		UpdateBonus();
-
-		// 影の更新
-		UpdateShadow();
-	}
-	else
-	{ // ポーズ状態の場合
-
-		// ポーズの更新
-		UpdatePause();
 	}
 #endif
 }
@@ -696,9 +588,6 @@ void DrawGame(void)
 	// オブジェクトの描画
 	DrawObject();
 
-	// がれきの描画
-	DrawJunk();
-
 	// 警察の描画
 	DrawPolice();
 
@@ -729,7 +618,6 @@ void DrawGame(void)
 	// 天気の描画処理
 	DrawWeather();
 	
-	
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードの場合
@@ -755,7 +643,6 @@ void DrawGame(void)
 	SetCamera(CAMERATYPE_UI);
 
 #if 1
-
 	// 体力バーの描画
 	DrawLife();
 
@@ -820,6 +707,15 @@ GAMESTATE GetGameState(void)
 }
 
 //======================================================================================================================
+//	ゲーム状態の取得処理
+//======================================================================================================================
+RESULTSTATE GetResultState(void)
+{
+	// ゲーム終了時の状態を返す
+	return g_resultState;
+}
+
+//======================================================================================================================
 //	ポーズ状態の取得処理
 //======================================================================================================================
 bool GetPause(void)
@@ -835,54 +731,4 @@ int GetGameMode(void)
 {
 	// ゲームモードを返す
 	return g_nGameMode;
-}
-
-//================================
-//外積の当たり判定
-//================================
-void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3DXVECTOR3 WallRpos, D3DXVECTOR3 WallLpos, bool *bUse, int *nShadow)
-{
-	D3DXVECTOR3 vecMove, vecLine, vecTopos, posCross;	//外積の変数
-	float fRate;										//割合の変数
-
-	//弾の軌跡を測る
-	vecMove.x = (Targetpos->x - TargetposOld->x);
-	vecMove.y = (Targetpos->y - TargetposOld->y);
-	vecMove.z = (Targetpos->z - TargetposOld->z);
-
-	//壁の境界線を測る
-	vecLine.x = (WallRpos.x - WallLpos.x);
-	vecLine.y = (WallRpos.y - WallLpos.y);
-	vecLine.z = (WallRpos.z - WallLpos.z);
-
-	//壁の始点から弾の位置の距離を測る
-	vecTopos.x = (Targetpos->x - WallLpos.x);
-	vecTopos.y = (Targetpos->y - WallLpos.y);
-	vecTopos.z = (Targetpos->z - WallLpos.z);
-
-	//割合を求める
-	fRate = ((vecTopos.z * vecMove.x) - (vecTopos.x * vecMove.z)) / ((vecLine.z * vecMove.x) - (vecLine.x * vecMove.z));
-
-	//交点を求める
-	posCross.x = vecLine.x * fRate - WallLpos.x;
-	posCross.y = vecLine.y * fRate - WallLpos.y;
-	posCross.z = vecLine.z * fRate - WallLpos.z;
-
-	if ((vecLine.z * vecTopos.x) - (vecLine.x * vecTopos.z) < 0.0f)
-	{//境界線を超えた場合
-		if (fRate >= 0.0f && fRate <= 1.0f)
-		{//割合が0.0f～1.0fの間だった(境界線を超えた)場合
-			//位置を設定する
-			Targetpos = &posCross;
-		}
-	}
-}
-
-//=======================================
-// ゲーム状態の取得処理
-//=======================================
-RESULTSTATE GetResultState(void)
-{
-	// ゲーム終了時の状態を返す
-	return g_resultState;
 }
