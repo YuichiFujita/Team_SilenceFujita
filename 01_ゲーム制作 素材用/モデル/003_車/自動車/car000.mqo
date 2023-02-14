@@ -2,10 +2,10 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos 98.7177 -8.4907 720.5896
+	pos 5.9955 -40.8356 720.5896
 	lookat 0.0000 0.0000 0.0000
-	head 848.1151
-	pich 0.2892
+	head 846.9139
+	pich 0.5508
 	bank 0.0000
 	ortho 0
 	zoom2 2.5411
@@ -17,7 +17,7 @@ Scene {
 		}
 	}
 }
-Material 10 {
+Material 11 {
 	"mat1" col(0.965 0.831 0.184 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 	"mat2" col(0.733 0.733 0.733 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.300) power(5.00)
 	"mat3" col(0.000 0.000 0.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
@@ -28,6 +28,7 @@ Material 10 {
 	"mat7" col(0.329 0.357 0.384 0.850) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 	"mat9" col(1.000 0.082 0.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 	"mat10" col(1.000 0.953 0.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
+	"基準モデルのカラー" col(1.000 1.000 1.000 0.300) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 }
 Object "車　外装" {
 	visible 0
@@ -1048,7 +1049,7 @@ Object "車　外装" {
 }
 Object "車　外装1" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 70.0
 	color 0.898 0.498 0.698
@@ -3137,7 +3138,7 @@ Object "車　外装1" {
 }
 Object "車　前パーツ" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 70.0
 	color 0.898 0.498 0.698
@@ -3219,7 +3220,7 @@ Object "車　前パーツ" {
 }
 Object "車　外装　ライト" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -3823,7 +3824,7 @@ Object "車　外装　ライト" {
 }
 Object "車　後パーツ" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 70.0
 	color 0.898 0.498 0.698
@@ -3905,7 +3906,7 @@ Object "車　後パーツ" {
 }
 Object "車　タイヤ" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -4453,7 +4454,7 @@ Object "車　タイヤ" {
 }
 Object "車　下部" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 70.0
 	color 0.898 0.498 0.698
@@ -4513,7 +4514,7 @@ Object "車　下部" {
 }
 Object "車　内部" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -4741,7 +4742,7 @@ Object "車　内部" {
 }
 Object "車　椅子" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -5373,7 +5374,7 @@ Object "車　椅子" {
 }
 Object "車　窓" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -5435,7 +5436,7 @@ Object "車　窓" {
 }
 Object "車　外装　謎パーツ" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -5623,7 +5624,7 @@ Object "車　外装　謎パーツ" {
 }
 Object "車　外装　とって" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -5779,7 +5780,7 @@ Object "車　外装　とって" {
 }
 Object "車　パイプ" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -5855,7 +5856,7 @@ Object "車　パイプ" {
 }
 Object "車　ブースター" {
 	visible 15
-	locking 0
+	locking 1
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -6768,6 +6769,32 @@ Object "車　ブースター" {
 		4 V(200 408 411 409) M(1) UV(0.50000 0.50000 0.50000 0.14819 0.45617 0.14819 0.45617 0.50000)
 		4 V(402 404 412 410) M(1) UV(0.45617 0.50000 0.45617 0.82555 0.45617 0.82555 0.45617 0.50000)
 		4 V(412 407 406 410) M(1) UV(0.45617 0.82555 0.50000 0.82555 0.50000 0.50000 0.45617 0.50000)
+	}
+}
+Object "基準の大きさ（大型車）" {
+	visible 15
+	locking 0
+	shading 1
+	facet 59.5
+	color 0.898 0.498 0.698
+	color_type 0
+	vertex 8 {
+		-103.9852 216.6846 194.6800
+		-103.9852 11.3307 191.6636
+		107.8761 216.6846 194.6800
+		107.8761 11.3307 191.6636
+		107.8761 216.6846 -172.4489
+		107.8761 11.3307 -175.4651
+		-103.9852 216.6846 -172.4489
+		-103.9852 11.3307 -175.4651
+	}
+	face 6 {
+		4 V(0 2 3 1) M(10) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
+		4 V(2 4 5 3) M(10) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
+		4 V(4 6 7 5) M(10) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
+		4 V(6 0 1 7) M(10) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
+		4 V(6 4 2 0) M(10) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
+		4 V(1 3 5 7) M(10) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
 	}
 }
 Eof

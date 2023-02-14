@@ -226,7 +226,7 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 
 		// AI系のセットアップ
 		TxtSetAI();
-	}
+	}	
 }
 
 //==================================================================================
