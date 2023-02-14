@@ -237,12 +237,13 @@ void UpdatePolice(void)
 					// オブジェクトとの当たり判定
 					CollisionObject
 					( // 引数
-						&g_aPolice[nCntPolice].pos,		// 現在の位置
-						&g_aPolice[nCntPolice].posOld,	// 前回の位置
-						&g_aPolice[nCntPolice].move,	// 移動量
-						POLICAR_WIDTH,					// 横幅
-						POLICAR_DEPTH,					// 奥行
-						&g_aPolice[nCntPolice].nTrafficCnt	// 渋滞カウント
+						&g_aPolice[nCntPolice].pos,			// 現在の位置
+						&g_aPolice[nCntPolice].posOld,		// 前回の位置
+						&g_aPolice[nCntPolice].move,		// 移動量
+						POLICAR_WIDTH,						// 横幅
+						POLICAR_DEPTH,						// 奥行
+						&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
+						BOOSTSTATE_NONE						// ブーストの状態
 					);
 				}
 

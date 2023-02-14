@@ -395,7 +395,7 @@ void UpdateResult(void)
 void DrawResult(void)
 {
 	// リザルトの描画全体処理
-	DrawResultChunk();				
+	DrawResultChunk();
 
 	LPDIRECT3DDEVICE9 pDevice;							//デバイスへのポインタ
 

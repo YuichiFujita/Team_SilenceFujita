@@ -27,6 +27,7 @@
 #include "weather.h"
 
 #include "bonus.h"
+#include "game.h"
 
 //==================================================================================
 //	四頂点の位置の計算処理
@@ -76,6 +77,52 @@ float LineOuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 po
 
 	// 外積の計算結果を返す
 	return (vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z);
+}
+
+//==================================================================================
+//	外積の当たり判定
+//==================================================================================
+//	境界線にぶつかっていた場合、ぶつかった位置を求める際に使用
+//==================================================================================
+void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3DXVECTOR3 WallRpos, D3DXVECTOR3 WallLpos, bool *bUse, int *nShadow)
+{
+	// 変数を宣言
+	D3DXVECTOR3 vecMove, vecLine, vecTopos, posCross;	// 外積の変数
+	float       fRate;									// 割合の変数
+
+	// 弾の軌跡を測る
+	vecMove.x = (Targetpos->x - TargetposOld->x);
+	vecMove.y = (Targetpos->y - TargetposOld->y);
+	vecMove.z = (Targetpos->z - TargetposOld->z);
+
+	// 壁の境界線を測る
+	vecLine.x = (WallRpos.x - WallLpos.x);
+	vecLine.y = (WallRpos.y - WallLpos.y);
+	vecLine.z = (WallRpos.z - WallLpos.z);
+
+	// 壁の始点から弾の位置の距離を測る
+	vecTopos.x = (Targetpos->x - WallLpos.x);
+	vecTopos.y = (Targetpos->y - WallLpos.y);
+	vecTopos.z = (Targetpos->z - WallLpos.z);
+
+	// 割合を求める
+	fRate = ((vecTopos.z * vecMove.x) - (vecTopos.x * vecMove.z)) / ((vecLine.z * vecMove.x) - (vecLine.x * vecMove.z));
+
+	// 交点を求める
+	posCross.x = vecLine.x * fRate - WallLpos.x;
+	posCross.y = vecLine.y * fRate - WallLpos.y;
+	posCross.z = vecLine.z * fRate - WallLpos.z;
+
+	if ((vecLine.z * vecTopos.x) - (vecLine.x * vecTopos.z) < 0.0f)
+	{ // 境界線を超えた場合
+
+		if (fRate >= 0.0f && fRate <= 1.0f)
+		{ // 割合が0.0f～1.0fの間だった(境界線を超えた)場合
+
+			// 位置を設定する
+			Targetpos = &posCross;
+		}
+	}
 }
 
 //==================================================================================
@@ -385,7 +432,7 @@ void DrawResultChunk(void)
 //==================================================================================
 //　未終了のアップデートがないかを判断する処理
 //==================================================================================
-bool UpdateAllClear(void)
+bool UpdateAllClear(RESULTSTATE state)
 {
 	bool bAllClear = true;			// 返り値用の変数(全てのアップデートが終了している)
 	

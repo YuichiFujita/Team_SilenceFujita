@@ -625,10 +625,10 @@ void SetEdit(void)
 		if (GetKeyboardTrigger(DIK_0) == true)
 		{//0キーを押した場合
 			for (int nCount = 0; nCount < MAX_MATERIAL; nCount++)
-			{//マテリアルの透明度を1.0fにする
-				//透明度を1.0fにする
+			{
+				// 透明度を元に戻す
 				g_EditObject.EditMaterial[g_EditObject.nType][nCount].MatD3D.Ambient.a = g_EditObject.MatCopy[g_EditObject.nType][nCount].MatD3D.Ambient.a;
-				g_EditObject.EditMaterial[g_EditObject.nType][nCount].MatD3D.Diffuse.a = g_EditObject.MatCopy[g_EditObject.nType][nCount].MatD3D.Ambient.a;
+				g_EditObject.EditMaterial[g_EditObject.nType][nCount].MatD3D.Diffuse.a = g_EditObject.MatCopy[g_EditObject.nType][nCount].MatD3D.Diffuse.a;
 			}
 
 			//代入する向き状態を設定
