@@ -178,12 +178,13 @@ void UpdateCar(void)
 					// オブジェクトとの当たり判定
 					CollisionObject
 					( // 引数
-						&g_aCar[nCntCar].pos,		// 現在の位置
-						&g_aCar[nCntCar].posOld,	// 前回の位置
-						&g_aCar[nCntCar].move,		// 移動量
-						CAR_WIDTH,					// 横幅
-						CAR_DEPTH,					// 奥行
-						&g_aCar[nCntCar].nTrafficCnt// 渋滞カウント
+						&g_aCar[nCntCar].pos,			// 現在の位置
+						&g_aCar[nCntCar].posOld,		// 前回の位置
+						&g_aCar[nCntCar].move,			// 移動量
+						CAR_WIDTH,						// 横幅
+						CAR_DEPTH,						// 奥行
+						&g_aCar[nCntCar].nTrafficCnt,	// 渋滞カウント
+						BOOSTSTATE_NONE					// ブースト状態
 					);
 
 					// 車の停止処理

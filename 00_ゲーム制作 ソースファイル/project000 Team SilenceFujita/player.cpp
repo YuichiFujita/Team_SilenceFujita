@@ -200,7 +200,7 @@ void DrawPlayer(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
 	D3DXMATERIAL      redMat;					// マテリアルデータ (赤)
-	D3DXMATERIAL      flashMat;					// マテリアルデータ (透明)
+	D3DXMATERIAL	  UnrivaledMat;				// マテリアルデータ (無敵)
 
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
@@ -262,15 +262,15 @@ void DrawPlayer(void)
 				{ // 透明状況の場合
 
 					// 構造体の要素をクリア
-					ZeroMemory(&flashMat, sizeof(D3DXMATERIAL));
+					ZeroMemory(&UnrivaledMat, sizeof(D3DXMATERIAL));
 
 					// 拡散光・環境光・自己発光を透明にする
-					flashMat.MatD3D.Diffuse  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-					flashMat.MatD3D.Ambient  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-					flashMat.MatD3D.Emissive = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+					UnrivaledMat.MatD3D.Diffuse  = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
+					UnrivaledMat.MatD3D.Ambient  = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
+					UnrivaledMat.MatD3D.Emissive = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
 
 					// マテリアルの設定
-					pDevice->SetMaterial(&flashMat.MatD3D);			// 透明
+					pDevice->SetMaterial(&UnrivaledMat.MatD3D);			// 透明
 				}
 				else
 				{ // 透明状況じゃない場合
@@ -478,12 +478,13 @@ void UpdateNormalPlayer(void)
 	// オブジェクトとの当たり判定
 	CollisionObject
 	( // 引数
-		&g_player.pos,		// 現在の位置
-		&g_player.oldPos,	// 前回の位置
-		&g_player.move,		// 移動量
-		PLAY_WIDTH,			// 横幅
-		PLAY_DEPTH,			// 奥行
-		&nTrafficCnt		// 渋滞カウント
+		&g_player.pos,			// 現在の位置
+		&g_player.oldPos,		// 前回の位置
+		&g_player.move,			// 移動量
+		PLAY_WIDTH,				// 横幅
+		PLAY_DEPTH,				// 奥行
+		&nTrafficCnt,			// 渋滞カウント
+		g_player.boost.state	// ブーストの状態
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -620,12 +621,13 @@ void UpdateOverPlayer(void)
 	// オブジェクトとの当たり判定
 	CollisionObject
 	( // 引数
-		&g_player.pos,		// 現在の位置
-		&g_player.oldPos,	// 前回の位置
-		&g_player.move,		// 移動量
-		PLAY_WIDTH,			// 横幅
-		PLAY_DEPTH,			// 奥行
-		&nTrafficCnt		// 渋滞カウント
+		&g_player.pos,			// 現在の位置
+		&g_player.oldPos,		// 前回の位置
+		&g_player.move,			// 移動量
+		PLAY_WIDTH,				// 横幅
+		PLAY_DEPTH,				// 奥行
+		&nTrafficCnt,			// 渋滞カウント
+		g_player.boost.state	// ブーストの状態
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
