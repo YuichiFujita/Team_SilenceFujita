@@ -91,6 +91,9 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_GATE\\gate000.x",			// ゲート (建物)
 	"data\\MODEL_GATE\\gate001.x",			// ゲート (鉄板)
 
+	// がれきモデル
+	"data\\MODEL_JUNK\\Junk.x",				// がれき
+
 	// エディットモデル
 	"data\\MODEL_EDIT\\collision000.x",		// 当たり判定
 };
