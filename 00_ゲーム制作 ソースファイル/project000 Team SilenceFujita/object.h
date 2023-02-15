@@ -11,6 +11,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "model.h"
+#include "game.h"
 #include "player.h"
 #include "Police.h"
 
@@ -118,6 +119,7 @@ typedef struct
 	ACTIONSTATE  state;					// 状態
 	Coll_Info    collInfo;				// 当たり判定情報
 	Smash_Object smash;					// 吹っ飛び状態
+	Judge		 judge;					// ジャッジ
 	int          nLife;					// 体力
 	int          nCollisionType;		// 当たり判定の種類
 	int          nShadowType;			// 影の種類
