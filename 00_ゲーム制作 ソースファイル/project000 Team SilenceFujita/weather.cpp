@@ -1107,22 +1107,16 @@ WEATHERTYPE GetWeather(void)
 void WeatherRain(void)
 {
 	D3DXVECTOR3 Camerapos = GetCamera()->posV;	// カメラの視点
+	D3DXVECTOR3 Camerarot = GetCamera()->rot;	// カメラの向き
 	D3DXVECTOR3 posRain;						// 雨の降る位置
 	float moveRain;								// 雨の移動量
-	float rotRain;								// 雨の降っている方向
 
 	for (int nCnt = 0; nCnt < RAIN_GENERATE; nCnt++)
 	{
 		// 雨の位置を設定する
-		posRain.x = Camerapos.x + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
+		posRain.x = Camerapos.x + (sinf(Camerarot.y) * SHIFT_RAIN) + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
 		posRain.y = Camerapos.y + RAIN_HEIGHT;
-		posRain.z = Camerapos.z + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
-
-		// 角度を取る
-		rotRain = atan2f(posRain.x - Camerapos.x, posRain.z - Camerapos.z);
-
-		posRain.x += sinf(rotRain) * SHIFT_RAIN;
-		posRain.z += cosf(rotRain) * SHIFT_RAIN;
+		posRain.z = Camerapos.z + (cosf(Camerarot.y) * SHIFT_RAIN) + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
 
 		// 速度を設定する
 		moveRain = (rand() % RAIN_MOVE_RANGE) + RAIN_MOVE_LEAST;
@@ -1143,22 +1137,16 @@ void WeatherRain(void)
 void WeatherSnow(void)
 {
 	D3DXVECTOR3 Camerapos = GetCamera()->posV;	// カメラの視点
+	D3DXVECTOR3 Camerarot = GetCamera()->rot;	// カメラの向き
 	D3DXVECTOR3 posSnow;						// 雪の降る位置
 	float moveSnow;								// 雪の移動量
-	float rotSnow;								// 雪の降っている方向
 
 	for (int nCnt = 0; nCnt < SNOW_GENERATE; nCnt++)
 	{
 		// 雨の位置を設定する
-		posSnow.x = Camerapos.x + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
+		posSnow.x = Camerapos.x + (sinf(Camerarot.y) * SHIFT_SNOW) + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
 		posSnow.y = Camerapos.y + SNOW_HEIGHT;
-		posSnow.z = Camerapos.z + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
-
-		// 角度を取る
-		rotSnow = atan2f(posSnow.x - Camerapos.x, posSnow.z - Camerapos.z);
-
-		posSnow.x += sinf(rotSnow) * SHIFT_SNOW;
-		posSnow.z += cosf(rotSnow) * SHIFT_SNOW;
+		posSnow.z = Camerapos.z + (cosf(Camerarot.y) * SHIFT_SNOW) + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
 
 		// 速度を設定する
 		moveSnow = (float)(rand() % SNOW_MOVE_RANGE) + SNOW_MOVE_LEAST;

@@ -13,10 +13,10 @@
 //	ƒ}ƒNƒ’è‹`(‰J)
 //**********************************************************************************************************************
 #define MAX_RAIN			(512)						// ‰J‚ÌÅ‘å”
-#define RAIN_RANGE			(900)						// ‰J‚Ì~‚é”ÍˆÍ
+#define RAIN_RANGE			(800)						// ‰J‚Ì~‚é”ÍˆÍ
 #define RAIN_GENERATE		(20)						// ‰J‚Ì¶¬”
 #define RAIN_MOVE_RANGE		(20)						// ‰J‚Ì‘¬“x‚Ì”ÍˆÍ
-#define SHIFT_RAIN			(150.0f)					// ‰J‚Ì‚¸‚ç‚·•
+#define SHIFT_RAIN			(500.0f)					// ‰J‚Ì‚¸‚ç‚·•
 #define RAIN_RADIUS_X		(0.3f)						// ‰J‚Ì”¼Œa(X²)
 #define RAIN_RADIUS_Y		(4.0f)						// ‰J‚Ì”¼Œa(Y²)
 #define RAIN_HEIGHT			(300.0f)					// ‰J‚Ì~‚é‚‚³
@@ -26,11 +26,11 @@
 //**********************************************************************************************************************
 //	ƒ}ƒNƒ’è‹`(á)
 //**********************************************************************************************************************
-#define MAX_SNOW			(4096)						// á‚ÌÅ‘å”
-#define SNOW_RANGE			(900)						// á‚Ì~‚é”ÍˆÍ
+#define MAX_SNOW			(2048)						// á‚ÌÅ‘å”
+#define SNOW_RANGE			(800)						// á‚Ì~‚é”ÍˆÍ
 #define SNOW_GENERATE		(30)						// á‚Ì¶¬”
 #define SNOW_MOVE_RANGE		(6)							// á‚Ì‘¬“x‚Ì”ÍˆÍ
-#define SHIFT_SNOW			(100.0f)					// á‚Ì‚¸‚ç‚·•
+#define SHIFT_SNOW			(500.0f)					// á‚Ì‚¸‚ç‚·•
 #define SNOW_RADIUS_X		(1.2f)						// á‚Ì”¼Œa(X²)
 #define SNOW_RADIUS_Y		(1.2f)						// á‚Ì”¼Œa(Y²)
 #define SNOW_HEIGHT			(300.0f)					// á‚Ì~‚é‚‚³

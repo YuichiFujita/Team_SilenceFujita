@@ -264,7 +264,7 @@ void Draw2DEffect(void)
 	for (nCntEffect = 0; nCntEffect < MAX_EFFECT; nCntEffect++)
 	{
 		if (g_a2DEffect[nCntEffect].bUse == true)
-		{//爆発が使用されている
+		{//エフェクトが使用されている
 
 			//テクスチャの設定
 			pDevice->SetTexture(0, g_apTexture2DEffect[TEXTURE_2DEFFECT_NORMAL]);

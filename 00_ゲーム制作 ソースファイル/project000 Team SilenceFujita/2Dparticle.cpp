@@ -30,6 +30,8 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
+void Particle2DScoreFire(Particle2D *pParticle);						// スコア加算時の花火エフェクト
+void Particle2DBonusFire(Particle2D *pParticle);						// ボーナス出現時の花火エフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -78,7 +80,7 @@ void Update2DParticle(void)
 			if (g_a2DParticle[nCnt2DParticle].nLife <= 0)
 			{ // 寿命が尽きた場合
 
-			  // 使用されていない状態にする
+				// 使用されていない状態にする
 				g_a2DParticle[nCnt2DParticle].bUse = false;
 			}
 		}
@@ -110,12 +112,101 @@ void Set2DParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLE2DTYPE type, int nSpa
 			g_a2DParticle[nCnt2DParticle].nSpawn = nSpawn;	// エフェクト数
 			g_a2DParticle[nCnt2DParticle].nLife	 = nLife;	// 寿命
 
+			switch (type)
+			{
+			case PARTICLE2DTYPE_SCORE_FIRE:		// スコア加算時の花火
+
+				// スコア加算時の花火エフェクト
+				Particle2DScoreFire(&g_a2DParticle[nCnt2DParticle]);
+
+				break;							// 抜け出す
+
+			case PARTICLE2DTYPE_BONUS_FIRE:		// ボーナス出現時の花火
+
+				// ボーナス出現時の花火エフェクト
+				Particle2DBonusFire(&g_a2DParticle[nCnt2DParticle]);
+
+				break;							// 抜け出す
+			}
+
 			// 使用している状態にする
 			g_a2DParticle[nCnt2DParticle].bUse = true;
 
 			// 処理を抜ける
 			break;
 		}
+	}
+}
+
+//======================================================================================================================
+// スコア加算時の花火エフェクト
+//======================================================================================================================
+void Particle2DScoreFire(Particle2D *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = 0.0f;
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= (float)(rand() % 6) + 2.0f;
+		move.y *= (float)(rand() % 6) + 2.0f;
+
+		// エフェクトの設定
+		Set2DEffect
+		( // 引数
+			pParticle->pos, // 位置
+			move, 			// 移動量
+			pParticle->col, // 色
+			30, 			// 寿命
+			30.0f, 			// 半径
+			0.5f			// 減衰係数
+		);
+	}
+}
+
+//======================================================================================================================
+// ボーナス出現時の花火エフェクト
+//======================================================================================================================
+void Particle2DBonusFire(Particle2D *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = 0.0f;
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= (float)(rand() % 6) + 2.0f;
+		move.y *= (float)(rand() % 6) + 2.0f;
+
+		// エフェクトの設定
+		Set2DEffect
+		( // 引数
+			pParticle->pos, // 位置
+			move, 			// 移動量
+			pParticle->col, // 色
+			30, 			// 寿命
+			15.0f, 			// 半径
+			0.2f			// 減衰係数
+		);
 	}
 }
 
