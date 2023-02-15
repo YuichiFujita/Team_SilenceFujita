@@ -91,12 +91,17 @@ void InitCar(void)
 		g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態
 		g_aCar[nCntCar].bUse		= false;							// 使用状況
 
-		//曲がり角の情報の初期化
+		// 曲がり角の情報の初期化
 		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle   = CURVE_LEFT;	// 左に曲がる
 		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;			// カーブする番地
 		g_aCar[nCntCar].carCurveInfo.nSKipCnt    = 0;						// スキップする曲がり角の回数
 		g_aCar[nCntCar].carCurveInfo.rotDest     = g_aCar[nCntCar].rot;		// 前回の向き
 		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;				// 現在の車の行動
+
+		//ジャッジの情報の初期化
+		g_aCar[nCntCar].judge.state = JUDGESTATE_JUSTICE;			// 善悪
+		g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;		// チカチカ状態
+		g_aCar[nCntCar].judge.col = JUDGE_WHITE;					// ピカピカの色
 
 		// モデル情報の初期化
 		g_aCar[nCntCar].modelData.dwNumMat = 0;						// マテリアルの数
@@ -168,6 +173,13 @@ void UpdateCar(void)
 
 					//位置を0.0fに戻す
 					g_aCar[nCntCar].pos.y = 0.0f;
+				}
+
+				if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+				{ // 悪者だった場合
+
+					// ジャッジの更新処理
+					UpdateJudge(&g_aCar[nCntCar].judge);
 				}
 			}
 
@@ -325,8 +337,23 @@ void DrawCar(void)
 				else
 				{ // 攻撃状態がそれ以外の状態の場合
 
-					// マテリアルの設定
-					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					// マテリアルのコピーに代入する
+					g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
+
+					if (g_aCar[nCntCar].judge.state == JUDGESTATE_JUSTICE)
+					{ // 良い奴の場合
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+					else
+					{ // 悪い奴の場合
+
+						// 自己発光を代入する
+						g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Emissive = g_aCar[nCntCar].judge.col;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
+					}
 				}
 
 				// テクスチャの設定
@@ -395,6 +422,23 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
 			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
 			g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;																		// 走っている状態
+
+
+			// ジャッジの情報の設定
+			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色
+
+			if (nCntCar % 2 == 0)
+			{ // 2の倍数だった場合
+
+				g_aCar[nCntCar].judge.state = JUDGESTATE_EVIL;					// 善悪
+				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+			else
+			{ // 上記以外
+
+				g_aCar[nCntCar].judge.state = JUDGESTATE_JUSTICE;				// 善悪
+				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
 
 			// 処理を抜ける
 			break;

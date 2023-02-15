@@ -227,12 +227,6 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 		// AI系のセットアップ
 		TxtSetAI();
 	}
-
-	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++)
-	{
-		// 車の設定処理
-		SetCar(D3DXVECTOR3(200.0f, 0.0f, 200.0f));
-	}
 }
 
 //==================================================================================
@@ -510,4 +504,53 @@ bool UpdateAllClear(RESULTSTATE state)
 
 	// 更新状況を返す
 	return bAllClear;
+}
+
+//==================================================================================
+// ジャッジの更新処理
+//==================================================================================
+// 悪い奴の自己発光を変化させる処理
+//==================================================================================
+void UpdateJudge(Judge *pJudge)
+{
+	switch (pJudge->ticatica)
+	{
+	case CHICASTATE_BLACKOUT:		// 暗転状態
+
+		// 暗転させていく
+		pJudge->col.r -= JUDGE_FLASH;
+		pJudge->col.g -= JUDGE_FLASH;
+		pJudge->col.b -= JUDGE_FLASH;
+
+		if (pJudge->col.r <= JUDGE_BLACK_LINE)
+		{ // 色が一定数を超えた場合
+
+			// 色を補正する
+			pJudge->col = JUDGE_BLACK;
+
+			// 明転状態にする
+			pJudge->ticatica = CHICASTATE_WHITEOUT;
+		}
+
+		break;						// 抜け出す
+
+	case CHICASTATE_WHITEOUT:		// 明転状態
+
+		// 明転させていく
+		pJudge->col.r += JUDGE_FLASH;
+		pJudge->col.g += JUDGE_FLASH;
+		pJudge->col.b += JUDGE_FLASH;
+
+		if (pJudge->col.r >= JUDGE_WHITE_LINE)
+		{ // 色が一定数を超えた場合
+
+			// 色を補正する
+			pJudge->col = JUDGE_WHITE;
+
+			// 暗転状態にする
+			pJudge->ticatica = CHICASTATE_BLACKOUT;
+		}
+
+		break;						// 抜け出す
+	}
 }

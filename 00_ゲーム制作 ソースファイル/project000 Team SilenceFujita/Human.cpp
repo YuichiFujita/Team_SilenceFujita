@@ -99,6 +99,11 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].modelData.size = INIT_SIZE;				// 縦幅
 		g_aHuman[nCntHuman].modelData.fRadius = 0.0f;				// 半径
 
+		// ジャッジの情報の初期化
+		g_aHuman[nCntHuman].judge.col = JUDGE_WHITE;				// ピカピカの色
+		g_aHuman[nCntHuman].judge.state = JUDGESTATE_JUSTICE;		// 善悪
+		g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
+
 		// 曲がり角関係の初期化
 		g_aHuman[nCntHuman].curveInfo.actionState = HUMANACT_WALK;	// 歩行状態
 		g_aHuman[nCntHuman].curveInfo.nRandamRoute = 0;				// 進むルートの種類
@@ -163,6 +168,13 @@ void UpdateHuman(void)
 				g_aHuman[nCntHuman].bMove,			// 移動しているか
 				g_aHuman[nCntHuman].fMaxMove		// 移動量の最大数
 			);
+
+			if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_EVIL)
+			{ // 悪者だった場合
+
+				// ジャッジの更新処理
+				UpdateJudge(&g_aHuman[nCntHuman].judge);
+			}
 
 			//人間のリアクション処理
 			ReactionHuman(&g_aHuman[nCntHuman]);
@@ -302,8 +314,23 @@ void DrawHuman(void)
 
 				default:		//上記以外
 
-					// マテリアルの設定
-					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					// マテリアルのコピーに代入する
+					g_aHuman[nCntHuman].matCopy[nCntMat] = pMat[nCntMat];
+
+					if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_JUSTICE)
+					{ // 良い奴の場合
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+					else
+					{ // 悪い奴の場合
+
+						// 自己発光を代入する
+						g_aHuman[nCntHuman].matCopy[nCntMat].MatD3D.Emissive = g_aHuman[nCntHuman].judge.col;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&g_aHuman[nCntHuman].matCopy[nCntMat].MatD3D);
+					}
 
 					break;					//抜け出す
 				}
@@ -354,6 +381,17 @@ void SetHuman(D3DXVECTOR3 pos)
 				&g_aHuman[nCntHuman].bUse		// 影の親の使用状況
 			);
 
+			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
+
+			//マテリアル情報に対するポインタを取得
+			pMat = (D3DXMATERIAL*)g_aHuman[nCntHuman].modelData.pBuffMat->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_aHuman[nCntHuman].modelData.dwNumMat; nCntMat++)
+			{
+				//マテリアルの情報を取得する
+				g_aHuman[nCntHuman].matCopy[nCntMat] = pMat[nCntMat];
+			}
+
 			// 影の位置設定
 			SetPositionShadow(g_aHuman[nCntHuman].nShadowID, g_aHuman[nCntHuman].pos, g_aHuman[nCntHuman].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
@@ -393,6 +431,22 @@ void SetHuman(D3DXVECTOR3 pos)
 				g_aHuman[nCntHuman].pos.x = g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[0].x - (HUMAN_WIDTH * 2);
 
 				break;			// 抜け出す
+			}
+
+			// ジャッジの情報の設定
+			g_aHuman[nCntHuman].judge.col = JUDGE_WHITE;			// ピカピカの色
+
+			if (nCntHuman % 2 == 0)
+			{ // 2の倍数だった場合
+
+				g_aHuman[nCntHuman].judge.state = JUDGESTATE_EVIL;					// 善悪
+				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+			else
+			{ // 上記以外
+
+				g_aHuman[nCntHuman].judge.state = JUDGESTATE_JUSTICE;				// 善悪
+				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
 			}
 
 			// 処理を抜ける

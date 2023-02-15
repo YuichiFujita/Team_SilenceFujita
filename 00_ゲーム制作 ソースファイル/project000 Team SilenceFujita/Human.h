@@ -52,6 +52,7 @@ typedef struct
 	bool		 bUse;					// 使用しているか
 	HUMANSTATE	 state;					// 状態
 	HUMANCURVE	 curveInfo;				// 曲がり角の情報
+	D3DXMATERIAL matCopy[MAX_MATERIAL];	// マテリアルのコピー
 	Judge		 judge;					// ジャッジ
 }Human;
 
