@@ -35,8 +35,9 @@
 //************************************************************
 typedef enum
 {
-	ATTACKSTATE_NORMAL = 0,			// 通常状態
+	ATTACKSTATE_NONE = 0,			// 何もしない状態
 	ATTACKSTATE_BOMB,				// ボム攻撃状態
+	ATTACKSTATE_WAIT,				// 攻撃待機状態
 	ATTACKSTATE_MAX					// この列挙型の総数
 }ATTACKSTATE;
 
@@ -85,6 +86,15 @@ typedef struct
 }PlayerWind;
 
 //************************************************************
+//	構造体定義 (PlayerBomb)
+//************************************************************
+typedef struct
+{
+	ATTACKSTATE state;				// 攻撃状態
+	int         nCounter;			// 攻撃管理カウンター
+}PlayerBomb;
+
+//************************************************************
 //	構造体定義 (PlayerDrift)
 //************************************************************
 typedef struct
@@ -104,10 +114,10 @@ typedef struct
 	D3DXVECTOR3 destRot;			// 目標の向き
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	ACTIONSTATE state;				// プレイヤーの状態
-	ATTACKSTATE atkState;			// 攻撃の状態
 	Model       modelData;			// モデル情報
 	PlayerBoost boost;				// ブーストの情報
-	PlayerWind	wind;				// 風の情報
+	PlayerWind  wind;				// 風の情報
+	PlayerBomb  bomb;				// 爆弾の情報
 	PlayerDrift drift;				// ドリフトの状況
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター

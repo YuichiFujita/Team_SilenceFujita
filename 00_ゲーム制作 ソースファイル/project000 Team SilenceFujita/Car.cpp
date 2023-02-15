@@ -273,7 +273,7 @@ void DrawCar(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aCar[nCntCar].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				if (pPlayer->atkState == ATTACKSTATE_BOMB)
+				if (pPlayer->bomb.state == ATTACKSTATE_BOMB)
 				{ // 攻撃状態がボム攻撃状態の場合
 
 					// 構造体の要素をクリア
@@ -363,7 +363,7 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].bUse = true;
 
 			// モデル情報を設定
-			g_aCar[nCntCar].modelData = GetModelData(/*(rand() % MODEL_CAR_MAX) + FROM_CAR*/MODELTYPE_CAR_CAR001);	// モデル情報
+			g_aCar[nCntCar].modelData = GetModelData((rand() % MODEL_CAR_MAX) + FROM_CAR);	// モデル情報
 
 			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
 

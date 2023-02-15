@@ -69,6 +69,11 @@
 #define FLYAWAY_SHIFT_HEIGHT	(50.0f)		// 風の出る位置をずらす距離
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
 
+//------------------------------------------------------------
+//	無音世界 (サイレンス・ワールド) マクロ定義
+//------------------------------------------------------------
+#define BOMB_CNT	(240)	// ボム再使用時間
+
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
@@ -89,6 +94,7 @@ void SilenceWorldPlayer(void);		// プレイヤーの爆弾処理
 void UpdateBoost(void);				// 加速の更新処理
 void SetBoost(void);				// 加速の設定処理
 void UpdateFlyAway(void);			// 送風の更新処理
+void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
 //************************************************************
 //	グローバル変数
@@ -110,7 +116,6 @@ void InitPlayer(void)
 	g_player.rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の向き
 	g_player.destRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の向き
 	g_player.state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
-	g_player.atkState      = ATTACKSTATE_NORMAL;				// 攻撃の状態
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
@@ -142,6 +147,10 @@ void InitPlayer(void)
 	g_player.wind.nCircleCount = 0;								// どこに出すか
 	g_player.wind.nCount       = 0;								// 風を出すカウント
 	g_player.wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
+
+	// 爆弾の情報の初期化
+	g_player.bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
+	g_player.bomb.nCounter = BOMB_CNT;							// 攻撃管理カウンター
 
 	// ドリフトの情報の初期化
 	g_player.drift.bDrift = false;	// ドリフト状況
@@ -466,6 +475,9 @@ void UpdateNormalPlayer(void)
 
 	// 送風の更新
 	UpdateFlyAway();
+
+	// 爆弾の更新
+	UpdateSilenceWorld();
 
 	// プレイヤーのカメラの状態変化
 	CameraChangePlayer();
@@ -972,8 +984,12 @@ void SilenceWorldPlayer(void)
 	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
 	{ // 攻撃モードの変更の操作が行われた場合
 
-		// 攻撃モードを変更
-		g_player.atkState = (ATTACKSTATE)((g_player.atkState + 1) % ATTACKSTATE_MAX);
+		if (g_player.bomb.state != ATTACKSTATE_WAIT)
+		{ // 攻撃状態が攻撃待機状態ではない場合
+
+			// 攻撃モードを変更
+			g_player.bomb.state = (ATTACKSTATE)((g_player.bomb.state + 1) % ATTACKSTATE_MAX);
+		}
 	}
 
 	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
@@ -1291,6 +1307,58 @@ void UpdateFlyAway(void)
 		}
 
 		break;					// 抜け出す
+	}
+}
+
+//============================================================
+//	爆弾の更新処理
+//============================================================
+void UpdateSilenceWorld(void)
+{
+	switch (g_player.bomb.state)
+	{ // 攻撃状態ごとの処理
+	case ATTACKSTATE_NONE:	// 何もしない状態
+
+		// 無し
+
+		// 処理を抜ける
+		break;
+
+	case ATTACKSTATE_BOMB:	// ボム攻撃状態
+
+		if (g_player.bomb.nCounter > 0)
+		{ // カウンターが 0より大きい場合
+
+			// カウンターを減算
+			g_player.bomb.nCounter--;
+		}
+		else
+		{ // カウンターが 0以下の場合
+
+			// 攻撃待機状態にする
+			g_player.bomb.state = ATTACKSTATE_WAIT;
+		}
+
+		// 処理を抜ける
+		break;
+
+	case ATTACKSTATE_WAIT:	// 攻撃待機状態
+
+		if (g_player.bomb.nCounter < BOMB_CNT)
+		{ // カウンターが一定値より小さい場合
+
+			// カウンターを加算
+			g_player.bomb.nCounter++;
+		}
+		else
+		{ // カウンターが一定値以上の場合
+
+			// 何もしない状態にする
+			g_player.bomb.state = ATTACKSTATE_NONE;
+		}
+
+		// 処理を抜ける
+		break;
 	}
 }
 

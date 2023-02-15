@@ -328,7 +328,7 @@ void DrawPolice(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aPolice[nCntPolice].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				if (pPlayer->atkState == ATTACKSTATE_BOMB)
+				if (pPlayer->bomb.state == ATTACKSTATE_BOMB)
 				{ // 攻撃状態がボム攻撃状態の場合
 
 					switch (g_aPolice[nCntPolice].bombState)
