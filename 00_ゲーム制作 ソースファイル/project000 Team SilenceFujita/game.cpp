@@ -26,6 +26,7 @@
 #include "gate.h"
 #include "life.h"
 #include "light.h"
+#include "map.h"
 #include "meshdome.h"
 #include "meshcylinder.h"
 #include "meshfield.h"
@@ -167,6 +168,9 @@ void InitGame(void)
 	// 能力バーの初期化
 	InitAbility();
 
+	// マップの初期化
+	InitMap();
+
 	// 速度バーの初期化
 	InitVelocity();
 
@@ -279,6 +283,9 @@ void UninitGame(void)
 
 	// 能力バーの終了
 	UninitAbility();
+
+	// マップの終了
+	UninitMap();
 
 	// 速度バーの終了
 	UninitVelocity();
@@ -493,6 +500,9 @@ void UpdateGame(void)
 			// 能力バーの更新
 			UpdateAbility();
 
+			// マップの更新
+			UpdateMap();
+
 			// 速度バーの更新
 			UpdateVelocity();
 
@@ -636,6 +646,16 @@ void DrawGame(void)
 	}
 #endif
 
+#if 1
+	//------------------------------------------------------------------------------------------------------------------
+	//	UIの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// カメラの設定
+	SetCamera(CAMERATYPE_UI);
+
+	// マップの描画
+	DrawMap();
+
 	//------------------------------------------------------------------------------------------------------------------
 	//	マップカメラの描画
 	//------------------------------------------------------------------------------------------------------------------
@@ -651,7 +671,6 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
-#if 1
 	// 体力バーの描画
 	DrawLife();
 

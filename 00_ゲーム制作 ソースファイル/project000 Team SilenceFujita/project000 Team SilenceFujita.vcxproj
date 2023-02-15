@@ -178,6 +178,7 @@
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="map.cpp" />
     <ClCompile Include="meshcylinder.cpp" />
     <ClCompile Include="meshdome.cpp" />
     <ClCompile Include="meshfield.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="map.h" />
     <ClInclude Include="meshcylinder.h" />
     <ClInclude Include="meshdome.h" />
     <ClInclude Include="meshfield.h" />
