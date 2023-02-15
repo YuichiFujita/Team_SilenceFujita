@@ -9,9 +9,10 @@
 #include "score.h"
 #include "value.h"
 #include "2Deffect.h"
+#include "2Dparticle.h"
 
 //**********************************************************************************************************************
-//マクロ定義
+// マクロ定義
 //**********************************************************************************************************************
 #define BONUS_MAX_VALUE		(9999)		// ボーナスの最大値
 #define BONUS_WIDTH			(20.0f)		// ボーナスの幅
@@ -21,6 +22,8 @@
 #define PLUS_WIDTH			(30.0f)		// プラスの幅
 #define PLUS_HEIGHT			(30.0f)		// プラスの高さ
 #define PLUS_SHIFT			(40.0f)		// プラスのずらす幅
+#define BONUS_RIGHT			(1000.0f)	// 右にボーナスを出す時の座標(X座標)
+#define BONUS_LEFT			(40.0f)		// 左にボーナスを出す時の座標(X座標)
 
 #define BONUS_MOVE_MAGNI	(0.02f)		// プラスの移動量の倍率
 #define BONUS_STATE_CNT		(120)		// 加算状態になるまでのカウント
@@ -28,10 +31,20 @@
 
 #define BONUS_EFFECT_LIFE	(8)			// ボーナスのエフェクトの寿命
 #define BONUS_EFFECT_RADIUS	(40.0f)		// ボーナスのエフェクトの半径
-#define BONUS_EFFECT_SUB	(0.15f)		// ボーナスのエフェクトの減衰係数
+#define BONUS_EFFECT_SUB	(4.0f)		// ボーナスのエフェクトの減衰係数
 
 #define SCORE_HUMAN			(500)		// 人を吹き飛ばした時のスコア
 #define DIGIT_HUMAN			(3)			// 人を吹き飛ばした時の桁数
+
+//**********************************************************************************************************************
+// 上に出すか下に出すか(WHEREBONUS)
+//**********************************************************************************************************************
+typedef enum
+{
+	WHEREBONUS_RIGHT = 0,		// 右に出す
+	WHEREBONUS_LEFT,			// 左に出す
+	WHEREBONUS_MAX				// この列挙型の総数
+}WHEREBONUS;
 
 //**********************************************************************************************************************
 //グローバル変数
@@ -54,7 +67,6 @@ const char *c_apFilenameBonus[BONUSTEX_MAX] =
 void InitBonus(void)
 {
 	LPDIRECT3DDEVICE9 pDevice;
-	int nCntBonus;
 
 	//デバイスの取得
 	pDevice = GetDevice();
@@ -68,7 +80,7 @@ void InitBonus(void)
 	}
 
 	//得点の情報の初期化
-	for (nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
+	for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
 	{
 		// 情報の初期化
 		g_aBonus[nCntBonus].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
@@ -94,13 +106,13 @@ void InitBonus(void)
 	//頂点バッファをロック
 	g_pVtxBuffBonus->Lock(0, 0, (void**)&pVtx, 0);
 
-	for (nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
+	for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
 	{
-		//頂点座標の設定
-		pVtx[0].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x, g_aBonus[nCntBonus].pos.y, 0.0f);
-		pVtx[1].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x, g_aBonus[nCntBonus].pos.y, 0.0f);
-		pVtx[2].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x, g_aBonus[nCntBonus].pos.y, 0.0f);
-		pVtx[3].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x, g_aBonus[nCntBonus].pos.y, 0.0f);
+		// 頂点座標の設定
+		pVtx[0].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x - PLUS_WIDTH, g_aBonus[nCntBonus].pos.y - PLUS_HEIGHT, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x + PLUS_WIDTH, g_aBonus[nCntBonus].pos.y - PLUS_HEIGHT, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x - PLUS_WIDTH, g_aBonus[nCntBonus].pos.y + PLUS_HEIGHT, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x + PLUS_WIDTH, g_aBonus[nCntBonus].pos.y + PLUS_HEIGHT, 0.0f);
 
 		//rhwの設定
 		pVtx[0].rhw = 1.0f;
@@ -132,15 +144,13 @@ void InitBonus(void)
 //========================================
 void UninitBonus(void)
 {
-	int nDASCount;
-
-	for (nDASCount = 0; nDASCount < BONUSTEX_MAX; nDASCount++)
+	for (int nCntBonus = 0; nCntBonus < BONUSTEX_MAX; nCntBonus++)
 	{
 		//テクスチャの破棄
-		if (g_pTextureBonus[nDASCount] != NULL)
+		if (g_pTextureBonus[nCntBonus] != NULL)
 		{
-			g_pTextureBonus[nDASCount]->Release();
-			g_pTextureBonus[nDASCount] = NULL;
+			g_pTextureBonus[nCntBonus]->Release();
+			g_pTextureBonus[nCntBonus] = NULL;
 		}
 	}
 
@@ -159,9 +169,9 @@ void UpdateBonus(void)
 {
 	int nCntBonus;					//回数の変数を宣言する
 
-	D3DXVECTOR3 ScorePos = GetScorePos();		// スコアの位置を取得
+	D3DXVECTOR3 ScorePos = D3DXVECTOR3(SCORE_POS_X, SCORE_POS_Y, 0.0f);		// スコアの位置を取得
 
-	VERTEX_2D * pVtx;				//頂点情報へのポインタ
+	VERTEX_2D *pVtx;				//頂点情報へのポインタ
 
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffBonus->Lock(0, 0, (void**)&pVtx, 0);
@@ -227,6 +237,16 @@ void UpdateBonus(void)
 
 					// スコアを加算する
 					AddScore(g_aBonus[nCntBonus].nScore);
+
+					// 2Dパーティクルの発生
+					Set2DParticle
+					( // 引数
+						g_aBonus[nCntBonus].pos,			// 位置
+						D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+						PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+						20,									// 発生数
+						1									// 寿命
+					);
 				}
 				else if(g_aBonus[nCntBonus].pos.y >= ScorePos.y)
 				{ // スコアの位置を過ぎた場合
@@ -239,6 +259,16 @@ void UpdateBonus(void)
 
 					// スコアを加算する
 					AddScore(g_aBonus[nCntBonus].nScore);
+
+					// 2Dパーティクルの発生
+					Set2DParticle
+					( // 引数
+						g_aBonus[nCntBonus].pos,			// 位置
+						D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+						PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+						20,									// 発生数
+						1									// 寿命
+					);
 				}
 
 				// 2Dパーティクルを発生させる
@@ -246,7 +276,7 @@ void UpdateBonus(void)
 				(
 					g_aBonus[nCntBonus].pos,
 					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-					D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
+					D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),
 					BONUS_EFFECT_LIFE,
 					BONUS_EFFECT_RADIUS,
 					BONUS_EFFECT_SUB
@@ -275,7 +305,7 @@ void UpdateBonus(void)
 }
 
 //=====================================
-//億点表示の描画処理
+//得点表示の描画処理
 //=====================================
 void DrawBonus(void)
 {
@@ -306,6 +336,13 @@ void DrawBonus(void)
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		// プリミティブの種類
 				4 * nCntBonus,								// 描画する最初の頂点インデックス
 				2);											// 描画するプリミティブ数
+		}
+	}
+
+	for (nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
+	{
+		if (g_aBonus[nCntBonus].bUse == true)
+		{ // 得点表示が使用されている
 
 			// 数値の設定処理
 			SetValue
@@ -333,9 +370,11 @@ void DrawBonus(void)
 //========================================
 //得点表示の設定処理
 //========================================
-void SetBonus(ADDSCORETYPE Reason, D3DXVECTOR3 pos)
+void SetBonus(ADDSCORETYPE Reason)
 {
 	VERTEX_2D * pVtx;					// 頂点情報へのポインタ
+	int nTopBotRand;					// 上に出すか下に出すか
+	D3DXVECTOR3 posBonus;				// ボーナスの位置
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffBonus->Lock(0, 0, (void**)&pVtx, 0);
@@ -345,8 +384,30 @@ void SetBonus(ADDSCORETYPE Reason, D3DXVECTOR3 pos)
 		if (g_aBonus[nCntBonus].bUse == false)
 		{ // 得点表示が使用されていない場合
 
+			// 上に出すか下に出すかをランダムで算出する
+			nTopBotRand = rand() % WHEREBONUS_MAX;
+
+			switch (nTopBotRand)
+			{
+			case WHEREBONUS_RIGHT:	// 右に出す
+
+				// ボーナスの位置を設定する
+				posBonus.x = BONUS_RIGHT;
+				posBonus.y = (float)(rand() % 100) + 320.0f;
+
+				break;				// 抜け出す
+
+			case WHEREBONUS_LEFT:	// 左に出す
+
+				// ボーナスの位置を設定する
+				posBonus.x = BONUS_LEFT;
+				posBonus.y = (float)(rand() % 100) + 220.0f;
+
+				break;				// 抜け出す
+			}
+
 			// 情報の設定
-			g_aBonus[nCntBonus].pos = D3DXVECTOR3(pos.x, pos.y, pos.z);		// 位置
+			g_aBonus[nCntBonus].pos = D3DXVECTOR3(posBonus.x, posBonus.y, 0.0f);	// 位置
 			g_aBonus[nCntBonus].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
 			g_aBonus[nCntBonus].state = BONUSSTATE_FADE;					// 状態
 			g_aBonus[nCntBonus].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);	// 色
@@ -379,6 +440,16 @@ void SetBonus(ADDSCORETYPE Reason, D3DXVECTOR3 pos)
 
 			//使用している状態にする
 			g_aBonus[nCntBonus].bUse = true;
+
+			// 2Dパーティクルの発生
+			Set2DParticle
+			( // 引数
+				g_aBonus[nCntBonus].pos,			// 位置
+				D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+				PARTICLE2DTYPE_BONUS_FIRE,			// 花火
+				20,									// 発生数
+				1									// 寿命
+			);
 
 			//抜け出す
 			break;
