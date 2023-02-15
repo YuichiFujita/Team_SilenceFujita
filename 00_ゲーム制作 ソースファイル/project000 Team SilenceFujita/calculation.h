@@ -23,6 +23,7 @@ void  LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump);										
 
 void RotNormalize(float *rot);			// 向きの正規化
 bool UpdateAllClear(RESULTSTATE state);	// 全てのアップデートが終わっているかどうかの判断処理
+void UpdateJudge(Judge *pJudge);		// ジャッジの更新処理
 
 // 万能シリーズ
 void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI);	// ファイルをロードする全体処理

@@ -94,6 +94,11 @@ void InitObject(void)
 		g_aObject[nCntObject].smash.bJump = false;									// ジャンプの状態
 		g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
 		g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
+
+		// ジャッジの情報の初期化
+		g_aObject[nCntObject].judge.col = JUDGE_WHITE;								// ピカピカの色
+		g_aObject[nCntObject].judge.state = JUDGESTATE_JUSTICE;						// 善悪
+		g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;					// チカチカ状態
 			
 		// 向き状態を初期化
 		g_aObject[nCntObject].collInfo.stateRot = ROTSTATE_0;
@@ -166,6 +171,13 @@ void UpdateObject(void)
 
 		if (g_aObject[nCntObject].bUse == true)
 		{ // オブジェクトが使用されている場合
+
+			if (g_aObject[nCntObject].judge.state == JUDGESTATE_EVIL)
+			{ // 悪者だった場合
+
+				// ジャッジの更新処理
+				UpdateJudge(&g_aObject[nCntObject].judge);
+			}
 
 			switch (g_aObject[nCntObject].nBreakType)
 			{ // 壊れ方の種類ごとの処理
@@ -371,8 +383,23 @@ void DrawObject(void)
 
 				default:					// それ以外の状態
 
-					// マテリアルの設定
-					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+					// マテリアルのコピーに代入する
+					g_aObject[nCntObject].matCopy[nCntMat] = pMat[nCntMat];
+
+					if (g_aObject[nCntObject].judge.state == JUDGESTATE_JUSTICE)
+					{ // 良い奴の場合
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+					else
+					{ // 悪い奴の場合
+
+						// 自己発光を代入する
+						g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Emissive = g_aObject[nCntObject].judge.col;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&g_aObject[nCntObject].matCopy[nCntMat].MatD3D);
+					}
 
 					// 処理を抜ける
 					break;
@@ -579,6 +606,22 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			// 影の位置設定
 			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
 
+			// ジャッジの情報の設定
+			g_aObject[nCntObject].judge.col = JUDGE_WHITE;			// ピカピカの色
+
+			if (nCntObject % 2 == 0)
+			{ // 2の倍数だった場合
+
+				g_aObject[nCntObject].judge.state = JUDGESTATE_EVIL;					// 善悪
+				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+			else
+			{ // 上記以外
+
+				g_aObject[nCntObject].judge.state = JUDGESTATE_JUSTICE;				// 善悪
+				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+
 			// 処理を抜ける
 			break;
 		}
@@ -662,7 +705,7 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 //	オブジェクトとの当たり判定
 //======================================================================================================================
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state)
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice)
 {
 	// 変数を宣言
 	D3DXVECTOR3 collPos;	// 当たり判定の中心座標
@@ -720,6 +763,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							}
 						}
 
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
+						}
+
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
 
@@ -755,6 +805,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+						}
+
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
 						}
 
 						// 渋滞カウントを加算する
@@ -801,6 +858,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							}
 						}
 
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
+						}
+
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
 
@@ -836,6 +900,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+						}
+
+						if (*pPolice == POLICESTATE_TACKLE)
+						{ // タックル中だった場合
+
+							// 追跡状態にする
+							*pPolice = POLICESTATE_CHASE;
 						}
 
 						// 渋滞カウントを加算する
@@ -893,6 +964,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								}
 							}
 
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
+							}
+
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
 
@@ -928,6 +1006,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+							}
+
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
 							}
 
 							// 渋滞カウントを加算する
@@ -974,6 +1059,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								}
 							}
 
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
+							}
+
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
 
@@ -1009,6 +1101,13 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+							}
+
+							if (*pPolice == POLICESTATE_TACKLE)
+							{ // タックル中だった場合
+
+								// 追跡状態にする
+								*pPolice = POLICESTATE_CHASE;
 							}
 
 							// 渋滞カウントを加算する
