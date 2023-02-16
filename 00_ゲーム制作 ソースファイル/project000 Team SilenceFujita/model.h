@@ -89,6 +89,9 @@ typedef enum
 	MODELTYPE_OBJECT_GATE000,			// ゲート (建物)
 	MODELTYPE_OBJECT_GATE001,			// ゲート (鉄板)
 
+	// がれきモデル
+	MODELTYPE_OBJECT_JUNK,				// がれき
+
 	// エディットモデル
 	MODELTYPE_EDIT_COLLISION,			// 当たり判定
 	MODELTYPE_MAX,						// 全モデルの総数

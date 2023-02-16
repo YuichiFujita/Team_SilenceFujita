@@ -23,19 +23,21 @@
 #define MAX_BOOST			(15.0f)		// ブーストの最大移動量
 
 #define PLAY_LIFE			(100)		// プレイヤーの体力
+#define PLAY_DAMAGE			(10)		// プレイヤーのダメージ数
 #define BOOST_WAIT_CNT		(180)		// ブーストの再使用までの時間
 #define WIND_OVERHEAT_CNT	(180)		// ウィンドのオーバーヒートまでの時間
 
-#define DAMAGE_TIME_PLAY	(30)					// ダメージ状態を保つ時間
-#define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)	// 無敵状態に変更する時間
+#define DAMAGE_TIME_PLAY	(90)						// ダメージ状態を保つ時間
+#define UNR_TIME_PLAY		(DAMAGE_TIME_PLAY - 10)		// 無敵状態に変更する時間
 
 //************************************************************
 //	列挙型定義 (ATTACKSTATE)
 //************************************************************
 typedef enum
 {
-	ATTACKSTATE_NORMAL = 0,			// 通常状態
+	ATTACKSTATE_NONE = 0,			// 何もしない状態
 	ATTACKSTATE_BOMB,				// ボム攻撃状態
+	ATTACKSTATE_WAIT,				// 攻撃待機状態
 	ATTACKSTATE_MAX					// この列挙型の総数
 }ATTACKSTATE;
 
@@ -84,6 +86,15 @@ typedef struct
 }PlayerWind;
 
 //************************************************************
+//	構造体定義 (PlayerBomb)
+//************************************************************
+typedef struct
+{
+	ATTACKSTATE state;				// 攻撃状態
+	int         nCounter;			// 攻撃管理カウンター
+}PlayerBomb;
+
+//************************************************************
 //	構造体定義 (PlayerDrift)
 //************************************************************
 typedef struct
@@ -103,18 +114,20 @@ typedef struct
 	D3DXVECTOR3 destRot;			// 目標の向き
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	ACTIONSTATE state;				// プレイヤーの状態
-	ATTACKSTATE atkState;			// 攻撃の状態
 	Model       modelData;			// モデル情報
 	PlayerBoost boost;				// ブーストの情報
-	PlayerWind	wind;				// 風の情報
+	PlayerWind  wind;				// 風の情報
+	PlayerBomb  bomb;				// 爆弾の情報
 	PlayerDrift drift;				// ドリフトの状況
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター
 	int         nShadowID;			// 影のインデックス
+	int			nIconID;			// アイコンのインデックス
 	int			nCameraState;		// 前向きカメラの状態
 	bool		bCameraFirst;		// 一人称カメラの状況
 	bool        bMove;				// 移動状況
 	bool        bJump;				// ジャンプ状況
+	bool		bUnrivaled;			// 透明状況
 	bool        bUse;				// 使用状況
 }Player;
 

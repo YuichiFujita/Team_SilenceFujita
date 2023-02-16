@@ -22,7 +22,6 @@
 //	マクロ定義
 //************************************************************
 // カメラ全般
-#define VIEW_ANGLE		(D3DXToRadian(65.0f))	// 視野角
 #define VIEW_NEAR		(10.0f)					// モデルが見えるZ軸の最小値
 #define VIEW_FAR		(60000.0f)				// モデルが見えるZ軸の最大値
 
@@ -51,14 +50,6 @@
 #define LIMIT_ROT_HIGH	(D3DX_PI - 0.1f)		// 回転量 (x) の回転制限値 (上)
 #define LIMIT_ROT_LOW	(0.1f)					// 回転量 (x) の回転制限値 (下)
 
-// マップカメラ
-#define MAPCAM_X		(1000)		// マップカメラの左上隅のピクセル座標 (x)
-#define MAPCAM_Y		(20)		// マップカメラの左上隅のピクセル座標 (y)
-#define MAPCAM_SIZE_X	(260)		// マップカメラの描画する画面の横幅
-#define MAPCAM_SIZE_Y	(260)		// マップカメラの描画する画面の縦幅
-#define MAPCAM_POS_R	(0.0f)		// マップカメラの注視点の位置 (y)
-#define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)
-
 // 一人称視点カメラ
 #define CAMERA_FORWARD_SHIFT	(18.5f)			// 前にカメラをずらす距離
 #define CAMERA_UP_SHIFT			(80.0f)			// 上にカメラをずらす距離
@@ -67,7 +58,7 @@
 
 // リザルトカメラ
 #define CAMERA_RSL_ROT_MOVE		(0.003f)		// カメラの向きの移動量
-#define TITLE_DISTANCE			(10000.0f)		// タイトル時のカメラの距離
+#define TITLE_DISTANCE			(13000.0f)		// タイトル時のカメラの距離
 #define TITLE_INIT_POS_Y		(4500.0f)		// タイトル時のカメラの初期位置(Y軸)
 	
 //************************************************************
@@ -780,10 +771,10 @@ void RevRotYCamera(void)
 //============================================================
 //	カメラの取得処理
 //============================================================
-Camera *GetCamera(void)
+Camera *GetCamera(int nID)
 {
-	// カメラの情報の先頭アドレスを返す
-	return &g_aCamera[0];
+	// カメラの情報の引数の要素のアドレスを返す
+	return &g_aCamera[nID];
 }
 
 //============================================================

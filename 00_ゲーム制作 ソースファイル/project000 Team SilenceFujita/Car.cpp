@@ -13,6 +13,7 @@
 #include "calculation.h"
 
 #include "Car.h"
+#include "icon.h"
 #include "shadow.h"
 #include "sound.h"
 #include "player.h"
@@ -43,8 +44,9 @@
 #define CAR_STOP_RADIUS_DIST	(300.0f)	// 車の止まる指標の円のずらす距離
 #define CAR_STOP_ADD_RADIUS		(50.0f)		// 車の止まる半径の追加分
 
-#define CAR_TRAFFIC_CNT			(240)		// 渋滞が起きたときに改善する用のカウント
+#define CAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
+#define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -55,7 +57,7 @@ void CurveCar(Car *pCar);							// 車のカーブ処理
 void DashCarAction(Car *pCar);						// 車の走行処理
 void SetCarPosRot(Car *pCar);						// 車の位置と向きの設定処理
 void CarPosRotCorrect(Car *pCar);					// 車の位置の補正処理
-void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// プレイヤーとの当たり判定
+void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, TACKLESTATE state);		// プレイヤーとの当たり判定
 void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);			// 車との当たり判定
 void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// 警察との当たり判定
 
@@ -83,6 +85,7 @@ void InitCar(void)
 		g_aCar[nCntCar].move        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aCar[nCntCar].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
+		g_aCar[nCntCar].nIconID		= NONE_ICON;						// アイコンのインデックス
 		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
 		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
 		g_aCar[nCntCar].bMove       = false;							// 移動しているか
@@ -90,12 +93,17 @@ void InitCar(void)
 		g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態
 		g_aCar[nCntCar].bUse		= false;							// 使用状況
 
-		//曲がり角の情報の初期化
+		// 曲がり角の情報の初期化
 		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle   = CURVE_LEFT;	// 左に曲がる
 		g_aCar[nCntCar].carCurveInfo.curveInfo.nCurveNumber = 0;			// カーブする番地
 		g_aCar[nCntCar].carCurveInfo.nSKipCnt    = 0;						// スキップする曲がり角の回数
 		g_aCar[nCntCar].carCurveInfo.rotDest     = g_aCar[nCntCar].rot;		// 前回の向き
 		g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;				// 現在の車の行動
+
+		//ジャッジの情報の初期化
+		g_aCar[nCntCar].judge.state = JUDGESTATE_JUSTICE;			// 善悪
+		g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;		// チカチカ状態
+		g_aCar[nCntCar].judge.col = JUDGE_WHITE;					// ピカピカの色
 
 		// モデル情報の初期化
 		g_aCar[nCntCar].modelData.dwNumMat = 0;						// マテリアルの数
@@ -122,6 +130,8 @@ void UninitCar(void)
 //======================================================================================================================
 void UpdateCar(void)
 {
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
+
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aCar[nCntCar].bUse == true)
@@ -166,6 +176,16 @@ void UpdateCar(void)
 					//位置を0.0fに戻す
 					g_aCar[nCntCar].pos.y = 0.0f;
 				}
+
+				if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+				{ // 悪者だった場合
+
+					// ジャッジの更新処理
+					UpdateJudge(&g_aCar[nCntCar].judge);
+
+					// アイコンの位置設定処理
+					SetPositionIcon(g_aCar[nCntCar].nIconID, g_aCar[nCntCar].pos);
+				}
 			}
 
 			if (GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
@@ -178,12 +198,14 @@ void UpdateCar(void)
 					// オブジェクトとの当たり判定
 					CollisionObject
 					( // 引数
-						&g_aCar[nCntCar].pos,		// 現在の位置
-						&g_aCar[nCntCar].posOld,	// 前回の位置
-						&g_aCar[nCntCar].move,		// 移動量
-						CAR_WIDTH,					// 横幅
-						CAR_DEPTH,					// 奥行
-						&g_aCar[nCntCar].nTrafficCnt// 渋滞カウント
+						&g_aCar[nCntCar].pos,			// 現在の位置
+						&g_aCar[nCntCar].posOld,		// 前回の位置
+						&g_aCar[nCntCar].move,			// 移動量
+						CAR_WIDTH,						// 横幅
+						CAR_DEPTH,						// 奥行
+						&g_aCar[nCntCar].nTrafficCnt,	// 渋滞カウント
+						BOOSTSTATE_NONE,				// ブースト状態
+						&policeState					// 警察の状態
 					);
 
 					// 車の停止処理
@@ -215,7 +237,7 @@ void UpdateCar(void)
 					CAR_DEPTH,							// 奥行
 					COLLOBJECTTYPE_CAR,					// 対象
 					&g_aCar[nCntCar].nTrafficCnt,		// 渋滞カウント
-					(int)(g_aCar[nCntCar].state)		// 状態
+					TACKLESTATE_CHARGE					// 状態
 				);
 			}
 
@@ -271,7 +293,7 @@ void DrawCar(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aCar[nCntCar].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				if (pPlayer->atkState == ATTACKSTATE_BOMB)
+				if (pPlayer->bomb.state == ATTACKSTATE_BOMB)
 				{ // 攻撃状態がボム攻撃状態の場合
 
 					// 構造体の要素をクリア
@@ -307,11 +329,36 @@ void DrawCar(void)
 					// マテリアルの設定
 					pDevice->SetMaterial(&bombMat.MatD3D);
 				}
+				else if (g_aCar[nCntCar].state == CARSTATE_TRAFFIC)
+				{ // 渋滞状態の場合
+
+					// 車を薄くする
+					g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Diffuse.a = CAR_TRAFFIC_ALPHA;
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
+
+				}
 				else
 				{ // 攻撃状態がそれ以外の状態の場合
 
-					// マテリアルの設定
-					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					// マテリアルのコピーに代入する
+					g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
+
+					if (g_aCar[nCntCar].judge.state == JUDGESTATE_JUSTICE)
+					{ // 良い奴の場合
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+					else
+					{ // 悪い奴の場合
+
+						// 自己発光を代入する
+						g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Emissive = g_aCar[nCntCar].judge.col;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
+					}
 				}
 
 				// テクスチャの設定
@@ -351,7 +398,18 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].bUse = true;
 
 			// モデル情報を設定
-			g_aCar[nCntCar].modelData = GetModelData(/*(rand() % MODEL_CAR_MAX) + FROM_CAR*/MODELTYPE_CAR_CAR001);	// モデル情報
+			g_aCar[nCntCar].modelData = GetModelData((rand() % MODEL_CAR_MAX) + FROM_CAR);	// モデル情報
+
+			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
+
+			//マテリアル情報に対するポインタを取得
+			pMat = (D3DXMATERIAL*)g_aCar[nCntCar].modelData.pBuffMat->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_aCar[nCntCar].modelData.dwNumMat; nCntMat++)
+			{
+				//マテリアルの情報を取得する
+				g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
+			}
 
 			// 影のインデックスを設定
 			g_aCar[nCntCar].nShadowID = SetModelShadow
@@ -369,6 +427,35 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
 			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
 			g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;																		// 走っている状態
+
+			// ジャッジの情報の設定
+			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色
+
+			if (nCntCar % 2 == 0)
+			{ // 2の倍数だった場合
+
+				g_aCar[nCntCar].judge.state = JUDGESTATE_EVIL;					// 善悪
+				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+			else
+			{ // 上記以外
+
+				g_aCar[nCntCar].judge.state = JUDGESTATE_JUSTICE;				// 善悪
+				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+
+			if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+			{ // 悪い奴の場合
+
+				// アイコンのインデックスを設定
+				g_aCar[nCntCar].nIconID = SetIcon
+				( // 引数
+					g_aCar[nCntCar].pos,
+					ICONTYPE_EVIL,
+					&g_aCar[nCntCar].nIconID,
+					&g_aCar[nCntCar].bUse
+				);
+			}
 
 			// 処理を抜ける
 			break;
@@ -849,7 +936,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 
 		for (int nCntPoli = 0; nCntPoli < MAX_POLICE; nCntPoli++, pPolice++)
 		{
-			if (pPolice->bUse == true)
+			if (pPolice->bUse == true && GetBarrierState(pPolice) != BARRIERSTATE_SET)
 			{ // 使用している場合
 				// 長さを測る
 				fLength = (pPolice->pos.x - stopCarpos.x) * (pPolice->pos.x - stopCarpos.x)
@@ -929,7 +1016,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 
 		for (int nCntPoli = 0; nCntPoli < MAX_CAR; nCntPoli++, pCar++)
 		{
-			if (pCar->bUse == true)
+			if (pCar->bUse == true && GetBarrierState(pCar) != BARRIERSTATE_SET)
 			{ // 使用している場合
 				// 長さを測る
 				fLength = (pCar->pos.x - stopCarpos.x) * (pCar->pos.x - stopCarpos.x)
@@ -972,7 +1059,7 @@ void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 
 //============================================================
 // 車同士の当たり判定
 //============================================================
-void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, int state)
+void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, TACKLESTATE state)
 {
 	switch (collObject)
 	{
@@ -982,11 +1069,11 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 
 	case COLLOBJECTTYPE_CAR:		// 車
 
-		// プレイヤーとの当たり判定
-		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
-
 		if (state != CARSTATE_TRAFFIC)
 		{ // 渋滞状態じゃなかった場合
+
+			// プレイヤーとの当たり判定
+			CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt, state);
 
 			// 車との当たり判定
 			CarBodyStopCar(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
@@ -1000,7 +1087,7 @@ void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, 
 	case COLLOBJECTTYPE_POLICE:		// 警察
 
 		// プレイヤーとの当たり判定
-		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt);
+		CarBodyStopPlayer(pPos, pPosOld, rot, pMove, fWidth, fDepth, collObject, pTraCnt, state);
 
 		if (state != POLICESTATE_TRAFFIC)
 		{ // 渋滞状態じゃなかった場合
@@ -1119,7 +1206,7 @@ void CarPosRotCorrect(Car *pCar)
 //============================================================
 // プレイヤーとの当たり判定
 //============================================================
-void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt)
+void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, TACKLESTATE state)
 {
 	Player *pPlayer = GetPlayer();				// 車の情報を取得する
 
@@ -1135,14 +1222,28 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
-					
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// 位置をずらす
+						//pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
+
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						if (state == TACKLESTATE_BOOST)
+						{ // タックル時
+							// プレイヤーのダメージ判定
+							HitPlayer
+							(
+								pPlayer,		// プレイヤーのアドレス
+								PLAY_DAMAGE		// プレイヤーのダメージ量
+							);
+						}
+					}
 
 					break;						// 抜け出す
 
@@ -1156,6 +1257,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					// 移動量を削除
 					pMove->x = 0.0f;
+
+					// 渋滞カウントを加算する
+					*pTraCnt += 1;
 
 					break;						// 抜け出す
 				}
@@ -1167,14 +1271,28 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+						// 位置をずらす
+						//pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						if (state == TACKLESTATE_BOOST)
+						{ // タックル時
+							// プレイヤーのダメージ判定
+							HitPlayer
+							(
+								pPlayer,		// プレイヤーのアドレス
+								PLAY_DAMAGE		// プレイヤーのダメージ量
+							);
+						}
+					}
 
 					break;						// 抜け出す
 
@@ -1188,6 +1306,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					// 移動量を削除
 					pMove->x = 0.0f;
+
+					// 渋滞カウントを加算する
+					*pTraCnt += 1;
 
 					break;						// 抜け出す
 				}
@@ -1204,14 +1325,28 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+						// 位置をずらす
+						//pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						if (state == TACKLESTATE_BOOST)
+						{ // タックル時
+							// プレイヤーのダメージ判定
+							HitPlayer
+							(
+								pPlayer,		// プレイヤーのアドレス
+								PLAY_DAMAGE		// プレイヤーのダメージ量
+							);
+						}
+					}
 
 					break;						// 抜け出す
 
@@ -1225,6 +1360,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					// 移動量を削除
 					pMove->x = 0.0f;
+
+					// 渋滞カウントを加算する
+					*pTraCnt += 1;
 
 					break;						// 抜け出す
 				}
@@ -1236,14 +1374,28 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 				{
 				case COLLOBJECTTYPE_POLICE:		// 警察の場合
 
-					//位置をずらす
-					pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
+					if (pPlayer->state != ACTIONSTATE_DAMAGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+					{ // ダメージ状態ではないかつ、無敵状態ではない場合
 
-					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+						// 位置をずらす
+						//pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
 
-					// 移動量を削除
-					pMove->x *= 0.95f;
+						// プレイヤーの移動量を削除
+						pPlayer->move.x *= 0.95f;
+
+						// 移動量を削除
+						pMove->x *= 0.95f;
+
+						if (state == TACKLESTATE_BOOST)
+						{ // タックル時
+							// プレイヤーのダメージ判定
+							HitPlayer
+							(
+								pPlayer,		// プレイヤーのアドレス
+								PLAY_DAMAGE		// プレイヤーのダメージ量
+							);
+						}
+					}
 
 					break;						// 抜け出す
 
@@ -1257,6 +1409,9 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					// 移動量を削除
 					pMove->x = 0.0f;
+
+					// 渋滞カウントを加算する
+					*pTraCnt += 1;
 
 					break;						// 抜け出す
 				}
@@ -1274,8 +1429,8 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 
 	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++, pCar++)
 	{
-		if (pCar->bUse == true)
-		{ // 車が使用されていた場合
+		if (pCar->bUse == true && pCar->state != CARSTATE_TRAFFIC && GetBarrierState(pCar) == BARRIERSTATE_SET)
+		{ // 車が使用されているかつ、渋滞状態以外の場合
 			if (pPos->x - fWidth <= pCar->pos.x + CAR_WIDTH
 				&& pPos->x + fWidth >= pCar->pos.x - CAR_WIDTH)
 			{ // 車のX幅の中にいた場合
@@ -1426,8 +1581,8 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 	for (int nCnt = 0; nCnt < MAX_POLICE; nCnt++, pPolice++)
 	{
-		if (pPolice->bUse == true)
-		{ // 車が使用されていた場合
+		if (pPolice->bUse == true && pPolice->state != POLICESTATE_TRAFFIC)
+		{ // 車が使用されているかつ、渋滞状態ではない場合
 			if (pPos->x - fWidth <= pPolice->pos.x + POLICAR_WIDTH
 				&& pPos->x + fWidth >= pPolice->pos.x - POLICAR_WIDTH)
 			{ // 車のX幅の中にいた場合

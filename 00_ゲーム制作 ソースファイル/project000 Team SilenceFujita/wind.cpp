@@ -17,6 +17,8 @@
 #include "particle.h"
 #include "object.h"
 #include "Human.h"
+#include "score.h"
+#include "bonus.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -363,7 +365,7 @@ void CollisionWind(Human *pHuman)
 			pPlayer->pos,	// 絶対座標
 			pPlayer->rot,	// 向き
 			1000.0f,		// 横幅
-			100.0f			// 縦幅
+			150.0f			// 縦幅
 		);
 
 		if (LineOuterProduct(vecPos[0], vecPos[1], pHuman->pos) < 0
@@ -372,14 +374,17 @@ void CollisionWind(Human *pHuman)
 		&&  LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
 		{ // 四辺の内側にいる場合 (当たっている場合)
 
-			if (pPlayer->wind.bUseWind == true)
-			{ // 風を使用している場合
+			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY)
+			{ // 風を使用しているかつ、人が吹き飛んでいない場合
 
 				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;
 
 				// 人間が吹き飛ばされる処理
 				FlyAwayHuman(pHuman, *pPlayer);
+
+				// ボーナスの設定処理
+				SetBonus(ADDSCORE_HUMAN);
 
 				// カメラの状態を変える
 				*GetCameraState() = CAMERASTATE_GOODJOB;

@@ -14,6 +14,7 @@
 
 #include "camera.h"
 #include "gate.h"
+#include "icon.h"
 #include "object.h"
 #include "particle.h"
 #include "player.h"
@@ -41,7 +42,12 @@
 #define DEL_MOVE_ABS	(1.9f)		// 移動量の削除範囲の絶対値
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
-#define REV_MOVE_SUB	(0.02f)		// 移動量の減速係数
+#define REV_MOVE_SUB	(0.08f)		// 移動量の減速係数
+#define UNRIVALED_CNT	(10)		// 無敵時にチカチカさせるカウント
+
+#define PLAY_CLEAR_MOVE		(4.0f)	// クリア成功時のプレイヤーの自動移動量
+#define REV_PLAY_CLEAR_MOVE	(0.1f)	// クリア成功時のプレイヤーの減速係数
+#define REV_PLAY_OVER_MOVE	(0.02f)	// クリア失敗時のプレイヤーの減速係数
 
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -64,9 +70,19 @@
 #define FLYAWAY_SHIFT_HEIGHT	(50.0f)		// 風の出る位置をずらす距離
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
 
+//------------------------------------------------------------
+//	無音世界 (サイレンス・ワールド) マクロ定義
+//------------------------------------------------------------
+#define BOMB_CNT		(2400)		// ボム再使用時間
+#define SUB_BOMB_CNT	(10)		// 使用待機時のゲージの減算量
+
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
+void UpdateNormalPlayer(void);		// 通常時のプレイヤー更新処理
+void UpdateClearPlayer(void);		// クリア成功時のプレイヤー更新処理
+void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
+
 void MovePlayer(void);				// プレイヤーの移動量の更新処理
 void PosPlayer(void);				// プレイヤーの位置の更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
@@ -80,6 +96,7 @@ void SilenceWorldPlayer(void);		// プレイヤーの爆弾処理
 void UpdateBoost(void);				// 加速の更新処理
 void SetBoost(void);				// 加速の設定処理
 void UpdateFlyAway(void);			// 送風の更新処理
+void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
 //************************************************************
 //	グローバル変数
@@ -101,14 +118,15 @@ void InitPlayer(void)
 	g_player.rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の向き
 	g_player.destRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の向き
 	g_player.state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
-	g_player.atkState      = ATTACKSTATE_NORMAL;				// 攻撃の状態
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
+	g_player.nIconID	   = NONE_ICON;							// アイコンのインデックス
 	g_player.bMove         = false;								// 移動状況
 	g_player.bJump         = false;								// ジャンプ状況
 	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
 	g_player.bCameraFirst  = false;								// 一人称カメラの状況
+	g_player.bUnrivaled	   = false;								// 透明状況
 	g_player.bUse          = false;								// 使用状況
 
 	// モデル情報の初期化
@@ -133,6 +151,10 @@ void InitPlayer(void)
 	g_player.wind.nCount       = 0;								// 風を出すカウント
 	g_player.wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
 
+	// 爆弾の情報の初期化
+	g_player.bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
+	g_player.bomb.nCounter = BOMB_CNT;							// 攻撃管理カウンター
+
 	// ドリフトの情報の初期化
 	g_player.drift.bDrift = false;	// ドリフト状況
 
@@ -153,151 +175,27 @@ void UninitPlayer(void)
 //============================================================
 void UpdatePlayer(void)
 {
-	int nCnt = 0;
-
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
 
-		// 前回位置の更新
-		g_player.oldPos = g_player.pos;
+		if (GetGameState() == GAMESTATE_NORMAL)
+		{ // ゲームが通常状態の場合
 
-		// 状態の更新
-		if (g_player.nCounterState > 0)
-		{ // カウンターが 0より大きい場合
-
-			// カウンターを減算
-			g_player.nCounterState--;
-
-			if (g_player.nCounterState == UNR_TIME_PLAY)
-			{ // カウンターが一定値の場合
-
-				// 無敵状態にする
-				g_player.state = ACTIONSTATE_UNRIVALED;
-			}
-			else if (g_player.nCounterState <= 0)
-			{ // カウンターが 0以下の場合
-
-				// 通常状態にする
-				g_player.state = ACTIONSTATE_NORMAL;
-			}
+			// 通常時のプレイヤー更新
+			UpdateNormalPlayer();
 		}
+		else if (GetResultState() == RESULTSTATE_CLEAR)
+		{ // リザルトがクリア成功状態の場合
 
-#if 1
-		// 加速の更新
-		UpdateBoost();
-
-		// プレイヤーの移動量の更新
-		MovePlayer();
-
-		// プレイヤーの位置の更新
-		PosPlayer();
-
-		// プレイヤーの着地の更新処
-		LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
-		
-		// プレイヤーのドリフト
-		DriftPlayer();
-
-		// プレイヤーの加速
-		SlumBoostPlayer();
-
-		// プレイヤーの送風
-		FlyAwayPlayer();
-
-		// プレイヤーの爆弾
-		SilenceWorldPlayer();
-
-		// 送風の更新
-		UpdateFlyAway();
-
-		// プレイヤーのカメラの状態変化
-		CameraChangePlayer();
-#else
-		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true || GetJoyStickPressLY(0) > 0)
-		{ // 奥移動の操作が行われた場合
-
-			g_player.pos.z += 10.0f;
+			// クリア成功時のプレイヤー更新
+			UpdateClearPlayer();
 		}
-		if (GetKeyboardPress(DIK_S) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true || GetJoyStickPressLY(0) < 0)
-		{ // 手前移動の操作が行われた場合
+		else if (GetResultState() == RESULTSTATE_TIMEOVER)
+		{ // リザルトがクリア失敗状態の場合
 
-			g_player.pos.z -= 10.0f;
+			// クリア失敗時のプレイヤー更新
+			UpdateOverPlayer();
 		}
-		if (GetKeyboardPress(DIK_A) == true || GetJoyKeyPress(JOYKEY_LEFT, 0) == true || GetJoyStickPressLX(0) < 0)
-		{ // 左移動の操作が行われた場合
-
-			g_player.pos.x -= 10.0f;
-		}
-		if (GetKeyboardPress(DIK_D) == true || GetJoyKeyPress(JOYKEY_RIGHT, 0) == true || GetJoyStickPressLX(0) > 0)
-		{ // 右移動の操作が行われた場合
-
-			g_player.pos.x += 10.0f;
-		}
-#endif
-
-		//----------------------------------------------------
-		//	当たり判定
-		//----------------------------------------------------
-		// オブジェクトとの当たり判定
-		CollisionObject
-		( // 引数
-			&g_player.pos,		// 現在の位置
-			&g_player.oldPos,	// 前回の位置
-			&g_player.move,		// 移動量
-			PLAY_WIDTH,			// 横幅
-			PLAY_DEPTH,			// 奥行
-			&nCnt				// 渋滞カウント
-		);
-
-		//	オブジェクトとの当たり判定
-		CollisionGate
-		(
-			&g_player.pos,		// 現在の位置
-			&g_player.oldPos,	// 前回の位置
-			&g_player.move,		// 移動量
-			PLAY_WIDTH,			// 横幅
-			PLAY_DEPTH			// 奥行
-		);	
-
-		// 車の停止処理
-		CollisionStopCar
-		( // 引数
-			g_player.pos,				//位置
-			g_player.rot,				//向き
-			&g_player.move,				//移動量
-			g_player.modelData.fRadius,	//半径
-			COLLOBJECTTYPE_PLAYER,		//対象のタイプ
-			&nCnt
-		);
-
-		// 車同士の当たり判定
-		CollisionCarBody
-		( // 引数
-			&g_player.pos,
-			&g_player.oldPos,
-			g_player.rot,
-			&g_player.move,
-			PLAY_WIDTH,
-			PLAY_DEPTH,
-			COLLOBJECTTYPE_PLAYER,
-			&nCnt,
-			nCnt
-		);
-
-		//----------------------------------------------------
-		//	影の更新
-		//----------------------------------------------------
-		// 影の位置設定
-		SetPositionShadow
-		( // 引数
-			g_player.nShadowID,	// 影のインデックス
-			g_player.pos,		// 位置
-			g_player.rot,		// 向き
-			NONE_SCALE			// 拡大率
-		);
-
-		// プレイヤーの補正の更新処理
-		RevPlayer();
 	}
 }
 
@@ -314,6 +212,7 @@ void DrawPlayer(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
 	D3DXMATERIAL      redMat;					// マテリアルデータ (赤)
+	D3DXMATERIAL	  UnrivaledMat;				// マテリアルデータ (無敵)
 
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
@@ -356,13 +255,49 @@ void DrawPlayer(void)
 				// マテリアルの設定
 				pDevice->SetMaterial(&redMat.MatD3D);			// 赤
 
+				// 透明状態をOFFにする
+				g_player.bUnrivaled = false;
+
 				// 処理を抜ける
 				break;
+
+			case ACTIONSTATE_UNRIVALED:	// 無敵状態
+
+				if (g_player.nCounterState % UNRIVALED_CNT == 0)
+				{ // 一定時間経過時
+
+					// 透明状況の入れ替え
+					g_player.bUnrivaled = g_player.bUnrivaled ? false : true;
+				}
+
+				if (g_player.bUnrivaled == true)
+				{ // 透明状況の場合
+
+					// マテリアルを代入する
+					UnrivaledMat = pMat[nCntMat];
+
+					// 自己発光を透明にする
+					UnrivaledMat.MatD3D.Emissive = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&UnrivaledMat.MatD3D);			// 透明
+				}
+				else
+				{ // 透明状況じゃない場合
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+				}
+
+				break;					// 抜け出す
 
 			default:					// それ以外の状態
 
 				// マテリアルの設定
 				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+
+				// 透明状態をOFFにする
+				g_player.bUnrivaled = false;
 
 				// 処理を抜ける
 				break;
@@ -396,6 +331,9 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	// 影のインデックスを設定
 	g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
+
+	// アイコンのインデックスを設定
+	g_player.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.nIconID, &g_player.bUse);
 
 	// 影の位置設定
 	SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
@@ -483,6 +421,302 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			pPlayer->bUse = false;
 		}
 	}
+}
+
+//============================================================
+//	通常時のプレイヤー更新処理
+//============================================================
+void UpdateNormalPlayer(void)
+{
+	// 変数を宣言
+	int nTrafficCnt = 0;	// 引数設定用
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
+
+	// 前回位置の更新
+	g_player.oldPos = g_player.pos;
+
+	// 状態の更新
+	if (g_player.nCounterState > 0)
+	{ // カウンターが 0より大きい場合
+
+		// カウンターを減算
+		g_player.nCounterState--;
+
+		if (g_player.nCounterState == UNR_TIME_PLAY)
+		{ // カウンターが一定値の場合
+
+			// 無敵状態にする
+			g_player.state = ACTIONSTATE_UNRIVALED;
+		}
+		else if (g_player.nCounterState <= 0)
+		{ // カウンターが 0以下の場合
+
+			// 通常状態にする
+			g_player.state = ACTIONSTATE_NORMAL;
+		}
+	}
+
+	// 加速の更新
+	UpdateBoost();
+
+	// プレイヤーの移動量の更新
+	MovePlayer();
+
+	// プレイヤーの位置の更新
+	PosPlayer();
+
+	// プレイヤーの着地の更新
+	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
+	
+	// プレイヤーのドリフト
+	DriftPlayer();
+
+	// プレイヤーの加速
+	SlumBoostPlayer();
+
+	// プレイヤーの送風
+	FlyAwayPlayer();
+
+	// プレイヤーの爆弾
+	SilenceWorldPlayer();
+
+	// 送風の更新
+	UpdateFlyAway();
+
+	// 爆弾の更新
+	UpdateSilenceWorld();
+
+	// プレイヤーのカメラの状態変化
+	CameraChangePlayer();
+
+	//--------------------------------------------------------
+	//	当たり判定
+	//--------------------------------------------------------
+	// オブジェクトとの当たり判定
+	CollisionObject
+	( // 引数
+		&g_player.pos,			// 現在の位置
+		&g_player.oldPos,		// 前回の位置
+		&g_player.move,			// 移動量
+		PLAY_WIDTH,				// 横幅
+		PLAY_DEPTH,				// 奥行
+		&nTrafficCnt,			// 渋滞カウント
+		g_player.boost.state,	// ブーストの状態
+		&policeState			// 警察の状態
+	);
+
+	// 吹っ飛ぶオブジェクトとの当たり判定
+	SmashCollision
+	( // 引数
+		g_player.pos, 
+		g_player.modelData.fRadius
+	);				
+
+	// ゲートとの当たり判定
+	CollisionGate
+	( // 引数
+		&g_player.pos,		// 現在の位置
+		&g_player.oldPos,	// 前回の位置
+		&g_player.move,		// 移動量
+		PLAY_WIDTH,			// 横幅
+		PLAY_DEPTH			// 奥行
+	);	
+
+	// 車の停止処理
+	CollisionStopCar
+	( // 引数
+		g_player.pos,				//位置
+		g_player.rot,				//向き
+		&g_player.move,				//移動量
+		g_player.modelData.fRadius,	//半径
+		COLLOBJECTTYPE_PLAYER,		//対象のタイプ
+		&nTrafficCnt
+	);
+
+	// 車同士の当たり判定
+	CollisionCarBody
+	( // 引数
+		&g_player.pos,
+		&g_player.oldPos,
+		g_player.rot,
+		&g_player.move,
+		PLAY_WIDTH,
+		PLAY_DEPTH,
+		COLLOBJECTTYPE_PLAYER,
+		&nTrafficCnt,
+		TACKLESTATE_CHARGE
+	);
+
+	//--------------------------------------------------------
+	//	影の更新
+	//--------------------------------------------------------
+	// 影の位置設定
+	SetPositionShadow
+	( // 引数
+		g_player.nShadowID,	// 影のインデックス
+		g_player.pos,		// 位置
+		g_player.rot,		// 向き
+		NONE_SCALE			// 拡大率
+	);
+
+	//--------------------------------------------------------
+	//	アイコンの更新
+	//--------------------------------------------------------
+	// アイコンの位置設定
+	SetPositionIcon
+	(
+		g_player.nIconID, 
+		g_player.pos
+	);
+
+	// プレイヤーの補正の更新処理
+	RevPlayer();
+}
+
+//============================================================
+//	クリア成功時のプレイヤー更新処理
+//============================================================
+void UpdateClearPlayer(void)
+{
+	// カメラの状態を通常状態に設定
+	g_player.bCameraFirst = false;
+	g_player.nCameraState = PLAYCAMESTATE_NORMAL;
+
+	// 角度をゲートの向きに設定
+	g_player.rot.y = GetExit().pGate->rot.y;
+
+	// 移動量を減速
+	g_player.move.x += (PLAY_CLEAR_MOVE - g_player.move.x) * REV_PLAY_CLEAR_MOVE;
+
+	// 追加移動量を減速
+	g_player.boost.plusMove.x += (0.0f - g_player.boost.plusMove.x) * REV_PLAY_CLEAR_MOVE;
+
+	// 前回位置の更新
+	g_player.oldPos = g_player.pos;
+
+	// プレイヤーの位置の更新
+	PosPlayer();
+
+	// プレイヤーの着地の更新
+	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
+
+	//--------------------------------------------------------
+	//	影の更新
+	//--------------------------------------------------------
+	// 影の位置設定
+	SetPositionShadow
+	( // 引数
+		g_player.nShadowID,	// 影のインデックス
+		g_player.pos,		// 位置
+		g_player.rot,		// 向き
+		NONE_SCALE			// 拡大率
+	);
+}
+
+//============================================================
+//	クリア失敗時のプレイヤー更新処理
+//============================================================
+void UpdateOverPlayer(void)
+{
+	// 変数を宣言
+	int nTrafficCnt = 0;	// 引数設定用
+
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
+
+	// カメラの状態を通常状態に設定
+	g_player.bCameraFirst = false;
+	g_player.nCameraState = PLAYCAMESTATE_NORMAL;
+
+	// 移動していない状態にする
+	g_player.bMove = false;
+
+	// 移動量を減速
+	g_player.move.x += (0.0f - g_player.move.x) * REV_PLAY_OVER_MOVE;
+
+	// 追加移動量を減速
+	g_player.boost.plusMove.x += (0.0f - g_player.boost.plusMove.x) * REV_PLAY_OVER_MOVE;
+
+	// 前回位置の更新
+	g_player.oldPos = g_player.pos;
+
+	// プレイヤーの位置の更新
+	PosPlayer();
+
+	// プレイヤーの着地の更新
+	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
+
+	//--------------------------------------------------------
+	//	当たり判定
+	//--------------------------------------------------------
+	// オブジェクトとの当たり判定
+	CollisionObject
+	( // 引数
+		&g_player.pos,			// 現在の位置
+		&g_player.oldPos,		// 前回の位置
+		&g_player.move,			// 移動量
+		PLAY_WIDTH,				// 横幅
+		PLAY_DEPTH,				// 奥行
+		&nTrafficCnt,			// 渋滞カウント
+		g_player.boost.state,	// ブーストの状態
+		&policeState			// 警察の状態
+	);
+
+	// 吹っ飛ぶオブジェクトとの当たり判定
+	SmashCollision
+	( // 引数
+		g_player.pos, 
+		g_player.modelData.fRadius
+	);				
+
+	// ゲートとの当たり判定
+	CollisionGate
+	( // 引数
+		&g_player.pos,		// 現在の位置
+		&g_player.oldPos,	// 前回の位置
+		&g_player.move,		// 移動量
+		PLAY_WIDTH,			// 横幅
+		PLAY_DEPTH			// 奥行
+	);	
+
+	// 車の停止処理
+	CollisionStopCar
+	( // 引数
+		g_player.pos,				//位置
+		g_player.rot,				//向き
+		&g_player.move,				//移動量
+		g_player.modelData.fRadius,	//半径
+		COLLOBJECTTYPE_PLAYER,		//対象のタイプ
+		&nTrafficCnt
+	);
+
+	// 車同士の当たり判定
+	CollisionCarBody
+	( // 引数
+		&g_player.pos,
+		&g_player.oldPos,
+		g_player.rot,
+		&g_player.move,
+		PLAY_WIDTH,
+		PLAY_DEPTH,
+		COLLOBJECTTYPE_PLAYER,
+		&nTrafficCnt,
+		TACKLESTATE_CHARGE
+	);
+
+	//--------------------------------------------------------
+	//	影の更新
+	//--------------------------------------------------------
+	// 影の位置設定
+	SetPositionShadow
+	( // 引数
+		g_player.nShadowID,	// 影のインデックス
+		g_player.pos,		// 位置
+		g_player.rot,		// 向き
+		NONE_SCALE			// 拡大率
+	);
+
+	// プレイヤーの補正の更新処理
+	RevPlayer();
 }
 
 //============================================================
@@ -771,8 +1005,12 @@ void SilenceWorldPlayer(void)
 	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
 	{ // 攻撃モードの変更の操作が行われた場合
 
-		// 攻撃モードを変更
-		g_player.atkState = (ATTACKSTATE)((g_player.atkState + 1) % ATTACKSTATE_MAX);
+		if (g_player.bomb.state != ATTACKSTATE_WAIT)
+		{ // 攻撃状態が攻撃待機状態ではない場合
+
+			// 攻撃モードを変更
+			g_player.bomb.state = (ATTACKSTATE)((g_player.bomb.state + 1) % ATTACKSTATE_MAX);
+		}
 	}
 
 	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
@@ -1090,6 +1328,65 @@ void UpdateFlyAway(void)
 		}
 
 		break;					// 抜け出す
+	}
+}
+
+//============================================================
+//	爆弾の更新処理
+//============================================================
+void UpdateSilenceWorld(void)
+{
+	switch (g_player.bomb.state)
+	{ // 攻撃状態ごとの処理
+	case ATTACKSTATE_NONE:	// 何もしない状態
+
+		// 無し
+
+		// 処理を抜ける
+		break;
+
+	case ATTACKSTATE_BOMB:	// ボム攻撃状態
+
+		if (g_player.bomb.nCounter > 0)
+		{ // カウンターが 0より大きい場合
+
+			// カウンターを減算
+			g_player.bomb.nCounter -= SUB_BOMB_CNT;
+
+			if (g_player.bomb.nCounter < 0)
+			{ // カウンターが 0を下回った場合
+
+				// カウンターを補正
+				g_player.bomb.nCounter = 0;
+			}
+		}
+		else
+		{ // カウンターが 0以下の場合
+
+			// 攻撃待機状態にする
+			g_player.bomb.state = ATTACKSTATE_WAIT;
+		}
+
+		// 処理を抜ける
+		break;
+
+	case ATTACKSTATE_WAIT:	// 攻撃待機状態
+
+		if (g_player.bomb.nCounter < BOMB_CNT)
+		{ // カウンターが一定値より小さい場合
+
+			// カウンターを加算
+			g_player.bomb.nCounter++;
+		}
+		else
+		{ // カウンターが一定値以上の場合
+
+			// 何もしない状態にする
+			g_player.bomb.state = ATTACKSTATE_NONE;
+		}
+
+		// 処理を抜ける
+		break;
 	}
 }
 

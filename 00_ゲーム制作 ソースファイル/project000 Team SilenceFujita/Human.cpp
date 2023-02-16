@@ -40,10 +40,13 @@
 #define MAX_HUMAN_BACKWARD			(8.0f)		// 後退時の最高速度
 #define REV_HUMAN_MOVE_SUB			(0.04f)		// 移動量の減速係数
 #define HUMAN_CURVE_ADD				(0.03f)		// 曲がり角での向きの加算数
-#define HUMAN_RANDAM_MOVE			(6)		// 人間の移動量のランダム
+#define HUMAN_RANDAM_MOVE			(6)			// 人間の移動量のランダム
 #define HUMAN_MOVE_LEAST			(4)			// 人間の移動量の最低限
 #define HUMAN_PASS_SHIFT			(40.0f)		// すれ違った時のずらす幅
-#define HUMAN_RADIUS				(40.0f)		// 人間の幅
+#define HUMAN_RADIUS				(30.0f)		// 人間の幅
+#define HUMAN_PASS_CORRECT			(0.06f)		// 人間のずらす補正倍率
+#define REACTION_HUMAN_RANGE		(170.0f)	// リアクションする人間の範囲
+#define REACTION_CAR_RANGE			(50.0f)		// リアクションする車の範囲
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -96,6 +99,11 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].modelData.size = INIT_SIZE;				// 縦幅
 		g_aHuman[nCntHuman].modelData.fRadius = 0.0f;				// 半径
 
+		// ジャッジの情報の初期化
+		g_aHuman[nCntHuman].judge.col = JUDGE_WHITE;				// ピカピカの色
+		g_aHuman[nCntHuman].judge.state = JUDGESTATE_JUSTICE;		// 善悪
+		g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
+
 		// 曲がり角関係の初期化
 		g_aHuman[nCntHuman].curveInfo.actionState = HUMANACT_WALK;	// 歩行状態
 		g_aHuman[nCntHuman].curveInfo.nRandamRoute = 0;				// 進むルートの種類
@@ -126,6 +134,7 @@ void UninitHuman(void)
 void UpdateHuman(void)
 {
 	int nCnt = 0;
+	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -159,6 +168,13 @@ void UpdateHuman(void)
 				g_aHuman[nCntHuman].bMove,			// 移動しているか
 				g_aHuman[nCntHuman].fMaxMove		// 移動量の最大数
 			);
+
+			if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_EVIL)
+			{ // 悪者だった場合
+
+				// ジャッジの更新処理
+				UpdateJudge(&g_aHuman[nCntHuman].judge);
+			}
 
 			//人間のリアクション処理
 			ReactionHuman(&g_aHuman[nCntHuman]);
@@ -226,7 +242,9 @@ void UpdateHuman(void)
 				&g_aHuman[nCntHuman].move,		// 移動量
 				HUMAN_WIDTH,					// 横幅
 				HUMAN_DEPTH,					// 奥行
-				&nCnt							// 渋滞カウント
+				&nCnt,							// 渋滞カウント
+				BOOSTSTATE_NONE,				// ブースト状態
+				&policeState					// 警察の状態
 			);
 
 			// プレイヤーの補正の更新処理
@@ -296,8 +314,23 @@ void DrawHuman(void)
 
 				default:		//上記以外
 
-					// マテリアルの設定
-					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					// マテリアルのコピーに代入する
+					g_aHuman[nCntHuman].matCopy[nCntMat] = pMat[nCntMat];
+
+					if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_JUSTICE)
+					{ // 良い奴の場合
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+					else
+					{ // 悪い奴の場合
+
+						// 自己発光を代入する
+						g_aHuman[nCntHuman].matCopy[nCntMat].MatD3D.Emissive = g_aHuman[nCntHuman].judge.col;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&g_aHuman[nCntHuman].matCopy[nCntMat].MatD3D);
+					}
 
 					break;					//抜け出す
 				}
@@ -348,12 +381,23 @@ void SetHuman(D3DXVECTOR3 pos)
 				&g_aHuman[nCntHuman].bUse		// 影の親の使用状況
 			);
 
+			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
+
+			//マテリアル情報に対するポインタを取得
+			pMat = (D3DXMATERIAL*)g_aHuman[nCntHuman].modelData.pBuffMat->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_aHuman[nCntHuman].modelData.dwNumMat; nCntMat++)
+			{
+				//マテリアルの情報を取得する
+				g_aHuman[nCntHuman].matCopy[nCntMat] = pMat[nCntMat];
+			}
+
 			// 影の位置設定
 			SetPositionShadow(g_aHuman[nCntHuman].nShadowID, g_aHuman[nCntHuman].pos, g_aHuman[nCntHuman].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
 			// 曲がり角情報の設置
 			g_aHuman[nCntHuman].curveInfo.actionState = HUMANACT_WALK;			// 状態
-			g_aHuman[nCntHuman].curveInfo.nRandamRoute = 0;						// ルートの種類
+			g_aHuman[nCntHuman].curveInfo.nRandamRoute = rand() % MAX_HUMAN_ROUTE;		// ルートの種類
 			g_aHuman[nCntHuman].curveInfo.rotDest = g_aHuman[nCntHuman].rot;	// 目標の向き
 			g_aHuman[nCntHuman].rot.y = GetDefaultRot(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// 初期の向き
 			g_aHuman[nCntHuman].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// ルート
@@ -387,6 +431,22 @@ void SetHuman(D3DXVECTOR3 pos)
 				g_aHuman[nCntHuman].pos.x = g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[0].x - (HUMAN_WIDTH * 2);
 
 				break;			// 抜け出す
+			}
+
+			// ジャッジの情報の設定
+			g_aHuman[nCntHuman].judge.col = JUDGE_WHITE;			// ピカピカの色
+
+			if (nCntHuman % 2 == 0)
+			{ // 2の倍数だった場合
+
+				g_aHuman[nCntHuman].judge.state = JUDGESTATE_EVIL;					// 善悪
+				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+			else
+			{ // 上記以外
+
+				g_aHuman[nCntHuman].judge.state = JUDGESTATE_JUSTICE;				// 善悪
+				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
 			}
 
 			// 処理を抜ける
@@ -751,7 +811,7 @@ void ReactionHuman(Human *pHuman)
 			fLength = (pPlayer->pos.x - pHuman->pos.x) * (pPlayer->pos.x - pHuman->pos.x)
 				+ (pPlayer->pos.z - pHuman->pos.z) * (pPlayer->pos.z - pHuman->pos.z);
 
-			if (fLength <= (pPlayer->modelData.fRadius + 50.0f) * 170.0f)
+			if (fLength <= (pPlayer->modelData.fRadius + REACTION_CAR_RANGE) * REACTION_HUMAN_RANGE)
 			{ // プレイヤーが近くに来た場合
 				//停止処理に移行
 				pHuman->state = HUMANSTATE_STOP;
@@ -1048,7 +1108,7 @@ void PassingHuman(Human *pHuman)
 				fLength = (pPassHuman->pos.x - pHuman->pos.x) * (pPassHuman->pos.x - pHuman->pos.x)
 					+ (pPassHuman->pos.z - pHuman->pos.z) * (pPassHuman->pos.z - pHuman->pos.z);
 
-				if (fLength <= (30.0f * 30.0f))
+				if (fLength <= (HUMAN_RADIUS * HUMAN_RADIUS))
 				{ // オブジェクトが当たっている
 					if (pHuman->move.x >= pPassHuman->move.x)
 					{ // 移動量が速い場合
@@ -1063,7 +1123,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.z;
 
 							// 幅をずらす
-							pHuman->pos.z += posDiff * 0.06f;
+							pHuman->pos.z += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 
@@ -1076,7 +1136,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.z;
 
 							// 幅をずらす
-							pHuman->pos.z += posDiff * 0.06f;
+							pHuman->pos.z += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 
@@ -1089,7 +1149,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.x;
 
 							// 幅をずらす
-							pHuman->pos.x += posDiff * 0.06f;
+							pHuman->pos.x += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 
@@ -1102,7 +1162,7 @@ void PassingHuman(Human *pHuman)
 							posDiff = posDest - pHuman->pos.x;
 
 							// 幅をずらす
-							pHuman->pos.x += posDiff * 0.06f;
+							pHuman->pos.x += posDiff * HUMAN_PASS_CORRECT;
 
 							break;				// 抜け出す
 						}
@@ -1115,6 +1175,12 @@ void PassingHuman(Human *pHuman)
 					WalkHuman(pHuman);
 				}
 			}
+		}
+		else
+		{ // 上記以外
+
+			// 人間の歩く処理
+			WalkHuman(pHuman);
 		}
 	}
 }

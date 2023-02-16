@@ -38,11 +38,22 @@ typedef enum
 }POLICESTATE;
 
 //**********************************************************************************************************************
+//	タックルの状態
+//**********************************************************************************************************************
+typedef enum
+{
+	TACKLESTATE_CHARGE = 0,				// チャージ中
+	TACKLESTATE_BOOST,					// 射出
+	TACKLESTATE_MAX						// この列挙型の総数
+}TACKLESTATE;
+
+//**********************************************************************************************************************
 //	構造体定義 (PoliceTackle)
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 Tacklemove;				// タックル時の追加移動量
+	D3DXVECTOR3 tacklemove;				// タックル時の追加移動量
+	TACKLESTATE tackleState;			// タックル時の状態
 	int nTackleCnt;						// タックル状態に移行する
 }PoliTackle;
 
@@ -63,6 +74,7 @@ typedef struct
 	POLICESTATE state;					// 警察車両の状態
 	BOMBSTATE   bombState;				// ボムの状態
 	int			nShadowID;				// 影のインデックス
+	int			nIconID;				// アイコンのインデックス
 	int			nLife;					// 寿命
 	bool		bMove;					// 移動しているかどうか
 	bool		bJump;					// ジャンプの状況
@@ -83,6 +95,7 @@ void UpdatePolice(void);				// 警察の更新処理
 void DrawPolice(void);					// 警察の描画処理
 void SetPolice(D3DXVECTOR3 pos);		// 警察の設定処理
 void HitPolice(Police *pPolice, int nDamage);	// 警察のダメージ判定
+void PatrolCarSearch(Police *pPolice);			// 警察車両の探知処理
 Police *GetPoliceData(void);					// 警察の取得処理
 
 //**********************************************************************************************************************

@@ -325,8 +325,11 @@ void ShotBarrier(void)
 						break;
 					}
 
-					// 攻撃モードを通常状態に変更
-					pPlayer->atkState = ATTACKSTATE_NORMAL;
+					// 攻撃モードを待機状態に変更
+					pPlayer->bomb.state = ATTACKSTATE_WAIT;
+
+					// カウンターを初期化
+					pPlayer->bomb.nCounter = 0;
 
 					// 使用している状態にする
 					g_aBarrier[nCntBarrier].bUse = true;
@@ -368,7 +371,7 @@ BARRIERSTATE GetBarrierState(void *pCar)
 //======================================================================================================================
 void UpdateBombData(void)
 {
-	if (GetPlayer()->atkState == ATTACKSTATE_BOMB)
+	if (GetPlayer()->bomb.state == ATTACKSTATE_BOMB)
 	{ // プレイヤーの攻撃状態がボムの場合
 
 		// ボムの再設定
@@ -629,6 +632,9 @@ void UpdateBarrierData(void)
 
 						// ボムの状態を何もしない状態にする
 						pPolice->bombState = BOMBSTATE_NONE;
+
+						// パトロールの探知処理
+						PatrolCarSearch(pPolice);
 
 						// 処理を抜ける
 						break;

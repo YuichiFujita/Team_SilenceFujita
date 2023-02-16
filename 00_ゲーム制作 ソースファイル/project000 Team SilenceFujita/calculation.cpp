@@ -26,6 +26,9 @@
 #include "Police.h"
 #include "weather.h"
 
+#include "bonus.h"
+#include "game.h"
+
 //==================================================================================
 //	四頂点の位置の計算処理
 //==================================================================================
@@ -77,6 +80,52 @@ float LineOuterProduct(D3DXVECTOR3 posLeft, D3DXVECTOR3 posRight, D3DXVECTOR3 po
 }
 
 //==================================================================================
+//	外積の当たり判定
+//==================================================================================
+//	境界線にぶつかっていた場合、ぶつかった位置を求める際に使用
+//==================================================================================
+void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3DXVECTOR3 WallRpos, D3DXVECTOR3 WallLpos, bool *bUse, int *nShadow)
+{
+	// 変数を宣言
+	D3DXVECTOR3 vecMove, vecLine, vecTopos, posCross;	// 外積の変数
+	float       fRate;									// 割合の変数
+
+	// 弾の軌跡を測る
+	vecMove.x = (Targetpos->x - TargetposOld->x);
+	vecMove.y = (Targetpos->y - TargetposOld->y);
+	vecMove.z = (Targetpos->z - TargetposOld->z);
+
+	// 壁の境界線を測る
+	vecLine.x = (WallRpos.x - WallLpos.x);
+	vecLine.y = (WallRpos.y - WallLpos.y);
+	vecLine.z = (WallRpos.z - WallLpos.z);
+
+	// 壁の始点から弾の位置の距離を測る
+	vecTopos.x = (Targetpos->x - WallLpos.x);
+	vecTopos.y = (Targetpos->y - WallLpos.y);
+	vecTopos.z = (Targetpos->z - WallLpos.z);
+
+	// 割合を求める
+	fRate = ((vecTopos.z * vecMove.x) - (vecTopos.x * vecMove.z)) / ((vecLine.z * vecMove.x) - (vecLine.x * vecMove.z));
+
+	// 交点を求める
+	posCross.x = vecLine.x * fRate - WallLpos.x;
+	posCross.y = vecLine.y * fRate - WallLpos.y;
+	posCross.z = vecLine.z * fRate - WallLpos.z;
+
+	if ((vecLine.z * vecTopos.x) - (vecLine.x * vecTopos.z) < 0.0f)
+	{ // 境界線を超えた場合
+
+		if (fRate >= 0.0f && fRate <= 1.0f)
+		{ // 割合が0.0f～1.0fの間だった(境界線を超えた)場合
+
+			// 位置を設定する
+			Targetpos = &posCross;
+		}
+	}
+}
+
+//==================================================================================
 //	モデルの着地の更新処理
 //==================================================================================
 //	地面の上に立つかメッシュフィールドの上にいるかの判定に使用
@@ -107,33 +156,36 @@ void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
 }
 
 //==================================================================================
-// 向きの正規化
+//	向きの正規化
+//==================================================================================
+//	あらゆる向きの正規化に使用
 //==================================================================================
 void RotNormalize(float *rot)
 {
-	//--------------------------------------------------------
-	//	向きの正規化
-	//--------------------------------------------------------
-	if (*rot > D3DX_PI) { *rot -= D3DX_PI * 2; }
+	if      (*rot >  D3DX_PI) { *rot -= D3DX_PI * 2; }
 	else if (*rot < -D3DX_PI) { *rot += D3DX_PI * 2; }
 }
 
 //==================================================================================
-// ファイルをロードする全体処理
+//	ファイルをロードする全体処理
 //==================================================================================
-void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bObject, bool bAI)
+//	ファイルをロードする際に使用。引数で読み込むものをコントロールすることも可
+//==================================================================================
+void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI)
 {
 	// カーブの情報の初期化処理
 	InitCurveInfo();
 
 	if (bCurve == true)
 	{ // カーブを読み込む場合
+
 		// カーブテキストのロード処理
 		LoadCurveTxt();
 	}
 
 	if (bHumanCurve == true)
 	{ // 人間の曲がり角を読み込む場合
+
 		// 人間のルートのロード処理
 		LoadHumanCurveTxt();
 
@@ -143,25 +195,42 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bObject, boo
 
 	if (bStage == true)
 	{ // ステージを読み込む場合
+
 		// ステージのセットアップ
 		TxtSetStage();
 	}
 
+	if (bCollision == true)
+	{ // 当たり判定を読み込む場合
+
+		// 当たり判定のセットアップ
+		TxtSetCollision();
+	}
+
+	if (bShadow == true)
+	{ // 影を読み込む場合
+
+		// 影の半径のセットアップ
+		TxtSetShadow();
+	}
+
 	if (bObject == true)
 	{ // オブジェクトを読み込む場合
+
 		// オブジェクトのセットアップ
 		TxtSetObject();
 	}
 
 	if (bAI == true)
 	{ // AIを読み込む場合
+
 		// AI系のセットアップ
 		TxtSetAI();
 	}
 }
 
 //==================================================================================
-// 万能初期化の全体処理
+//	万能初期化の全体処理
 //==================================================================================
 void InitAllAroundChunk(void)
 {
@@ -215,7 +284,7 @@ void InitAllAroundChunk(void)
 }
 
 //==================================================================================
-// 万能終了の全体処理
+//	万能終了の全体処理
 //==================================================================================
 void UninitAllAroundChunk(void)
 {
@@ -269,7 +338,7 @@ void UninitAllAroundChunk(void)
 }
 
 //==================================================================================
-// 万能描画の全体処理
+//	万能描画の全体処理
 //==================================================================================
 void DrawAllAroundChunk(void)
 {
@@ -332,7 +401,7 @@ void DrawAllAroundChunk(void)
 }
 
 //==================================================================================
-// リザルトの初期化全体処理
+//	リザルトの初期化全体処理
 //==================================================================================
 void InitResultChunk(void)
 {
@@ -341,7 +410,7 @@ void InitResultChunk(void)
 }
 
 //==================================================================================
-// リザルトの終了全体処理
+//	リザルトの終了全体処理
 //==================================================================================
 void UninitResultChunk(void)
 {
@@ -350,10 +419,138 @@ void UninitResultChunk(void)
 }
 
 //==================================================================================
-// リザルトの描画全体処理
+//	リザルトの描画全体処理
 //==================================================================================
 void DrawResultChunk(void)
 {
 	// 万能描画の全体処理
 	DrawAllAroundChunk();
+}
+
+//==================================================================================
+//　全てのアップデートが終わっているかどうかの判断処理
+//==================================================================================
+//　未終了のアップデートがないかを判断する処理
+//==================================================================================
+bool UpdateAllClear(RESULTSTATE state)
+{
+	// 変数を宣言
+	bool bAllClear = true;				// 更新の終了確認用
+
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+	Gate   *pGate   = GetGateData();	// ゲートの情報
+	Bonus  *pBonus  = GetBonus();		// ボーナスの情報
+
+	switch (state)
+	{ // リザルトの状態ごとの処理
+	case RESULTSTATE_CLEAR:		// クリア状態
+
+		// 無し
+
+		// 処理を抜ける
+		break;
+
+	case RESULTSTATE_TIMEOVER:	// タイムオーバー状態
+
+		for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++, pGate++)
+		{ // ゲートの最大表示数分繰り返す
+
+			if (pGate->bUse == true)
+			{ // ゲートが使用されている場合
+
+				if (pGate->state != GATESTATE_STOP)
+				{ // 停止状態ではない場合
+
+					// ゲートの更新
+					UpdateGate();
+
+					// 更新を終了していない状態にする
+					bAllClear = false;
+
+					// 処理を抜ける
+					break;
+				}
+			}
+		}
+
+		// 処理を抜ける
+		break;
+
+	case RESULTSTATE_LIFEOVER:	// ライフオーバー状態
+
+		// 無し
+
+		// 処理を抜ける
+		break;
+	}
+
+	for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++, pBonus++)
+	{ // ボーナスの最大表示数分繰り返す
+
+		if (pBonus->bUse == true)
+		{ // 使用されている場合
+
+			// ボーナスの更新
+			UpdateBonus();
+
+			// 更新を終了していない状態にする
+			bAllClear = false;
+
+			// 処理を抜ける
+			break;
+		}
+	}
+
+	// 更新状況を返す
+	return bAllClear;
+}
+
+//==================================================================================
+// ジャッジの更新処理
+//==================================================================================
+// 悪い奴の自己発光を変化させる処理
+//==================================================================================
+void UpdateJudge(Judge *pJudge)
+{
+	switch (pJudge->ticatica)
+	{
+	case CHICASTATE_BLACKOUT:		// 暗転状態
+
+		// 暗転させていく
+		pJudge->col.r -= JUDGE_FLASH;
+		pJudge->col.g -= JUDGE_FLASH;
+		pJudge->col.b -= JUDGE_FLASH;
+
+		if (pJudge->col.r <= JUDGE_BLACK_LINE)
+		{ // 色が一定数を超えた場合
+
+			// 色を補正する
+			pJudge->col = JUDGE_BLACK;
+
+			// 明転状態にする
+			pJudge->ticatica = CHICASTATE_WHITEOUT;
+		}
+
+		break;						// 抜け出す
+
+	case CHICASTATE_WHITEOUT:		// 明転状態
+
+		// 明転させていく
+		pJudge->col.r += JUDGE_FLASH;
+		pJudge->col.g += JUDGE_FLASH;
+		pJudge->col.b += JUDGE_FLASH;
+
+		if (pJudge->col.r >= JUDGE_WHITE_LINE)
+		{ // 色が一定数を超えた場合
+
+			// 色を補正する
+			pJudge->col = JUDGE_WHITE;
+
+			// 暗転状態にする
+			pJudge->ticatica = CHICASTATE_BLACKOUT;
+		}
+
+		break;						// 抜け出す
+	}
 }

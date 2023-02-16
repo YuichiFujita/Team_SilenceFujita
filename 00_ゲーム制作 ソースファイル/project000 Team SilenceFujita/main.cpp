@@ -26,6 +26,7 @@
 #include "Human.h"
 
 #ifdef _DEBUG	// デバッグ処理
+// デバッグ表示用
 #include "camera.h"
 #include "effect.h"
 #include "particle.h"
@@ -35,6 +36,11 @@
 #include "EditBillboard.h"
 #include "SoundDJ.h"
 #include "weather.h"
+
+// メモリリーク出力用
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 #endif
 
 //************************************************************
@@ -260,6 +266,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 	// ウインドウクラスの登録を解除
 	UnregisterClass(CLASS_NAME, wcex.hInstance);
+
+#ifdef _DEBUG	// デバッグ処理
+	// メモリリークを出力
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	_CrtDumpMemoryLeaks();
+#endif
 
 	// 値を返す
 	return (int)msg.wParam;
@@ -760,11 +772,11 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 void TxtSetStage(void)
 {
 	// 変数を宣言
-	int         nEnd;			// テキスト読み込み終了の確認用
-	StageLimit  stageLimit;		// ステージの移動範囲の代入用
+	int        nEnd;			// テキスト読み込み終了の確認用
+	StageLimit stageLimit;		// ステージの移動範囲の代入用
 
 	// 変数配列を宣言
-	char         aString[MAX_STRING];	// テキストの文字列の代入用
+	char aString[MAX_STRING];	// テキストの文字列の代入用
 
 	// ポインタを宣言
 	FILE *pFile;		// ファイルポインタ
@@ -1627,6 +1639,7 @@ void DrawDebug(void)
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	Player *pPlayer = GetPlayer();
 
 	// 文字列に代入
 	sprintf
@@ -1657,7 +1670,8 @@ void DrawDebug(void)
 		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
 		" 　警察のスピード：[%.3f]\n"
 		" 　人間の位置：[%.3f,%.3f,%.3f]\n"
-		" 　降っている物の総数：%d",
+		" 　降っている物の総数：%d"
+		" 　現在の爆弾ゲージ：%d",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1678,7 +1692,8 @@ void DrawDebug(void)
 		pPolice->pos.x, pPolice->pos.y, pPolice->pos.z,
 		pPolice->move.x,
 		HumanPos.x, HumanPos.y, HumanPos.z,
-		nNumWeather
+		nNumWeather,
+		pPlayer->bomb.nCounter
 	);
 
 	//--------------------------------------------------------
@@ -2087,15 +2102,5 @@ void DrawDebugControlBillboard(void)
 	// テキストの描画
 	g_pFont->DrawText(NULL, &aDeb[0], -1, &rect, DT_RIGHT, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
-
-#if 1
-//==============================================
-//警察のデバッグ表記
-//==============================================
-void DrawDebugPolice(void)
-{
-
-}
-#endif
 
 #endif

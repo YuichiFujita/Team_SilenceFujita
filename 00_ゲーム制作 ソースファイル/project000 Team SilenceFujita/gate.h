@@ -36,19 +36,39 @@ typedef enum
 } GATESTATE;
 
 //**********************************************************************************************************************
-//	構造体定義 (Object)
+//	構造体定義 (Door)
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3  pos;			// 位置
-	D3DXVECTOR3  move;			// 移動量
-	D3DXVECTOR3  rot;			// 向き
-	D3DXMATRIX   mtxWorld;		// ワールドマトリックス
-	Model        modelData;		// モデル情報
-	GATESTATE	 state;			// 状態
-	Coll_Info    collInfo;		// 当たり判定情報
-	bool         bUse;			// 使用状況
+	float      fPos;			// 位置
+	float      fMove;			// 移動量
+	D3DXMATRIX mtxWorld;		// ワールドマトリックス
+	Model      modelData;		// モデル情報
+}Door;
+
+//**********************************************************************************************************************
+//	構造体定義 (Gate)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3  pos;						// 位置
+	D3DXVECTOR3  rot;						// 向き
+	D3DXMATRIX   mtxWorld;					// ワールドマトリックス
+	Model        modelData;					// モデル情報
+	GATESTATE	 state;						// 状態
+	Coll_Info    collInfo[MODEL_GATE_MAX];	// 当たり判定情報
+	Door         doorData;					// 鉄板の情報
+	bool         bUse;						// 使用状況
 }Gate;
+
+//**********************************************************************************************************************
+//	構造体定義 (Exit)
+//**********************************************************************************************************************
+typedef struct
+{
+	Gate *pGate;	// 脱出ゲートのアドレス
+	bool  bExit;	// 脱出状況
+}Exit;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -58,10 +78,13 @@ void UninitGate(void);			// オブジェクトの終了処理
 void UpdateGate(void);			// オブジェクトの更新処理
 void DrawGate(void);			// オブジェクトの描画処理
 
-void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot);																	// オブジェクトの設定処理
+void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot);												// オブジェクトの設定処理
 void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
+void CollisionExitGate(Gate *pGate);																			// ゲートの脱出判定
 
+void AllShutOutGate(void);		// ゲートの全閉め処理
 Gate *GetGateData(void);		// オブジェクトの取得処理
+Exit GetExit(void);				// 脱出の情報の取得処理
 Collision *GetCollGate(void);	// ゲートの当たり判定の取得処理
 
 //**********************************************************************************************************************

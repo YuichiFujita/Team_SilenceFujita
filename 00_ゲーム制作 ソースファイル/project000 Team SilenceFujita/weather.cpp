@@ -15,49 +15,49 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define SNOW_TEXTURE	"data\\TEXTURE\\effect000.jpg"	//雪のテクスチャ
+#define SNOW_TEXTURE	"data\\TEXTURE\\effect000.jpg"			// 雪のテクスチャ
 
 #define RAIN_COL		(D3DXCOLOR(0.5f, 0.5f, 0.95f, 1.0f))	// 雨の頂点カラー
 #define SNOW_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// 雪の頂点カラー
 #define THUNDER_COL		(D3DXCOLOR(1.0f, 1.0f, 0.5f, 1.0f))		// 雷の頂点カラー
 
-#define WEATHER_RAND	(10)									// 天気のランダムの範囲
-#define SUNNY_RAND		(6)										// ランダムでの晴れの範囲
-#define RAIN_RAND		(7)										// ランダムでの雨の範囲
-#define SNOW_RAND		(8)										// ランダムでの雪の範囲
-#define THUNDER_RAND	(9)										// ランダムでの雷雨の範囲
+#define WEATHER_RAND	(10)	// 天気のランダムの範囲
+#define SUNNY_RAND		(6)		// ランダムでの晴れの範囲
+#define RAIN_RAND		(7)		// ランダムでの雨の範囲
+#define SNOW_RAND		(8)		// ランダムでの雪の範囲
+#define THUNDER_RAND	(9)		// ランダムでの雷雨の範囲
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 // 雨
-void InitRain(void);									// 雨の初期化処理
-void UpdateRain(void);									// 雨の更新処理
-void DrawRain(void);									// 雨の描画処理
+void InitRain(void);			// 雨の初期化処理
+void UpdateRain(void);			// 雨の更新処理
+void DrawRain(void);			// 雨の描画処理
 
 // 雪
-void InitSnow(void);									// 雪の初期化処理
-void UpdateSnow(void);									// 雪の更新処理
-void DrawSnow(void);									// 雪の描画処理
+void InitSnow(void);			// 雪の初期化処理
+void UpdateSnow(void);			// 雪の更新処理
+void DrawSnow(void);			// 雪の描画処理
 
 // 雷
-void InitThunder(void);									// 雷の初期化処理
-void UpdateThunder(void);								// 雷の更新処理
+void InitThunder(void);			// 雷の初期化処理
+void UpdateThunder(void);		// 雷の更新処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-LPDIRECT3DTEXTURE9		g_apTextureWeather = NULL;		// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWeather = NULL;		// 頂点バッファへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffThunder = NULL;		// 頂点バッファへのポインタ(雷)
+LPDIRECT3DTEXTURE9      g_apTextureWeather = NULL;		// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWeather  = NULL;		// 頂点バッファへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffThunder  = NULL;		// 頂点バッファへのポインタ(雷)
 
-Rain g_aRain[MAX_RAIN];		// 雨の情報
-Snow g_aSnow[MAX_SNOW];		// 雪の情報
-Thunder g_aThunder[MAX_THUNDER];		// 雷の情報
-WEATHERTYPE g_Weather;		// 天気の状態
-int g_NumWeather;			// 降っている数を取得する
-int g_nThunderCount;		// 雷のカウント
-MODE g_WeatherMode;			// モード(天気専用)
+Rain g_aRain[MAX_RAIN];				// 雨の情報
+Snow g_aSnow[MAX_SNOW];				// 雪の情報
+Thunder g_aThunder[MAX_THUNDER];	// 雷の情報
+WEATHERTYPE g_Weather;				// 天気の状態
+int g_NumWeather;					// 降っている数を取得する
+int g_nThunderCount;				// 雷のカウント
+MODE g_WeatherMode;					// モード(天気専用)
 
 //======================================================================================================================
 //	天気の初期化処理
@@ -101,21 +101,18 @@ void InitWeather(void)
 
 	case MODE_RESULT:	// リザルト
 
-		switch (resultState)
-		{
-		case RESULTSTATE_CLEAR:		// クリア状態
-
+		if (resultState == RESULTSTATE_CLEAR)
+		{ // ゲームクリア状態の場合
+	
 			// 天気を晴れに設定する
 			g_Weather = WEATHERTYPE_SUNNY;
-
-			break;					// 抜け出す
-
-		case RESULTSTATE_OVER:		// ゲームオーバー状態
-
+		}
+		else if (resultState == RESULTSTATE_TIMEOVER
+			 ||  resultState == RESULTSTATE_LIFEOVER)
+		{ // ゲームオーバー状態の場合
+	
 			// 天気を雷雨に設定する
 			g_Weather = WEATHERTYPE_THUNDER;
-
-			break;					// 抜け出す
 		}
 
 		break;			// 抜け出す
@@ -469,9 +466,9 @@ void UpdateRain(void)
 	int nNumWeather = 0;	// 降っている物の数
 
 	// ポインタを宣言
-	VERTEX_3D *pVtx;		// 頂点情報へのポインタ
-	Player *pPlayer = GetPlayer();		// プレイヤーの情報
-	Camera *pCamera = GetCamera();		// カメラの情報
+	VERTEX_3D *pVtx;								// 頂点情報へのポインタ
+	Player *pPlayer = GetPlayer();					// プレイヤーの情報
+	Camera *pCamera = GetCamera(CAMERATYPE_MAIN);	// カメラの情報
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
@@ -549,7 +546,7 @@ void UpdateRain(void)
 
 			case MODE_RESULT:	// リザルト
 
-				if (g_aRain[nCntWeather].pos.y <= 4200.0f)
+				if (g_aRain[nCntWeather].pos.y <= RESULT_RAIN_LINE)
 				{ // 雨が地面に落ちたとき
 					// 使用しない
 					g_aRain[nCntWeather].bUse = false;
@@ -1109,23 +1106,17 @@ WEATHERTYPE GetWeather(void)
 //======================================================================================================================
 void WeatherRain(void)
 {
-	D3DXVECTOR3 Camerapos = GetCamera()->posV;	// カメラの視点
-	D3DXVECTOR3 posRain;						// 雨の降る位置
-	float moveRain;								// 雨の移動量
-	float rotRain;								// 雨の降っている方向
+	D3DXVECTOR3 Camerapos = GetCamera(CAMERATYPE_MAIN)->posV;	// カメラの視点
+	D3DXVECTOR3 Camerarot = GetCamera(CAMERATYPE_MAIN)->rot;	// カメラの向き
+	D3DXVECTOR3 posRain;	// 雨の降る位置
+	float moveRain;			// 雨の移動量
 
 	for (int nCnt = 0; nCnt < RAIN_GENERATE; nCnt++)
 	{
 		// 雨の位置を設定する
-		posRain.x = Camerapos.x + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
+		posRain.x = Camerapos.x + (sinf(Camerarot.y) * SHIFT_RAIN) + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
 		posRain.y = Camerapos.y + RAIN_HEIGHT;
-		posRain.z = Camerapos.z + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
-
-		// 角度を取る
-		rotRain = atan2f(posRain.x - Camerapos.x, posRain.z - Camerapos.z);
-
-		posRain.x += sinf(rotRain) * SHIFT_RAIN;
-		posRain.z += cosf(rotRain) * SHIFT_RAIN;
+		posRain.z = Camerapos.z + (cosf(Camerarot.y) * SHIFT_RAIN) + (rand() % RAIN_RANGE - (int)(RAIN_RANGE * 0.5f));
 
 		// 速度を設定する
 		moveRain = (rand() % RAIN_MOVE_RANGE) + RAIN_MOVE_LEAST;
@@ -1145,23 +1136,17 @@ void WeatherRain(void)
 //======================================================================================================================
 void WeatherSnow(void)
 {
-	D3DXVECTOR3 Camerapos = GetCamera()->posV;	// カメラの視点
-	D3DXVECTOR3 posSnow;						// 雪の降る位置
-	float moveSnow;								// 雪の移動量
-	float rotSnow;								// 雪の降っている方向
+	D3DXVECTOR3 Camerapos = GetCamera(CAMERATYPE_MAIN)->posV;	// カメラの視点
+	D3DXVECTOR3 Camerarot = GetCamera(CAMERATYPE_MAIN)->rot;	// カメラの向き
+	D3DXVECTOR3 posSnow;	// 雪の降る位置
+	float moveSnow;			// 雪の移動量
 
 	for (int nCnt = 0; nCnt < SNOW_GENERATE; nCnt++)
 	{
 		// 雨の位置を設定する
-		posSnow.x = Camerapos.x + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
+		posSnow.x = Camerapos.x + (sinf(Camerarot.y) * SHIFT_SNOW) + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
 		posSnow.y = Camerapos.y + SNOW_HEIGHT;
-		posSnow.z = Camerapos.z + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
-
-		// 角度を取る
-		rotSnow = atan2f(posSnow.x - Camerapos.x, posSnow.z - Camerapos.z);
-
-		posSnow.x += sinf(rotSnow) * SHIFT_SNOW;
-		posSnow.z += cosf(rotSnow) * SHIFT_SNOW;
+		posSnow.z = Camerapos.z + (cosf(Camerarot.y) * SHIFT_SNOW) + (rand() % SNOW_RANGE - (int)(SNOW_RANGE * 0.5f));
 
 		// 速度を設定する
 		moveSnow = (float)(rand() % SNOW_MOVE_RANGE) + SNOW_MOVE_LEAST;
