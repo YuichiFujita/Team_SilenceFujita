@@ -390,6 +390,9 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			// ダメージ状態にする
 			pPlayer->state = ACTIONSTATE_DAMAGE;
 
+			// ダメージ中にする
+			pPlayer->icon.state = ICONSTATE_DAMAGE;
+
 			// パーティクルの設定
 			SetParticle
 			( // 引数
@@ -449,12 +452,18 @@ void UpdateNormalPlayer(void)
 
 			// 無敵状態にする
 			g_player.state = ACTIONSTATE_UNRIVALED;
+
+			// 無敵状態の状態にする
+			g_player.icon.state = ICONSTATE_UNRIVALED;
 		}
 		else if (g_player.nCounterState <= 0)
 		{ // カウンターが 0以下の場合
 
 			// 通常状態にする
 			g_player.state = ACTIONSTATE_NORMAL;
+
+			// 無しの状態にする
+			g_player.icon.state = ICONSTATE_NONE;
 		}
 	}
 
@@ -573,13 +582,6 @@ void UpdateNormalPlayer(void)
 
 	// プレイヤーの補正の更新処理
 	RevPlayer();
-
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{ // 0キーを押した場合
-
-		// 復活状態にする
-		g_player.icon.state = ICONSTATE_REVIVAL;
-	}
 }
 
 //============================================================

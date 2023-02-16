@@ -31,6 +31,9 @@
 #define ICON_CORRECT_NEAR	(3800.0f)	// アイコンの手前側の補正係数
 
 #define ICON_ALPHA_CHANGE	(0.005f)	// アイコンの透明度の変化量
+#define ICON_REVIVAL_CNT	(20)		// 復活中のカウント
+#define ICON_DAMAGE_COL		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))		// ダメージ時の色
+#define ICON_UNRIVALED_CNT	(10)		// 無敵状態のカウント
 
 //************************************************************
 //	グローバル変数
@@ -70,6 +73,7 @@ void InitIcon(void)
 		g_aIcon[nCntIcon].pos			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
 		g_aIcon[nCntIcon].type			= ICONTYPE_PLAY;						// アイコン
 		g_aIcon[nCntIcon].col			= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
+		g_aIcon[nCntIcon].colCopy		= g_aIcon[nCntIcon].col;				// 色のコピー
 		g_aIcon[nCntIcon].nCounter		= 0;									// カウンター
 		g_aIcon[nCntIcon].alpha			= ICONALPHA_NONE;						// 透明度の状態
 		g_aIcon[nCntIcon].pIconIDParent = NULL;									// アイコンの親のアイコンインデックス
@@ -192,6 +196,12 @@ void UpdateIcon(void)
 					// 透明度を設定する
 					g_aIcon[nCntIcon].col.a = 1.0f;
 
+					// 透明度の位を設定する
+					g_aIcon[nCntIcon].alpha = ICONALPHA_NONE;
+
+					// 色を設定する
+					g_aIcon[nCntIcon].col = g_aIcon[nCntIcon].colCopy;
+
 					break;					// 抜け出す
 
 				case ICONSTATE_DISAPPEAR:	// 消える途中
@@ -216,7 +226,51 @@ void UpdateIcon(void)
 					// カウンターを加算する
 					g_aIcon[nCntIcon].nCounter++;
 
-					if (g_aIcon[nCntIcon].nCounter % 20 == 0)
+					if (g_aIcon[nCntIcon].nCounter % ICON_REVIVAL_CNT == 0)
+					{ // 一定数ごとに
+
+						// 透明度の状態を設定
+						g_aIcon[nCntIcon].alpha = (ICONALPHA)((g_aIcon[nCntIcon].alpha + 1) % ICONALPHA_MAX);
+					}
+
+					switch (g_aIcon[nCntIcon].alpha)
+					{
+					case ICONALPHA_NONE:	// 不透明
+
+						// 透明度を設定する
+						g_aIcon[nCntIcon].col.a = 1.0f;
+
+						break;				// 抜け出す
+
+					case ICONALPHA_CLEAR:	// 透明
+
+						// 透明度を設定する
+						g_aIcon[nCntIcon].col.a = 0.0f;
+
+						break;				// 抜け出す
+					}
+
+					break;					// 抜け出す
+
+				case ICONSTATE_DAMAGE:		// ダメージ中
+
+					// カウンターを初期化する
+					g_aIcon[nCntIcon].nCounter = 0;
+
+					// 色を赤くする
+					g_aIcon[nCntIcon].col = ICON_DAMAGE_COL;
+
+					break;					// 抜け出す
+
+				case ICONSTATE_UNRIVALED:	// 無敵状態
+
+					// 色を設定する
+					g_aIcon[nCntIcon].col = g_aIcon[nCntIcon].colCopy;
+
+					// カウンターを加算する
+					g_aIcon[nCntIcon].nCounter++;
+
+					if (g_aIcon[nCntIcon].nCounter % ICON_UNRIVALED_CNT == 0)
 					{ // 一定数ごとに
 
 						// 透明度の状態を設定
@@ -406,6 +460,9 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 
 				break;				// 抜け出す
 			}
+
+			// 色のコピーを設定する
+			g_aIcon[nCntIcon].colCopy = g_aIcon[nCntIcon].col;
 
 			//頂点座標の設定
 			pVtx[0].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].fRadius, +0.0f, +g_aIcon[nCntIcon].fRadius);
