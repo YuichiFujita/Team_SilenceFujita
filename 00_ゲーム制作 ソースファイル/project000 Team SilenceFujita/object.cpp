@@ -116,6 +116,10 @@ void InitObject(void)
 		// マテリアルのコピーを初期化
 		g_aObject[nCntObject].matCopy[MAX_MATERIAL] = {};
 
+		// アイコンの情報の初期化
+		g_aObject[nCntObject].icon.nIconID = NONE_ICON;				// アイコンのインデックス
+		g_aObject[nCntObject].icon.state = ICONSTATE_NONE;			// アイコンの状態
+
 #ifdef _DEBUG	// デバッグ処理
 		// エディット時の状態
 		g_aObject[nCntObject].editState = OBJECTSTATE_NONE;
@@ -605,6 +609,16 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 			// 影の位置設定
 			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
+
+			// アイコンの設定処理
+			g_aObject[nCntObject].icon.nIconID = SetIcon
+			(
+				g_aObject[nCntObject].pos,
+				ICONTYPE_EVIL,
+				&g_aObject[nCntObject].icon.nIconID,
+				&g_aObject[nCntObject].bUse,
+				&g_aObject[nCntObject].icon.state
+			);
 
 			// ジャッジの情報の設定
 			g_aObject[nCntObject].judge.col = JUDGE_WHITE;			// ピカピカの色

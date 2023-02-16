@@ -14,8 +14,13 @@
 
 #include "value.h"
 #include "camera.h"
+#include "Car.h"
+#include "Human.h"
 #include "light.h"
+#include "object.h"
+#include "Police.h"
 #include "score.h"
+#include "shadow.h"
 #include "weather.h"
 
 //**********************************************************************************************************************
@@ -332,11 +337,26 @@ void UpdateResult(void)
 	// カメラの更新処理
 	UpdateCamera();
 
+	// 車の更新処理
+	UpdateCar();
+
+	// オブジェクトの更新処理
+	UpdateObject();
+
+	// 警察の更新処理
+	UpdatePolice();
+
+	// 人間の更新処理
+	UpdateHuman();
+
 	// ライトの更新処理
 	UpdateLight();
 
 	// タイヤの更新処理
-	WheelUpdateRsl();	
+	WheelUpdateRsl();
+
+	// 影の更新処理
+	UpdateShadow();
 
 	if (g_bRslFade == true)
 	{ // フェードしない場合

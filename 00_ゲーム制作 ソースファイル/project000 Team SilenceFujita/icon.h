@@ -37,6 +37,8 @@ typedef enum
 	ICONSTATE_NONE = 0,			// 何もなし
 	ICONSTATE_DISAPPEAR,		// 消える途中
 	ICONSTATE_REVIVAL,			// 復活中
+	ICONSTATE_DAMAGE,			// ダメージ中
+	ICONSTATE_UNRIVALED,		// 無敵状態
 	ICONSTATE_MAX				// この列挙型の総数
 }ICONSTATE;
 
@@ -67,6 +69,7 @@ typedef struct
 	D3DXVECTOR3 pos;				// 位置
 	ICONTYPE	type;				// 種類
 	D3DXCOLOR	col;				// 色
+	D3DXCOLOR	colCopy;			// 色のコピー
 	ICONALPHA	alpha;				// 透明度の状態
 	float		fRadius;			// 半径
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
