@@ -104,6 +104,15 @@ void InitLight(void)
 		}
 
 		break;			// 抜け出す
+
+	case MODE_RANKING:	// ランキング
+		
+		// 拡散光カラーを設定
+		aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+		break;			// 抜け出す
 	}
 
 	// 方向ベクトルを設定

@@ -27,9 +27,10 @@ void InitRanking(void);
 void UninitRanking(void);
 void UpdateRanking(void);
 void DrawRanking(void);
-void SetRankingScore(void);
+void SortRankingScore(void);
 void ResetRanking(void);
 void SaveRanking(void);
 void LoadRanking(void);
+void SetRankingRoadTrance(void);
 
 #endif 

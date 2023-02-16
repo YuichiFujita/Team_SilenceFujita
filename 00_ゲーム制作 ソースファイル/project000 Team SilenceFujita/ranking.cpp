@@ -18,6 +18,16 @@
 
 #include "score.h"
 
+#include "calculation.h"
+#include "camera.h"
+#include "light.h"
+#include "score.h"
+#include "weather.h"
+#include "shadow.h"
+#include "Car.h"
+#include "Police.h"
+
+
 //**********************************************
 //* マクロ
 //**********************************************
@@ -34,6 +44,9 @@
 #define RANK_SIZE_Y			(40.0f)					//スコアの大きさ（Y）
 #define RANK_INTERVAL_X		(80.0f)					//スコアの間隔（X）
 #define RANK_INTERVAL_Y		(90.0f)					//スコアの間隔（Y）
+#define RANK_MAX_NUMBER		(99999999)				//スコアの最大数
+#define RANK_ALPHA			(1.0f)					//スコアのアルファ値
+
 
 #define RANK_FILE_MODE		(FILE_MODE_BIN)					//ランキングファイルの入出力モード
 #define RANK_FILE_TXT		("data\\TXT\\rank.txt")			//ランキングのスコアのテキストファイル
@@ -42,15 +55,17 @@
 //**********************************
 //* ランキングニュースコアの数値関係
 //**********************************
-#define	RANK_NEW_NUM_PLACE	(8)						//ニュースコアの桁数
-#define RANK_NEW_TEX		(1)						//ニュースコアのテクスチャ
-#define RANK_NEW_COLUMN		(1)						//ニュースコアを分ける列
-#define RANK_NEW_POS_X		(SCREEN_WIDTH * 0.65f)	//ニュースコアの開始位置（X)
-#define RANK_NEW_POS_Y		(SCREEN_HEIGHT * 0.85f)	//ニュースコアの開始位置（Y）	
-#define RANK_NEW_SIZE_X		(40.0f)					//ニュースコアの大きさ（X）
-#define RANK_NEW_SIZE_Y		(30.0f)					//ニュースコアの大きさ（Y）
-#define RANK_NEW_INTERVAL_X	(60.0f)					//ニュースコアの間隔（X）
-#define RANK_NEW_INTERVAL_Y	(0.0f)					//ニュースコアの間隔（Y）
+#define	RANK_NEW_NUM_PLACE	(8)							//ニュースコアの桁数
+#define RANK_NEW_TEX		(1)							//ニュースコアのテクスチャ
+#define RANK_NEW_COLUMN		(1)							//ニュースコアを分ける列
+#define RANK_NEW_POS_X		(SCREEN_WIDTH * 0.65f)		//ニュースコアの開始位置（X)
+#define RANK_NEW_POS_Y		(SCREEN_HEIGHT * 0.8f)		//ニュースコアの開始位置（Y）	
+#define RANK_NEW_SIZE_X		(40.0f)						//ニュースコアの大きさ（X）
+#define RANK_NEW_SIZE_Y		(30.0f)						//ニュースコアの大きさ（Y）
+#define RANK_NEW_INTERVAL_X	(60.0f)						//ニュースコアの間隔（X）
+#define RANK_NEW_INTERVAL_Y	(0.0f)						//ニュースコアの間隔（Y）
+#define RANK_NEW_MAX_NUMBER	(99999999)					//ニュースコアの最大数
+#define RANK_NEW_ALPHA		(1.0f)						//ニュースコアのアルファ値
 
 //**********************************************
 //* 列挙型
@@ -89,7 +104,7 @@ RankingScore g_aRankScore[RANK_MAX];		//ランキングでのスコアの情報
 RankingNewScore g_aRankNewScore;			//ランキングのニュースコアの情報
 
 FileMode g_fileMode;			//ファイルの入出力の種類
-int g_nRankingNoTouchTime;		//触ってない時間
+bool g_bRankTrance;				//遷移の有無
 int g_nNewScoreNumber = -1;		//ニュースコアの番号
 
 
@@ -105,8 +120,7 @@ void InitRanking(void)
 	int nCutRank;
 
 	//変数の初期化
-	g_nRankingNoTouchTime = 0;
-
+	g_bRankTrance = false;
 
 	//スコアの情報を初期化
 	for (nCutRank = 0; nCutRank < RANK_MAX; nCutRank++)
@@ -125,7 +139,24 @@ void InitRanking(void)
 		g_aRankNewScore.bUse = true;
 	}
 
-	SetRankingScore();
+	// 万能初期化の全体処理（3Dマップ）
+	InitAllAroundChunk();
+
+	// ファイルをロードする全体処理
+	LoadFileChunk
+	( // 引数
+		true,	// 車のカーブ
+		true,	// 人間のカーブ
+		true,	// ステージ
+		false,	// 当たり判定
+		true,	// 影
+		true,	// オブジェクト
+		true	// AI
+	);
+
+
+	//スコアのソート
+	SortRankingScore();
 }
 
 //=====================================
@@ -138,6 +169,9 @@ void UninitRanking(void)
 
 	//ランキングの値をファイルに書き出し
 	SaveRanking();
+
+	// 万能終了の全体処理（3Dマップ）
+	UninitAllAroundChunk();
 }
 
 //=====================================
@@ -145,13 +179,30 @@ void UninitRanking(void)
 //=====================================
 void UpdateRanking(void)
 {
+	// 天気の更新処理
+	UpdateWeather();
+
+	// カメラの更新処理
+	UpdateCamera();
+
+	// ライトの更新処理
+	UpdateLight();
+
+	// 車の更新処理
+	UpdateCar();
+
+	//　パトカーの更新処理
+	UpdatePolice();
+
 	//------*****入力の判定******------
 
 	//フェードの情報を取得
 	FADE pFade = GetFade();
 
 	//モード設定
-	if (GetKeyboardTrigger(DIK_RETURN) == true && pFade == FADE_NONE)
+	if (GetKeyboardTrigger(DIK_RETURN) == true || GetKeyboardTrigger(DIK_SPACE) == true
+	 || GetJoyKeyTrigger(JOYKEY_A, 0) == true  || GetJoyKeyTrigger(JOYKEY_B, 0) == true
+	 || GetJoyKeyTrigger(JOYKEY_X, 0) == true  || GetJoyKeyTrigger(JOYKEY_Y, 0) == true && pFade == FADE_NONE)
 	{//決定キーを押したら
 		//モード設定（タイトル画面に移行）
 		SetFade(MODE_TITLE);
@@ -159,10 +210,8 @@ void UpdateRanking(void)
 		//PlaySound(SOUND_LABEL_SE_ENTER);
 	}
 
-	g_nRankingNoTouchTime++;
-
 	//触っていない時間のときタイトルに
-	if (g_nRankingNoTouchTime == 600)
+	if (g_bRankTrance == true)
 	{
 		//モード設定（タイトル画面に移行）
 		SetFade(MODE_TITLE);
@@ -174,6 +223,9 @@ void UpdateRanking(void)
 //=====================================
 void DrawRanking(void)
 {
+	// リザルトの描画全体処理
+	DrawResultChunk();
+
 	//ランキングスコアの数値
 	for (int nCount = 0; nCount < RANK_MAX; nCount++)
 	{ // 順位が更新されている場合
@@ -182,11 +234,11 @@ void DrawRanking(void)
 		SetValue(
 			D3DXVECTOR3(g_aRankScore[nCount].pos.x, g_aRankScore[nCount].pos.y + (nCount * RANK_INTERVAL_Y), 0.0f),
 			g_aRankScore[nCount].nScore,
-			99999999,
+			RANK_MAX_NUMBER,
 			RANK_SIZE_X,
 			RANK_SIZE_Y,
 			RANK_INTERVAL_X,
-			1.0f);
+			RANK_ALPHA);
 
 		// 数値の描画
 		DrawValue(RANK_NUM_PLACE, VALUETYPE_NORMAL);
@@ -198,11 +250,11 @@ void DrawRanking(void)
 		SetValue(
 			D3DXVECTOR3(g_aRankNewScore.pos.x, g_aRankNewScore.pos.y, 0.0f),
 			g_aRankNewScore.nScore,
-			99999999,
+			RANK_MAX_NUMBER,
 			RANK_NEW_SIZE_X,
 			RANK_NEW_SIZE_Y,
 			RANK_NEW_INTERVAL_X,
-			1.0f);
+			RANK_NEW_ALPHA);
 
 		// 数値の描画
 		DrawValue(RANK_NUM_PLACE, VALUETYPE_RED);
@@ -212,7 +264,7 @@ void DrawRanking(void)
 //=====================================
 //= ランキングのスコアの設定
 //=====================================
-void SetRankingScore(void)
+void SortRankingScore(void)
 {
 	//変数宣言
 	int nCutRank, nCutScoreRank;	//最大数のデータと要素のカウント
@@ -374,4 +426,12 @@ void LoadRanking(void)
 		}
 		break;
 	}
+}
+
+//=======================
+//=　道路処理での画面遷移を設定
+//=======================
+void SetRankingRoadTrance(void)
+{
+	g_bRankTrance = true;
 }
