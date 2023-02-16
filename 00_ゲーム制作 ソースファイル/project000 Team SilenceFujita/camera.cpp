@@ -52,10 +52,6 @@
 #define LIMIT_ROT_LOW	(0.1f)					// 回転量 (x) の回転制限値 (下)
 
 // マップカメラ
-#define MAPCAM_X		(1000)		// マップカメラの左上隅のピクセル座標 (x)
-#define MAPCAM_Y		(20)		// マップカメラの左上隅のピクセル座標 (y)
-#define MAPCAM_SIZE_X	(260)		// マップカメラの描画する画面の横幅
-#define MAPCAM_SIZE_Y	(260)		// マップカメラの描画する画面の縦幅
 #define MAPCAM_POS_R	(0.0f)		// マップカメラの注視点の位置 (y)
 #define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)
 
