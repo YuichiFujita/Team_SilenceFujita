@@ -633,6 +633,9 @@ void UpdateBarrierData(void)
 						// ボムの状態を何もしない状態にする
 						pPolice->bombState = BOMBSTATE_NONE;
 
+						// パトロールの探知処理
+						PatrolCarSearch(pPolice);
+
 						// 処理を抜ける
 						break;
 					}

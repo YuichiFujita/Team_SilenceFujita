@@ -11,7 +11,11 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define CNT_ROT_FOLLOW	(50)		// 追従時の回り込みが始まるカウンターの値
+#define VIEW_ANGLE		(D3DXToRadian(65.0f))	// 視野角
 
+// マップカメラ
+#define MAPCAM_POS_R	(0.0f)		// マップカメラの注視点の位置 (y)
+#define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)
 #define MAPCAM_X		(980)		// マップカメラの左上隅のピクセル座標 (x)
 #define MAPCAM_Y		(72)		// マップカメラの左上隅のピクセル座標 (y)
 #define MAPCAM_SIZE_X	(220)		// マップカメラの描画する画面の横幅
@@ -63,7 +67,7 @@ void InitCamera(void);				// カメラの初期化処理
 void UninitCamera(void);			// カメラの終了処理
 void UpdateCamera(void);			// カメラの更新処理
 void SetCamera(int nID);			// カメラの設定処理
-Camera *GetCamera(void);			// カメラの取得処理
+Camera *GetCamera(int nID);			// カメラの取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

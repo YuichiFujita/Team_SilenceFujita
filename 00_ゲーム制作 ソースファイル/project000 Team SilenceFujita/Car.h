@@ -15,6 +15,8 @@
 #include "model.h"
 #include "bomb.h"
 #include "curve.h"
+#include "Police.h"
+#include "icon.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -66,6 +68,7 @@ typedef struct
 	Model        modelData;				// モデル情報
 	BOMBSTATE    bombState;				// ボムの状態
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
+	IconInfo	 icon;					// アイコンの情報
 	int			 nShadowID;				// 影のインデックス
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
@@ -86,7 +89,7 @@ void DrawCar(void);					// 車の描画処理
 void SetCar(D3DXVECTOR3 pos);		// 車の設定処理
 Car *GetCarData(void);																		// 車の取得処理
 void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject,int *pTraCnt);	// 車の停止処理
-void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, int state);		// 車同士の当たり判定
+void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, TACKLESTATE state);		// 車同士の当たり判定
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
