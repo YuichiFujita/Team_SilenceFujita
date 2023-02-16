@@ -24,6 +24,8 @@
 typedef enum
 {
 	ICONTYPE_PLAY = 0,			// プレイヤーのアイコン
+	ICONTYPE_EVIL,				// 悪い奴のアイコン
+	ICONTYPE_POLICE,			// 警察のアイコン
 	ICONTYPE_MAX				// この列挙型の総数
 }ICONTYPE;
 

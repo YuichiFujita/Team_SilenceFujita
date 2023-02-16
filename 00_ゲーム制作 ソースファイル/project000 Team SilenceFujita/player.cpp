@@ -544,7 +544,7 @@ void UpdateNormalPlayer(void)
 		PLAY_DEPTH,
 		COLLOBJECTTYPE_PLAYER,
 		&nTrafficCnt,
-		nTrafficCnt
+		TACKLESTATE_CHARGE
 	);
 
 	//--------------------------------------------------------
@@ -700,7 +700,7 @@ void UpdateOverPlayer(void)
 		PLAY_DEPTH,
 		COLLOBJECTTYPE_PLAYER,
 		&nTrafficCnt,
-		nTrafficCnt
+		TACKLESTATE_CHARGE
 	);
 
 	//--------------------------------------------------------

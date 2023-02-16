@@ -199,7 +199,7 @@ void UninitEditBillboard(void)
 void UpdateEditBillboard(void)
 {
 	Billboard *pBillboard = GetBillboard();			//ビルボードの情報を取得する
-	Camera *pCamera = GetCamera();					//カメラの情報を取得する
+	Camera *pCamera = GetCamera(CAMERATYPE_MAIN);	//カメラの情報を取得する
 
 	g_nStyleBillboard = GetStyle();					//スタイルを取得する
 

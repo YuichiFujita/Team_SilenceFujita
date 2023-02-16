@@ -9,13 +9,26 @@
 //************************************************************
 #include "icon.h"
 #include "player.h"
+#include "camera.h"
 
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MAX_ICON		(1024)		// 使用するポリゴン数 (アイコンの最大数)
+#define MAX_ICON			(1024)		// 使用するポリゴン数 (アイコンの最大数)
 
-#define PLAY_ICON_RADIUS	(120.0f)	// プレイヤーのアイコンの半径
+#define PLAY_ICON_RADIUS	(130.0f)	// プレイヤーのアイコンの半径
+#define PLAY_ICON_COL		(D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f))		// プレイヤーのアイコンの色
+
+#define EVIL_ICON_RADIUS	(100.0f)	// 悪い奴のアイコンの半径
+#define EVIL_ICON_COL		(D3DXCOLOR(0.2f, 1.0f, 0.2f, 1.0f))		// 悪い奴のアイコンの色
+
+#define POLICE_ICON_RADIUS	(100.0f)	// 警察のアイコンの半径
+#define POLICE_ICON_COL		(D3DXCOLOR(0.2f, 0.2f, 1.0f, 1.0f))		// 警察のアイコンの色
+
+#define ICON_CORRECT_RIGHT	(4000.0f)	// アイコンの右側の補正係数
+#define ICON_CORRECT_LEFT	(4000.0f)	// アイコンの左側の補正係数
+#define ICON_CORRECT_FAR	(3800.0f)	// アイコンの奥側の補正係数
+#define ICON_CORRECT_NEAR	(3800.0f)	// アイコンの手前側の補正係数
 
 //************************************************************
 //	構造体定義 (Icon)
@@ -24,6 +37,7 @@ typedef struct
 {
 	D3DXVECTOR3 pos;				// 位置
 	ICONTYPE	type;				// 種類
+	float		fRadius;			// 半径
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	int        *pIconIDParent;		// アイコンの親のアイコンインデックス
 	bool       *pUseParent;			// アイコンの親の使用状況
@@ -139,7 +153,7 @@ void UninitIcon(void)
 //=======================================================================================================
 void UpdateIcon(void)
 {
-	D3DXVECTOR3 playerPos = GetPlayer()->pos;		// プレイヤーの位置を取得
+	D3DXVECTOR3 cameraPos = GetCamera(CAMERATYPE_MAP)->posV;	// カメラの視点を取得
 
 	for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
 	{ // アイコンの最大表示数分繰り返す
@@ -170,9 +184,29 @@ void UpdateIcon(void)
 					}
 				}
 
-				//位置を設定する
-				g_aIcon[nCntIcon].pos.x = playerPos.x + 3800.0f;
-				g_aIcon[nCntIcon].pos.z = playerPos.z + 3800.0f;
+				if (cameraPos.x + ICON_CORRECT_RIGHT <= g_aIcon[nCntIcon].pos.x + g_aIcon[nCntIcon].fRadius)
+				{ // 右側よりも外側にアイコンがある場合
+					// アイコンを補正する
+					g_aIcon[nCntIcon].pos.x = cameraPos.x + ICON_CORRECT_RIGHT - g_aIcon[nCntIcon].fRadius;
+				}
+
+				if (cameraPos.x - ICON_CORRECT_LEFT >= g_aIcon[nCntIcon].pos.x - g_aIcon[nCntIcon].fRadius)
+				{ // 左側よりも外側にアイコンがある場合
+					// アイコンを補正する
+					g_aIcon[nCntIcon].pos.x = cameraPos.x - ICON_CORRECT_LEFT + g_aIcon[nCntIcon].fRadius;
+				}
+
+				if (cameraPos.z + ICON_CORRECT_FAR <= g_aIcon[nCntIcon].pos.z + g_aIcon[nCntIcon].fRadius)
+				{ // 奥側よりも外側にアイコンがある場合
+					// アイコンを補正する
+					g_aIcon[nCntIcon].pos.z = cameraPos.z + ICON_CORRECT_FAR - g_aIcon[nCntIcon].fRadius;
+				}
+
+				if (cameraPos.z - ICON_CORRECT_NEAR >= g_aIcon[nCntIcon].pos.z - g_aIcon[nCntIcon].fRadius)
+				{ // 手前側よりも外側にアイコンがある場合
+					// アイコンを補正する
+					g_aIcon[nCntIcon].pos.z = cameraPos.z - ICON_CORRECT_NEAR + g_aIcon[nCntIcon].fRadius;
+				}
 			}
 		}
 	}
@@ -256,8 +290,8 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
 		{//使用していなかった場合
 
 			//位置を設定する
-			g_aIcon[nCntIcon].pos.x = playerPos.x + 2500.0f;
-			g_aIcon[nCntIcon].pos.z = playerPos.z + 2500.0f;
+			g_aIcon[nCntIcon].pos.x = pos.x;
+			g_aIcon[nCntIcon].pos.z = pos.z;
 
 			// 種類を設定する
 			g_aIcon[nCntIcon].type = type;
@@ -266,24 +300,53 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
 			g_aIcon[nCntIcon].pIconIDParent = pIconID;
 			g_aIcon[nCntIcon].pUseParent = pUse;
 
-			//頂点座標の設定
-			pVtx[0].pos = D3DXVECTOR3(-PLAY_ICON_RADIUS, +0.0f, +PLAY_ICON_RADIUS);
-			pVtx[1].pos = D3DXVECTOR3(+PLAY_ICON_RADIUS, +0.0f, +PLAY_ICON_RADIUS);
-			pVtx[2].pos = D3DXVECTOR3(-PLAY_ICON_RADIUS, +0.0f, -PLAY_ICON_RADIUS);
-			pVtx[3].pos = D3DXVECTOR3(+PLAY_ICON_RADIUS, +0.0f, -PLAY_ICON_RADIUS);
-
 			switch (g_aIcon[nCntIcon].type)
 			{
 			case ICONTYPE_PLAY:		// プレイヤー
 
-				// 頂点カラーの設定
-				pVtx[0].col = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
-				pVtx[1].col = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
-				pVtx[2].col = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
-				pVtx[3].col = D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f);
+				// 半径を設定
+				g_aIcon[nCntIcon].fRadius = PLAY_ICON_RADIUS;		
 
-				break;				//抜け出す
+				// 頂点カラーの設定
+				pVtx[0].col = PLAY_ICON_COL;
+				pVtx[1].col = PLAY_ICON_COL;
+				pVtx[2].col = PLAY_ICON_COL;
+				pVtx[3].col = PLAY_ICON_COL;
+
+				break;				// 抜け出す
+
+			case ICONTYPE_EVIL:		// 悪い奴
+
+				// 半径を設定
+				g_aIcon[nCntIcon].fRadius = EVIL_ICON_RADIUS;
+
+				// 頂点カラーの設定
+				pVtx[0].col = EVIL_ICON_COL;
+				pVtx[1].col = EVIL_ICON_COL;
+				pVtx[2].col = EVIL_ICON_COL;
+				pVtx[3].col = EVIL_ICON_COL;
+
+				break;				// 抜け出す
+
+			case ICONTYPE_POLICE:	// 警察
+
+				// 半径を設定
+				g_aIcon[nCntIcon].fRadius = POLICE_ICON_RADIUS;
+
+				// 頂点カラーの設定
+				pVtx[0].col = POLICE_ICON_COL;
+				pVtx[1].col = POLICE_ICON_COL;
+				pVtx[2].col = POLICE_ICON_COL;
+				pVtx[3].col = POLICE_ICON_COL;
+
+				break;				// 抜け出す
 			}
+
+			//頂点座標の設定
+			pVtx[0].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].fRadius, +0.0f, +g_aIcon[nCntIcon].fRadius);
+			pVtx[1].pos = D3DXVECTOR3(+g_aIcon[nCntIcon].fRadius, +0.0f, +g_aIcon[nCntIcon].fRadius);
+			pVtx[2].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].fRadius, +0.0f, -g_aIcon[nCntIcon].fRadius);
+			pVtx[3].pos = D3DXVECTOR3(+g_aIcon[nCntIcon].fRadius, +0.0f, -g_aIcon[nCntIcon].fRadius);
 
 			//使用する
 			g_aIcon[nCntIcon].bUse = true;

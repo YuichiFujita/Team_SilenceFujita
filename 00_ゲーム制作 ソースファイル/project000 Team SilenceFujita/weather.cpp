@@ -466,9 +466,9 @@ void UpdateRain(void)
 	int nNumWeather = 0;	// 降っている物の数
 
 	// ポインタを宣言
-	VERTEX_3D *pVtx;		// 頂点情報へのポインタ
-	Player *pPlayer = GetPlayer();		// プレイヤーの情報
-	Camera *pCamera = GetCamera();		// カメラの情報
+	VERTEX_3D *pVtx;								// 頂点情報へのポインタ
+	Player *pPlayer = GetPlayer();					// プレイヤーの情報
+	Camera *pCamera = GetCamera(CAMERATYPE_MAIN);	// カメラの情報
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffWeather->Lock(0, 0, (void**)&pVtx, 0);
@@ -1106,10 +1106,10 @@ WEATHERTYPE GetWeather(void)
 //======================================================================================================================
 void WeatherRain(void)
 {
-	D3DXVECTOR3 Camerapos = GetCamera()->posV;	// カメラの視点
-	D3DXVECTOR3 Camerarot = GetCamera()->rot;	// カメラの向き
-	D3DXVECTOR3 posRain;						// 雨の降る位置
-	float moveRain;								// 雨の移動量
+	D3DXVECTOR3 Camerapos = GetCamera(CAMERATYPE_MAIN)->posV;	// カメラの視点
+	D3DXVECTOR3 Camerarot = GetCamera(CAMERATYPE_MAIN)->rot;	// カメラの向き
+	D3DXVECTOR3 posRain;	// 雨の降る位置
+	float moveRain;			// 雨の移動量
 
 	for (int nCnt = 0; nCnt < RAIN_GENERATE; nCnt++)
 	{
@@ -1136,10 +1136,10 @@ void WeatherRain(void)
 //======================================================================================================================
 void WeatherSnow(void)
 {
-	D3DXVECTOR3 Camerapos = GetCamera()->posV;	// カメラの視点
-	D3DXVECTOR3 Camerarot = GetCamera()->rot;	// カメラの向き
-	D3DXVECTOR3 posSnow;						// 雪の降る位置
-	float moveSnow;								// 雪の移動量
+	D3DXVECTOR3 Camerapos = GetCamera(CAMERATYPE_MAIN)->posV;	// カメラの視点
+	D3DXVECTOR3 Camerarot = GetCamera(CAMERATYPE_MAIN)->rot;	// カメラの向き
+	D3DXVECTOR3 posSnow;	// 雪の降る位置
+	float moveSnow;			// 雪の移動量
 
 	for (int nCnt = 0; nCnt < SNOW_GENERATE; nCnt++)
 	{
