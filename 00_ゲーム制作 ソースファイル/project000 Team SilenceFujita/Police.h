@@ -14,6 +14,7 @@
 #include "model.h"
 #include "bomb.h"
 #include "curve.h"
+#include "icon.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -74,7 +75,7 @@ typedef struct
 	POLICESTATE state;					// 警察車両の状態
 	BOMBSTATE   bombState;				// ボムの状態
 	int			nShadowID;				// 影のインデックス
-	int			nIconID;				// アイコンのインデックス
+	IconInfo	icon;					// アイコンの情報
 	int			nLife;					// 寿命
 	bool		bMove;					// 移動しているかどうか
 	bool		bJump;					// ジャンプの状況

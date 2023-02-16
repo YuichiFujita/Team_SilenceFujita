@@ -14,7 +14,6 @@
 
 #include "camera.h"
 #include "gate.h"
-#include "icon.h"
 #include "object.h"
 #include "particle.h"
 #include "player.h"
@@ -121,7 +120,6 @@ void InitPlayer(void)
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
-	g_player.nIconID	   = NONE_ICON;							// アイコンのインデックス
 	g_player.bMove         = false;								// 移動状況
 	g_player.bJump         = false;								// ジャンプ状況
 	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
@@ -154,6 +152,10 @@ void InitPlayer(void)
 	// 爆弾の情報の初期化
 	g_player.bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
 	g_player.bomb.nCounter = BOMB_CNT;							// 攻撃管理カウンター
+
+	// アイコンの情報の初期化
+	g_player.icon.nIconID = NONE_ICON;							// アイコンのインデックス
+	g_player.icon.state = ICONSTATE_NONE;						// アイコンの状態
 
 	// ドリフトの情報の初期化
 	g_player.drift.bDrift = false;	// ドリフト状況
@@ -333,7 +335,7 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
 
 	// アイコンのインデックスを設定
-	g_player.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.nIconID, &g_player.bUse);
+	g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
 
 	// 影の位置設定
 	SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
@@ -565,12 +567,19 @@ void UpdateNormalPlayer(void)
 	// アイコンの位置設定
 	SetPositionIcon
 	(
-		g_player.nIconID, 
+		g_player.icon.nIconID, 
 		g_player.pos
 	);
 
 	// プレイヤーの補正の更新処理
 	RevPlayer();
+
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{ // 0キーを押した場合
+
+		// 復活状態にする
+		g_player.icon.state = ICONSTATE_REVIVAL;
+	}
 }
 
 //============================================================

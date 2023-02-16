@@ -30,13 +30,61 @@ typedef enum
 }ICONTYPE;
 
 //************************************************************
+//	列挙型定義（ICONSTATE）
+//************************************************************
+typedef enum
+{
+	ICONSTATE_NONE = 0,			// 何もなし
+	ICONSTATE_DISAPPEAR,		// 消える途中
+	ICONSTATE_REVIVAL,			// 復活中
+	ICONSTATE_MAX				// この列挙型の総数
+}ICONSTATE;
+
+//************************************************************
+//	列挙型定義（ICONALPHA）
+//************************************************************
+typedef enum
+{
+	ICONALPHA_NONE = 0,			// 不透明
+	ICONALPHA_CLEAR,			// 透明
+	ICONALPHA_MAX				// この列挙型の定義
+}ICONALPHA;
+
+//************************************************************
+//	構造体定義 (IconInfo)
+//************************************************************
+typedef struct
+{
+	int nIconID;					// アイコンのインデックス
+	ICONSTATE state;				// アイコンの状態
+} IconInfo;
+
+//************************************************************
+//	構造体定義 (Icon)
+//************************************************************
+typedef struct
+{
+	D3DXVECTOR3 pos;				// 位置
+	ICONTYPE	type;				// 種類
+	D3DXCOLOR	col;				// 色
+	ICONALPHA	alpha;				// 透明度の状態
+	float		fRadius;			// 半径
+	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
+	int        *pIconIDParent;		// アイコンの親のアイコンインデックス
+	int			nCounter;			// カウンター
+	bool       *pUseParent;			// アイコンの親の使用状況
+	ICONSTATE  *pState;				// アイコンの状態
+	bool        bUse;				// 使用状況
+} Icon;
+
+//************************************************************
 //	プロトタイプ宣言
 //************************************************************
 void InitIcon(void);		// アイコンの初期化処理
 void UninitIcon(void);		// アイコンの終了処理
 void UpdateIcon(void);		// アイコンの更新処理
 void DrawIcon(void);		// アイコンの描画処理
-int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse);			// アイコンの設定処理
+int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE *pState);			// アイコンの設定処理
 
 void SetPositionIcon(int nIconID, D3DXVECTOR3 pos);	// アイコンの位置の設定処理
 

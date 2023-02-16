@@ -13,7 +13,6 @@
 #include "calculation.h"
 
 #include "Car.h"
-#include "icon.h"
 #include "shadow.h"
 #include "sound.h"
 #include "player.h"
@@ -85,7 +84,6 @@ void InitCar(void)
 		g_aCar[nCntCar].move        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aCar[nCntCar].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
-		g_aCar[nCntCar].nIconID		= NONE_ICON;						// アイコンのインデックス
 		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
 		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
 		g_aCar[nCntCar].bMove       = false;							// 移動しているか
@@ -114,6 +112,10 @@ void InitCar(void)
 		g_aCar[nCntCar].modelData.vtxMax   = INIT_VTX_MAX;			// 最大の頂点座標
 		g_aCar[nCntCar].modelData.size     = INIT_SIZE;				// 大きさ
 		g_aCar[nCntCar].modelData.fRadius  = 0.0f;					// 半径
+
+		// アイコンの情報の初期化
+		g_aCar[nCntCar].icon.nIconID = NONE_ICON;					// アイコンのインデックス
+		g_aCar[nCntCar].icon.state = ICONSTATE_NONE;				// アイコンの状態
 	}
 }
 
@@ -184,7 +186,7 @@ void UpdateCar(void)
 					UpdateJudge(&g_aCar[nCntCar].judge);
 
 					// アイコンの位置設定処理
-					SetPositionIcon(g_aCar[nCntCar].nIconID, g_aCar[nCntCar].pos);
+					SetPositionIcon(g_aCar[nCntCar].icon.nIconID, g_aCar[nCntCar].pos);
 				}
 			}
 
@@ -448,12 +450,13 @@ void SetCar(D3DXVECTOR3 pos)
 			{ // 悪い奴の場合
 
 				// アイコンのインデックスを設定
-				g_aCar[nCntCar].nIconID = SetIcon
+				g_aCar[nCntCar].icon.nIconID = SetIcon
 				( // 引数
 					g_aCar[nCntCar].pos,
 					ICONTYPE_EVIL,
-					&g_aCar[nCntCar].nIconID,
-					&g_aCar[nCntCar].bUse
+					&g_aCar[nCntCar].icon.nIconID,
+					&g_aCar[nCntCar].bUse,
+					&g_aCar[nCntCar].icon.state
 				);
 			}
 

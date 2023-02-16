@@ -16,6 +16,7 @@
 #include "bomb.h"
 #include "curve.h"
 #include "Police.h"
+#include "icon.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -67,8 +68,8 @@ typedef struct
 	Model        modelData;				// モデル情報
 	BOMBSTATE    bombState;				// ボムの状態
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
+	IconInfo	 icon;					// アイコンの情報
 	int			 nShadowID;				// 影のインデックス
-	int			 nIconID;				// アイコンのインデックス
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか

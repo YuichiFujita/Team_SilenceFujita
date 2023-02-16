@@ -30,19 +30,7 @@
 #define ICON_CORRECT_FAR	(3800.0f)	// アイコンの奥側の補正係数
 #define ICON_CORRECT_NEAR	(3800.0f)	// アイコンの手前側の補正係数
 
-//************************************************************
-//	構造体定義 (Icon)
-//************************************************************
-typedef struct
-{
-	D3DXVECTOR3 pos;				// 位置
-	ICONTYPE	type;				// 種類
-	float		fRadius;			// 半径
-	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
-	int        *pIconIDParent;		// アイコンの親のアイコンインデックス
-	bool       *pUseParent;			// アイコンの親の使用状況
-	bool        bUse;				// 使用状況
-} Icon;
+#define ICON_ALPHA_CHANGE	(0.005f)	// アイコンの透明度の変化量
 
 //************************************************************
 //	グローバル変数
@@ -79,11 +67,14 @@ void InitIcon(void)
 	for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
 	{ // アイコンの最大表示数分繰り返す
 
-		g_aIcon[nCntIcon].pos			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aIcon[nCntIcon].type			= ICONTYPE_PLAY;					// アイコン
-		g_aIcon[nCntIcon].pIconIDParent = NULL;								// アイコンの親のアイコンインデックス
-		g_aIcon[nCntIcon].pUseParent	= NULL;								// アイコンの親の使用状況
-		g_aIcon[nCntIcon].bUse			= false;							// 使用状況
+		g_aIcon[nCntIcon].pos			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+		g_aIcon[nCntIcon].type			= ICONTYPE_PLAY;						// アイコン
+		g_aIcon[nCntIcon].col			= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
+		g_aIcon[nCntIcon].nCounter		= 0;									// カウンター
+		g_aIcon[nCntIcon].alpha			= ICONALPHA_NONE;						// 透明度の状態
+		g_aIcon[nCntIcon].pIconIDParent = NULL;									// アイコンの親のアイコンインデックス
+		g_aIcon[nCntIcon].pUseParent	= NULL;									// アイコンの親の使用状況
+		g_aIcon[nCntIcon].bUse			= false;								// 使用状況
 	}
 
 	//--------------------------------------------------------
@@ -108,10 +99,10 @@ void InitIcon(void)
 		pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 		// 頂点カラーの設定
-		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[0].col = g_aIcon[nCntIcon].col;
+		pVtx[1].col = g_aIcon[nCntIcon].col;
+		pVtx[2].col = g_aIcon[nCntIcon].col;
+		pVtx[3].col = g_aIcon[nCntIcon].col;
 
 		// テクスチャ座標の設定
 		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -155,33 +146,101 @@ void UpdateIcon(void)
 {
 	D3DXVECTOR3 cameraPos = GetCamera(CAMERATYPE_MAP)->posV;	// カメラの視点を取得
 
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	VERTEX_3D *pVtx;							// 頂点情報へのポインタ
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	g_pVtxBuffIcon->Lock(0, 0, (void**)&pVtx, 0);
+
 	for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
 	{ // アイコンの最大表示数分繰り返す
 
 		if (g_aIcon[nCntIcon].bUse == true && g_aIcon[nCntIcon].pUseParent != NULL)
-		{ // 影が使用されている且つ、影の親の使用状況アドレスが設定されている場合
+		{ // アイコンが使用されている且つ、アイコンの親の使用状況アドレスが設定されている場合
 
 			if (*g_aIcon[nCntIcon].pUseParent == false)
-			{ // 影の親が使用されていない場合
+			{ // アイコンの親が使用されていない場合
 
-				// 影を使用していない状態にする
+				// アイコンを使用していない状態にする
 				g_aIcon[nCntIcon].bUse = false;
 			}
 			else
-			{ // 影の親が使用されている場合
+			{ // アイコンの親が使用されている場合
 
 				if (g_aIcon[nCntIcon].pIconIDParent != NULL)
-				{ // 影の親の影インデックスアドレスが設定されている場合
+				{ // アイコンの親のアイコンインデックスアドレスが設定されている場合
 
 					if (*g_aIcon[nCntIcon].pIconIDParent != nCntIcon)
-					{ // 影の親の影インデックスと、現在の影インデックスの値が違う場合
+					{ // アイコンの親のアイコンインデックスと、現在のアイコンインデックスの値が違う場合
 
-						// 影を使用していない状態にする
+						// アイコンを使用していない状態にする
 						g_aIcon[nCntIcon].bUse = false;
 
 						// [※] 使用しない状態になった親が同フレーム内で同じインデックスが使われて
-						//      また使用された場合に影が一つの親に二つ生成されてしまうため、その防止。
+						//      また使用された場合にアイコンが一つの親に二つ生成されてしまうため、その防止。
 					}
+				}
+
+				switch (*g_aIcon[nCntIcon].pState)
+				{
+				case ICONSTATE_NONE:		// 何もなし
+
+					// カウンターを初期化する
+					g_aIcon[nCntIcon].nCounter = 0;
+
+					// 透明度を設定する
+					g_aIcon[nCntIcon].col.a = 1.0f;
+
+					break;					// 抜け出す
+
+				case ICONSTATE_DISAPPEAR:	// 消える途中
+
+					// カウンターを初期化する
+					g_aIcon[nCntIcon].nCounter = 0;
+
+					// 透明度を下げる
+					g_aIcon[nCntIcon].col.a -= ICON_ALPHA_CHANGE;
+
+					if (g_aIcon[nCntIcon].col.a <= 0.0f)
+					{ //透明度が1.0fを超えた場合
+
+						// 透明度を1.0fにする
+						g_aIcon[nCntIcon].col.a = 0.0f;
+					}
+
+					break;					// 抜け出す
+
+				case ICONSTATE_REVIVAL:		// 復活中
+
+					// カウンターを加算する
+					g_aIcon[nCntIcon].nCounter++;
+
+					if (g_aIcon[nCntIcon].nCounter % 20 == 0)
+					{ // 一定数ごとに
+
+						// 透明度の状態を設定
+						g_aIcon[nCntIcon].alpha = (ICONALPHA)((g_aIcon[nCntIcon].alpha + 1) % ICONALPHA_MAX);
+					}
+
+					switch (g_aIcon[nCntIcon].alpha)
+					{
+					case ICONALPHA_NONE:	// 不透明
+
+						// 透明度を設定する
+						g_aIcon[nCntIcon].col.a = 1.0f;
+
+						break;				// 抜け出す
+
+					case ICONALPHA_CLEAR:	// 透明
+
+						// 透明度を設定する
+						g_aIcon[nCntIcon].col.a = 0.0f;
+
+						break;				// 抜け出す
+					}
+
+					break;					// 抜け出す
 				}
 
 				if (cameraPos.x + ICON_CORRECT_RIGHT <= g_aIcon[nCntIcon].pos.x + g_aIcon[nCntIcon].fRadius)
@@ -208,8 +267,20 @@ void UpdateIcon(void)
 					g_aIcon[nCntIcon].pos.z = cameraPos.z - ICON_CORRECT_NEAR + g_aIcon[nCntIcon].fRadius;
 				}
 			}
+
+			// 頂点カラーの設定
+			pVtx[0].col = g_aIcon[nCntIcon].col;
+			pVtx[1].col = g_aIcon[nCntIcon].col;
+			pVtx[2].col = g_aIcon[nCntIcon].col;
+			pVtx[3].col = g_aIcon[nCntIcon].col;
 		}
+
+		// 頂点データのポインタを 4つ分進める
+		pVtx += 4;
 	}
+
+	// 頂点バッファをアンロックする
+	g_pVtxBuffIcon->Unlock();
 }
 
 //=======================================================================================================
@@ -269,11 +340,11 @@ void DrawIcon(void)
 }
 
 //===============================
-//影の設定処理
+//アイコンの設定処理
 //===============================
-int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
+int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE *pState)
 {
-	//影の番号を初期化する
+	//アイコンの番号を初期化する
 	int nIdxIcon = NONE_ICON;
 
 	D3DXVECTOR3 playerPos = GetPlayer()->pos;		// プレイヤーの位置を取得
@@ -289,29 +360,29 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
 		if (g_aIcon[nCntIcon].bUse == false)
 		{//使用していなかった場合
 
-			//位置を設定する
-			g_aIcon[nCntIcon].pos.x = pos.x;
+			// 情報の設定
+			g_aIcon[nCntIcon].pos.x = pos.x;			//位置
 			g_aIcon[nCntIcon].pos.z = pos.z;
+			g_aIcon[nCntIcon].nCounter = 0;				// カウンター
+			g_aIcon[nCntIcon].alpha = ICONALPHA_NONE;	// 透明度の状態
 
 			// 種類を設定する
 			g_aIcon[nCntIcon].type = type;
 
 			// 引数のアドレスを設定する
-			g_aIcon[nCntIcon].pIconIDParent = pIconID;
-			g_aIcon[nCntIcon].pUseParent = pUse;
+			g_aIcon[nCntIcon].pIconIDParent = pIconID;		// アイコンのインデックス
+			g_aIcon[nCntIcon].pUseParent = pUse;			// 親の使用状況
+			g_aIcon[nCntIcon].pState = pState;				// 状態
 
 			switch (g_aIcon[nCntIcon].type)
 			{
 			case ICONTYPE_PLAY:		// プレイヤー
 
 				// 半径を設定
-				g_aIcon[nCntIcon].fRadius = PLAY_ICON_RADIUS;		
+				g_aIcon[nCntIcon].fRadius = PLAY_ICON_RADIUS;	
 
-				// 頂点カラーの設定
-				pVtx[0].col = PLAY_ICON_COL;
-				pVtx[1].col = PLAY_ICON_COL;
-				pVtx[2].col = PLAY_ICON_COL;
-				pVtx[3].col = PLAY_ICON_COL;
+				// 色を設定
+				g_aIcon[nCntIcon].col = PLAY_ICON_COL;
 
 				break;				// 抜け出す
 
@@ -320,11 +391,8 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
 				// 半径を設定
 				g_aIcon[nCntIcon].fRadius = EVIL_ICON_RADIUS;
 
-				// 頂点カラーの設定
-				pVtx[0].col = EVIL_ICON_COL;
-				pVtx[1].col = EVIL_ICON_COL;
-				pVtx[2].col = EVIL_ICON_COL;
-				pVtx[3].col = EVIL_ICON_COL;
+				// 色を設定
+				g_aIcon[nCntIcon].col = EVIL_ICON_COL;
 
 				break;				// 抜け出す
 
@@ -333,11 +401,8 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
 				// 半径を設定
 				g_aIcon[nCntIcon].fRadius = POLICE_ICON_RADIUS;
 
-				// 頂点カラーの設定
-				pVtx[0].col = POLICE_ICON_COL;
-				pVtx[1].col = POLICE_ICON_COL;
-				pVtx[2].col = POLICE_ICON_COL;
-				pVtx[3].col = POLICE_ICON_COL;
+				// 色を設定
+				g_aIcon[nCntIcon].col = POLICE_ICON_COL;
 
 				break;				// 抜け出す
 			}
@@ -348,10 +413,16 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
 			pVtx[2].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].fRadius, +0.0f, -g_aIcon[nCntIcon].fRadius);
 			pVtx[3].pos = D3DXVECTOR3(+g_aIcon[nCntIcon].fRadius, +0.0f, -g_aIcon[nCntIcon].fRadius);
 
+			// 頂点カラーの設定
+			pVtx[0].col = g_aIcon[nCntIcon].col;
+			pVtx[1].col = g_aIcon[nCntIcon].col;
+			pVtx[2].col = g_aIcon[nCntIcon].col;
+			pVtx[3].col = g_aIcon[nCntIcon].col;
+
 			//使用する
 			g_aIcon[nCntIcon].bUse = true;
 
-			//影の番号をコピーする
+			//アイコンの番号をコピーする
 			nIdxIcon = nCntIcon;
 
 			break;				//抜け出す
@@ -362,7 +433,7 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse)
 	//頂点バッファをアンロックする
 	g_pVtxBuffIcon->Unlock();
 
-	//影の番号を返す
+	//アイコンの番号を返す
 	return nIdxIcon;
 }
 

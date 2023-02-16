@@ -14,7 +14,6 @@
  
 #include "Car.h"
 #include "gate.h"
-#include "icon.h"
 #include "Police.h"
 #include "shadow.h"
 #include "sound.h"
@@ -42,6 +41,7 @@
 #define MAX_POLI_FORWARD_PATROL (15.0f)		// パトロール中の前進時の最高速度
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
+#define POLI_BACK_ALPHA			(0.005f)	// 戻るときの透明度の変化量
 
 #define POLICAR_TRAFFIC_CNT			(400)	// 渋滞が起きたときに改善する用のカウント
 #define POLICAR_TRAFFIC_IMPROVE_CNT	(540)	// 渋滞状態の解除のカウント
@@ -104,7 +104,6 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].bombState   = BOMBSTATE_NONE;					// ボムの状態
 		g_aPolice[nCntPolice].nLife		  = 0;								// 体力
 		g_aPolice[nCntPolice].nShadowID   = NONE_SHADOW;					// 影のインデックス
-		g_aPolice[nCntPolice].nIconID	  = NONE_ICON;						// アイコンのインデックス
 		g_aPolice[nCntPolice].bJump		  = false;							// ジャンプしていない
 		g_aPolice[nCntPolice].nTrafficCnt = 0;								// 渋滞カウント
 		g_aPolice[nCntPolice].bUse		  = false;							// 使用状況
@@ -136,6 +135,10 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].tackle.nTackleCnt = 0;						// タックルのカウント
 		g_aPolice[nCntPolice].tackle.tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
 		g_aPolice[nCntPolice].tackle.tackleState = TACKLESTATE_CHARGE;		// タックルの状態
+
+		// アイコンの情報の初期化
+		g_aPolice[nCntPolice].icon.nIconID = NONE_ICON;						// アイコンのインデックス
+		g_aPolice[nCntPolice].icon.state = ICONSTATE_NONE;					// アイコンの状態
 	}
 }
 
@@ -185,7 +188,7 @@ void UpdatePolice(void)
 				// アイコンの位置設定
 				SetPositionIcon
 				( // 引数
-					g_aPolice[nCntPolice].nIconID,		// アイコンのインデックス
+					g_aPolice[nCntPolice].icon.nIconID,		// アイコンのインデックス
 					g_aPolice[nCntPolice].pos			// 位置
 				);
 
@@ -402,9 +405,9 @@ void DrawPolice(void)
 						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.b = pMat[nCntMat].MatD3D.Diffuse.b;
 
 						// 透明度を下げる
-						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a  -= 0.005f;
-						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Ambient.a  -= 0.005f;
-						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a -= 0.005f;
+						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a  -= POLI_BACK_ALPHA;
+						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Ambient.a  -= POLI_BACK_ALPHA;
+						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a -= POLI_BACK_ALPHA;
 
 						if (g_aPolice[nCntPolice].MatCopy->MatD3D.Emissive.a <= 0.0f)
 						{ // 透明度が0.0f以下になった場合
@@ -419,6 +422,9 @@ void DrawPolice(void)
 
 							// 最初の位置に戻す処理
 							g_aPolice[nCntPolice].state = POLICESTATE_POSBACK;
+
+							// アイコンの状態を復活中にする
+							g_aPolice[nCntPolice].icon.state = ICONSTATE_REVIVAL;
 						}
 
 						// マテリアルの設定
@@ -435,9 +441,9 @@ void DrawPolice(void)
 						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.b = pMat[nCntMat].MatD3D.Diffuse.b;
 
 						// 透明度を下げる
-						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a  += 0.005f;
-						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Ambient.a  += 0.005f;
-						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a += 0.005f;
+						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a  += POLI_BACK_ALPHA;
+						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Ambient.a  += POLI_BACK_ALPHA;
+						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a += POLI_BACK_ALPHA;
 
 						if (g_aPolice[nCntPolice].MatCopy->MatD3D.Emissive.a >= 1.0f)
 						{ // 透明度が0.0f以下になった場合
@@ -449,6 +455,9 @@ void DrawPolice(void)
 
 							// 最初の位置に戻す処理
 							g_aPolice[nCntPolice].state = POLICESTATE_PATROL;
+
+							// アイコンの状態を無しにする
+							g_aPolice[nCntMat].icon.state = ICONSTATE_NONE;
 						}
 
 						// マテリアルの設定
@@ -536,12 +545,13 @@ void SetPolice(D3DXVECTOR3 pos)
 			SetPositionShadow(g_aPolice[nCntPolice].nShadowID, g_aPolice[nCntPolice].pos, g_aPolice[nCntPolice].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
 			// アイコンのインデックスを設定
-			g_aPolice[nCntPolice].nIconID = SetIcon
+			g_aPolice[nCntPolice].icon.nIconID = SetIcon
 			( // 引数
 				g_aPolice[nCntPolice].pos,
 				ICONTYPE_POLICE,
-				&g_aPolice[nCntPolice].nIconID,
-				&g_aPolice[nCntPolice].bUse
+				&g_aPolice[nCntPolice].icon.nIconID,
+				&g_aPolice[nCntPolice].bUse,
+				&g_aPolice[nCntPolice].icon.state
 			);
 
 			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
@@ -825,6 +835,9 @@ void PatrolCarSearch(Police *pPolice)
 	{ // 範囲内に入っていない場合
 		//巡回に戻る状態にする
 		pPolice->state = POLICESTATE_PATBACK;
+
+		// アイコンの状態を消える状態にする
+		pPolice->icon.state = ICONSTATE_DISAPPEAR;
 	}
 }
 
