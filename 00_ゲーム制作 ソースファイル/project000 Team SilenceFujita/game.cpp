@@ -24,8 +24,10 @@
 #include "Car.h"
 #include "effect.h"
 #include "gate.h"
+#include "icon.h"
 #include "life.h"
 #include "light.h"
+#include "map.h"
 #include "meshdome.h"
 #include "meshcylinder.h"
 #include "meshfield.h"
@@ -94,6 +96,9 @@ void InitGame(void)
 
 	// 影の初期化
 	InitShadow();
+
+	// アイコンの初期化
+	InitIcon();
 
 	// プレイヤーの初期化
 	InitPlayer();
@@ -167,6 +172,9 @@ void InitGame(void)
 	// 能力バーの初期化
 	InitAbility();
 
+	// マップの初期化
+	InitMap();
+
 	// 速度バーの初期化
 	InitVelocity();
 
@@ -207,6 +215,9 @@ void UninitGame(void)
 
 	// 影の終了
 	UninitShadow();
+
+	// アイコンの終了
+	UninitIcon();
 
 	// プレイヤーの終了
 	UninitPlayer();
@@ -279,6 +290,9 @@ void UninitGame(void)
 
 	// 能力バーの終了
 	UninitAbility();
+
+	// マップの終了
+	UninitMap();
 
 	// 速度バーの終了
 	UninitVelocity();
@@ -493,6 +507,9 @@ void UpdateGame(void)
 			// 能力バーの更新
 			UpdateAbility();
 
+			// マップの更新
+			UpdateMap();
+
 			// 速度バーの更新
 			UpdateVelocity();
 
@@ -504,6 +521,9 @@ void UpdateGame(void)
 
 			// 影の更新
 			UpdateShadow();
+
+			// アイコンの更新
+			UpdateIcon();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -636,6 +656,16 @@ void DrawGame(void)
 	}
 #endif
 
+#if 1
+	//------------------------------------------------------------------------------------------------------------------
+	//	UIの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// カメラの設定
+	SetCamera(CAMERATYPE_UI);
+
+	// マップの描画
+	DrawMap();
+
 	//------------------------------------------------------------------------------------------------------------------
 	//	マップカメラの描画
 	//------------------------------------------------------------------------------------------------------------------
@@ -645,13 +675,15 @@ void DrawGame(void)
 	// メッシュフィールドの描画
 	DrawMeshField(true);
 
+	// アイコンの描画
+	DrawIcon();
+
 	//------------------------------------------------------------------------------------------------------------------
 	//	UIの描画
 	//------------------------------------------------------------------------------------------------------------------
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
-#if 1
 	// 体力バーの描画
 	DrawLife();
 

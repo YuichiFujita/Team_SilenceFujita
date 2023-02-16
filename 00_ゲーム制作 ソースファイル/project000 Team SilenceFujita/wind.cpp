@@ -365,7 +365,7 @@ void CollisionWind(Human *pHuman)
 			pPlayer->pos,	// 絶対座標
 			pPlayer->rot,	// 向き
 			1000.0f,		// 横幅
-			100.0f			// 縦幅
+			150.0f			// 縦幅
 		);
 
 		if (LineOuterProduct(vecPos[0], vecPos[1], pHuman->pos) < 0
@@ -384,11 +384,7 @@ void CollisionWind(Human *pHuman)
 				FlyAwayHuman(pHuman, *pPlayer);
 
 				// ボーナスの設定処理
-				SetBonus
-				(
-					ADDSCORE_HUMAN,						// 理由
-					D3DXVECTOR3(300.0f, 50.0f, 0.0f)	// 位置
-				);
+				SetBonus(ADDSCORE_HUMAN);
 
 				// カメラの状態を変える
 				*GetCameraState() = CAMERASTATE_GOODJOB;

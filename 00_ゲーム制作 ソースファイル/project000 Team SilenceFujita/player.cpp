@@ -14,6 +14,7 @@
 
 #include "camera.h"
 #include "gate.h"
+#include "icon.h"
 #include "object.h"
 #include "particle.h"
 #include "player.h"
@@ -72,7 +73,8 @@
 //------------------------------------------------------------
 //	無音世界 (サイレンス・ワールド) マクロ定義
 //------------------------------------------------------------
-#define BOMB_CNT	(240)	// ボム再使用時間
+#define BOMB_CNT		(2400)		// ボム再使用時間
+#define SUB_BOMB_CNT	(10)		// 使用待機時のゲージの減算量
 
 //************************************************************
 //	プロトタイプ宣言
@@ -119,6 +121,7 @@ void InitPlayer(void)
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
+	g_player.nIconID	   = NONE_ICON;							// アイコンのインデックス
 	g_player.bMove         = false;								// 移動状況
 	g_player.bJump         = false;								// ジャンプ状況
 	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
@@ -328,6 +331,9 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	// 影のインデックスを設定
 	g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
+
+	// アイコンのインデックスを設定
+	g_player.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.nIconID, &g_player.bUse);
 
 	// 影の位置設定
 	SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
@@ -551,6 +557,16 @@ void UpdateNormalPlayer(void)
 		g_player.pos,		// 位置
 		g_player.rot,		// 向き
 		NONE_SCALE			// 拡大率
+	);
+
+	//--------------------------------------------------------
+	//	アイコンの更新
+	//--------------------------------------------------------
+	// アイコンの位置設定
+	SetPositionIcon
+	(
+		g_player.nIconID, 
+		g_player.pos
 	);
 
 	// プレイヤーの補正の更新処理
@@ -1335,7 +1351,14 @@ void UpdateSilenceWorld(void)
 		{ // カウンターが 0より大きい場合
 
 			// カウンターを減算
-			g_player.bomb.nCounter--;
+			g_player.bomb.nCounter -= SUB_BOMB_CNT;
+
+			if (g_player.bomb.nCounter < 0)
+			{ // カウンターが 0を下回った場合
+
+				// カウンターを補正
+				g_player.bomb.nCounter = 0;
+			}
 		}
 		else
 		{ // カウンターが 0以下の場合
