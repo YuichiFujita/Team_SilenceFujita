@@ -173,6 +173,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gate.cpp" />
     <ClCompile Include="Human.cpp" />
+    <ClCompile Include="icon.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="junk.cpp" />
     <ClCompile Include="life.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="gate.h" />
     <ClInclude Include="Human.h" />
+    <ClInclude Include="icon.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="junk.h" />
     <ClInclude Include="life.h" />

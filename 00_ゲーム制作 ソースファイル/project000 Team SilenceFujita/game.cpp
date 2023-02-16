@@ -24,6 +24,7 @@
 #include "Car.h"
 #include "effect.h"
 #include "gate.h"
+#include "icon.h"
 #include "life.h"
 #include "light.h"
 #include "meshdome.h"
@@ -94,6 +95,9 @@ void InitGame(void)
 
 	// 影の初期化
 	InitShadow();
+
+	// アイコンの初期化
+	InitIcon();
 
 	// プレイヤーの初期化
 	InitPlayer();
@@ -207,6 +211,9 @@ void UninitGame(void)
 
 	// 影の終了
 	UninitShadow();
+
+	// アイコンの終了
+	UninitIcon();
 
 	// プレイヤーの終了
 	UninitPlayer();
@@ -504,6 +511,9 @@ void UpdateGame(void)
 
 			// 影の更新
 			UpdateShadow();
+
+			// アイコンの更新
+			UpdateIcon();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -644,6 +654,9 @@ void DrawGame(void)
 
 	// メッシュフィールドの描画
 	DrawMeshField(true);
+
+	// アイコンの描画
+	DrawIcon();
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	UIの描画

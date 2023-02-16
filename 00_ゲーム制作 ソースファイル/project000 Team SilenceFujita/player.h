@@ -122,6 +122,7 @@ typedef struct
 	int         nLife;				// 体力
 	int         nCounterState;		// 状態管理カウンター
 	int         nShadowID;			// 影のインデックス
+	int			nIconID;			// アイコンのインデックス
 	int			nCameraState;		// 前向きカメラの状態
 	bool		bCameraFirst;		// 一人称カメラの状況
 	bool        bMove;				// 移動状況
