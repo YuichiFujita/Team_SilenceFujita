@@ -1185,6 +1185,12 @@ void WeatherThunder(void)
 		nThunderGene = THUNDER_RSL_INTERVAL;
 
 		break;				// 抜け出す
+	case MODE_RANKING:		// ランキング
+
+		// 雷の間隔を設定する
+		nThunderGene = THUNDER_RSL_INTERVAL;
+
+		break;				// 抜け出す
 	}
 
 	if (g_nThunderCount % nThunderGene == 0)

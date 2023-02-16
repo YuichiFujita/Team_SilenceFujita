@@ -17,6 +17,7 @@
 #include "title.h"
 #include "game.h"
 #include "result.h"
+#include "ranking.h"
 
 #include "billboard.h"
 #include "object.h"
@@ -431,7 +432,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_GAME;	// モードをタイトルに初期化
+	g_mode = MODE_TITLE;	// モードをタイトルに初期化
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -467,6 +468,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	// フェードの初期化
 	InitFade(g_mode);
+
+	//ランキングのリセット
+	ResetRanking();
 
 #ifdef _DEBUG	// デバッグ処理
 	// サウンドDJの初期化
@@ -508,6 +512,9 @@ void Uninit(void)
 
 	// リザルト画面の終了
 	UninitResult();
+
+	// ランキング画面の終了
+	UninitRanking();
 
 	// Direct3D デバイスの破棄
 	if (g_pD3DDevice != NULL)
@@ -574,6 +581,14 @@ void Update(void)
 
 		// 処理から抜ける
 		break;
+
+	case MODE_RANKING:
+
+		// ランキング画面の更新
+		UpdateRanking();
+
+		// 処理から抜ける
+		break;
 	}
 
 	// フェードの更新
@@ -636,6 +651,14 @@ void Draw(void)
 
 			// 処理から抜ける
 			break;
+
+		case MODE_RANKING:
+
+			// ランキング画面の描画
+			DrawRanking();
+
+			// 処理から抜ける
+			break;
 		}
 
 		// ビューポートを元に戻す
@@ -690,6 +713,14 @@ void SetMode(MODE mode)
 
 		// 処理から抜ける
 		break;
+
+	case MODE_RANKING:		// ランキング画面
+
+		// リザルト画面の終了
+		UninitRanking();
+
+		// 処理から抜ける
+		break;
 	}
 
 	// モードを設定する
@@ -720,6 +751,13 @@ void SetMode(MODE mode)
 
 		// リザルト画面の初期化
 		InitResult();
+
+		// 処理から抜ける
+		break;
+	case MODE_RANKING:	// ランキング画面
+
+		// ランキング画面の初期化
+		InitRanking();
 
 		// 処理から抜ける
 		break;

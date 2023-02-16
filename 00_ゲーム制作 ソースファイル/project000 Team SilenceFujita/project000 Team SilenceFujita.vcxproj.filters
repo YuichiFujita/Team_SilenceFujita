@@ -159,13 +159,9 @@
     <ClCompile Include="junk.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="icon.cpp">
+    <ClCompile Include="ranking.cpp">
       <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="map.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-  </ItemGroup>
+    </ClCompile>  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h">
       <Filter>ヘッダー ファイル</Filter>
@@ -311,11 +307,7 @@
     <ClInclude Include="junk.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="icon.h">
+    <ClInclude Include="ranking.h">
       <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="map.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-  </ItemGroup>
+    </ClInclude>  </ItemGroup>
 </Project>

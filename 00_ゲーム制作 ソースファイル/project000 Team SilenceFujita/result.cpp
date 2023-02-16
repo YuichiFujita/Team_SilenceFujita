@@ -377,7 +377,7 @@ void UpdateResult(void)
 			{ // フェードしていない場合
 
 				// タイトルに移行
-				SetFade(MODE_TITLE);
+				SetFade(MODE_RANKING);
 			}
 		}
 	}
