@@ -25,16 +25,16 @@
 #define VELO_POS_VAL_X	(200.0f)	// スコア (値) の絶対座標 (x)
 #define VELO_POS_VAL_Y	(600.0f)	// スコアの絶対座標 (y)
 
-#define VELO_POS_X		(70.0f)		// 速度バーの絶対座標 (x)
-#define VELO_POS_Y		(655.0f)	// 速度バーの絶対座標 (y)
-#define VELO_WIDTH_MUL	(4.8f)		// 速度バーの横幅のプレイヤー速度乗算量
+#define VELO_POS_X		(72.0f)		// 速度バーの絶対座標 (x)
+#define VELO_POS_Y		(652.5f)	// 速度バーの絶対座標 (y)
+#define VELO_WIDTH_MUL	(3.9f)		// 速度バーの横幅のプレイヤー速度乗算量
 #define VELO_HEIGHT		(15.0f)		// 速度バーの縦幅 / 2
-#define VELO_PULS_Y		(65.0f)		// 速度バーの縦幅の追加量
+#define VELO_PULS_Y		(66.0f)		// 速度バーの縦幅の追加量
 
 #define VELO_BG_POS_X	(190.0f)	// 速度バーの背景の絶対座標 (x)
 #define VELO_BG_POS_Y	(620.0f)	// 速度バーの背景の絶対座標 (x)
-#define VELO_BG_WIDTH	(165.0f)	// 速度バーの背景の横幅 / 2
-#define VELO_BG_HEIGHT	(80.0f)		// 速度バーの背景の縦幅 / 2
+#define VELO_BG_WIDTH	(155.0f)	// 速度バーの背景の横幅 / 2
+#define VELO_BG_HEIGHT	(70.0f)		// 速度バーの背景の縦幅 / 2
 
 #define MAX_SPEED		(240)						// 表示上の最高速度
 #define MAX_REAL_SPEED	(MAX_FORWARD + MAX_BOOST)	// 数値上の最高速度
@@ -44,7 +44,7 @@
 //**********************************************************************************************************************
 const char *apTextureVelocity[] =	// テクスチャの相対パス
 {
-	"data\\TEXTURE\\ui000.png",		// ライフ背景のテクスチャの相対パス
+	"data\\TEXTURE\\ui003.png",		// ライフ背景のテクスチャの相対パス
 	NULL,							// NULL
 	NULL,							// NULL
 };
