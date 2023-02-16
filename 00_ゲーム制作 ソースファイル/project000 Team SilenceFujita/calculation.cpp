@@ -16,6 +16,7 @@
 #include "effect.h"
 #include "gate.h"
 #include "Human.h"
+#include "icon.h"
 #include "light.h"
 #include "meshdome.h"
 #include "meshcylinder.h"
@@ -288,52 +289,52 @@ void InitAllAroundChunk(void)
 //==================================================================================
 void UninitAllAroundChunk(void)
 {
-	// 天気の初期化処理
+	// 天気の終了
 	UninitWeather();
 
-	// 影の初期化
+	// 影の終了
 	UninitShadow();
 
-	// 警察の初期化
+	// 警察の終了
 	UninitPolice();
 
-	// オブジェクトの初期化
+	// オブジェクトの終了
 	UninitObject();
 
-	// 車の初期化
+	// 車の終了
 	UninitCar();
 
-	// 人間の初期化
+	// 人間の終了
 	UninitHuman();
 
-	// ゲートの初期化
+	// ゲートの終了
 	UninitGate();
 
-	// カメラの初期化
+	// カメラの終了
 	UninitCamera();
 
-	// ライトの初期化
+	// ライトの終了
 	UninitLight();
 
-	// メッシュドームの初期化
+	// メッシュドームの終了
 	UninitMeshDome();
 
-	// メッシュシリンダーの初期化
+	// メッシュシリンダーの終了
 	UninitMeshCylinder();
 
-	// メッシュフィールドの初期化
+	// メッシュフィールドの終了
 	UninitMeshField();
 
-	// メッシュウォールの初期化
+	// メッシュウォールの終了
 	UninitMeshWall();
 
-	// ビルボードの初期化
+	// ビルボードの終了
 	UninitBillboard();
 
-	// エフェクトの初期化
+	// エフェクトの終了
 	UninitEffect();
 
-	// パーティクルの初期化
+	// パーティクルの終了
 	UninitParticle();
 }
 
@@ -407,6 +408,9 @@ void InitResultChunk(void)
 {
 	// 万能初期化の全体処理
 	InitAllAroundChunk();
+
+	// アイコンの初期化
+	InitIcon();
 }
 
 //==================================================================================
@@ -416,6 +420,9 @@ void UninitResultChunk(void)
 {
 	// 万能終了の全体処理
 	UninitAllAroundChunk();
+
+	// アイコンの終了
+	UninitIcon();
 }
 
 //==================================================================================

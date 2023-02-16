@@ -20,6 +20,8 @@
 
 #include "calculation.h"
 #include "camera.h"
+#include "Human.h"
+#include "icon.h"
 #include "light.h"
 #include "score.h"
 #include "weather.h"
@@ -142,6 +144,9 @@ void InitRanking(void)
 	// 万能初期化の全体処理（3Dマップ）
 	InitAllAroundChunk();
 
+	// アイコンの初期化
+	InitIcon();
+
 	// ファイルをロードする全体処理
 	LoadFileChunk
 	( // 引数
@@ -172,6 +177,9 @@ void UninitRanking(void)
 
 	// 万能終了の全体処理（3Dマップ）
 	UninitAllAroundChunk();
+
+	// アイコンの終了
+	UninitIcon();
 }
 
 //=====================================
@@ -190,6 +198,9 @@ void UpdateRanking(void)
 
 	// 車の更新処理
 	UpdateCar();
+
+	// 人間の更新処理
+	UpdateHuman();
 
 	//　パトカーの更新処理
 	UpdatePolice();

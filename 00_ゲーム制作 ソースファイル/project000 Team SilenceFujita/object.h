@@ -14,6 +14,7 @@
 #include "game.h"
 #include "player.h"
 #include "Police.h"
+#include "icon.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
@@ -120,6 +121,7 @@ typedef struct
 	Coll_Info    collInfo;				// 当たり判定情報
 	Smash_Object smash;					// 吹っ飛び状態
 	Judge		 judge;					// ジャッジ
+	IconInfo	 icon;					// アイコンの情報
 	int          nLife;					// 体力
 	int          nCollisionType;		// 当たり判定の種類
 	int          nShadowType;			// 影の種類
