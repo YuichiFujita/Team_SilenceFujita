@@ -75,6 +75,7 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\obaratempura000.x",	// 商店街（汎用・天ぷら）	
 	"data\\MODEL_OBJECT\\obarapharmacy000.x",	// 商店街（汎用・薬局）	
 	"data\\MODEL_OBJECT\\obarashutter000.x",	// 商店街（汎用・シャッター）	
+	"data\\MODEL_OBJECT\\bill003.x",		// ビルver3
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
