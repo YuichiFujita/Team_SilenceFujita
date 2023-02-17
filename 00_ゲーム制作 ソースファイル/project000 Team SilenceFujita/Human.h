@@ -14,6 +14,7 @@
 #include "game.h"
 #include "model.h"
 #include "curve.h"
+#include "icon.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -46,6 +47,7 @@ typedef struct
 	D3DXVECTOR3  rot;					// 向き
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報
+	IconInfo	 icon;					// アイコンの情報
 	int			 nShadowID;				// 影のインデックス
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか

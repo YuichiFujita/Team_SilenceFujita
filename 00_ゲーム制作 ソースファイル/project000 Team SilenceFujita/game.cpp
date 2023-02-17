@@ -17,6 +17,7 @@
 
 #include "2Deffect.h"
 #include "2Dparticle.h"
+#include "3DValue.h"
 #include "ability.h"
 #include "billboard.h"
 #include "bonus.h"
@@ -146,6 +147,9 @@ void InitGame(void)
 	// 再建築タイマーの初期化
 	InitBuildtimer();
 
+	// 3Dの数値の初期化
+	Init3DValue();
+
 	// 2Dエフェクトの初期化
 	Init2DEffect();
 
@@ -267,6 +271,9 @@ void UninitGame(void)
 
 	// 再建築タイマーの終了
 	UninitBuildtimer();
+
+	// 3Dの数値の終了
+	Uninit3DValue();
 
 	// 2Dエフェクトの終了
 	Uninit2DEffect();
@@ -505,6 +512,9 @@ void UpdateGame(void)
 
 			// 再建築タイマーの更新
 			UpdateBuildtimer();
+
+			// 3Dの数値の更新
+			Update3DValue();
 
 			// 体力バーの更新
 			UpdateLife();

@@ -111,6 +111,10 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].curveInfo.curveInfo.nCurveTime = 0;		// 曲がり角の数
 		g_aHuman[nCntHuman].curveInfo.curveInfo.nNowCurve = 0;		// 現在の曲がり角
 
+		// アイコンの情報の初期化
+		g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;				// アイコンのインデックス
+		g_aHuman[nCntHuman].icon.state = ICONSTATE_NONE;			// アイコンの状態
+
 		for (int nCntCur = 0; nCntCur < MAX_HUMAN_CURVE; nCntCur++)
 		{
 			g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[nCntCur] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 曲がり角の位置
@@ -174,6 +178,9 @@ void UpdateHuman(void)
 
 				// ジャッジの更新処理
 				UpdateJudge(&g_aHuman[nCntHuman].judge);
+
+				// アイコンの位置設定処理
+				SetPositionIcon(g_aHuman[nCntHuman].icon.nIconID, g_aHuman[nCntHuman].pos);
 			}
 
 			//人間のリアクション処理
@@ -402,6 +409,10 @@ void SetHuman(D3DXVECTOR3 pos)
 			g_aHuman[nCntHuman].rot.y = GetDefaultRot(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// 初期の向き
 			g_aHuman[nCntHuman].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// ルート
 
+			// アイコンの情報の初期化
+			g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;				// アイコンのインデックス
+			g_aHuman[nCntHuman].icon.state = ICONSTATE_NONE;			// アイコンの状態
+
 			switch (g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[0])
 			{
 			case DASH_RIGHT:	// 右に向かって走っている
@@ -447,6 +458,20 @@ void SetHuman(D3DXVECTOR3 pos)
 
 				g_aHuman[nCntHuman].judge.state = JUDGESTATE_JUSTICE;				// 善悪
 				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+			}
+
+			if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_EVIL)
+			{ // 悪い奴だった場合
+
+				// アイコンの設定処理
+				g_aHuman[nCntHuman].icon.nIconID = SetIcon
+				( // 引数
+					g_aHuman[nCntHuman].pos,
+					ICONTYPE_EVIL,
+					&g_aHuman[nCntHuman].icon.nIconID,
+					&g_aHuman[nCntHuman].bUse,
+					&g_aHuman[nCntHuman].icon.state
+				);
 			}
 
 			// 処理を抜ける

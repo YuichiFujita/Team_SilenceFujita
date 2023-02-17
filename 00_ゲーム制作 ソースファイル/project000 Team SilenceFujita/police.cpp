@@ -530,6 +530,10 @@ void SetPolice(D3DXVECTOR3 pos)
 			// 使用している状態にする
 			g_aPolice[nCntPolice].bUse = true;
 
+			// アイコンの情報の初期化
+			g_aPolice[nCntPolice].icon.nIconID = NONE_ICON;						// アイコンのインデックス
+			g_aPolice[nCntPolice].icon.state = ICONSTATE_NONE;					// アイコンの状態
+
 			// モデル情報を設定
 			g_aPolice[nCntPolice].modelData = GetModelData(MODELTYPE_CAR_POLICE);	// モデル情報
 

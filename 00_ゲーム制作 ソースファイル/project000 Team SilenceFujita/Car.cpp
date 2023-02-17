@@ -424,6 +424,10 @@ void SetCar(D3DXVECTOR3 pos)
 			// 影の位置設定
 			SetPositionShadow(g_aCar[nCntCar].nShadowID, g_aCar[nCntCar].pos, g_aCar[nCntCar].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
+			// アイコンの情報の初期化
+			g_aCar[nCntCar].icon.nIconID = NONE_ICON;					// アイコンのインデックス
+			g_aCar[nCntCar].icon.state = ICONSTATE_NONE;				// アイコンの状態
+
 			// 車の位置と向きの設定処理
 			SetCarPosRot(&g_aCar[nCntCar]);
 			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数

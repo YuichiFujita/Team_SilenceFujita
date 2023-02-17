@@ -10,6 +10,8 @@
 #include "main.h"
 #include "buildtimer.h"
 #include "object.h"
+#include "3DValue.h"
+#include "player.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -188,6 +190,10 @@ void UpdateBuildtimer(void)
 //=====================================
 void DrawBuildtimer(void)
 {
+	Player *pPlayer = GetPlayer();
+
+	/*float fAngle;*/
+
 	//デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -209,20 +215,6 @@ void DrawBuildtimer(void)
 	{
 		if (g_aBuild[nCntDraw].bUse == true)
 		{//使用していた場合
-
-			// 時間を設定する
-			int nMin = g_aBuild[nCntDraw].nCount / 3600;			// タイマー (分)
-			int nSec = (g_aBuild[nCntDraw].nCount % 3600) / 60;		// タイマー (秒)
-
-			// 変数配列を宣言
-			D3DXVECTOR3 aPosValue[MAX_VAL_BUILD] =					// タイマーの位置用
-			{ // 初期値
-				D3DXVECTOR3(g_aBuild[nCntDraw].pos.x - 50.0f, g_aBuild[nCntDraw].pos.y, 0.0f),	// タイマー (分) の位置
-				D3DXVECTOR3(g_aBuild[nCntDraw].pos.x + 20.0f, g_aBuild[nCntDraw].pos.y, 0.0f)	// タイマー (秒) の位置
-			};
-
-			int aValue[MAX_VAL_BUILD] = { nMin,    nSec };			// タイマー表示用
-			int aMaxValue[MAX_VAL_BUILD] = { MAX_BUILD_MIN, MAX_BUILD_SEC };	// タイマー表示の値の制限用
 
 			//ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aBuild[nCntDraw].mtx);
@@ -268,6 +260,48 @@ void DrawBuildtimer(void)
 
 	//ライティングをONにする
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+
+
+	//for (int nCntDraw = 0; nCntDraw < MAX_BUILDTIMER; nCntDraw++)
+	//{
+	//	if (g_aBuild[nCntDraw].bUse == true)
+	//	{//使用していた場合
+
+	//		// 角度を取る
+	//		fAngle = atan2f(g_aBuild[nCntDraw].pos.x - pPlayer->pos.x, g_aBuild[nCntDraw].pos.z - pPlayer->pos.z);
+
+	//		// 角度に足す
+	//		fAngle += D3DX_PI * 0.5f;
+
+	//		for (int nCntValue = 0; nCntValue < 2; nCntValue++)
+	//		{
+	//			// 時間を設定する
+	//			int nMin = g_aBuild[nCntDraw].nCount / 3600;			// タイマー (分)
+	//			int nSec = (g_aBuild[nCntDraw].nCount % 3600) / 60;		// タイマー (秒)
+
+	//			int aValue[MAX_VAL_BUILD] = { nMin,    nSec };			// タイマー表示用
+	//			int aMaxValue[MAX_VAL_BUILD] = { MAX_BUILD_MIN, MAX_BUILD_SEC };	// タイマー表示の値の制限用
+
+	//			// 3Dの数値の設定
+	//			Set3DValue
+	//			( // 引数
+	//				aValue[nCntValue],		// 値
+	//				aMaxValue[nCntValue],	// 値の最大値
+	//				50.0f,					// 横幅
+	//				70.0f,					// 縦幅
+	//				1.0f					// α値
+	//			);
+
+	//			// 3Dの数値の描画処理
+	//			Draw3DValue
+	//			( // 引数
+	//				D3DXVECTOR3(g_aBuild[nCntDraw].pos.x + cosf(fAngle) * (30.0f * nCntValue), g_aBuild[nCntDraw].pos.y, g_aBuild[nCntDraw].pos.z + sinf(fAngle) * (30.0f * nCntValue)),
+	//				MAX_VAL_BUILD,
+	//				VALUE3DTYPE_NORMAL
+	//			);
+	//		}
+	//	}
+	//}
 }
 
 //======================================
@@ -287,7 +321,7 @@ void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object *pObject)
 		{//使用されていなかった場合
 			
 			// 情報の設定
-			g_aBuild[nCntBill].pos		= pos;			// 位置
+			g_aBuild[nCntBill].pos = D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z);	// 位置
 			g_aBuild[nCntBill].pObject	= pObject;		// オブジェクトのアドレス
 			g_aBuild[nCntBill].nCount	= nCount;		// カウント
 
