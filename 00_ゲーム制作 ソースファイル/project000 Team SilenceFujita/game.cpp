@@ -20,6 +20,7 @@
 #include "ability.h"
 #include "billboard.h"
 #include "bonus.h"
+#include "buildtimer.h"
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
@@ -142,6 +143,9 @@ void InitGame(void)
 	// ボーナスの初期化
 	InitBonus();
 
+	// 再建築タイマーの初期化
+	InitBuildtimer();
+
 	// 2Dエフェクトの初期化
 	Init2DEffect();
 
@@ -260,6 +264,9 @@ void UninitGame(void)
 
 	// ボーナスの終了
 	UninitBonus();
+
+	// 再建築タイマーの終了
+	UninitBuildtimer();
 
 	// 2Dエフェクトの終了
 	Uninit2DEffect();
@@ -496,6 +503,9 @@ void UpdateGame(void)
 			// ビルボードの更新
 			UpdateBillboard();
 
+			// 再建築タイマーの更新
+			UpdateBuildtimer();
+
 			// 体力バーの更新
 			UpdateLife();
 
@@ -613,6 +623,9 @@ void DrawGame(void)
 
 	// タイヤ痕の描画
 	DrawTireMark();
+
+	// 再建築タイマーの描画
+	DrawBuildtimer();
 
 	// オブジェクトの描画
 	DrawObject();

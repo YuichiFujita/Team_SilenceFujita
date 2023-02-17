@@ -12,6 +12,7 @@
 #include "input.h"
 #include "model.h"
 
+#include "buildtimer.h"
 #include "junk.h"
 #include "object.h"
 #include "particle.h"
@@ -626,7 +627,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			if (nCntObject % 2 == 0)
 			{ // 2の倍数だった場合
 
-				g_aObject[nCntObject].judge.state = JUDGESTATE_EVIL;					// 善悪
+				g_aObject[nCntObject].judge.state = JUDGESTATE_EVIL;				// 善悪
 				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
 			}
 			else
@@ -691,6 +692,9 @@ void HitObject(Object *pObject, int nDamage)
 				SPAWN_PARTICLE_EXPLOSION,			// エフェクト数
 				2									// 寿命
 			);
+
+			// 再建築タイマーの設定処理
+			SetBuildtimer(pObject->pos, 30, pObject);
 
 			//// サイズに応じてがれきを生み出す
 			//for (int nCntColl = 0; nCntColl < g_aCollision[pObject->nType].nNumColl; nCntColl++)

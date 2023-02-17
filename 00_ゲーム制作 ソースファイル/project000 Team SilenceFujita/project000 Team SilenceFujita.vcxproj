@@ -160,6 +160,7 @@
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
     <ClCompile Include="bonus.cpp" />
+    <ClCompile Include="buildtimer.cpp" />
     <ClCompile Include="calculation.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Car.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />
     <ClInclude Include="bonus.h" />
+    <ClInclude Include="buildtimer.h" />
     <ClInclude Include="calculation.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="Car.h" />
