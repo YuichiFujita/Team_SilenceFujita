@@ -288,6 +288,9 @@ void DrawMeshField(bool bMap)
 	if (bMap == true)
 	{ // マップ表示用のメッシュフィールドの描画の場合
 
+		// ライティングを無効にする
+		pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
 		// Zテストを無効にする
 		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// Zテストの設定
 		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zバッファ更新の有効 / 無効の設定
@@ -384,6 +387,9 @@ void DrawMeshField(bool bMap)
 			nNumIdx += g_aMeshField[nCntMeshField].nNumIdx;
 		}
 	}
+
+	// ライティングを有効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 
 	// Zテストを有効にする
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);	// Zテストの設定
