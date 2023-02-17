@@ -42,6 +42,8 @@
 #define SMASH_ROTMOVE_Y	(0.2f)					// 吹き飛ぶ角度の移動量(Y軸)
 #define SMASH_ROTMOVE_Z	(0.01f)					// 吹き飛ぶ角度の移動量(Z軸)
 
+#define APPEAR_ADD_MAGNI	(0.05f)				// 出現時の加算数の倍率
+
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
@@ -117,6 +119,12 @@ void InitObject(void)
 		// マテリアルのコピーを初期化
 		g_aObject[nCntObject].matCopy[MAX_MATERIAL] = {};
 
+		// 出現関係の初期化
+		g_aObject[nCntObject].appear.scaleCopy = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
+		g_aObject[nCntObject].appear.state = APPEARSTATE_NONE;						// 出現状態
+		g_aObject[nCntObject].appear.scaleAdd = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率の加算数
+		g_aObject[nCntObject].appear.fAlpha = 0.0f;									// 透明度
+
 #ifdef _DEBUG	// デバッグ処理
 		// エディット時の状態
 		g_aObject[nCntObject].editState = OBJECTSTATE_NONE;
@@ -173,141 +181,178 @@ void UpdateObject(void)
 		if (g_aObject[nCntObject].bUse == true)
 		{ // オブジェクトが使用されている場合
 
-			if (g_aObject[nCntObject].judge.state == JUDGESTATE_EVIL)
-			{ // 悪者だった場合
+			switch (g_aObject[nCntObject].appear.state)
+			{
+			case APPEARSTATE_NONE:		// 一瞬で出現
 
-				// ジャッジの更新処理
-				UpdateJudge(&g_aObject[nCntObject].judge);
-			}
+				// 出現完了状態にする
+				g_aObject[nCntObject].appear.state = APPEARSTATE_COMPLETE;
 
-			switch (g_aObject[nCntObject].nBreakType)
-			{ // 壊れ方の種類ごとの処理
-			case BREAKTYPE_NONE:	// 壊れない種類
+				break;					// 抜け出す
 
-				// 無し
+			case APPEARSTATE_SLOWLY:	// 徐々に出現
 
-				// 処理を抜ける
-				break;
+				// 拡大率を上げていく
+				g_aObject[nCntObject].scale += g_aObject[nCntObject].appear.scaleAdd;
 
-			case BREAKTYPE_ON:		// 壊れる種類
+				// 透明度を上げていく
+				g_aObject[nCntObject].appear.fAlpha += APPEAR_ADD_MAGNI;
 
-				if (g_aObject[nCntObject].nCounterState > 0)
-				{ // カウンターが 0より大きい場合
+				if (g_aObject[nCntObject].scale.x >= g_aObject[nCntObject].appear.scaleCopy.x)
+				{ // 拡大率がコピー以上になった場合
 
-					// カウンターを減算
-					g_aObject[nCntObject].nCounterState--;
+					// 拡大率を補正する
+					g_aObject[nCntObject].scale = g_aObject[nCntObject].appear.scaleCopy;
 
-					if (g_aObject[nCntObject].nCounterState == UNR_TIME_OBJ)
-					{ // カウンターが一定値の場合
+					// 出現完了にする
+					g_aObject[nCntObject].appear.state = APPEARSTATE_COMPLETE;
 
-						// 無敵状態にする
-						g_aObject[nCntObject].state = ACTIONSTATE_UNRIVALED;
-					}
-					else if (g_aObject[nCntObject].nCounterState <= 0)
-					{ // カウンターが 0以下の場合
-
-						// 通常状態にする
-						g_aObject[nCntObject].state = ACTIONSTATE_NORMAL;
-					}
+					// 透明度を設定する
+					g_aObject[nCntObject].appear.fAlpha = 1.0f;
 				}
 
-				// 処理を抜ける
-				break;
+				break;					// 抜け出す
 
-			case BREAKTYPE_SMASH:		// 吹っ飛ぶ種類
+			case APPEARSTATE_COMPLETE:	// 出現完了
 
-				switch (g_aObject[nCntObject].smash.State)
-				{
-				case SMASHSTATE_NONE:	// 吹っ飛び状態
-					
-					break;				// 抜け出す
+				if (g_aObject[nCntObject].judge.state == JUDGESTATE_EVIL)
+				{ // 悪者だった場合
 
-				case SMASHSTATE_ON:		// 吹っ飛んでいる状態
+					// ジャッジの更新処理
+					UpdateJudge(&g_aObject[nCntObject].judge);
+				}
 
-					// 重力をかける
-					g_aObject[nCntObject].smash.move.y += OBJECT_GRAVITY;
+				switch (g_aObject[nCntObject].nBreakType)
+				{ // 壊れ方の種類ごとの処理
+				case BREAKTYPE_NONE:	// 壊れない種類
 
-					// 移動量を足す
-					g_aObject[nCntObject].pos += g_aObject[nCntObject].smash.move;
+					// 無し
 
-					// カウントを加算する
-					g_aObject[nCntObject].smash.nCounter++;
+					// 処理を抜ける
+					break;
 
-					g_aObject[nCntObject].rot.x += g_aObject[nCntObject].smash.rotMove.x + 0.02f;
-					g_aObject[nCntObject].rot.y -= g_aObject[nCntObject].smash.rotMove.y + 0.02f;
-					g_aObject[nCntObject].rot.z -= g_aObject[nCntObject].smash.rotMove.z + 0.02f;
+				case BREAKTYPE_ON:		// 壊れる種類
 
-					if (g_aObject[nCntObject].smash.nCounter >= SMASH_DEATH_CNT)
-					{ // カウントが一定時間経ったら
-						// 使用しない
-						g_aObject[nCntObject].bUse = false;
+					if (g_aObject[nCntObject].nCounterState > 0)
+					{ // カウンターが 0より大きい場合
+
+						// カウンターを減算
+						g_aObject[nCntObject].nCounterState--;
+
+						if (g_aObject[nCntObject].nCounterState == UNR_TIME_OBJ)
+						{ // カウンターが一定値の場合
+
+							// 無敵状態にする
+							g_aObject[nCntObject].state = ACTIONSTATE_UNRIVALED;
+						}
+						else if (g_aObject[nCntObject].nCounterState <= 0)
+						{ // カウンターが 0以下の場合
+
+							// 通常状態にする
+							g_aObject[nCntObject].state = ACTIONSTATE_NORMAL;
+						}
 					}
 
-					// 向きの正規化(X軸)
-					if (g_aObject[nCntObject].rot.x >= D3DX_PI * 0.5f)
+					// 処理を抜ける
+					break;
+
+				case BREAKTYPE_SMASH:		// 吹っ飛ぶ種類
+
+					switch (g_aObject[nCntObject].smash.State)
 					{
-						g_aObject[nCntObject].rot.x = D3DX_PI * 0.5f;
+					case SMASHSTATE_NONE:	// 吹っ飛び状態
 
-						g_aObject[nCntObject].smash.rotMove.x = 0.0f;
+						break;				// 抜け出す
+
+					case SMASHSTATE_ON:		// 吹っ飛んでいる状態
+
+						// 重力をかける
+						g_aObject[nCntObject].smash.move.y += OBJECT_GRAVITY;
+
+						// 移動量を足す
+						g_aObject[nCntObject].pos += g_aObject[nCntObject].smash.move;
+
+						// カウントを加算する
+						g_aObject[nCntObject].smash.nCounter++;
+
+						g_aObject[nCntObject].rot.x += g_aObject[nCntObject].smash.rotMove.x + 0.02f;
+						g_aObject[nCntObject].rot.y -= g_aObject[nCntObject].smash.rotMove.y + 0.02f;
+						g_aObject[nCntObject].rot.z -= g_aObject[nCntObject].smash.rotMove.z + 0.02f;
+
+						if (g_aObject[nCntObject].smash.nCounter >= SMASH_DEATH_CNT)
+						{ // カウントが一定時間経ったら
+							// 使用しない
+							g_aObject[nCntObject].bUse = false;
+						}
+
+						// 向きの正規化(X軸)
+						if (g_aObject[nCntObject].rot.x >= D3DX_PI * 0.5f)
+						{
+							g_aObject[nCntObject].rot.x = D3DX_PI * 0.5f;
+
+							g_aObject[nCntObject].smash.rotMove.x = 0.0f;
+						}
+						else if (g_aObject[nCntObject].rot.x <= (-D3DX_PI * 0.5f))
+						{
+							g_aObject[nCntObject].rot.x = -(D3DX_PI * 0.5f);
+
+							g_aObject[nCntObject].smash.rotMove.x = 0.0f;
+						}
+
+						// 向きの正規化(Y軸)
+						if (g_aObject[nCntObject].rot.y >= D3DX_PI * 0.5f)
+						{
+							g_aObject[nCntObject].rot.y = D3DX_PI * 0.5f;
+
+							g_aObject[nCntObject].smash.rotMove.y = 0.0f;
+						}
+						else if (g_aObject[nCntObject].rot.y <= (-D3DX_PI * 0.5f))
+						{
+							g_aObject[nCntObject].rot.y = -(D3DX_PI * 0.5f);
+
+							g_aObject[nCntObject].smash.rotMove.y = 0.0f;
+						}
+
+						// 向きの正規化(Z軸)
+						if (g_aObject[nCntObject].rot.z >= D3DX_PI * 0.5f)
+						{
+							g_aObject[nCntObject].rot.z = D3DX_PI * 0.5f;
+
+							g_aObject[nCntObject].smash.rotMove.z = 0.0f;
+						}
+						else if (g_aObject[nCntObject].rot.z <= (-D3DX_PI * 0.5f))
+						{
+							g_aObject[nCntObject].rot.z = -(D3DX_PI * 0.5f);
+
+							g_aObject[nCntObject].smash.rotMove.z = 0.0f;
+						}
+
+						if (g_aObject[nCntObject].pos.y <= 0.0f)
+						{ // 地面よりも下に行ったら
+
+							// 移動量を0にする
+							g_aObject[nCntObject].smash.move.x = 0.0f;
+							g_aObject[nCntObject].smash.move.z = 0.0f;
+						}
+
+						break;				// 抜け出す(吹っ飛んでいる状態)
 					}
-					else if (g_aObject[nCntObject].rot.x <= (-D3DX_PI * 0.5f))
-					{
-						g_aObject[nCntObject].rot.x = -(D3DX_PI * 0.5f);
 
-						g_aObject[nCntObject].smash.rotMove.x = 0.0f;
-					}
-
-					// 向きの正規化(Y軸)
-					if (g_aObject[nCntObject].rot.y >= D3DX_PI * 0.5f) 
-					{
-						g_aObject[nCntObject].rot.y = D3DX_PI * 0.5f; 
-
-						g_aObject[nCntObject].smash.rotMove.y = 0.0f;
-					}
-					else if (g_aObject[nCntObject].rot.y <= (-D3DX_PI * 0.5f)) 
-					{
-						g_aObject[nCntObject].rot.y = -(D3DX_PI * 0.5f);
-
-						g_aObject[nCntObject].smash.rotMove.y = 0.0f;
-					}
-
-					// 向きの正規化(Z軸)
-					if (g_aObject[nCntObject].rot.z >= D3DX_PI * 0.5f) 
-					{
-						g_aObject[nCntObject].rot.z = D3DX_PI * 0.5f; 
-
-						g_aObject[nCntObject].smash.rotMove.z = 0.0f;
-					}
-					else if (g_aObject[nCntObject].rot.z <= (-D3DX_PI * 0.5f)) 
-					{
-						g_aObject[nCntObject].rot.z = -(D3DX_PI * 0.5f); 
-
-						g_aObject[nCntObject].smash.rotMove.z = 0.0f;
-					}
+					// 地面に接しているか
+					LandObject(&g_aObject[nCntObject].pos, &g_aObject[nCntObject].smash.move, &g_aObject[nCntObject].smash.bJump);
 
 					if (g_aObject[nCntObject].pos.y <= 0.0f)
 					{ // 地面よりも下に行ったら
 
-						// 移動量を0にする
-						g_aObject[nCntObject].smash.move.x = 0.0f;
-						g_aObject[nCntObject].smash.move.z = 0.0f;
+						// 位置を0にする
+						g_aObject[nCntObject].pos.y = 0.0f;
 					}
 
-					break;				// 抜け出す
+					// 処理を抜ける
+					break;
 				}
 
-				// 地面に接しているか
-				LandObject(&g_aObject[nCntObject].pos, &g_aObject[nCntObject].smash.move, &g_aObject[nCntObject].smash.bJump);
-
-				if (g_aObject[nCntObject].pos.y <= 0.0f)
-				{ // 地面よりも下に行ったら
-					
-					// 位置を0にする
-					g_aObject[nCntObject].pos.y = 0.0f;
-				}
-
-				// 処理を抜ける
-				break;				
+				break;					// 抜け出す(出現完了)
 			}
 		}
 	}
@@ -364,46 +409,58 @@ void DrawObject(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				switch (g_aObject[nCntObject].state)
-				{ // 状態ごとの処理
-				case ACTIONSTATE_DAMAGE:	// ダメージ状態
+				if (g_aObject[nCntObject].appear.state == APPEARSTATE_SLOWLY)
+				{ // 徐々に出現する時
 
-					// 読み込んだマテリアルを代入
-					blackMat.MatD3D = pMat[nCntMat].MatD3D;
-
-					// 拡散光・環境光・自己発光を赤にする
-					blackMat.MatD3D.Diffuse  = D3DXCOLOR(0.3f, 0.3f, 0.0f, 1.0f);
-					blackMat.MatD3D.Ambient  = D3DXCOLOR(0.3f, 0.3f, 0.0f, 1.0f);
-					blackMat.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+					// 透明度を設定する
+					pMat[nCntMat].MatD3D.Diffuse.a = g_aObject[nCntObject].appear.fAlpha;
 
 					// マテリアルの設定
-					pDevice->SetMaterial(&blackMat.MatD3D);			// 黄＋黒
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				}
+				else
+				{ // 上記以外
+					switch (g_aObject[nCntObject].state)
+					{ // 状態ごとの処理
+					case ACTIONSTATE_DAMAGE:	// ダメージ状態
 
-					// 処理を抜ける
-					break;
+						// 読み込んだマテリアルを代入
+						blackMat.MatD3D = pMat[nCntMat].MatD3D;
 
-				default:					// それ以外の状態
-
-					// マテリアルのコピーに代入する
-					g_aObject[nCntObject].matCopy[nCntMat] = pMat[nCntMat];
-
-					if (g_aObject[nCntObject].judge.state == JUDGESTATE_JUSTICE)
-					{ // 良い奴の場合
-						// マテリアルの設定
-						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
-					}
-					else
-					{ // 悪い奴の場合
-
-						// 自己発光を代入する
-						g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Emissive = g_aObject[nCntObject].judge.col;
+						// 拡散光・環境光・自己発光を赤にする
+						blackMat.MatD3D.Diffuse = D3DXCOLOR(0.3f, 0.3f, 0.0f, 1.0f);
+						blackMat.MatD3D.Ambient = D3DXCOLOR(0.3f, 0.3f, 0.0f, 1.0f);
+						blackMat.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
 
 						// マテリアルの設定
-						pDevice->SetMaterial(&g_aObject[nCntObject].matCopy[nCntMat].MatD3D);
-					}
+						pDevice->SetMaterial(&blackMat.MatD3D);			// 黄＋黒
 
-					// 処理を抜ける
-					break;
+						// 処理を抜ける
+						break;
+
+					default:					// それ以外の状態
+
+						// マテリアルのコピーに代入する
+						g_aObject[nCntObject].matCopy[nCntMat] = pMat[nCntMat];
+
+						if (g_aObject[nCntObject].judge.state == JUDGESTATE_JUSTICE)
+						{ // 良い奴の場合
+							// マテリアルの設定
+							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+						}
+						else
+						{ // 悪い奴の場合
+
+							// 自己発光を代入する
+							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Emissive = g_aObject[nCntObject].judge.col;
+
+							// マテリアルの設定
+							pDevice->SetMaterial(&g_aObject[nCntObject].matCopy[nCntMat].MatD3D);
+						}
+
+						// 処理を抜ける
+						break;
+					}
 				}
 
 #ifdef _DEBUG	// デバッグ処理
@@ -462,7 +519,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear)
 {
 	// 変数を宣言
 	float AverageScale;			// 拡大率の平均値
@@ -484,6 +541,27 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].nBreakType     = nBreakType;			// 壊れ方の種類
 			g_aObject[nCntObject].nShadowType    = nShadowType;			// 影の種類
 			g_aObject[nCntObject].nCollisionType = nCollisionType;		// 当たり判定の種類
+
+			// 出現関係の設定
+			g_aObject[nCntObject].appear.scaleCopy = scale;							// 拡大率のコピー
+			g_aObject[nCntObject].appear.state	   = appear;						// 出現状態
+			g_aObject[nCntObject].appear.scaleAdd  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の加算数
+			g_aObject[nCntObject].appear.fAlpha	   = 1.0f;							// 透明度
+
+			if (g_aObject[nCntObject].appear.state == APPEARSTATE_SLOWLY)
+			{ // 徐々に出てくる状態だった場合
+
+				// 拡大率を初期化する
+				g_aObject[nCntObject].scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+				// 拡大率の加算数を設定する
+				g_aObject[nCntObject].appear.scaleAdd.x = scale.x * APPEAR_ADD_MAGNI;
+				g_aObject[nCntObject].appear.scaleAdd.y = scale.y * APPEAR_ADD_MAGNI;
+				g_aObject[nCntObject].appear.scaleAdd.z = scale.z * APPEAR_ADD_MAGNI;
+
+				// 透明度を設定する
+				g_aObject[nCntObject].appear.fAlpha = 0.0f;							
+			}
 
 			// オブジェクトの情報を初期化
 			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態
@@ -679,8 +757,8 @@ void HitObject(Object *pObject, int nDamage)
 				2									// 寿命
 			);
 
-			//// 再建築タイマーの設定処理
-			//SetBuildtimer(pObject->pos, 1000, pObject);
+			// 再建築タイマーの設定処理
+			SetBuildtimer(pObject->pos, 600, *pObject);
 
 			//// サイズに応じてがれきを生み出す
 			//for (int nCntColl = 0; nCntColl < g_aCollision[pObject->nType].nNumColl; nCntColl++)

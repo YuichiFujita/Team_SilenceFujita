@@ -19,6 +19,7 @@
 #define BUILDTIMER_TEXTURE		"data/TEXTURE/BuildTimerUI.png"		// 再建築タイマーのテクスチャ
 #define BUILDTIMER_RADIUS_X		(200.0f)				// 再建築タイマーの半径(X軸)
 #define BUILDTIMER_RADIUS_Y		(80.0f)					// 再建築タイマーの半径(Y軸)
+#define BUILDTIMER_POS_Y_SHIFT	(100.0f)				// 再建築タイマーのずらす高さ(Y軸)
 
 #define MAX_VAL_BUILD			(2)						// 再建築タイマーの表示数値数
 #define MAX_BUILD_MIN			(60)					// タイム (分) の最大値
@@ -30,10 +31,12 @@
 typedef struct
 {
 	D3DXVECTOR3 pos;		// 位置
-	D3DXMATRIX mtx;			// ワールドマトリックス
-	Object *pObject;		// オブジェクトのポインタ
-	int nCount;				// カウント
-	bool bUse;				// 使用状況
+	D3DXVECTOR3 radius;		// 半径
+	D3DXMATRIX	mtx;		// ワールドマトリックス
+	Object		object;		// オブジェクトのポインタ
+	BUILDSTATE	state;		// 状態
+	int			nCount;		// カウント
+	bool		bUse;		// 使用状況
 }Build;
 
 //グローバル変数
@@ -59,7 +62,8 @@ void InitBuildtimer(void)
 		// 情報の初期化
 		g_aBuild[nCntSet].pos	 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_aBuild[nCntSet].nCount = 0;								// カウンター
-		g_aBuild[nCntSet].pObject = NULL;							// オブジェクトのポインタ
+		g_aBuild[nCntSet].radius = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 半径
+		g_aBuild[nCntSet].state	 = BUILDSTATE_APPEAR;				// 状態
 		g_aBuild[nCntSet].bUse	 = false;							// 使用状況
 	}
 
@@ -146,37 +150,72 @@ void UpdateBuildtimer(void)
 		if (g_aBuild[nCntBill].bUse == true)
 		{//使用されていた場合
 
-			// カウントを減算する
-			g_aBuild[nCntBill].nCount--;
+			switch (g_aBuild[nCntBill].state)
+			{
+			case BUILDSTATE_APPEAR:		// 出現状態
 
-			if (g_aBuild[nCntBill].nCount <= 0)
-			{ // カウントが0を超えた場合
+				// 拡大していく
+				g_aBuild[nCntBill].radius.x += (BUILDTIMER_RADIUS_X * 0.05f);	// X軸
+				g_aBuild[nCntBill].radius.y += (BUILDTIMER_RADIUS_Y * 0.05f);	// Y軸
 
-				D3DXMATERIAL mat[MAX_MATERIAL];
+				if (g_aBuild[nCntBill].radius.x >= BUILDTIMER_RADIUS_X
+					|| g_aBuild[nCntBill].radius.y >= BUILDTIMER_RADIUS_Y)
+				{ // どちらかの半径が超えた場合
 
-				for (int nCnt = 0; nCnt < (int)g_aBuild[nCntBill].pObject->modelData.dwNumMat; nCnt++)
-				{
-					// マテリアルをコピーする
-					mat[nCnt] = g_aBuild[nCntBill].pObject->matCopy[nCnt];
+					// 半径を補正する
+					g_aBuild[nCntBill].radius = D3DXVECTOR3(BUILDTIMER_RADIUS_X, BUILDTIMER_RADIUS_Y, 0.0f);
+
+					// カウント状態にする
+					g_aBuild[nCntBill].state = BUILDSTATE_COUNT;
 				}
+
+				break;					// 抜け出す
+
+			case BUILDSTATE_COUNT:		// カウント状態
+
+				// カウントを減算する
+				g_aBuild[nCntBill].nCount--;
+
+				if (g_aBuild[nCntBill].nCount <= 0)
+				{ // カウントが0を超えた場合
+
+					// カウントを0にする
+					g_aBuild[nCntBill].nCount = 0;
+
+					// 消滅状態にする
+					g_aBuild[nCntBill].state = BUILDSTATE_DISAPPEAR;
+				}
+
+				break;					// 抜け出す
+
+			case BUILDSTATE_DISAPPEAR:	// 消滅状態
 
 				// オブジェクトの設定処理
 				SetObject
 				(
-					g_aBuild[nCntBill].pObject->pos,				// 位置
-					g_aBuild[nCntBill].pObject->rot,				// 向き
-					g_aBuild[nCntBill].pObject->scale,				// 拡大率
-					&mat[0],										// マテリアルデータ
-					g_aBuild[nCntBill].pObject->nType,				// 種類
-					g_aBuild[nCntBill].pObject->nBreakType,			// 壊れ方の種類
-					g_aBuild[nCntBill].pObject->nShadowType,		// 影の種類
-					g_aBuild[nCntBill].pObject->nCollisionType,		// 当たり判定の種類
-					g_aBuild[nCntBill].pObject->collInfo.stateRot	// 当たり判定の向きの状態
+					g_aBuild[nCntBill].object.pos,					// 位置
+					g_aBuild[nCntBill].object.rot,					// 向き
+					g_aBuild[nCntBill].object.scale,				// 拡大率
+					&g_aBuild[nCntBill].object.matCopy[0],			// マテリアルデータ
+					g_aBuild[nCntBill].object.nType,				// 種類
+					g_aBuild[nCntBill].object.nBreakType,			// 壊れ方の種類
+					g_aBuild[nCntBill].object.nShadowType,			// 影の種類
+					g_aBuild[nCntBill].object.nCollisionType,		// 当たり判定の種類
+					g_aBuild[nCntBill].object.collInfo.stateRot,	// 当たり判定の向きの状態
+					APPEARSTATE_SLOWLY								// 徐々に出現
 				);
 
 				// 使用しない
 				g_aBuild[nCntBill].bUse = false;
+
+				break;					// 抜け出す
 			}
+
+			//頂点座標の設定
+			pVtx[0].pos = D3DXVECTOR3(-g_aBuild[nCntBill].radius.x, +g_aBuild[nCntBill].radius.y, 0.0f);
+			pVtx[1].pos = D3DXVECTOR3(+g_aBuild[nCntBill].radius.x, +g_aBuild[nCntBill].radius.y, 0.0f);
+			pVtx[2].pos = D3DXVECTOR3(-g_aBuild[nCntBill].radius.x, -g_aBuild[nCntBill].radius.y, 0.0f);
+			pVtx[3].pos = D3DXVECTOR3(+g_aBuild[nCntBill].radius.x, -g_aBuild[nCntBill].radius.y, 0.0f);
 		}
 		pVtx += 4;					//頂点データを4つ分進める
 	}
@@ -307,7 +346,7 @@ void DrawBuildtimer(void)
 //======================================
 // 再建築タイマーの設定処理
 //======================================
-void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object *pObject)
+void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object object)
 {
 	//頂点情報へのポインタ
 	VERTEX_3D *pVtx;
@@ -321,15 +360,17 @@ void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object *pObject)
 		{//使用されていなかった場合
 			
 			// 情報の設定
-			g_aBuild[nCntBill].pos = D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z);	// 位置
-			g_aBuild[nCntBill].pObject	= pObject;		// オブジェクトのアドレス
-			g_aBuild[nCntBill].nCount	= nCount;		// カウント
+			g_aBuild[nCntBill].pos		= D3DXVECTOR3(pos.x, pos.y + BUILDTIMER_POS_Y_SHIFT, pos.z);	// 位置
+			g_aBuild[nCntBill].radius	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);									// 半径
+			g_aBuild[nCntBill].object	= object;					// オブジェクトの情報
+			g_aBuild[nCntBill].nCount	= nCount;					// カウント
+			g_aBuild[nCntBill].state	= BUILDSTATE_APPEAR;		// 状態
 
 			//頂点座標の設定
-			pVtx[0].pos = D3DXVECTOR3(-BUILDTIMER_RADIUS_X, +BUILDTIMER_RADIUS_Y, 0.0f);
-			pVtx[1].pos = D3DXVECTOR3(+BUILDTIMER_RADIUS_X, +BUILDTIMER_RADIUS_Y, 0.0f);
-			pVtx[2].pos = D3DXVECTOR3(-BUILDTIMER_RADIUS_X, -BUILDTIMER_RADIUS_Y, 0.0f);
-			pVtx[3].pos = D3DXVECTOR3(+BUILDTIMER_RADIUS_X, -BUILDTIMER_RADIUS_Y, 0.0f);
+			pVtx[0].pos = D3DXVECTOR3(-g_aBuild[nCntBill].radius.x, +g_aBuild[nCntBill].radius.y, 0.0f);
+			pVtx[1].pos = D3DXVECTOR3(+g_aBuild[nCntBill].radius.x, +g_aBuild[nCntBill].radius.y, 0.0f);
+			pVtx[2].pos = D3DXVECTOR3(-g_aBuild[nCntBill].radius.x, -g_aBuild[nCntBill].radius.y, 0.0f);
+			pVtx[3].pos = D3DXVECTOR3(+g_aBuild[nCntBill].radius.x, -g_aBuild[nCntBill].radius.y, 0.0f);
 
 			//使用する
 			g_aBuild[nCntBill].bUse = true;
