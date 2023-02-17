@@ -18,6 +18,7 @@
 #include "player.h"
 #include "Police.h"
 #include "object.h"
+#include "particle.h"
 #include "meshfield.h"
 
 #ifdef _DEBUG	// デバッグ処理
@@ -1270,6 +1271,19 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					break;						// 抜け出す
 				}
+
+				if (pPlayer->move.x >= 13.0f)
+				{ // 移動量が一定以上の場合
+					// パーティクルの設定処理
+					SetParticle
+					(
+						D3DXVECTOR3(pPlayer->pos.x, pPlayer->pos.y + 50.0f, pPlayer->pos.z - PLAY_DEPTH),	// 位置
+						D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+						PARTICLETYPE_SPARK,									// パーティクルの種類
+						10,													// 生成数
+						2													// 寿命
+					);
+				}
 			}							//手前で止められる処理
 			else if (pPosOld->z - fDepth >= pPlayer->oldPos.z + PLAY_DEPTH
 				&& pPos->z - fDepth <= pPlayer->pos.z + PLAY_DEPTH)
@@ -1318,6 +1332,19 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					*pTraCnt += 1;
 
 					break;						// 抜け出す
+				}
+
+				if (pPlayer->move.x >= 13.0f)
+				{ // 移動量が一定以上の場合
+					// パーティクルの設定処理
+					SetParticle
+					(
+						D3DXVECTOR3(pPlayer->pos.x, pPlayer->pos.y + 50.0f, pPlayer->pos.z + PLAY_DEPTH),	// 位置
+						D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+						PARTICLETYPE_SPARK,									// パーティクルの種類
+						10,													// 生成数
+						2													// 寿命
+					);
 				}
 			}							//奥で止められる処理
 		}
@@ -1373,6 +1400,19 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 
 					break;						// 抜け出す
 				}
+
+				if (pPlayer->move.x >= 13.0f)
+				{ // 移動量が一定以上の場合
+					// パーティクルの設定処理
+					SetParticle
+					(
+						D3DXVECTOR3(pPlayer->pos.x - PLAY_WIDTH, pPlayer->pos.y + 50.0f, pPlayer->pos.z),	// 位置
+						D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+						PARTICLETYPE_SPARK,									// パーティクルの種類
+						10,													// 生成数
+						2													// 寿命
+					);
+				}
 			}							//左端の処理
 			else if (pPosOld->x - fWidth >= pPlayer->oldPos.x + PLAY_WIDTH
 				&& pPos->x - fWidth <= pPlayer->pos.x + PLAY_WIDTH)
@@ -1421,6 +1461,19 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					*pTraCnt += 1;
 
 					break;						// 抜け出す
+				}
+
+				if (pPlayer->move.x >= 13.0f)
+				{ // 移動量が一定以上の場合
+					// パーティクルの設定処理
+					SetParticle
+					(
+						D3DXVECTOR3(pPlayer->pos.x + PLAY_WIDTH, pPlayer->pos.y + 50.0f, pPlayer->pos.z),	// 位置
+						D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f),					// 色
+						PARTICLETYPE_SPARK,									// パーティクルの種類
+						10,													// 生成数
+						2													// 寿命
+					);
 				}
 			}							//右端の処理
 		}
