@@ -27,6 +27,7 @@
 #include "effect.h"
 #include "gate.h"
 #include "icon.h"
+#include "junk.h"
 #include "life.h"
 #include "light.h"
 #include "map.h"
@@ -119,6 +120,9 @@ void InitGame(void)
 
 	// ゲートの初期化
 	InitGate();
+
+	// がれきの初期化
+	InitJunk();
 
 	// カメラの初期化
 	InitCamera();
@@ -244,6 +248,9 @@ void UninitGame(void)
 
 	// ゲートの終了
 	UninitGate();
+
+	// がれきの終了
+	UninitJunk();
 
 	// カメラの終了
 	UninitCamera();
@@ -486,6 +493,9 @@ void UpdateGame(void)
 			// オブジェクトの更新
 			UpdateObject();
 
+			// がれきの更新
+			UpdateJunk();
+
 			// 車の更新処理
 			UpdateCar();
 
@@ -639,6 +649,9 @@ void DrawGame(void)
 
 	// オブジェクトの描画
 	DrawObject();
+
+	// がれきの描画
+	DrawJunk();
 
 	// 警察の描画
 	DrawPolice();

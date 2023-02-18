@@ -13,6 +13,7 @@
 #include "model.h"
 
 #include "junk.h"
+#include "player.h"
 #include "shadow.h"
 
 //**********************************************************************************************************************
@@ -85,10 +86,7 @@ void UninitJunk(void)
 //======================================================================================================================
 void UpdateJunk(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{ // 0を押した場合
-		SetJunk(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	}
+	Player *pPlayer = GetPlayer();
 
 	for (int nCntJunk = 0; nCntJunk < MAX_JUNK; nCntJunk++)
 	{ // がれきの最大表示数分繰り返す
@@ -103,8 +101,8 @@ void UpdateJunk(void)
 			g_aJunk[nCntJunk].pos += g_aJunk[nCntJunk].move;
 
 			// 移動量を減衰させる
-			g_aJunk[nCntJunk].pos.x += (0.0f - g_aJunk[nCntJunk].pos.x) * 0.06f;
-			g_aJunk[nCntJunk].pos.z += (0.0f - g_aJunk[nCntJunk].pos.z) * 0.06f;
+			g_aJunk[nCntJunk].move.x += (0.0f - g_aJunk[nCntJunk].move.x) * 0.06f;
+			g_aJunk[nCntJunk].move.z += (0.0f - g_aJunk[nCntJunk].move.z) * 0.06f;
 
 			// 角度を傾ける
 			g_aJunk[nCntJunk].rot.x += 0.1f;
@@ -274,7 +272,6 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;	// マテリアルデータへのポインタ
-	D3DXVECTOR3 junkMove;		// 移動量
 
 	for (int nCntJunk = 0; nCntJunk < MAX_JUNK; nCntJunk++)
 	{ // がれきの最大表示数分繰り返す
@@ -290,13 +287,10 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aJunk[nCntJunk].state = JUNKSTATE_NONE;		// がれきの状態
 			g_aJunk[nCntJunk].bUse = true;					// 使用している状態にする
 
-			// 移動量を算出する
-			junkMove.x = (float)(rand() % 50 - 25);
-			junkMove.y = 0.0f;
-			junkMove.z = (float)(rand() % 50 - 25);
-
 			// 移動量を設定する
-			g_aJunk[nCntJunk].move = junkMove;		// 移動量
+			g_aJunk[nCntJunk].move.x = (float)(rand() % 50 - 25);
+			g_aJunk[nCntJunk].move.y = 0.0f;
+			g_aJunk[nCntJunk].move.z = (float)(rand() % 50 - 25);
 
 			// モデル情報を設定
 			g_aJunk[nCntJunk].modelData = GetModelData(MODELTYPE_OBJECT_JUNK + FROM_OBJECT);	// モデル情報

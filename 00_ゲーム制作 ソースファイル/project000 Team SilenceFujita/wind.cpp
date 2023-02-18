@@ -313,7 +313,7 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aWind[nCntWind].move.z = cosf(rot.y) * fMoveMagni;
 
 			// F‚ğİ’è‚·‚é
-			g_aWind[nCntWind].col = D3DXCOLOR(0.6f, 0.7f, 1.0f, 1.0f);
+			g_aWind[nCntWind].col = D3DXCOLOR(0.7f, 1.0f, 0.7f, 1.0f);
 
 			//õ–½‚ğZo‚·‚é
 			nLife = (rand() % 10) + 6;

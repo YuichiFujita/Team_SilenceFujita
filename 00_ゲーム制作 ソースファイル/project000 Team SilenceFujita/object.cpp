@@ -260,7 +260,7 @@ void UpdateObject(void)
 
 					switch (g_aObject[nCntObject].smash.State)
 					{
-					case SMASHSTATE_NONE:	// 吹っ飛び状態
+					case SMASHSTATE_NONE:	// 無し状態
 
 						break;				// 抜け出す
 
@@ -290,13 +290,13 @@ void UpdateObject(void)
 						{
 							g_aObject[nCntObject].rot.x = D3DX_PI * 0.5f;
 
-							g_aObject[nCntObject].smash.rotMove.x = 0.0f;
+							g_aObject[nCntObject].smash.rotMove.z = 0.0f;
 						}
 						else if (g_aObject[nCntObject].rot.x <= (-D3DX_PI * 0.5f))
 						{
 							g_aObject[nCntObject].rot.x = -(D3DX_PI * 0.5f);
 
-							g_aObject[nCntObject].smash.rotMove.x = 0.0f;
+							g_aObject[nCntObject].smash.rotMove.z = 0.0f;
 						}
 
 						// 向きの正規化(Y軸)
@@ -318,13 +318,13 @@ void UpdateObject(void)
 						{
 							g_aObject[nCntObject].rot.z = D3DX_PI * 0.5f;
 
-							g_aObject[nCntObject].smash.rotMove.z = 0.0f;
+							g_aObject[nCntObject].smash.rotMove.x = 0.0f;
 						}
 						else if (g_aObject[nCntObject].rot.z <= (-D3DX_PI * 0.5f))
 						{
 							g_aObject[nCntObject].rot.z = -(D3DX_PI * 0.5f);
 
-							g_aObject[nCntObject].smash.rotMove.z = 0.0f;
+							g_aObject[nCntObject].smash.rotMove.x = 0.0f;
 						}
 
 						if (g_aObject[nCntObject].pos.y <= 0.0f)
@@ -760,19 +760,19 @@ void HitObject(Object *pObject, int nDamage)
 			// 再建築タイマーの設定処理
 			SetBuildtimer(pObject->pos, 600, *pObject);
 
-			//// サイズに応じてがれきを生み出す
-			//for (int nCntColl = 0; nCntColl < g_aCollision[pObject->nType].nNumColl; nCntColl++)
-			//{
-			//	// 位置
-			//	D3DXVECTOR3 pos = pObject->pos + g_aCollision[pObject->nType].vecPos[nCntColl];
+			// サイズに応じてがれきを生み出す
+			for (int nCntColl = 0; nCntColl < g_aCollision[pObject->nType].nNumColl; nCntColl++)
+			{
+				// 位置
+				D3DXVECTOR3 pos = pObject->pos + g_aCollision[pObject->nType].vecPos[nCntColl];
 
-			//	// がれきの設定処理
-			//	SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			//	SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			//	SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			//	SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pObject->modelData.vtxMax.y, pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			//	SetJunk(D3DXVECTOR3(pos.x, pObject->modelData.vtxMax.y, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			//}
+				// がれきの設定処理
+				SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				SetJunk(D3DXVECTOR3(pos.x, pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			}
 
 			//// アイテムの設定
 			//SetItem(pObject->pos, ITEMTYPE_HEAL);
