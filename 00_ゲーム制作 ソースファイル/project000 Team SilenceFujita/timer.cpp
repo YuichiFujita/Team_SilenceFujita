@@ -27,10 +27,10 @@
 #define VAL_TIME_HEIGHT	(28.0f)		// タイマーの数値の縦幅 / 2
 #define VAL_TIME_SPACE	(38.0f)		// タイマーの数値間の幅 (x)
 
-#define TIMER_POS_MIN_X	(610.0f)	// タイマー (分) の絶対座標 (x)
-#define TIMER_POS_SEC_X	(710.0f)	// タイマー (秒) の絶対座標 (x)
-#define TIMER_POS_X		(640.0f)	// タイマー (背景) の絶対座標 (x)
-#define TIMER_POS_Y		(65.0f)		// タイマーの絶対座標 (y)
+#define TIMER_POS_MIN_X	(1085.0f)	// タイマー (分) の絶対座標 (x)
+#define TIMER_POS_SEC_X	(1185.0f)	// タイマー (秒) の絶対座標 (x)
+#define TIMER_POS_X		(1115.0f)	// タイマー (背景) の絶対座標 (x)
+#define TIMER_POS_Y		(320.0f)	// タイマーの絶対座標 (y)
 #define TIMER_WIDTH		(32.0f)		// タイマーの横幅 / 2
 #define TIMER_HEIGHT	(32.0f)		// タイマーの縦幅 / 2
 

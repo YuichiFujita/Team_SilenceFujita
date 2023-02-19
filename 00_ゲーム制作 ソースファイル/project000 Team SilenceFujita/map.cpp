@@ -18,9 +18,9 @@
 #define MAX_MAP			(2)			// 使用するポリゴン数
 
 #define MAP_BG_X		(1105.0f)	// マップ背景の座標 (x)
-#define MAP_BG_Y		(170.0f)	// マップ背景の座標 (y)
+#define MAP_BG_Y		(190.0f)	// マップ背景の座標 (y)
 #define MAP_BG_SIZE_X	(170.0f)	// マップ背景の横幅
-#define MAP_BG_SIZE_Y	(170.0f)	// マップ背景の縦幅
+#define MAP_BG_SIZE_Y	(190.0f)	// マップ背景の縦幅
 
 #define MAP_FRAME_PLUS	(5.0f)		// マップ枠の加算量
 

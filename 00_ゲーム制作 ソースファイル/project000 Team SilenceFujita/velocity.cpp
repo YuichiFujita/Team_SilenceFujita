@@ -22,8 +22,8 @@
 #define VAL_VELO_SPACE	(38.0f)		// スコアの数値間の幅 (x)
 #define VAL_VELO_DIGIT	(3)			// スコアの数値間の幅 (x)
 
-#define VELO_POS_VAL_X	(200.0f)	// スコア (値) の絶対座標 (x)
-#define VELO_POS_VAL_Y	(600.0f)	// スコアの絶対座標 (y)
+#define VELO_POS_VAL_X	(190.0f)	// スコア (値) の絶対座標 (x)
+#define VELO_POS_VAL_Y	(610.0f)	// スコアの絶対座標 (y)
 
 #define VELO_POS_X		(72.0f)		// 速度バーの絶対座標 (x)
 #define VELO_POS_Y		(652.5f)	// 速度バーの絶対座標 (y)

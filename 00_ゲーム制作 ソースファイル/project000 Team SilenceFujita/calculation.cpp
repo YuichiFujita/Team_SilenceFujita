@@ -465,6 +465,21 @@ bool UpdateAllClear(RESULTSTATE state)
 
 	case RESULTSTATE_TIMEOVER:	// タイムオーバー状態
 
+		if (pPlayer->bUse == true)
+		{ // プレイヤーが使用されている場合
+
+			if (fabsf(pPlayer->pos.x - pPlayer->oldPos.x) >= 0.5f
+			||  fabsf(pPlayer->pos.z - pPlayer->oldPos.z) >= 0.5f)
+			{ // 移動が一定値以上行われている場合
+
+				//// プレイヤーの更新
+				//UpdatePlayer();
+
+				// 更新を終了していない状態にする
+				bAllClear = false;
+			}
+		}
+
 		for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++, pGate++)
 		{ // ゲートの最大表示数分繰り返す
 
@@ -474,8 +489,8 @@ bool UpdateAllClear(RESULTSTATE state)
 				if (pGate->state != GATESTATE_STOP)
 				{ // 停止状態ではない場合
 
-					// ゲートの更新
-					UpdateGate();
+					//// ゲートの更新
+					//UpdateGate();
 
 					// 更新を終了していない状態にする
 					bAllClear = false;
@@ -503,8 +518,8 @@ bool UpdateAllClear(RESULTSTATE state)
 		if (pBonus->bUse == true)
 		{ // 使用されている場合
 
-			// ボーナスの更新
-			UpdateBonus();
+			//// ボーナスの更新
+			//UpdateBonus();
 
 			// 更新を終了していない状態にする
 			bAllClear = false;
