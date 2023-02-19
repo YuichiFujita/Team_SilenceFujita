@@ -1025,7 +1025,7 @@ void TxtSetObject(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_COMPLETE);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}

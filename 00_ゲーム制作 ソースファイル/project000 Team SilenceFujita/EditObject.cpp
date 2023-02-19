@@ -635,7 +635,7 @@ void SetEdit(void)
 			stateRot = (g_EditObject.Collisiontype.Collisiontype == COLLISIONTYPE_CREATE) ? g_EditObject.CollInfo.stateRot : ROTSTATE_0;
 
 			//オブジェクトの設定処理
-			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], g_EditObject.nType, g_EditObject.Break.Breaktype, g_EditObject.Shadowtype.Shadowtype, g_EditObject.Collisiontype.Collisiontype, stateRot);
+			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], g_EditObject.nType, g_EditObject.Break.Breaktype, g_EditObject.Shadowtype.Shadowtype, g_EditObject.Collisiontype.Collisiontype, stateRot, APPEARSTATE_COMPLETE);
 
 			//エディットオブジェクトの番号を初期化する
 			g_EditObject.nSetNumber = -1;

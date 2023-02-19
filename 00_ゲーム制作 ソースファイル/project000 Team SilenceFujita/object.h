@@ -60,7 +60,7 @@ typedef enum
 } BREAKTYPE;
 
 //**********************************************************************************************************************
-//	列挙型定義 (SMASHTYPE)
+//	列挙型定義 (SMASHSTATE)
 //**********************************************************************************************************************
 typedef enum
 {
@@ -68,6 +68,17 @@ typedef enum
 	SMASHSTATE_ON,				// 吹っ飛び中状態
 	SMASHSTATE_MAX,				// この列挙型の総数
 } SMASHSTATE;
+
+//**********************************************************************************************************************
+//	列挙型定義 (APPEARSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	APPEARSTATE_NONE = 0,		// 一瞬で出現
+	APPEARSTATE_SLOWLY,			// 徐々に出現
+	APPEARSTATE_COMPLETE,		// 出現完了
+	APPEARSTATE_MAX,			// この列挙型の総数
+} APPEARSTATE;
 
 //**********************************************************************************************************************
 //	構造体定義 (Collision)
@@ -106,6 +117,17 @@ typedef struct
 }Smash_Object;
 
 //**********************************************************************************************************************
+//	構造体定義 (Appear)
+//**********************************************************************************************************************
+typedef struct
+{
+	APPEARSTATE state;		// 出現状態
+	D3DXVECTOR3 scaleCopy;	// 拡大率のコピー
+	D3DXVECTOR3 scaleAdd;	// 拡大率の加算数
+	float fAlpha;			// 透明度
+}Appear;
+
+//**********************************************************************************************************************
 //	構造体定義 (Object)
 //**********************************************************************************************************************
 typedef struct
@@ -120,6 +142,7 @@ typedef struct
 	Coll_Info    collInfo;				// 当たり判定情報
 	Smash_Object smash;					// 吹っ飛び状態
 	Judge		 judge;					// ジャッジ
+	Appear		 appear;				// 出現関係
 	int          nLife;					// 体力
 	int          nCollisionType;		// 当たり判定の種類
 	int          nShadowType;			// 影の種類
@@ -142,7 +165,7 @@ void UninitObject(void);		// オブジェクトの終了処理
 void UpdateObject(void);		// オブジェクトの更新処理
 void DrawObject(void);			// オブジェクトの描画処理
 
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot);	// オブジェクトの設定処理
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear);	// オブジェクトの設定処理
 void HitObject(Object *pObject, int nDamage);																					// オブジェクトのダメージ判定
 void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice);	// オブジェクトとの当たり判定
 void SmashCollision(D3DXVECTOR3 pos, float fRadius);				// 吹っ飛ぶオブジェクトとの当たり判定
