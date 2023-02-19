@@ -23,24 +23,24 @@
 #define MAX_SEC			(60)		// タイム (秒) の最大値
 #define NUM_RED_TIMER	(10)		// タイマーが赤くなり始める時間
 
-#define VAL_TIME_WIDTH	(30.0f)		// タイマーの数値の横幅 / 2
-#define VAL_TIME_HEIGHT	(30.0f)		// タイマーの数値の縦幅 / 2
-#define VAL_TIME_SPACE	(42.0f)		// タイマーの数値間の幅 (x)
+#define VAL_TIME_WIDTH	(28.0f)		// タイマーの数値の横幅 / 2
+#define VAL_TIME_HEIGHT	(28.0f)		// タイマーの数値の縦幅 / 2
+#define VAL_TIME_SPACE	(38.0f)		// タイマーの数値間の幅 (x)
 
-#define TIMER_POS_MIN_X	(600.0f)	// タイマー (分) の絶対座標 (x)
-#define TIMER_POS_SEC_X	(720.0f)	// タイマー (秒) の絶対座標 (x)
+#define TIMER_POS_MIN_X	(610.0f)	// タイマー (分) の絶対座標 (x)
+#define TIMER_POS_SEC_X	(710.0f)	// タイマー (秒) の絶対座標 (x)
 #define TIMER_POS_X		(640.0f)	// タイマー (背景) の絶対座標 (x)
 #define TIMER_POS_Y		(65.0f)		// タイマーの絶対座標 (y)
-#define TIMER_WIDTH		(135.0f)	// タイマーの横幅 / 2
-#define TIMER_HEIGHT	(45.0f)		// タイマーの縦幅 / 2
+#define TIMER_WIDTH		(32.0f)		// タイマーの横幅 / 2
+#define TIMER_HEIGHT	(32.0f)		// タイマーの縦幅 / 2
 
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
 const char *apTextureTimer[] =		// テクスチャの相対パス
 {
-	"data\\TEXTURE\\ui001.png",		// タイマー背景 (通常) のテクスチャ相対パス
-	"data\\TEXTURE\\ui002.png",		// タイマー背景 (赤) のテクスチャ相対パス
+	"data\\TEXTURE\\timer000.png",	// タイマーコロン(：) (通常) のテクスチャ相対パス
+	"data\\TEXTURE\\timer001.png",	// タイマーコロン(：) (赤) のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
@@ -48,8 +48,8 @@ const char *apTextureTimer[] =		// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_TIMER_BG_NORMAL = 0,	// タイマーの背景 (通常)
-	TEXTURE_TIMER_BG_RED,			// タイマーの背景 (赤)
+	TEXTURE_TIMER_NORMAL = 0,		// タイマーコロン(：) (通常)
+	TEXTURE_TIMER_RED,				// タイマーコロン(：) (赤)
 	TEXTURE_TIMER_MAX,				// この列挙型の総数
 } TEXTURE_TIMER;
 
@@ -210,13 +210,13 @@ void DrawTimer(void)
 	if (GetTime() > NUM_RED_TIMER)
 	{ // タイマーが 10秒より大きい場合
 
-		texBG    = TEXTURE_TIMER_BG_NORMAL;	// 通常のテクスチャを設定
+		texBG    = TEXTURE_TIMER_NORMAL;	// 通常のテクスチャを設定
 		texValue = VALUETYPE_NORMAL;		// 通常のテクスチャを設定
 	}
 	else
 	{ // タイマーが 10秒以下の場合
 
-		texBG    = TEXTURE_TIMER_BG_RED;	// 赤のテクスチャを設定
+		texBG    = TEXTURE_TIMER_RED;		// 赤のテクスチャを設定
 		texValue = VALUETYPE_RED;			// 赤のテクスチャを設定
 	}
 

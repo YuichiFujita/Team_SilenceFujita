@@ -17,9 +17,9 @@
 //**********************************************************************************************************************
 #define MAX_VELO		(3)			// 使用するポリゴン数
 
-#define VAL_VELO_WIDTH	(30.0f)		// スコアの数値の横幅 / 2
-#define VAL_VELO_HEIGHT	(30.0f)		// スコアの数値の縦幅 / 2
-#define VAL_VELO_SPACE	(47.0f)		// スコアの数値間の幅 (x)
+#define VAL_VELO_WIDTH	(28.0f)		// スコアの数値の横幅 / 2
+#define VAL_VELO_HEIGHT	(28.0f)		// スコアの数値の縦幅 / 2
+#define VAL_VELO_SPACE	(38.0f)		// スコアの数値間の幅 (x)
 #define VAL_VELO_DIGIT	(3)			// スコアの数値間の幅 (x)
 
 #define VELO_POS_VAL_X	(200.0f)	// スコア (値) の絶対座標 (x)
