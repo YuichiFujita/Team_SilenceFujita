@@ -433,7 +433,9 @@ void HitPlayer(Player *pPlayer, int nDamage)
 void UpdateNormalPlayer(void)
 {
 	// 変数を宣言
-	int nTrafficCnt = 0;	// 引数設定用
+	int nTrafficCnt = 0;		// 引数設定用
+	int nTackleCnt = 0;			// 引数設定用
+	float fTackleSpeed = 0.0f;	// 引数設定用
 	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	// 前回位置の更新
@@ -512,7 +514,9 @@ void UpdateNormalPlayer(void)
 		PLAY_DEPTH,				// 奥行
 		&nTrafficCnt,			// 渋滞カウント
 		g_player.boost.state,	// ブーストの状態
-		&policeState			// 警察の状態
+		&policeState,			// 警察の状態
+		&nTackleCnt,			// タックルカウント
+		&fTackleSpeed			// タックル時の移動量
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -628,6 +632,9 @@ void UpdateClearPlayer(void)
 //============================================================
 void UpdateOverPlayer(void)
 {
+	int nTackleCnt = 0;			// 引数設定用
+	float fTackleSpeed = 0.0f;	// 引数設定用
+
 	// 変数を宣言
 	int nTrafficCnt = 0;	// 引数設定用
 
@@ -668,7 +675,9 @@ void UpdateOverPlayer(void)
 		PLAY_DEPTH,				// 奥行
 		&nTrafficCnt,			// 渋滞カウント
 		g_player.boost.state,	// ブーストの状態
-		&policeState			// 警察の状態
+		&policeState,			// 警察の状態
+		&nTackleCnt,			// タックルカウント
+		&fTackleSpeed			// タックル時の移動量
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定

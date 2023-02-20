@@ -265,7 +265,9 @@ void UpdatePolice(void)
 						POLICAR_DEPTH,						// 奥行
 						&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
 						BOOSTSTATE_NONE,					// ブーストの状態
-						&g_aPolice[nCntPolice].state		// 警察の状態
+						&g_aPolice[nCntPolice].state,		// 警察の状態
+						&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
+						&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
 					);
 
 					// ゲートとの当たり判定
@@ -877,6 +879,9 @@ void PatrolBackAct(Police *pPolice)
 	pPolice->rot = pPolice->rotCopy;					// 向き
 	pPolice->move.x = 0.0f;								// 移動量
 	pPolice->policeCurve = pPolice->policeCurveCopy;	// 曲がり角の情報を代入
+	pPolice->tackle.nTackleCnt = 0;						// タックルカウント
+	pPolice->tackle.tacklemove.x = 0.0f;				// タックル時の移動量
+	pPolice->tackle.tackleState = TACKLESTATE_CHARGE;	// タックル状態
 }
 
 //============================================================

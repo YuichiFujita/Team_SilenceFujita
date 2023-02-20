@@ -138,6 +138,8 @@ void UninitCar(void)
 //======================================================================================================================
 void UpdateCar(void)
 {
+	int nTackleCnt = 0;			// 引数設定用
+	float fTackleMove = 0.0f;	// 引数設定用
 	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
@@ -217,7 +219,9 @@ void UpdateCar(void)
 						CAR_DEPTH,						// 奥行
 						&g_aCar[nCntCar].nTrafficCnt,	// 渋滞カウント
 						BOOSTSTATE_NONE,				// ブースト状態
-						&policeState					// 警察の状態
+						&policeState,					// 警察の状態
+						&nTackleCnt,					// タックルカウント
+						&fTackleMove					// タックル時の移動量
 					);
 
 					// 車の停止処理

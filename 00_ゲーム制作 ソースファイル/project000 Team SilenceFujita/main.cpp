@@ -1714,7 +1714,9 @@ void DrawDebug(void)
 		" 　降っている物の総数：%d\n"
 		" 　現在の爆弾ゲージ：%d\n"
 		"　 オブジェクトの数：%d\n"
-		" 　再建築タイマーの数：%d\n",
+		" 　再建築タイマーの数：%d\n"
+		" 　警察の状態：%d\n"
+		" 　警察のタックル状態：%d",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1738,7 +1740,9 @@ void DrawDebug(void)
 		nNumWeather,
 		pPlayer->bomb.nCounter,
 		nNumObject,
-		nNumBuild
+		nNumBuild,
+		pPolice->state,
+		pPolice->tackle.tackleState
 	);
 
 	//--------------------------------------------------------
