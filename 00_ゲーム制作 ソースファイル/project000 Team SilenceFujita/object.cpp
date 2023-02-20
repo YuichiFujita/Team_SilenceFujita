@@ -713,8 +713,8 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 //======================================================================================================================
 void HitObject(Object *pObject, int nDamage)
 {
-	if (pObject->state == ACTIONSTATE_NORMAL)
-	{ // オブジェクトが通常状態の場合
+	if (pObject->state == ACTIONSTATE_NORMAL && pObject->appear.state == APPEARSTATE_COMPLETE && pObject->bUse == true)
+	{ // オブジェクトが通常状態かつ、出現完了状態の場合
 
 		// 引数のダメージ分を体力から減算
 		pObject->nLife -= nDamage;
@@ -767,11 +767,37 @@ void HitObject(Object *pObject, int nDamage)
 				D3DXVECTOR3 pos = pObject->pos + g_aCollision[pObject->nType].vecPos[nCntColl];
 
 				// がれきの設定処理
-				SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-				SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-				SetJunk(D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-				SetJunk(D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-				SetJunk(D3DXVECTOR3(pos.x, pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				SetJunk
+				(
+					D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
+					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+				);
+
+				SetJunk
+				(
+					D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
+					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+				);
+
+				SetJunk
+				(
+					D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
+					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+				);
+
+				SetJunk
+				(
+					D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
+					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+				);
 			}
 
 			//// アイテムの設定
@@ -843,6 +869,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
+							}
+						}
+						else
+						{ // 上記以外の場合
+
+							// 移動量を削除
+							pMove->x *= 0.95f;
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -854,9 +892,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
-
-						// 移動量を削除
-						pMove->x *= 0.95f;
 					}
 					else if (pPos->z    - fDepth <  g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z
 					     &&  pOldPos->z - fDepth >= g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z)
@@ -887,6 +922,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
+							}
+						}
+						else
+						{ // 上記以外の場合
+
+							// 移動量を削除
+							pMove->x *= 0.95f;
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -898,9 +945,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
-
-						// 移動量を削除
-						pMove->x *= 0.95f;
 					}
 				}
 
@@ -938,6 +982,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
+							}
+						}
+						else
+						{ // 上記以外の場合
+
+							// 移動量を削除
+							pMove->x *= 0.95f;
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -949,9 +1005,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
-
-						// 移動量を削除
-						pMove->x *= 0.95f;
 					}
 					else if (pPos->x    - fWidth <  g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x
 					     &&  pOldPos->x - fWidth >= g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x)
@@ -982,6 +1035,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								// オブジェクトのダメージ判定
 								HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
+							}
+						}
+						else
+						{ // 上記以外の場合
+
+							// 移動量を削除
+							pMove->x *= 0.95f;
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -993,9 +1058,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 						// 渋滞カウントを加算する
 						*pTraCnt += 1;
-
-						// 移動量を削除
-						pMove->x *= 0.95f;
 					}
 				}
 
@@ -1044,6 +1106,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+								else
+								{ // 上記以外の場合
+
+									// 移動量を削除
+									pMove->x *= 0.95f;
+								}
+							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1055,9 +1129,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
-
-							// 移動量を削除
-							pMove->x *= 0.95f;
 						}
 						else if (pPos->z    - fDepth <  collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl]
 						     &&  pOldPos->z - fDepth >= collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl])
@@ -1088,6 +1159,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+								else
+								{ // 上記以外の場合
+
+									// 移動量を削除
+									pMove->x *= 0.95f;
+								}
+							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1099,9 +1182,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
-
-							// 移動量を削除
-							pMove->x *= 0.95f;
 						}
 					}
 
@@ -1139,6 +1219,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+								else
+								{ // 上記以外の場合
+
+									// 移動量を削除
+									pMove->x *= 0.95f;
+								}
+							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1150,9 +1242,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
-
-							// 移動量を削除
-							pMove->x *= 0.95f;
 						}
 						else if (pPos->x    - fWidth <  collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl]
 						     &&  pOldPos->x - fWidth >= collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl])
@@ -1183,6 +1272,18 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									// オブジェクトのダメージ判定
 									HitObject(&g_aObject[nCntObject], OBJ_LIFE);
 								}
+								else
+								{ // 上記以外の場合
+
+									// 移動量を削除
+									pMove->x *= 0.95f;
+								}
+							}
+							else
+							{ // 上記以外の場合
+
+								// 移動量を削除
+								pMove->x *= 0.95f;
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1194,9 +1295,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 
 							// 渋滞カウントを加算する
 							*pTraCnt += 1;
-
-							// 移動量を削除
-							pMove->x *= 0.95f;
 						}
 					}
 				}

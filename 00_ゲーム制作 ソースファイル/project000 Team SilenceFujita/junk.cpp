@@ -43,14 +43,15 @@ void InitJunk(void)
 	{ // がれきの最大表示数分繰り返す
 
 		// 基本情報の初期化
-		g_aJunk[nCntJunk].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aJunk[nCntJunk].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
-		g_aJunk[nCntJunk].scale = NONE_SCALE;						// 拡大率
-		g_aJunk[nCntJunk].scaleMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);// 拡大率の移動量
-		g_aJunk[nCntJunk].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
-		g_aJunk[nCntJunk].state = JUNKSTATE_NONE;					// がれきの状態
-		g_aJunk[nCntJunk].nShadowID = NONE_SHADOW;					// 影のインデックス
-		g_aJunk[nCntJunk].bUse = false;								// 使用状況
+		g_aJunk[nCntJunk].pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aJunk[nCntJunk].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aJunk[nCntJunk].scale		= NONE_SCALE;						// 拡大率
+		g_aJunk[nCntJunk].scaleMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の移動量
+		g_aJunk[nCntJunk].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aJunk[nCntJunk].rotMove	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向きの移動量
+		g_aJunk[nCntJunk].state		= JUNKSTATE_NONE;					// がれきの状態
+		g_aJunk[nCntJunk].nShadowID = NONE_SHADOW;						// 影のインデックス
+		g_aJunk[nCntJunk].bUse		= false;							// 使用状況
 
 		// モデル情報の初期化
 		g_aJunk[nCntJunk].modelData.dwNumMat = 0;					// マテリアルの数
@@ -105,9 +106,7 @@ void UpdateJunk(void)
 			g_aJunk[nCntJunk].move.z += (0.0f - g_aJunk[nCntJunk].move.z) * 0.06f;
 
 			// 角度を傾ける
-			g_aJunk[nCntJunk].rot.x += 0.1f;
-			g_aJunk[nCntJunk].rot.y += 0.3f;
-			g_aJunk[nCntJunk].rot.z += 0.3f;
+			g_aJunk[nCntJunk].rot += g_aJunk[nCntJunk].rotMove;
 
 			// 向きの正規化
 			RotNormalize(&g_aJunk[nCntJunk].rot.x);
@@ -117,6 +116,10 @@ void UpdateJunk(void)
 			switch (g_aJunk[nCntJunk].state)
 			{
 			case JUNKSTATE_NONE:	// がれき
+
+				// プレイヤーの移動量を加える
+				g_aJunk[nCntJunk].pos.x += (pPlayer->pos.x - pPlayer->oldPos.x) * 0.4f;
+				g_aJunk[nCntJunk].pos.z += (pPlayer->pos.z - pPlayer->oldPos.z) * 0.4f;
 
 				if (g_aJunk[nCntJunk].pos.y <= 0.0f)
 				{ // 地面より下に行った場合
@@ -268,7 +271,7 @@ void DrawJunk(void)
 //======================================================================================================================
 //	がれきの設定処理
 //======================================================================================================================
-void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot, SCALETYPE scale, D3DMATERIAL9 col)
 {
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;	// マテリアルデータへのポインタ
@@ -292,6 +295,35 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 			g_aJunk[nCntJunk].move.y = 0.0f;
 			g_aJunk[nCntJunk].move.z = (float)(rand() % 50 - 25);
 
+			// 向きの移動量を設定する
+			g_aJunk[nCntJunk].rotMove.x = (float)(rand() % 7 - 3) * 0.1f;
+			g_aJunk[nCntJunk].rotMove.y = (float)(rand() % 7 - 3) * 0.1f;
+			g_aJunk[nCntJunk].rotMove.z = (float)(rand() % 7 - 3) * 0.1f;
+
+			switch (scale)
+			{
+			case SCALETYPE_SMALL:	// 小さいがれき
+
+				// 拡大率を設定する
+				g_aJunk[nCntJunk].scale = D3DXVECTOR3(0.5f, 0.5f, 0.5f);
+
+				break;				// 抜け出す
+
+			case SCALETYPE_NORMAL:	// 普通のがれき
+
+				// 拡大率を設定する
+				g_aJunk[nCntJunk].scale = D3DXVECTOR3(0.75f, 0.75f, 0.75f);
+
+				break;				// 抜け出す
+
+			case SCALETYPE_BIG:		// 大きいがれき
+
+				// 拡大率を設定する
+				g_aJunk[nCntJunk].scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+
+				break;				// 抜け出す
+			}
+
 			// モデル情報を設定
 			g_aJunk[nCntJunk].modelData = GetModelData(MODELTYPE_OBJECT_JUNK + FROM_OBJECT);	// モデル情報
 
@@ -304,6 +336,9 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 				// マテリアルをコピーする
 				g_aJunk[nCntJunk].matCopy[nCntMat] = *pMatModel;
 			}
+
+			// 色を設定する
+			g_aJunk[nCntJunk].matCopy[0].MatD3D = col;
 
 			// 影のインデックスを設定
 			g_aJunk[nCntJunk].nShadowID = SetCircleShadow

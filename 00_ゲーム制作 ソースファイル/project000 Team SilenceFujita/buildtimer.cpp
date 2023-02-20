@@ -24,6 +24,8 @@
 #define MAX_VAL_BUILD			(2)						// 再建築タイマーの表示数値数
 #define MAX_BUILD_MIN			(60)					// タイム (分) の最大値
 #define MAX_BUILD_SEC			(60)					// タイム (秒) の最大値
+#define BUILD_WAIT_TIME			(40)					// 待機状態のカウント数
+#define BUILD_APPEAR_MAGNI		(0.05f)					// 出現時の拡大率
 
 //**********************************************************************************************************************
 //	構造体宣言(Build)
@@ -35,6 +37,7 @@ typedef struct
 	D3DXMATRIX	mtx;		// ワールドマトリックス
 	Object		object;		// オブジェクトのポインタ
 	BUILDSTATE	state;		// 状態
+	int			nWaitCount;	// 待機カウント
 	int			nCount;		// カウント
 	bool		bUse;		// 使用状況
 }Build;
@@ -62,6 +65,7 @@ void InitBuildtimer(void)
 		// 情報の初期化
 		g_aBuild[nCntSet].pos	 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_aBuild[nCntSet].nCount = 0;								// カウンター
+		g_aBuild[nCntSet].nWaitCount = 0;							// 待機カウント
 		g_aBuild[nCntSet].radius = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 半径
 		g_aBuild[nCntSet].state	 = BUILDSTATE_APPEAR;				// 状態
 		g_aBuild[nCntSet].bUse	 = false;							// 使用状況
@@ -152,11 +156,28 @@ void UpdateBuildtimer(void)
 
 			switch (g_aBuild[nCntBill].state)
 			{
+			case BUILDSTATE_WAIT:		// 待機状態
+
+				// 待機カウントを加算する
+				g_aBuild[nCntBill].nWaitCount++;
+
+				if (g_aBuild[nCntBill].nWaitCount >= BUILD_WAIT_TIME)
+				{ // 待機カウント数を超えた場合
+
+					// 待機カウントを0にする
+					g_aBuild[nCntBill].nWaitCount = 0;
+
+					// 出現状態にする
+					g_aBuild[nCntBill].state = BUILDSTATE_APPEAR;
+				}
+
+				break;					// 抜け出す
+
 			case BUILDSTATE_APPEAR:		// 出現状態
 
 				// 拡大していく
-				g_aBuild[nCntBill].radius.x += (BUILDTIMER_RADIUS_X * 0.05f);	// X軸
-				g_aBuild[nCntBill].radius.y += (BUILDTIMER_RADIUS_Y * 0.05f);	// Y軸
+				g_aBuild[nCntBill].radius.x += (BUILDTIMER_RADIUS_X * BUILD_APPEAR_MAGNI);	// X軸
+				g_aBuild[nCntBill].radius.y += (BUILDTIMER_RADIUS_Y * BUILD_APPEAR_MAGNI);	// Y軸
 
 				if (g_aBuild[nCntBill].radius.x >= BUILDTIMER_RADIUS_X
 					|| g_aBuild[nCntBill].radius.y >= BUILDTIMER_RADIUS_Y)
@@ -364,7 +385,8 @@ void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object object)
 			g_aBuild[nCntBill].radius	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);									// 半径
 			g_aBuild[nCntBill].object	= object;					// オブジェクトの情報
 			g_aBuild[nCntBill].nCount	= nCount;					// カウント
-			g_aBuild[nCntBill].state	= BUILDSTATE_APPEAR;		// 状態
+			g_aBuild[nCntBill].nWaitCount = 0;						// 待機カウント
+			g_aBuild[nCntBill].state	= BUILDSTATE_WAIT;			// 状態
 
 			//頂点座標の設定
 			pVtx[0].pos = D3DXVECTOR3(-g_aBuild[nCntBill].radius.x, +g_aBuild[nCntBill].radius.y, 0.0f);
@@ -381,4 +403,25 @@ void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object object)
 	}
 	//頂点バッファをアンロックする
 	g_pVtxBuffBuild->Unlock();
+}
+
+//======================================
+// 再建築タイマーの総数取得処理
+//======================================
+int GetNumBuildTimer(void)
+{
+	int nNumBuild = 0;
+
+	for (int nCnt = 0; nCnt < MAX_BUILDTIMER; nCnt++)
+	{
+		if (g_aBuild[nCnt].bUse == true)
+		{ // 使用している場合
+
+			// 再建築の総数を加算する
+			nNumBuild++;
+		}
+	}
+
+	// 再建築タイマーの総数を返す
+	return nNumBuild;
 }

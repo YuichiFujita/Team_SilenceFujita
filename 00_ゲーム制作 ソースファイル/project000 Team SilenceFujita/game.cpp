@@ -440,13 +440,14 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
-	// カメラの更新
-	UpdateCamera();
-
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
 #ifdef _DEBUG	// デバッグ処理
+
+		// カメラの更新
+		UpdateCamera();
+
 		// エディットメインの更新
 		UpdateEditmain();
 #endif
@@ -483,6 +484,9 @@ void UpdateGame(void)
 
 			// プレイヤーの更新
 			UpdatePlayer();
+
+			// カメラの更新
+			UpdateCamera();
 
 			// タイヤ痕の更新
 			UpdateTireMark();
