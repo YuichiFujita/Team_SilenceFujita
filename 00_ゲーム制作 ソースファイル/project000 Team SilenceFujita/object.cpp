@@ -760,44 +760,94 @@ void HitObject(Object *pObject, int nDamage)
 			// 再建築タイマーの設定処理
 			SetBuildtimer(pObject->pos, 600, *pObject);
 
-			// サイズに応じてがれきを生み出す
-			for (int nCntColl = 0; nCntColl < g_aCollision[pObject->nType].nNumColl; nCntColl++)
+			switch (pObject->nCollisionType)
 			{
-				// 位置
-				D3DXVECTOR3 pos = pObject->pos + g_aCollision[pObject->nType].vecPos[nCntColl];
+			case COLLISIONTYPE_MODEL:	// モデルの座標による当たり判定
 
-				// がれきの設定処理
-				SetJunk
-				(
-					D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
-					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
-				);
+				for (int nCntColl = 0; nCntColl < 3; nCntColl++)
+				{
+					// がれきの設定処理
+					SetJunk
+					(
+						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
 
-				SetJunk
-				(
-					D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
-					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
-				);
+					// がれきの設定処理
+					SetJunk
+					(
+						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
 
-				SetJunk
-				(
-					D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
-					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
-				);
+					// がれきの設定処理
+					SetJunk
+					(
+						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
 
-				SetJunk
-				(
-					D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
-					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-					(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-					g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
-				);
+					// がれきの設定処理
+					SetJunk
+					(
+						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
+				}
+
+				break;					// 抜け出す
+
+			case COLLISIONTYPE_CREATE:	// 汎用的な当たり判定
+
+				// サイズに応じてがれきを生み出す
+				for (int nCntColl = 0; nCntColl < g_aCollision[pObject->nType].nNumColl; nCntColl++)
+				{
+					// 位置
+					D3DXVECTOR3 pos = pObject->pos + g_aCollision[pObject->nType].vecPos[nCntColl];
+
+					// がれきの設定処理
+					SetJunk
+					(
+						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
+
+					SetJunk
+					(
+						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
+
+					SetJunk
+					(
+						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
+
+					SetJunk
+					(
+						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
+						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+					);
+				}
+
+				break;					// 抜け出す
 			}
 
 			//// アイテムの設定

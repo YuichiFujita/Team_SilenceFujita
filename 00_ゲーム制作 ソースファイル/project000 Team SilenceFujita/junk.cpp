@@ -20,6 +20,12 @@
 //	ƒ}ƒNƒ’è‹`
 //**********************************************************************************************************************
 #define JUNK_GRAVITY		(-0.8f)		// ‚ª‚ê‚«‚Ìd—Í
+#define JUNK_LEV_MAGNI		(0.06f)		// ‚ª‚ê‚«‚ÌˆÚ“®—Ê‚ÌŒ¸ŠŒW”
+#define JUNK_MOVE_ADD_MAGNI	(0.4f)		// ‚ª‚ê‚«‚É•t‚¯‘«‚·•ª‚ÌˆÚ“®—Ê‚Ì”{—¦
+#define JUNK_MOVE_LEV		(-0.4f)		// ‚ª‚ê‚«‚ÌˆÚ“®—Ê‚ÌŒ¸Š”{—¦
+#define JUNK_SCALE_MAGNI	(0.05f)		// ‚ª‚ê‚«‚ÌŠg‘å—¦‚Ì”{—¦
+#define JUNK_COL_MAGNI		(0.05f)		// ‚ª‚ê‚«‚ÌF‚ÌŒ¸Š”{—¦
+#define JUNK_POS_Y_ADD		(40.0f)		// ‚ª‚ê‚«‚ÌˆÊ’u‚Ì‰ÁŽZ”(YŽ²)
 
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾
@@ -102,8 +108,8 @@ void UpdateJunk(void)
 			g_aJunk[nCntJunk].pos += g_aJunk[nCntJunk].move;
 
 			// ˆÚ“®—Ê‚ðŒ¸Š‚³‚¹‚é
-			g_aJunk[nCntJunk].move.x += (0.0f - g_aJunk[nCntJunk].move.x) * 0.06f;
-			g_aJunk[nCntJunk].move.z += (0.0f - g_aJunk[nCntJunk].move.z) * 0.06f;
+			g_aJunk[nCntJunk].move.x += (0.0f - g_aJunk[nCntJunk].move.x) * JUNK_LEV_MAGNI;
+			g_aJunk[nCntJunk].move.z += (0.0f - g_aJunk[nCntJunk].move.z) * JUNK_LEV_MAGNI;
 
 			// Šp“x‚ðŒX‚¯‚é
 			g_aJunk[nCntJunk].rot += g_aJunk[nCntJunk].rotMove;
@@ -118,8 +124,8 @@ void UpdateJunk(void)
 			case JUNKSTATE_NONE:	// ‚ª‚ê‚«
 
 				// ƒvƒŒƒCƒ„[‚ÌˆÚ“®—Ê‚ð‰Á‚¦‚é
-				g_aJunk[nCntJunk].pos.x += (pPlayer->pos.x - pPlayer->oldPos.x) * 0.4f;
-				g_aJunk[nCntJunk].pos.z += (pPlayer->pos.z - pPlayer->oldPos.z) * 0.4f;
+				g_aJunk[nCntJunk].pos.x += (pPlayer->pos.x - pPlayer->oldPos.x) * JUNK_MOVE_ADD_MAGNI;
+				g_aJunk[nCntJunk].pos.z += (pPlayer->pos.z - pPlayer->oldPos.z) * JUNK_MOVE_ADD_MAGNI;
 
 				if (g_aJunk[nCntJunk].pos.y <= 0.0f)
 				{ // ’n–Ê‚æ‚è‰º‚És‚Á‚½ê‡
@@ -127,15 +133,16 @@ void UpdateJunk(void)
 					// ˆÊ’u‚ð•â³‚·‚é
 					g_aJunk[nCntJunk].pos.y = 0.0f;
 
-					// ˆÚ“®—Ê‚ð‰ÁŽZ‚·‚é
-					g_aJunk[nCntJunk].move.y *= -0.4f;
+					// ˆÚ“®—Ê‚ðŒ¸ŽZ‚·‚é
+					g_aJunk[nCntJunk].move.y *= JUNK_MOVE_LEV;
 
 					// Á‹Žó‘Ô‚É‚·‚é
 					g_aJunk[nCntJunk].state = JUNKSTATE_DELETE;
 
-					g_aJunk[nCntJunk].scaleMove.x = (g_aJunk[nCntJunk].scale.x * 0.05f);
-					g_aJunk[nCntJunk].scaleMove.y = (g_aJunk[nCntJunk].scale.y * 0.05f);
-					g_aJunk[nCntJunk].scaleMove.z = (g_aJunk[nCntJunk].scale.z * 0.05f);
+					// Šg‘å—¦‚ÌŒ¸Š—¦‚ð‘ª‚é
+					g_aJunk[nCntJunk].scaleMove.x = (g_aJunk[nCntJunk].scale.x * JUNK_SCALE_MAGNI);
+					g_aJunk[nCntJunk].scaleMove.y = (g_aJunk[nCntJunk].scale.y * JUNK_SCALE_MAGNI);
+					g_aJunk[nCntJunk].scaleMove.z = (g_aJunk[nCntJunk].scale.z * JUNK_SCALE_MAGNI);
 				}
 
 				break;				// ”²‚¯o‚·
@@ -152,7 +159,7 @@ void UpdateJunk(void)
 					g_aJunk[nCntJunk].pos.y = 0.0f;
 
 					// ˆÚ“®—Ê‚ð‰ÁŽZ‚·‚é
-					g_aJunk[nCntJunk].move.y *= -0.4f;
+					g_aJunk[nCntJunk].move.y *= -JUNK_MOVE_LEV;
 				}
 
 				if
@@ -232,7 +239,7 @@ void DrawJunk(void)
 				{ // Á‹Žó‘Ô‚¾‚Á‚½ê‡
 
 					// “§–¾“x‚ðŒ¸ŽZ‚·‚é
-					g_aJunk[nCntJunk].matCopy[nCntMat].MatD3D.Diffuse.a -= 0.05f;
+					g_aJunk[nCntJunk].matCopy[nCntMat].MatD3D.Diffuse.a -= JUNK_COL_MAGNI;
 
 					if (g_aJunk[nCntJunk].matCopy[nCntMat].MatD3D.Diffuse.a <= 0.0f)
 					{ // “§–¾“x‚ª0.0fˆÈ‰º‚É‚È‚Á‚½ê‡
@@ -283,7 +290,7 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot, SCALETYPE scale, D3DMATERIAL9 col
 		{ // ‚ª‚ê‚«‚ªŽg—p‚³‚ê‚Ä‚¢‚È‚¢ê‡
 
 			// ˆø”‚ð‘ã“ü
-			g_aJunk[nCntJunk].pos = D3DXVECTOR3(pos.x, pos.y + 40.0f, pos.z);		// ˆÊ’u
+			g_aJunk[nCntJunk].pos = D3DXVECTOR3(pos.x, pos.y + JUNK_POS_Y_ADD, pos.z);		// ˆÊ’u
 			g_aJunk[nCntJunk].rot = rot;					// Œü‚«
 			g_aJunk[nCntJunk].scale = NONE_SCALE;			// Šg‘å—¦
 			g_aJunk[nCntJunk].scaleMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// Šg‘å—¦‚ÌˆÚ“®—Ê
@@ -291,9 +298,9 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot, SCALETYPE scale, D3DMATERIAL9 col
 			g_aJunk[nCntJunk].bUse = true;					// Žg—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
 
 			// ˆÚ“®—Ê‚ðÝ’è‚·‚é
-			g_aJunk[nCntJunk].move.x = (float)(rand() % 50 - 25);
+			g_aJunk[nCntJunk].move.x = (float)(rand() % 51 - 25);
 			g_aJunk[nCntJunk].move.y = 0.0f;
-			g_aJunk[nCntJunk].move.z = (float)(rand() % 50 - 25);
+			g_aJunk[nCntJunk].move.z = (float)(rand() % 51 - 25);
 
 			// Œü‚«‚ÌˆÚ“®—Ê‚ðÝ’è‚·‚é
 			g_aJunk[nCntJunk].rotMove.x = (float)(rand() % 7 - 3) * 0.1f;
