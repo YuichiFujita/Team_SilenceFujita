@@ -688,8 +688,9 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			// ジャッジの情報の設定
 			g_aObject[nCntObject].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			if (nCntObject % 2 == 0)
-			{ // 2の倍数だった場合
+
+			if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
+			{ // 壊れるタイプの場合
 
 				g_aObject[nCntObject].judge.state = JUDGESTATE_EVIL;				// 善悪
 				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態

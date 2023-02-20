@@ -85,6 +85,7 @@ void InitCar(void)
 		g_aCar[nCntCar].move        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aCar[nCntCar].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
+		g_aCar[nCntCar].type		= CARTYPE_CAR001;					// 種類
 		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
 		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
 		g_aCar[nCntCar].bMove       = false;							// 移動しているか
@@ -382,6 +383,8 @@ void DrawCar(void)
 //======================================================================================================================
 void SetCar(D3DXVECTOR3 pos)
 {
+	int nCarType;
+
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -400,8 +403,14 @@ void SetCar(D3DXVECTOR3 pos)
 			// 使用している状態にする
 			g_aCar[nCntCar].bUse = true;
 
+			// 車の種類をランダムで算出する
+			nCarType = rand() % CARTYPE_MAX;
+
+			// 車の種類を設定する
+			g_aCar[nCntCar].type =(CARTYPE)(nCarType);
+
 			// モデル情報を設定
-			g_aCar[nCntCar].modelData = GetModelData((rand() % MODEL_CAR_MAX) + FROM_CAR);	// モデル情報
+			g_aCar[nCntCar].modelData = GetModelData(nCarType + FROM_CAR);	// モデル情報
 
 			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
 
@@ -438,14 +447,14 @@ void SetCar(D3DXVECTOR3 pos)
 			// ジャッジの情報の設定
 			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			if (nCntCar % 2 == 0)
-			{ // 2の倍数だった場合
+			if (g_aCar[nCntCar].type == CARTYPE_ELECTIONCAR)
+			{ // 悪いやつだった場合
 
 				g_aCar[nCntCar].judge.state = JUDGESTATE_EVIL;					// 善悪
 				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
 			}
 			else
-			{ // 上記以外
+			{ // 良い奴だった場合
 
 				g_aCar[nCntCar].judge.state = JUDGESTATE_JUSTICE;				// 善悪
 				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態

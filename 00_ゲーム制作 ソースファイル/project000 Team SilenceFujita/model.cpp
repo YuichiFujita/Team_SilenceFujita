@@ -81,10 +81,12 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
 	"data\\MODEL_PLAYER\\barrier000.x",		// バリア
 
-	// 車モデル
+	// 警察モデル
 	"data\\MODEL_OBJECT\\policecar.x",		// パトカー
-	"data\\MODEL_OBJECT\\farecar.x",		// 消防車
+
+	// 車モデル
 	"data\\MODEL_OBJECT\\car001.x",			// 自動車
+	"data\\MODEL_OBJECT\\farecar.x",		// 消防車
 	"data\\MODEL_OBJECT\\yakiimocar.x",		// 焼き芋屋
 	"data\\MODEL_OBJECT\\senkyoCar000.x",	// 選挙カー
 
