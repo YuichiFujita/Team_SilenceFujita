@@ -804,8 +804,8 @@ void PatrolCarSearch(Police *pPolice)
 	if (fDist <= POLICAR_CHASE_RANGE)
 	{ // 目的の距離が一定以内に入ったら
 
-		if (fDist <= POLICAR_TACKLE_RANGE)
-		{ // 目的の距離が一定以内に入った場合
+		if (fDist <= POLICAR_TACKLE_RANGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+		{ // 目的の距離が一定以内に入ったかつ、無敵状態以外の場合
 
 			// タックルのカウントを0にする
 			pPolice->tackle.nTackleCnt = 0;

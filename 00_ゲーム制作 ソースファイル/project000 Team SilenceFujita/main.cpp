@@ -28,6 +28,7 @@
 
 #ifdef _DEBUG	// デバッグ処理
 // デバッグ表示用
+#include "buildtimer.h"
 #include "camera.h"
 #include "effect.h"
 #include "particle.h"
@@ -1667,10 +1668,12 @@ void DrawDebug(void)
 	float       cameraDis    = GetCameraDis();		// カメラの距離
 	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
+	int			nNumObject = GetNumObject();		// オブジェクトの数
 	Car *pCar = GetCarData();						// 車の情報を取得する
 	Police *pPolice = GetPoliceData();
 	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
 	int nNumWeather = GetNumWeather();				// 降っている物の総数を取得する
+	int nNumBuild = GetNumBuildTimer();				// 再建築タイマーの総数取得処理
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1708,8 +1711,10 @@ void DrawDebug(void)
 		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
 		" 　警察のスピード：[%.3f]\n"
 		" 　人間の位置：[%.3f,%.3f,%.3f]\n"
-		" 　降っている物の総数：%d"
-		" 　現在の爆弾ゲージ：%d",
+		" 　降っている物の総数：%d\n"
+		" 　現在の爆弾ゲージ：%d\n"
+		"　 オブジェクトの数：%d\n"
+		" 　再建築タイマーの数：%d\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1731,7 +1736,9 @@ void DrawDebug(void)
 		pPolice->move.x,
 		HumanPos.x, HumanPos.y, HumanPos.z,
 		nNumWeather,
-		pPlayer->bomb.nCounter
+		pPlayer->bomb.nCounter,
+		nNumObject,
+		nNumBuild
 	);
 
 	//--------------------------------------------------------
