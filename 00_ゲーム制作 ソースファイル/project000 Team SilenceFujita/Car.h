@@ -74,6 +74,7 @@ typedef struct
 	IconInfo	 icon;					// アイコンの情報
 	CARTYPE		 type;					// 種類
 	int			 nShadowID;				// 影のインデックス
+	int			 nBombCount;			// ボム中のカウント
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか

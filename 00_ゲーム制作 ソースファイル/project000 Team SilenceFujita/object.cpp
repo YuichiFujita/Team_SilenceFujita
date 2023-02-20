@@ -13,6 +13,7 @@
 #include "model.h"
 
 #include "buildtimer.h"
+#include "bonus.h"
 #include "junk.h"
 #include "object.h"
 #include "particle.h"
@@ -850,6 +851,9 @@ void HitObject(Object *pObject, int nDamage)
 
 				break;					// 抜け出す
 			}
+
+			// ボーナスの設定処理
+			SetBonus(ADDSCORE_OBJECT);	
 
 			//// アイテムの設定
 			//SetItem(pObject->pos, ITEMTYPE_HEAL);

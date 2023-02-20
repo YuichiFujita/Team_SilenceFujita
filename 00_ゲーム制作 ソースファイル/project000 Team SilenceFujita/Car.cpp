@@ -12,6 +12,7 @@
 #include "model.h"
 #include "calculation.h"
 
+#include "bonus.h"
 #include "Car.h"
 #include "shadow.h"
 #include "sound.h"
@@ -47,6 +48,8 @@
 #define CAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 #define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
+
+#define CAR_BOMB_BONUS_CNT		(180)		// ボム状態の時ボーナスが入るカウント数
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -87,6 +90,7 @@ void InitCar(void)
 		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
 		g_aCar[nCntCar].type		= CARTYPE_CAR001;					// 種類
 		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
+		g_aCar[nCntCar].nBombCount = 0;									// ボム中のカウント
 		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
 		g_aCar[nCntCar].bMove       = false;							// 移動しているか
 		g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
@@ -194,6 +198,10 @@ void UpdateCar(void)
 
 			if (GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
 			{ // バリアセット状態じゃなかった場合
+
+				// ボム中のカウントを初期化する
+				g_aCar[nCntCar].nBombCount = 0;
+
 				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC)
 				{ // 渋滞状態じゃない場合
 					//----------------------------------------------------
@@ -244,9 +252,27 @@ void UpdateCar(void)
 					TACKLESTATE_CHARGE					// 状態
 				);
 			}
+			else
+			{ // バリアセット状態の場合
+
+				if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+				{ // 悪い奴の場合
+
+					// ボム中のカウントを加算する
+					g_aCar[nCntCar].nBombCount++;
+
+					if (g_aCar[nCntCar].nBombCount % CAR_BOMB_BONUS_CNT == 0)
+					{ // ボムカウントが一定数になった場合
+
+					  // ボーナスの設定処理
+						SetBonus(ADDSCORE_CAR);
+					}
+				}
+			}
 
 			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
+
 				// 車の補正の更新処理
 				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 			}
@@ -395,6 +421,7 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;				// 前回の位置
 			g_aCar[nCntCar].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aCar[nCntCar].bombState	= BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aCar[nCntCar].nBombCount	= 0;								// ボム中のカウント
 			g_aCar[nCntCar].bJump		= false;							// ジャンプしているかどうか
 			g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
 			g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態

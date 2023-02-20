@@ -20,6 +20,8 @@
 typedef enum
 {
 	ADDSCORE_HUMAN = 0,		// 人を吹き飛ばした時
+	ADDSCORE_CAR,			// 車をバリアで閉じ込めたとき
+	ADDSCORE_OBJECT,		// オブジェクトを破壊したとき
 	ADDSCORE_MAX			// この列挙型の総数
 }ADDSCORETYPE;
 

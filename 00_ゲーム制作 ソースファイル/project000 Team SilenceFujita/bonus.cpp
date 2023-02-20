@@ -35,6 +35,10 @@
 
 #define SCORE_HUMAN			(500)		// 人を吹き飛ばした時のスコア
 #define DIGIT_HUMAN			(3)			// 人を吹き飛ばした時の桁数
+#define SCORE_OBJECT		(1000)		// オブジェクトを壊した時のスコア
+#define DIGIT_OBJECT		(4)			// オブジェクトを壊した時の桁数
+#define SCORE_CAR			(100)		// 車を封じ込めてる時のスコア
+#define DIGIT_CAR			(3)			// 車を封じ込めてる時の桁数
 
 //**********************************************************************************************************************
 // 上に出すか下に出すか(WHEREBONUS)
@@ -384,7 +388,7 @@ void SetBonus(ADDSCORETYPE Reason)
 		if (g_aBonus[nCntBonus].bUse == false)
 		{ // 得点表示が使用されていない場合
 
-			// 上に出すか下に出すかをランダムで算出する
+			// 右に出すか左に出すかをランダムで算出する
 			nTopBotRand = rand() % WHEREBONUS_MAX;
 
 			switch (nTopBotRand)
@@ -422,6 +426,26 @@ void SetBonus(ADDSCORETYPE Reason)
 
 				// 桁数を設定する
 				g_aBonus[nCntBonus].nDigit = DIGIT_HUMAN;
+
+				break;				// 抜け出す
+
+			case ADDSCORE_OBJECT:	// オブジェクトを壊した場合
+
+				// スコアを設定する
+				g_aBonus[nCntBonus].nScore = SCORE_OBJECT;
+
+				// 桁数を設定する
+				g_aBonus[nCntBonus].nDigit = DIGIT_OBJECT;
+
+				break;				// 抜け出す
+
+			case ADDSCORE_CAR:		//車を封じ込めた場合
+
+				// スコアを設定する
+				g_aBonus[nCntBonus].nScore = SCORE_CAR;
+
+				// 桁数を設定する
+				g_aBonus[nCntBonus].nDigit = DIGIT_CAR;
 
 				break;				// 抜け出す
 			}
