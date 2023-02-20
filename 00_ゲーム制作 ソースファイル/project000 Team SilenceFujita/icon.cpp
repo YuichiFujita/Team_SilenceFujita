@@ -295,6 +295,13 @@ void UpdateIcon(void)
 					}
 
 					break;					// ”²‚¯o‚·
+
+				case ICONSTATE_FLYAWAY:		// l‚ª”ò‚ñ‚Å‚¢‚éó‘Ô
+
+					// ”¼“§–¾‚É‚·‚é
+					g_aIcon[nCntIcon].col.a = 0.4f;
+
+					break;					// ”²‚¯o‚·
 				}
 
 				if (cameraPos.x + ICON_CORRECT_RIGHT <= g_aIcon[nCntIcon].pos.x + g_aIcon[nCntIcon].fRadius)

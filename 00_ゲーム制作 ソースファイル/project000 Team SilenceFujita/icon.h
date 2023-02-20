@@ -39,6 +39,7 @@ typedef enum
 	ICONSTATE_REVIVAL,			// 復活中
 	ICONSTATE_DAMAGE,			// ダメージ中
 	ICONSTATE_UNRIVALED,		// 無敵状態
+	ICONSTATE_FLYAWAY,			// 人が飛んでいる状態
 	ICONSTATE_MAX				// この列挙型の総数
 }ICONSTATE;
 
