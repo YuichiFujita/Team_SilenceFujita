@@ -407,6 +407,9 @@ void FlyAwayHuman(Human *pHuman, Player player)
 
 	// ”ò‚Î‚·
 	pHuman->pos += pHuman->move;
+
+	// l‚ª”ò‚ñ‚Å‚¢‚éó‘Ô‚É‚·‚é
+	pHuman->icon.state = ICONSTATE_FLYAWAY;
 }
 
 //============================================================
