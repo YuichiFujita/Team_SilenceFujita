@@ -352,6 +352,8 @@ void DrawHuman(void)
 //======================================================================================================================
 void SetHuman(D3DXVECTOR3 pos)
 {
+	int nHumanType;
+
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -368,6 +370,12 @@ void SetHuman(D3DXVECTOR3 pos)
 
 			// 使用している状態にする
 			g_aHuman[nCntHuman].bUse = true;
+
+			// 人間の種類をランダムで算出する
+			nHumanType = rand() % HUMANTYPE_MAX;
+
+			// 種類を設定する
+			g_aHuman[nCntHuman].type = (HUMANTYPE)nHumanType;
 
 			// モデル情報を設定
 			g_aHuman[nCntHuman].modelData = GetModelData(MODELTYPE_OBJECT_BIGTREE + FROM_OBJECT);	// モデル情報
@@ -439,14 +447,15 @@ void SetHuman(D3DXVECTOR3 pos)
 			// ジャッジの情報の設定
 			g_aHuman[nCntHuman].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			if (nCntHuman % 2 == 0)
-			{ // 2の倍数だった場合
+			if (g_aHuman[nCntHuman].type == HUMANTYPE_CIGARETTE ||
+				g_aHuman[nCntHuman].type == HUMANTYPE_SMARTPHONE)
+			{ // 悪い奴だった場合
 
-				g_aHuman[nCntHuman].judge.state = JUDGESTATE_EVIL;					// 善悪
-				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
+				g_aHuman[nCntHuman].judge.state = JUDGESTATE_EVIL;				// 善悪
+				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;		// チカチカ状態
 			}
 			else
-			{ // 上記以外
+			{ // 良い奴だった場合
 
 				g_aHuman[nCntHuman].judge.state = JUDGESTATE_JUSTICE;				// 善悪
 				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
