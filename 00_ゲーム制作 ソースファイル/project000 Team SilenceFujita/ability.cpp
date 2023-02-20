@@ -22,13 +22,18 @@
 #define ABI_BG_WIDTH		(240.0f)	// ‘Ì—Íƒo[‚Ì”wŒi‚Ì‰¡• / 2
 #define ABI_BG_HEIGHT		(46.0f)		// ‘Ì—Íƒo[‚Ì”wŒi‚Ìc• / 2
 
+#define ABI_INIT_BG			(0)			// ”wŒi‚Ì‰Šú’l
+#define ABI_LOOP_BG			(2)			// ”wŒi‚ÌŒJ‚è•Ô‚µ”
+#define ABI_INIT_FRAME		(2)			// ˜g‚Ì‰Šú’l
+#define ABI_LOOP_FRAME		(3)			// ˜g‚ÌŒJ‚è•Ô‚µ”
+
 //----------------------------------------------------------------------------------------------------------------------
 //	”j–Å¾‘– (ƒXƒ‰ƒ€Eƒu[ƒXƒg) ƒ}ƒNƒ’è‹`
 //----------------------------------------------------------------------------------------------------------------------
 #define MAX_ABI_BOOST		(2)			// ƒu[ƒXƒgƒo[‚Ég—p‚·‚éƒ|ƒŠƒSƒ“”
 
 #define ABI_BOOST_POS_X		(65.0f)		// ”\—Íƒo[‚Ìâ‘ÎÀ•W (x)
-#define ABI_BOOST_POS_Y		(135.0f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (y)
+#define ABI_BOOST_POS_Y		(138.0f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (y)
 #define ABI_BOOST_WIDTH_MUL	(0.66f)		// ”\—Íƒo[‚Ì‰¡•‚ÌƒvƒŒƒCƒ„[”\—ÍæZ—Ê
 #define ABI_BOOST_HEIGHT	(35.0f)		// ”\—Íƒo[‚Ìc• / 2
 
@@ -37,14 +42,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 #define MAX_ABI_WIND		(2)			// ƒEƒBƒ“ƒhƒo[‚Ég—p‚·‚éƒ|ƒŠƒSƒ“”
 
-#define ABI_WIND_POS_X		(185.5f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (x)
-#define ABI_WIND_POS_Y		(135.0f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (y)
-#define ABI_WIND_WIDTH_MUL	(0.66f)		// ”\—Íƒo[‚Ì‰¡•‚ÌƒvƒŒƒCƒ„[”\—ÍæZ—Ê
+#define ABI_WIND_POS_X		(185.0f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (x)
+#define ABI_WIND_POS_Y		(138.0f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (y)
+#define ABI_WIND_WIDTH_MUL	(0.655f)	// ”\—Íƒo[‚Ì‰¡•‚ÌƒvƒŒƒCƒ„[”\—ÍæZ—Ê
 #define ABI_WIND_HEIGHT		(35.0f)		// ”\—Íƒo[‚Ìc• / 2
 
 //----------------------------------------------------------------------------------------------------------------------
 //	–³‰¹¢ŠE (ƒTƒCƒŒƒ“ƒXEƒ[ƒ‹ƒh) ƒ}ƒNƒ’è‹`
 //----------------------------------------------------------------------------------------------------------------------
+#define MAX_ABI_BOMB		(2)			// ƒ{ƒ€ƒo[‚Ég—p‚·‚éƒ|ƒŠƒSƒ“”
+
+#define ABI_BOMB_POS_X		(305.0f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (x)
+#define ABI_BOMB_POS_Y		(138.0f)	// ”\—Íƒo[‚Ìâ‘ÎÀ•W (y)
+#define ABI_BOMB_WIDTH_MUL	(0.062f)	// ”\—Íƒo[‚Ì‰¡•‚ÌƒvƒŒƒCƒ„[”\—ÍæZ—Ê
+#define ABI_BOMB_HEIGHT		(35.0f)		// ”\—Íƒo[‚Ìc• / 2
 
 //**********************************************************************************************************************
 //	ƒRƒ“ƒXƒg’è‹`
@@ -85,6 +96,11 @@ void UninitAbiWind(void);			// ƒEƒBƒ“ƒhƒQ[ƒW‚ÌI—¹
 void UpdateAbiWind(void);			// ƒEƒBƒ“ƒhƒQ[ƒW‚ÌXV
 void DrawAbiWind(void);				// ƒEƒBƒ“ƒhƒQ[ƒW‚Ì•`‰æ
 
+void InitAbiBomb(void);				// ƒ{ƒ€ƒQ[ƒW‚Ì‰Šú‰»
+void UninitAbiBomb(void);			// ƒ{ƒ€ƒQ[ƒW‚ÌI—¹
+void UpdateAbiBomb(void);			// ƒ{ƒ€ƒQ[ƒW‚ÌXV
+void DrawAbiBomb(void);				// ƒ{ƒ€ƒQ[ƒW‚Ì•`‰æ
+
 //**********************************************************************************************************************
 //	ƒOƒ[ƒoƒ‹•Ï”
 //**********************************************************************************************************************
@@ -92,6 +108,7 @@ LPDIRECT3DTEXTURE9      g_apTextureAbility[TEXTURE_ABI_MAX] = {};	// ƒeƒNƒXƒ`ƒƒ‚
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffAbility  = NULL;					// ”\—Í•\¦‚Ì’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffAbiBoost = NULL;					// ƒu[ƒXƒgƒQ[ƒW‚Ì’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffAbiWind  = NULL;					// ƒEƒBƒ“ƒhƒQ[ƒW‚Ì’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffAbiBomb  = NULL;					// ƒ{ƒ€ƒQ[ƒW‚Ì’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
 //======================================================================================================================
 //	”\—Íƒo[‚Ì‰Šú‰»ˆ—
@@ -106,6 +123,9 @@ void InitAbility(void)
 
 	// ƒEƒBƒ“ƒhƒQ[ƒW‚Ì‰Šú‰»
 	InitAbiWind();
+
+	// ƒ{ƒ€ƒQ[ƒW‚Ì‰Šú‰»
+	InitAbiBomb();
 }
 
 //======================================================================================================================
@@ -121,6 +141,9 @@ void UninitAbility(void)
 	
 	// ƒEƒBƒ“ƒhƒQ[ƒW‚ÌI—¹
 	UninitAbiWind();
+
+	// ƒ{ƒ€ƒQ[ƒW‚ÌI—¹
+	UninitAbiBomb();
 }
 
 //======================================================================================================================
@@ -136,6 +159,9 @@ void UpdateAbility(void)
 
 	// ƒEƒBƒ“ƒhƒQ[ƒW‚ÌXV
 	UpdateAbiWind();
+
+	// ƒ{ƒ€ƒQ[ƒW‚ÌXV
+	UpdateAbiBomb();
 }
 
 //======================================================================================================================
@@ -151,6 +177,9 @@ void DrawAbility(void)
 
 	// ƒEƒBƒ“ƒhƒQ[ƒW‚Ì•`‰æ
 	DrawAbiWind();
+
+	// ƒ{ƒ€ƒQ[ƒW‚Ì•`‰æ
+	DrawAbiBomb();
 
 	// ”\—Í•\¦‚Ì•`‰æ (˜g)
 	DrawAbi(false);
@@ -317,15 +346,15 @@ void DrawAbi(bool bBG)
 	{ // ”wŒi‚Ìê‡
 
 		// ŒJ‚è•Ô‚µ‚Ìİ’è
-		nInit = 0;	// ‰Šú’l
-		nLoop = 2;	// ŒJ‚è•Ô‚µ”
+		nInit = ABI_INIT_BG;	// ‰Šú’l
+		nLoop = ABI_LOOP_BG;	// ŒJ‚è•Ô‚µ”
 	}
 	else
 	{ // ˜g‚Ìê‡
 
 		// ŒJ‚è•Ô‚µ‚Ìİ’è
-		nInit = 2;	// ‰Šú’l
-		nLoop = 3;	// ŒJ‚è•Ô‚µ”
+		nInit = ABI_INIT_FRAME;	// ‰Šú’l
+		nLoop = ABI_LOOP_FRAME;	// ŒJ‚è•Ô‚µ”
 	}
 
 	for (int nCntAbility = nInit; nCntAbility < nLoop; nCntAbility++)
@@ -435,7 +464,7 @@ void InitAbiBoost(void)
 	pVtx[3].col = D3DCOLOR_RGBA(205,  0,  0, 255);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	”\—Íƒo[ (‰©)
+	//	”\—Íƒo[ (ƒIƒŒƒ“ƒW)
 	//------------------------------------------------------------------------------------------------------------------
 	// ’¸“_À•W‚ğİ’è
 	pVtx[4].pos = D3DXVECTOR3(ABI_BOOST_POS_X,                                          ABI_BOOST_POS_Y - ABI_BOOST_HEIGHT, 0.0f);
@@ -576,10 +605,10 @@ void InitAbiWind(void)
 	//	”\—Íƒo[ (Ô)
 	//------------------------------------------------------------------------------------------------------------------
 	// ’¸“_À•W‚ğİ’è
-	pVtx[0].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                         ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(ABI_WIND_POS_X + (BOOST_WAIT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                         ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(ABI_WIND_POS_X + (BOOST_WAIT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
+	pVtx[0].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                            ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(ABI_WIND_POS_X + (WIND_OVERHEAT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                            ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(ABI_WIND_POS_X + (WIND_OVERHEAT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
 
 	// rhw ‚Ìİ’è
 	pVtx[0].rhw = 1.0f;
@@ -594,13 +623,13 @@ void InitAbiWind(void)
 	pVtx[3].col = D3DCOLOR_RGBA(205,  0,  0, 255);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	”\—Íƒo[ (‰©)
+	//	”\—Íƒo[ (—Î)
 	//------------------------------------------------------------------------------------------------------------------
 	// ’¸“_À•W‚ğİ’è
-	pVtx[4].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                         ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
-	pVtx[5].pos = D3DXVECTOR3(ABI_WIND_POS_X + (BOOST_WAIT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
-	pVtx[6].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                         ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
-	pVtx[7].pos = D3DXVECTOR3(ABI_WIND_POS_X + (BOOST_WAIT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
+	pVtx[4].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                            ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(ABI_WIND_POS_X + (WIND_OVERHEAT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y - ABI_WIND_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(ABI_WIND_POS_X,                                            ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(ABI_WIND_POS_X + (WIND_OVERHEAT_CNT * ABI_WIND_WIDTH_MUL), ABI_WIND_POS_Y + ABI_WIND_HEIGHT, 0.0f);
 
 	// rhw ‚Ìİ’è
 	pVtx[4].rhw = 1.0f;
@@ -679,6 +708,158 @@ void DrawAbiWind(void)
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zƒoƒbƒtƒ@XV‚Ì—LŒø / –³Œø‚Ìİ’è
 
 	for (int nCntAbility = 0; nCntAbility < MAX_ABI_WIND; nCntAbility++)
+	{ // g—p‚·‚éƒ|ƒŠƒSƒ“”•ªŒJ‚è•Ô‚·
+
+		// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+		pDevice->SetTexture(0, NULL);
+
+		// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntAbility * 4, 2);
+	}
+
+	// ZƒeƒXƒg‚ğ—LŒø‚É‚·‚é
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);		// ZƒeƒXƒg‚Ìİ’è
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);			// Zƒoƒbƒtƒ@XV‚Ì—LŒø / –³Œø‚Ìİ’è
+}
+
+//======================================================================================================================
+//	ƒ{ƒ€ƒQ[ƒW‚Ì‰Šú‰»ˆ—
+//======================================================================================================================
+void InitAbiBomb(void)
+{
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	VERTEX_2D *pVtx;							// ’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+	// ’¸“_ƒoƒbƒtƒ@‚Ì¶¬
+	pDevice->CreateVertexBuffer
+	( // ˆø”
+		sizeof(VERTEX_2D) * 4 * MAX_ABI_BOMB,	// •K—v’¸“_”
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_2D,							// ’¸“_ƒtƒH[ƒ}ƒbƒg
+		D3DPOOL_MANAGED,
+		&g_pVtxBuffAbiBomb,
+		NULL
+	);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	’¸“_î•ñ‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
+	g_pVtxBuffAbiBomb->Lock(0, 0, (void**)&pVtx, 0);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	”\—Íƒo[ (Ô)
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ğİ’è
+	pVtx[0].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                        ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOMB_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                        ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOMB_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+
+	// rhw ‚Ìİ’è
+	pVtx[0].rhw = 1.0f;
+	pVtx[1].rhw = 1.0f;
+	pVtx[2].rhw = 1.0f;
+	pVtx[3].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	pVtx[0].col = D3DCOLOR_RGBA(255, 50, 50, 255);
+	pVtx[1].col = D3DCOLOR_RGBA(255, 50, 50, 255);
+	pVtx[2].col = D3DCOLOR_RGBA(205,  0,  0, 255);
+	pVtx[3].col = D3DCOLOR_RGBA(205,  0,  0, 255);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	”\—Íƒo[ (Â)
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ğİ’è
+	pVtx[4].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                         ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOOST_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                         ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOOST_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+
+	// rhw ‚Ìİ’è
+	pVtx[4].rhw = 1.0f;
+	pVtx[5].rhw = 1.0f;
+	pVtx[6].rhw = 1.0f;
+	pVtx[7].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	pVtx[4].col = D3DCOLOR_RGBA(110, 210, 255, 255);
+	pVtx[5].col = D3DCOLOR_RGBA(110, 210, 255, 255);
+	pVtx[6].col = D3DCOLOR_RGBA( 60, 160, 205, 255);
+	pVtx[7].col = D3DCOLOR_RGBA( 60, 160, 205, 255);
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
+	g_pVtxBuffAbiBomb->Unlock();
+}
+
+//======================================================================================================================
+//	ƒ{ƒ€ƒQ[ƒW‚ÌI—¹ˆ—
+//======================================================================================================================
+void UninitAbiBomb(void)
+{
+	// ’¸“_ƒoƒbƒtƒ@‚Ì”jŠü
+	if (g_pVtxBuffAbiBomb != NULL)
+	{ // •Ï” (g_pVtxBuffAbiBomb) ‚ªNULL‚Å‚Í‚È‚¢ê‡
+
+		g_pVtxBuffAbiBomb->Release();
+		g_pVtxBuffAbiBomb = NULL;
+	}
+}
+
+//======================================================================================================================
+//	ƒ{ƒ€ƒQ[ƒW‚ÌXVˆ—
+//======================================================================================================================
+void UpdateAbiBomb(void)
+{
+	// •Ï”‚ğéŒ¾
+	float fCurrentBomb = 0.0f;			// Œ»İ‚Ìƒ{ƒ€‚Ì‘Ò‹@Ag—pŠÔ
+
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	VERTEX_2D *pVtx;					// ’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	Player    *pPlayer = GetPlayer();	// ƒvƒŒƒCƒ„[‚Ìî•ñ
+
+	// Œ»İ‚Ìƒ{ƒ€‚Ì‘Ò‹@Ag—pŠÔ‚ğ‹‚ß‚é
+	//if (pPlayer->boost.state == BOOSTSTATE_UP)
+	{ // ƒ{ƒ€‚ª‰Á‘¬ó‘Ô‚Ìê‡
+
+		// ƒ{ƒ€‚Ìg—pŠÔ‚ğŒvZ
+		fCurrentBomb = (float)pPlayer->bomb.nCounter;
+	}
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
+	g_pVtxBuffAbiBomb->Lock(0, 0, (void**)&pVtx, 0);
+
+	// ’¸“_À•W‚ğİ’è
+	pVtx[4].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                       ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (fCurrentBomb * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                       ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (fCurrentBomb * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
+	g_pVtxBuffAbiBomb->Unlock();
+}
+
+//======================================================================================================================
+//	ƒ{ƒ€ƒQ[ƒW‚Ì•`‰æˆ—
+//======================================================================================================================
+void DrawAbiBomb(void)
+{
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒf[ƒ^ƒXƒgƒŠ[ƒ€‚Éİ’è
+	pDevice->SetStreamSource(0, g_pVtxBuffAbiBomb, 0, sizeof(VERTEX_2D));
+
+	// ’¸“_ƒtƒH[ƒ}ƒbƒg‚Ìİ’è
+	pDevice->SetFVF(FVF_VERTEX_2D);
+
+	// ZƒeƒXƒg‚ğ–³Œø‚É‚·‚é
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);		// ZƒeƒXƒg‚Ìİ’è
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zƒoƒbƒtƒ@XV‚Ì—LŒø / –³Œø‚Ìİ’è
+
+	for (int nCntAbility = 0; nCntAbility < MAX_ABI_BOMB; nCntAbility++)
 	{ // g—p‚·‚éƒ|ƒŠƒSƒ“”•ªŒJ‚è•Ô‚·
 
 		// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è

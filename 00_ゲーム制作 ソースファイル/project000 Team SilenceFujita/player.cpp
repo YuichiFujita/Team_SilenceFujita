@@ -72,7 +72,6 @@
 //------------------------------------------------------------
 //	無音世界 (サイレンス・ワールド) マクロ定義
 //------------------------------------------------------------
-#define BOMB_CNT		(2400)		// ボム再使用時間
 #define SUB_BOMB_CNT	(10)		// 使用待機時のゲージの減算量
 
 //************************************************************
@@ -151,7 +150,7 @@ void InitPlayer(void)
 
 	// 爆弾の情報の初期化
 	g_player.bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
-	g_player.bomb.nCounter = BOMB_CNT;							// 攻撃管理カウンター
+	g_player.bomb.nCounter = BOMB_WAIT_CNT;						// 攻撃管理カウンター
 
 	// アイコンの情報の初期化
 	g_player.icon.nIconID = NONE_ICON;							// アイコンのインデックス
@@ -1383,7 +1382,7 @@ void UpdateSilenceWorld(void)
 
 	case ATTACKSTATE_WAIT:	// 攻撃待機状態
 
-		if (g_player.bomb.nCounter < BOMB_CNT)
+		if (g_player.bomb.nCounter < BOMB_WAIT_CNT)
 		{ // カウンターが一定値より小さい場合
 
 			// カウンターを加算
