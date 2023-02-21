@@ -36,6 +36,7 @@ void ParticleDamage(Particle *pParticle);		// ダメージエフェクト
 void ParticleExplosion(Particle *pParticle);	// 爆発エフェクト
 void ParticleBoost(Particle *pParticle);		// ブーストエフェクト
 void ParticleSpark(Particle *pParticle);		// 火花エフェクト
+void ParticleDust(Particle *pParticle);			// 埃エフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -153,7 +154,15 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 				ParticleSpark(&g_aParticle[nCntParticle]);
 
 				// 処理を抜ける
-				break;			
+				break;
+
+			case PARTICLETYPE_DUST:
+
+				// 埃エフェクト
+				ParticleDust(&g_aParticle[nCntParticle]);
+
+				// 処理を抜ける
+				break;	
 			}
 
 			// 処理を抜ける
@@ -329,6 +338,51 @@ void ParticleSpark(Particle *pParticle)
 	}
 }
 
+//======================================================================================================================
+// 埃エフェクト
+//======================================================================================================================
+void ParticleDust(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;		// エフェクトの移動量の代入用
+	float fRadius;			// エフェクトの半径の代入用
+	int nLife;				// エフェクトの寿命の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = D3DX_PI;
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= (float)(rand() % 5 - 2);
+		move.y *= 4.0f;
+		move.z *= (float)(rand() % 5 - 2);
+
+		// 半径をランダムに設定
+		fRadius = (float)(rand() % 200 + 50.0f);
+
+		// 寿命を設定
+		nLife = (rand() % 20) + 160;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,		// 位置
+			move,				// 移動量
+			pParticle->col,		// 色
+			nLife,				// 寿命
+			fRadius,			// 半径
+			0.1f,				// 減算量 (半径)
+			EFFECTTYPE_NONE		// 火花
+		);
+	}
+}
 
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================

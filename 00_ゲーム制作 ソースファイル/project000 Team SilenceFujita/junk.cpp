@@ -21,7 +21,7 @@
 //**********************************************************************************************************************
 #define JUNK_GRAVITY		(-0.8f)		// ‚ª‚ê‚«‚Ìd—Í
 #define JUNK_LEV_MAGNI		(0.06f)		// ‚ª‚ê‚«‚ÌˆÚ“®—Ê‚ÌŒ¸ŠŒW”
-#define JUNK_MOVE_ADD_MAGNI	(0.4f)		// ‚ª‚ê‚«‚É•t‚¯‘«‚·•ª‚ÌˆÚ“®—Ê‚Ì”{—¦
+#define JUNK_MOVE_ADD_MAGNI	(0.7f)		// ‚ª‚ê‚«‚É•t‚¯‘«‚·•ª‚ÌˆÚ“®—Ê‚Ì”{—¦
 #define JUNK_MOVE_LEV		(-0.4f)		// ‚ª‚ê‚«‚ÌˆÚ“®—Ê‚ÌŒ¸Š”{—¦
 #define JUNK_SCALE_MAGNI	(0.05f)		// ‚ª‚ê‚«‚ÌŠg‘å—¦‚Ì”{—¦
 #define JUNK_COL_MAGNI		(0.05f)		// ‚ª‚ê‚«‚ÌF‚ÌŒ¸Š”{—¦
