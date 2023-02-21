@@ -27,23 +27,27 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define OBJ_LIFE		(50)					// オブジェクトの体力
-#define DAMAGE_TIME_OBJ	(20)					// ダメージ状態を保つ時間
-#define UNR_TIME_OBJ	(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
+#define OBJ_LIFE				(50)							// オブジェクトの体力
+#define DAMAGE_TIME_OBJ			(20)							// ダメージ状態を保つ時間
+#define UNR_TIME_OBJ			(DAMAGE_TIME_OBJ - 10)			// 無敵状態に変更する時間
+#define JUNK_POS_Y				(0.7f)							// がれきが出現する位置の倍率(Y軸)
 
-#define OBJECT_GRAVITY	(-1.5f)					// オブジェクトの重力
-#define SMASH_WIDTH		(10.0f)					// 吹き飛びの幅
-#define SMASH_HEIGHT	(20.0f)					// 吹き飛びの高さ
-#define SMASH_DEPTH		(10.0f)					// 吹き飛びの奥行
-#define SMASH_ANGLE		(0.3f)					// 吹き飛ぶ高さの角度
-#define SMASH_ANGLE_ADD	(0.3f)					// 吹き飛ぶ角度の追加分
-#define SMASH_ADD_ROT	(0.02f)					// 吹き飛びの回転の加算数
-#define SMASH_DEATH_CNT	(40)					// 吹き飛んだ後に消えるまでのカウント
-#define SMASH_ROTMOVE_X	(0.01f)					// 吹き飛ぶ角度の移動量(X軸)
-#define SMASH_ROTMOVE_Y	(0.2f)					// 吹き飛ぶ角度の移動量(Y軸)
-#define SMASH_ROTMOVE_Z	(0.01f)					// 吹き飛ぶ角度の移動量(Z軸)
+#define OBJECT_GRAVITY			(-1.5f)							// オブジェクトの重力
+#define SMASH_WIDTH_MAGNI		(3.0f)							// 吹き飛びの幅の倍率
+#define SMASH_HEIGHT			(20.0f)							// 吹き飛びの高さ
+#define SMASH_DEPTH_MAGNI		(3.0f)							// 吹き飛びの奥行の倍率
+#define SMASH_ANGLE				(0.3f)							// 吹き飛ぶ高さの角度
+#define SMASH_ANGLE_ADD			(0.3f)							// 吹き飛ぶ角度の追加分
+#define SMASH_ADD_ROT			(0.02f)							// 吹き飛びの回転の加算数
+#define SMASH_DEATH_CNT			(40)							// 吹き飛んだ後に消えるまでのカウント
+#define SMASH_ROTMOVE_X			(5)								// 吹き飛ぶ角度の移動量のランダムの範囲(X軸)
+#define SMASH_ROTMOVE_HALF_X	((int)(SMASH_ROTMOVE_X * 0.5f))	// 吹き飛ぶ角度の移動量のランダムの引く数(X軸)
+#define SMASH_ROTMOVE_Y			(9)								// 吹き飛ぶ角度の移動量(Y軸)
+#define SMASH_ROTMOVE_HALF_Y	((int)(SMASH_ROTMOVE_Y * 0.5f))	// 吹き飛ぶ角度の移動量のランダムの引く数(Y軸)
+#define SMASH_ROTMOVE_Z			(5)								// 吹き飛ぶ角度の移動量(Z軸)
+#define SMASH_ROTMOVE_HALF_Z	((int)(SMASH_ROTMOVE_Z * 0.5f))	// 吹き飛ぶ角度の移動量のランダムの引く数(Z軸)
 
-#define APPEAR_ADD_MAGNI	(0.05f)				// 出現時の加算数の倍率
+#define APPEAR_ADD_MAGNI		(0.05f)							// 出現時の加算数の倍率
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -276,9 +280,10 @@ void UpdateObject(void)
 						// カウントを加算する
 						g_aObject[nCntObject].smash.nCounter++;
 
-						g_aObject[nCntObject].rot.x += g_aObject[nCntObject].smash.rotMove.x + 0.02f;
-						g_aObject[nCntObject].rot.y -= g_aObject[nCntObject].smash.rotMove.y + 0.02f;
-						g_aObject[nCntObject].rot.z -= g_aObject[nCntObject].smash.rotMove.z + 0.02f;
+						// 向きの移動量を加算する
+						g_aObject[nCntObject].rot.x += (g_aObject[nCntObject].smash.rotMove.x += 0.02f);
+						g_aObject[nCntObject].rot.y -= (g_aObject[nCntObject].smash.rotMove.y += 0.01f);
+						g_aObject[nCntObject].rot.z -= (g_aObject[nCntObject].smash.rotMove.z += 0.02f);
 
 						if (g_aObject[nCntObject].smash.nCounter >= SMASH_DEATH_CNT)
 						{ // カウントが一定時間経ったら
@@ -339,8 +344,8 @@ void UpdateObject(void)
 						break;				// 抜け出す(吹っ飛んでいる状態)
 					}
 
-					// 地面に接しているか
-					LandObject(&g_aObject[nCntObject].pos, &g_aObject[nCntObject].smash.move, &g_aObject[nCntObject].smash.bJump);
+					//// 地面に接しているか
+					//LandObject(&g_aObject[nCntObject].pos, &g_aObject[nCntObject].smash.move, &g_aObject[nCntObject].smash.bJump);
 
 					if (g_aObject[nCntObject].pos.y <= 0.0f)
 					{ // 地面よりも下に行ったら
@@ -771,7 +776,7 @@ void HitObject(Object *pObject, int nDamage)
 					// がれきの設定処理
 					SetJunk
 					(
-						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -780,7 +785,7 @@ void HitObject(Object *pObject, int nDamage)
 					// がれきの設定処理
 					SetJunk
 					(
-						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -789,7 +794,7 @@ void HitObject(Object *pObject, int nDamage)
 					// がれきの設定処理
 					SetJunk
 					(
-						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -798,7 +803,7 @@ void HitObject(Object *pObject, int nDamage)
 					// がれきの設定処理
 					SetJunk
 					(
-						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * 0.5f), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
+						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -818,7 +823,7 @@ void HitObject(Object *pObject, int nDamage)
 					// がれきの設定処理
 					SetJunk
 					(
-						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -826,7 +831,7 @@ void HitObject(Object *pObject, int nDamage)
 
 					SetJunk
 					(
-						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -834,7 +839,7 @@ void HitObject(Object *pObject, int nDamage)
 
 					SetJunk
 					(
-						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -842,7 +847,7 @@ void HitObject(Object *pObject, int nDamage)
 
 					SetJunk
 					(
-						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * 0.5f), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
+						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
@@ -1412,7 +1417,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 //======================================================================================================================
 // 吹っ飛ぶオブジェクトとの当たり判定
 //======================================================================================================================
-void SmashCollision(D3DXVECTOR3 pos, float fRadius)
+void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed)
 {
 	float fLength;			// 長さ
 	float fAngle;			// 向き
@@ -1438,9 +1443,9 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius)
 				g_aObject[nCntObject].smash.State = SMASHSTATE_ON;
 
 				// 向きの移動量を設定する
-				g_aObject[nCntObject].smash.rotMove.x = SMASH_ROTMOVE_X;
-				g_aObject[nCntObject].smash.rotMove.y = SMASH_ROTMOVE_Y;
-				g_aObject[nCntObject].smash.rotMove.z = SMASH_ROTMOVE_Z;
+				g_aObject[nCntObject].smash.rotMove.x = (float)((rand() % SMASH_ROTMOVE_X - SMASH_ROTMOVE_HALF_X) / 100.0f);
+				g_aObject[nCntObject].smash.rotMove.y = (float)((rand() % SMASH_ROTMOVE_Y - SMASH_ROTMOVE_HALF_Y) / 100.0f);
+				g_aObject[nCntObject].smash.rotMove.z = (float)((rand() % SMASH_ROTMOVE_Z - SMASH_ROTMOVE_HALF_Z) / 100.0f);
 
 				if (fAngle <= 0.0f)
 				{ // 角度が右側だった場合
@@ -1451,9 +1456,9 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius)
 					RotNormalize(&fAngle);
 
 					//オブジェクトを吹き飛ばす
-					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH;
+					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH_MAGNI * fSpeed;
 					g_aObject[nCntObject].smash.move.y = cosf(D3DX_PI * SMASH_ANGLE) * SMASH_HEIGHT;
-					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH;
+					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH_MAGNI * fSpeed;
 				}
 				else
 				{ // 上記以外
@@ -1464,9 +1469,9 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius)
 					RotNormalize(&fAngle);
 
 					//オブジェクトを吹き飛ばす
-					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH;
+					g_aObject[nCntObject].smash.move.x = -sinf(fAngle) * SMASH_WIDTH_MAGNI * fSpeed;
 					g_aObject[nCntObject].smash.move.y = cosf(D3DX_PI * SMASH_ANGLE) * SMASH_HEIGHT;
-					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH;
+					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH_MAGNI * fSpeed;
 				}
 			}
 		}

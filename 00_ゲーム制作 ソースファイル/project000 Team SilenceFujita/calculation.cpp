@@ -229,7 +229,7 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 		TxtSetAI();
 	}
 
-	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
+	for (int nCntHuman = 0; nCntHuman < 64; nCntHuman++)
 	{
 		SetHuman(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}

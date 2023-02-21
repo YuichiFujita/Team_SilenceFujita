@@ -151,9 +151,6 @@ void UpdateCar(void)
 				// 前回位置の更新
 				g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;
 
-				// オブジェクトの着地の更新処理
-				LandObject(&g_aCar[nCntCar].pos, &g_aCar[nCntCar].move, &g_aCar[nCntCar].bJump);
-
 				//----------------------------------------------------
 				//	影の更新
 				//----------------------------------------------------

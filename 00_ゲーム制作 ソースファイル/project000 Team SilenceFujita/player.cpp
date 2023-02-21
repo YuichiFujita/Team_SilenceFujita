@@ -523,7 +523,8 @@ void UpdateNormalPlayer(void)
 	SmashCollision
 	( // 引数
 		g_player.pos, 
-		g_player.modelData.fRadius
+		g_player.modelData.fRadius,
+		g_player.move.x
 	);				
 
 	// ゲートとの当たり判定
@@ -684,7 +685,8 @@ void UpdateOverPlayer(void)
 	SmashCollision
 	( // 引数
 		g_player.pos, 
-		g_player.modelData.fRadius
+		g_player.modelData.fRadius,
+		g_player.move.x
 	);				
 
 	// ゲートとの当たり判定
