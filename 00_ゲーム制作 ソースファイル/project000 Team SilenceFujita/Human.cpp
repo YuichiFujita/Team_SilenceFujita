@@ -115,6 +115,9 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;				// アイコンのインデックス
 		g_aHuman[nCntHuman].icon.state = ICONSTATE_NONE;			// アイコンの状態
 
+		// 移動の種類
+		g_aHuman[nCntHuman].typeMove = MOVETYPE_STOP;
+
 		for (int nCntCur = 0; nCntCur < MAX_HUMAN_CURVE; nCntCur++)
 		{
 			g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[nCntCur] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 曲がり角の位置
@@ -195,15 +198,23 @@ void UpdateHuman(void)
 			{
 			case HUMANSTATE_WALK:		//歩き状態
 
-				//人間のカーブ処理
-				CurveHuman(&g_aHuman[nCntHuman]);
+				if (g_aHuman[nCntHuman].typeMove == MOVETYPE_MOVE)
+				{ // 動く種類の場合
+
+					//人間のカーブ処理
+					CurveHuman(&g_aHuman[nCntHuman]);
+				}
 
 				break;					//抜け出す
 
 			case HUMANSTATE_STOP:		//止まった状態
 
-				// 人間の停止処理
-				StopHuman(&g_aHuman[nCntHuman]);
+				if (g_aHuman[nCntHuman].typeMove == MOVETYPE_MOVE)
+				{ // 動く種類の場合
+
+					// 人間の停止処理
+					StopHuman(&g_aHuman[nCntHuman]);
+				}
 
 				break;					//抜け出す
 
@@ -215,7 +226,8 @@ void UpdateHuman(void)
 
 				if (g_aHuman[nCntHuman].pos.y <= 0.0f)
 				{ // 位置が0.0f以下になった場合
-					//使用していない
+
+					// 使用していない
 					g_aHuman[nCntHuman].bUse = false;
 				}
 
@@ -223,12 +235,12 @@ void UpdateHuman(void)
 			}
 
 			if (g_aHuman[nCntHuman].pos.y < 0.0f)
-			{//Y軸の位置が0.0fだった場合
+			{ // Y軸の位置が0.0fだった場合
 
-				//縦への移動量を0.0fにする
+				// 縦への移動量を0.0fにする
 				g_aHuman[nCntHuman].move.y = 0.0f;
 
-				//位置を0.0fに戻す
+				// 位置を0.0fに戻す
 				g_aHuman[nCntHuman].pos.y = 0.0f;
 			}
 
@@ -478,6 +490,9 @@ void SetHuman(D3DXVECTOR3 pos)
 					&g_aHuman[nCntHuman].icon.state
 				);
 			}
+
+			// 移動の種類を設定する
+			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(rand() % MOVETYPE_MAX);
 
 			// 処理を抜ける
 			break;
