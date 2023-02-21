@@ -9,8 +9,10 @@
 //**********************************************************************************************************************
 #include "weather.h"
 #include "game.h"
+
 #include "camera.h"
 #include "player.h"
+#include "flash.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -1040,6 +1042,9 @@ void SetThunder(D3DXVECTOR3 pos, D3DXVECTOR2 fRadius)
 	// ポインタを宣言
 	VERTEX_3D *pVtx;	// 頂点情報へのポインタ
 
+	D3DXVECTOR3 Playerpos = GetPlayer()->pos;		// プレイヤーの位置
+	float fDist;		// 距離の変数
+
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffThunder->Lock(0, 0, (void**)&pVtx, 0);
 
@@ -1056,6 +1061,17 @@ void SetThunder(D3DXVECTOR3 pos, D3DXVECTOR2 fRadius)
 
 			// ずらす幅をランダムで変える
 			g_aThunder[nCntWeather].fShiftWidth = (float)(rand() % 300 + 100.0f);
+
+			// 距離を測る
+			fDist = sqrtf((Playerpos.x - g_aThunder[nCntWeather].pos.x) * (Playerpos.x - g_aThunder[nCntWeather].pos.x)
+				+ (Playerpos.z - g_aThunder[nCntWeather].pos.z) * (Playerpos.z - g_aThunder[nCntWeather].pos.z));
+
+			if (fDist <= 33000.0f)
+			{ // 距離が一定以内だった場合
+
+				// フラッシュの設定処理
+				SetFlash();
+			}
 
 			// 使用している状態にする
 			g_aThunder[nCntWeather].bUse = true;

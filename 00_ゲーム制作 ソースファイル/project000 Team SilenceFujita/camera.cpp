@@ -77,7 +77,7 @@
 #define RANK_POS_Z_ROAD_THREE	(11000.0f)		// 三つ目の道路の視点の位置
 
 #define RANK_ROT_ROAD_ONE		(0)					// 一つ目の道路の角度
-#define RANK_ROT_ROAD_TWO		(D3DX_PI * 0.5f)	// 二つ目の道路の角度
+#define RANK_ROT_ROAD_TWO		(-D3DX_PI * 0.5f)	// 二つ目の道路の角度
 #define RANK_ROT_ROAD_THREE		(-D3DX_PI)			// 三つ目の道路の角度
 
 #define RANK_POS_MOVE_ROAD		(10.0f)		// 道路の移動量
@@ -128,6 +128,7 @@ void InitCamera(void)
 {
 	MODE mode = GetMode();					// モードの状態
 	g_roadType = ROADTYPE(rand() % int(ROAD_CAMERA_TYPE_MAX));
+	g_roadType = ROADTYPE(1);
 
 	switch (mode)
 	{
@@ -593,7 +594,76 @@ void UpdateCamera(void)
 		g_aCamera[CAMERATYPE_MAIN].posR.z = g_aCamera[CAMERATYPE_MAIN].posV.z + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * g_aCamera[CAMERATYPE_MAIN].fDis;
 
 		break;						// 抜け出す
-}
+
+	case MODE_RANKING:				// ランキング
+									//道路ごとの移動量を設定
+		switch (g_roadType)
+		{
+		case ROAD_CAMERA_TYPE_ONE:	//一つ目の道路
+
+			g_aCamera[CAMERATYPE_MAIN].posV.z += RANK_POS_MOVE_ROAD;
+			g_aCamera[CAMERATYPE_MAIN].posR.z += RANK_POS_MOVE_ROAD;
+
+			if (g_aCamera[CAMERATYPE_MAIN].posV.z >= RANK_POS_END_ROAD_ONE)
+			{
+				//画面を遷移させる
+				SetRankingRoadTrance();
+			}
+			break;
+
+		case ROAD_CAMERA_TYPE_TWO:	//二つ目の道路
+
+			g_aCamera[CAMERATYPE_MAIN].posV.x -= RANK_POS_MOVE_ROAD;
+			g_aCamera[CAMERATYPE_MAIN].posR.x -= RANK_POS_MOVE_ROAD;
+
+			//道路の終着点を判定
+			if (g_aCamera[CAMERATYPE_MAIN].posV.x <= RANK_POS_END_ROAD_TWO)
+			{
+				//画面を遷移させる
+				SetRankingRoadTrance();
+			}
+			break;
+
+		case ROAD_CAMERA_TYPE_THREE://三つ目の道路
+
+			g_aCamera[CAMERATYPE_MAIN].posV.z -= RANK_POS_MOVE_ROAD;
+			g_aCamera[CAMERATYPE_MAIN].posR.z -= RANK_POS_MOVE_ROAD;
+			//道路の終着点を判定
+			if (g_aCamera[CAMERATYPE_MAIN].posV.z <= RANK_POS_END_ROAD_THREE)
+			{
+				//画面を遷移させる
+				SetRankingRoadTrance();
+			}
+
+			break;
+
+		}
+
+
+		// 前回の位置を記録する
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;
+
+		if (g_aCamera[CAMERATYPE_MAIN].rot.y > D3DX_PI)
+		{//角度が3.14fより大きかった場合
+		 //角度から1周分減らす
+			g_aCamera[CAMERATYPE_MAIN].rot.y -= (2 * D3DX_PI);
+		}
+		else if (g_aCamera[CAMERATYPE_MAIN].rot.y < -D3DX_PI)
+		{//角度が-3.14fより小さかった場合
+		 //角度に1周分加える
+			g_aCamera[CAMERATYPE_MAIN].rot.y += (2 * D3DX_PI);
+		}
+
+		//カメラの視点を更新する
+		g_aCamera[CAMERATYPE_MAIN].posV.x = g_aCamera[CAMERATYPE_MAIN].posR.x + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * -g_aCamera[CAMERATYPE_MAIN].fDis;
+		g_aCamera[CAMERATYPE_MAIN].posV.z = g_aCamera[CAMERATYPE_MAIN].posR.z + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * -g_aCamera[CAMERATYPE_MAIN].fDis;
+
+		//カメラの注視点を更新する
+		g_aCamera[CAMERATYPE_MAIN].posR.x = g_aCamera[CAMERATYPE_MAIN].posV.x + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * g_aCamera[CAMERATYPE_MAIN].fDis;
+		g_aCamera[CAMERATYPE_MAIN].posR.z = g_aCamera[CAMERATYPE_MAIN].posV.z + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * g_aCamera[CAMERATYPE_MAIN].fDis;
+
+		break;						// 抜け出す
+	}
 
 	// マップカメラの位置の更新
 	MoveMiniMap();

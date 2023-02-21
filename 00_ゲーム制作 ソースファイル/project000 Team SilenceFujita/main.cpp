@@ -813,6 +813,9 @@ void TxtSetStage(void)
 	// 変数を宣言
 	int        nEnd;			// テキスト読み込み終了の確認用
 	StageLimit stageLimit;		// ステージの移動範囲の代入用
+	D3DXVECTOR3 pos;			// 位置
+	D3DXVECTOR3 rot;			// 向き
+	ROTSTATE	stateRot;		// 向きの状態
 
 	// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
@@ -873,6 +876,50 @@ void TxtSetStage(void)
 
 				// ステージの移動範囲の設定
 				SetLimitStage(stageLimit);
+			}
+
+			//------------------------------------------------
+			//	ゲートの設定処理
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_GATE") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_GATE の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_GATE ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_GATE") == 0)
+					{ // 読み込んだ文字列が SET_GATE の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_GATE ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);			// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "COLLROT") == 0)
+							{ // 読み込んだ文字列が COLLROT の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%d", &stateRot);								// 向き状態を読み込む
+							}
+						} while (strcmp(&aString[0], "END_SET_GATE") != 0);	// 読み込んだ文字列が END_SET_GATE ではない場合ループ
+
+						// ゲートの設定処理
+						SetGate(pos, rot, stateRot);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
 		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
 		

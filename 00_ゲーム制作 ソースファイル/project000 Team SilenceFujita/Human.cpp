@@ -490,16 +490,15 @@ void SetHuman(D3DXVECTOR3 pos)
 			// 影の位置設定
 			SetPositionShadow(g_aHuman[nCntHuman].nShadowID, g_aHuman[nCntHuman].pos, g_aHuman[nCntHuman].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
+			// 移動の種類を設定する
+			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(rand() % MOVETYPE_MAX);
+
 			// 曲がり角情報の設置
 			g_aHuman[nCntHuman].curveInfo.actionState  = HUMANACT_WALK;												// 状態
 			g_aHuman[nCntHuman].curveInfo.nRandamRoute = rand() % MAX_HUMAN_ROUTE;									// ルートの種類
 			g_aHuman[nCntHuman].curveInfo.rotDest      = g_aHuman[nCntHuman].rot;									// 目標の向き
 			g_aHuman[nCntHuman].rot.y                  = GetDefaultRot(g_aHuman[nCntHuman].curveInfo.nRandamRoute);	// 初期の向き
 			g_aHuman[nCntHuman].curveInfo.curveInfo    = GetHumanRoute(g_aHuman[nCntHuman].curveInfo.nRandamRoute);	// ルート
-
-			// アイコンの情報の初期化
-			g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;		// アイコンのインデックス
-			g_aHuman[nCntHuman].icon.state   = ICONSTATE_NONE;	// アイコンの状態
 
 			switch (g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[0])
 			{
@@ -541,6 +540,10 @@ void SetHuman(D3DXVECTOR3 pos)
 
 				g_aHuman[nCntHuman].judge.state = JUDGESTATE_EVIL;			// 善悪
 				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
+
+				// アイコンの情報の初期化
+				g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;				// アイコンのインデックス
+				g_aHuman[nCntHuman].icon.state = ICONSTATE_NONE;			// アイコンの状態
 			}
 			else
 			{ // 良い奴だった場合
@@ -562,9 +565,6 @@ void SetHuman(D3DXVECTOR3 pos)
 					&g_aHuman[nCntHuman].icon.state
 				);
 			}
-
-			// 移動の種類を設定する
-			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(rand() % MOVETYPE_MAX);
 
 			// 処理を抜ける
 			break;
