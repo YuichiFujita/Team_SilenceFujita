@@ -418,46 +418,21 @@ void SetHuman(D3DXVECTOR3 pos)
 			// 影の位置設定
 			SetPositionShadow(g_aHuman[nCntHuman].nShadowID, g_aHuman[nCntHuman].pos, g_aHuman[nCntHuman].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			// 曲がり角情報の設置
-			g_aHuman[nCntHuman].curveInfo.actionState = HUMANACT_WALK;			// 状態
-			g_aHuman[nCntHuman].curveInfo.nRandamRoute = rand() % MAX_HUMAN_ROUTE;		// ルートの種類
-			g_aHuman[nCntHuman].curveInfo.rotDest = g_aHuman[nCntHuman].rot;	// 目標の向き
-			g_aHuman[nCntHuman].rot.y = GetDefaultRot(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// 初期の向き
-			g_aHuman[nCntHuman].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// ルート
+			// 移動の種類を設定する
+			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(rand() % MOVETYPE_MAX);
 
-			// アイコンの情報の初期化
-			g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;				// アイコンのインデックス
-			g_aHuman[nCntHuman].icon.state = ICONSTATE_NONE;			// アイコンの状態
+			if (g_aHuman[nCntHuman].typeMove == MOVETYPE_MOVE)
+			{ // 動く種類の場合
 
-			switch (g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[0])
-			{
-			case DASH_RIGHT:	// 右に向かって走っている
+				// 曲がり角情報の設置
+				g_aHuman[nCntHuman].curveInfo.actionState	= HUMANACT_WALK;					// 状態
+				g_aHuman[nCntHuman].curveInfo.nRandamRoute	= rand() % MAX_HUMAN_ROUTE;			// ルートの種類
+				g_aHuman[nCntHuman].curveInfo.rotDest		= g_aHuman[nCntHuman].rot;			// 目標の向き
+				g_aHuman[nCntHuman].rot.y					= GetDefaultRot(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// 初期の向き
+				g_aHuman[nCntHuman].curveInfo.curveInfo		= GetHumanRoute(g_aHuman[nCntHuman].curveInfo.nRandamRoute);		// ルート
 
 				// 位置を補正する
-				g_aHuman[nCntHuman].pos.z = g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[0].z - (HUMAN_WIDTH * 2);
-
-				break;			// 抜け出す
-
-			case DASH_LEFT:		// 左に向かって走っている
-
-				// 位置を補正する
-				g_aHuman[nCntHuman].pos.z = g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[0].z + (HUMAN_WIDTH * 2);
-
-				break;			// 抜け出す
-
-			case DASH_FAR:		// 奥に向かって走っている
-
-				// 位置を補正する
-				g_aHuman[nCntHuman].pos.x = g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[0].x + (HUMAN_WIDTH * 2);
-
-				break;			// 抜け出す
-
-			case DASH_NEAR:		// 手前に向かって走っている
-
-				// 位置を補正する
-				g_aHuman[nCntHuman].pos.x = g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[0].x - (HUMAN_WIDTH * 2);
-
-				break;			// 抜け出す
+				g_aHuman[nCntHuman].pos = g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[0];
 			}
 
 			// ジャッジの情報の設定
@@ -469,6 +444,10 @@ void SetHuman(D3DXVECTOR3 pos)
 
 				g_aHuman[nCntHuman].judge.state = JUDGESTATE_EVIL;				// 善悪
 				g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;		// チカチカ状態
+
+				// アイコンの情報の初期化
+				g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;				// アイコンのインデックス
+				g_aHuman[nCntHuman].icon.state = ICONSTATE_NONE;			// アイコンの状態
 			}
 			else
 			{ // 良い奴だった場合
@@ -490,9 +469,6 @@ void SetHuman(D3DXVECTOR3 pos)
 					&g_aHuman[nCntHuman].icon.state
 				);
 			}
-
-			// 移動の種類を設定する
-			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(rand() % MOVETYPE_MAX);
 
 			// 処理を抜ける
 			break;
