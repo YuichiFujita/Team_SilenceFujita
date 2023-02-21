@@ -568,6 +568,19 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				// 透明度を設定する
 				g_aObject[nCntObject].appear.fAlpha = 0.0f;							
 			}
+			else
+			{ // 一瞬で出てくる状態だった場合
+
+				// 最大値を反映する
+				g_aObject[nCntObject].modelData.vtxMax.x *= g_aObject[nCntObject].scale.x;
+				g_aObject[nCntObject].modelData.vtxMax.y *= g_aObject[nCntObject].scale.y;
+				g_aObject[nCntObject].modelData.vtxMax.z *= g_aObject[nCntObject].scale.z;
+
+				// 最小値を反映する
+				g_aObject[nCntObject].modelData.vtxMin.x *= g_aObject[nCntObject].scale.x;
+				g_aObject[nCntObject].modelData.vtxMin.y *= g_aObject[nCntObject].scale.y;
+				g_aObject[nCntObject].modelData.vtxMin.z *= g_aObject[nCntObject].scale.z;
+			}
 
 			// オブジェクトの情報を初期化
 			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態
@@ -636,16 +649,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				// マテリアルをコピーする
 				g_aObject[nCntObject].matCopy[nCntMat] = *pMatModel;
 			}
-
-			// 最大値を反映する
-			g_aObject[nCntObject].modelData.vtxMax.x *= g_aObject[nCntObject].scale.x;
-			g_aObject[nCntObject].modelData.vtxMax.y *= g_aObject[nCntObject].scale.y;
-			g_aObject[nCntObject].modelData.vtxMax.z *= g_aObject[nCntObject].scale.z;
-
-			// 最小値を反映する
-			g_aObject[nCntObject].modelData.vtxMin.x *= g_aObject[nCntObject].scale.x;
-			g_aObject[nCntObject].modelData.vtxMin.y *= g_aObject[nCntObject].scale.y;
-			g_aObject[nCntObject].modelData.vtxMin.z *= g_aObject[nCntObject].scale.z;
 
 			for (int nCntMat = 0; nCntMat < (int)g_aObject[nCntObject].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す

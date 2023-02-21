@@ -14,6 +14,7 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
+#include "flash.h"
 #include "gate.h"
 #include "Human.h"
 #include "icon.h"
@@ -413,6 +414,9 @@ void InitResultChunk(void)
 
 	// アイコンの初期化
 	InitIcon();
+
+	// フラッシュの初期化
+	InitFlash();
 }
 
 //==================================================================================
@@ -425,6 +429,9 @@ void UninitResultChunk(void)
 
 	// アイコンの終了
 	UninitIcon();
+
+	// フラッシュの終了
+	UninitFlash();
 }
 
 //==================================================================================
