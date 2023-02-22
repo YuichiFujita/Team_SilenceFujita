@@ -195,8 +195,11 @@ void UpdateCar(void)
 				}
 			}
 
-			if (GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
-			{ // バリアセット状態じゃなかった場合
+			if (GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_NONE	 ||
+				GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_FLY	 ||
+				GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_HOMING ||
+				GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_LAND)
+			{ // バリアが展開されてなかった場合
 
 				// ボム中のカウントを初期化する
 				g_aCar[nCntCar].nBombCount = 0;

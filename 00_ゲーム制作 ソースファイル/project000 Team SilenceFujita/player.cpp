@@ -198,11 +198,6 @@ void UpdatePlayer(void)
 			// クリア失敗時のプレイヤー更新
 			UpdateOverPlayer();
 		}
-
-		if (GetWeather() == WEATHERTYPE_RAIN || GetWeather() == WEATHERTYPE_THUNDER)
-		{ // 雨もしくは雷雨の場合
-			
-		}
 	}
 }
 
@@ -1110,6 +1105,30 @@ void UpdateBoost(void)
 			// タイヤ痕を出す
 			SetTireMark(D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
 				g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
+
+			if (GetWeather() == WEATHERTYPE_RAIN || GetWeather() == WEATHERTYPE_THUNDER)
+			{ // 雨もしくは雷雨の場合
+
+				// 雨の水しぶきのエフェクト
+				SetParticle
+				(
+					D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f),
+					D3DXCOLOR(0.3f, 0.3f, 1.0f, 1.0f),
+					PARTICLETYPE_RAINSPRAY,
+					SPAWN_PARTICLE_RAINSPRAY,
+					2
+				);
+
+				// 雨の水しぶきのエフェクト
+				SetParticle
+				(
+					D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y, g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f),
+					D3DXCOLOR(0.3f, 0.3f, 1.0f, 1.0f),
+					PARTICLETYPE_RAINSPRAY,
+					SPAWN_PARTICLE_RAINSPRAY,
+					2
+				);
+			}
 		}
 		else
 		{ // カウンターが 0以下の場合
