@@ -309,6 +309,7 @@ void UpdateHuman(void)
 void DrawHuman(void)
 {
 	// 変数を宣言
+	float        humanRot;						// 人間の向きの計算用
 	D3DXMATRIX   mtxRot, mtxTrans;				// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 	D3DXMATRIX   mtxRotParts, mtxTransParts;	// 階層構造の計算用マトリックス
@@ -329,8 +330,12 @@ void DrawHuman(void)
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aHuman[nCntHuman].mtxWorld);
 
+			// 人間の向きを設定
+			humanRot = g_aHuman[nCntHuman].rot.y + D3DX_PI;
+			RotNormalize(&humanRot);	// 向きを正規化
+
 			// 向きを反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aHuman[nCntHuman].rot.y + D3DX_PI, g_aHuman[nCntHuman].rot.x, g_aHuman[nCntHuman].rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, humanRot, g_aHuman[nCntHuman].rot.x, g_aHuman[nCntHuman].rot.z);
 			D3DXMatrixMultiply(&g_aHuman[nCntHuman].mtxWorld, &g_aHuman[nCntHuman].mtxWorld, &mtxRot);
 
 			// 位置を反映
