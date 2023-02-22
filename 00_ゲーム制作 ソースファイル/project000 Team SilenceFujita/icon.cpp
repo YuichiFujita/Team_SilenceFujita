@@ -25,6 +25,10 @@
 #define POLICE_ICON_RADIUS	(100.0f)	// 警察のアイコンの半径
 #define POLICE_ICON_COL		(D3DXCOLOR(0.2f, 0.2f, 1.0f, 1.0f))		// 警察のアイコンの色
 
+#define BARRIER_ICON_SET_RADIUS		(0.0f)	// アイコンの設定時の半径
+#define BARRIER_ICON_RADIUS	(140.0f)	// バリアのアイコンの半径
+#define BARRIER_ICON_COL	(D3DXCOLOR(0.4f,1.0f,1.0f,1.0f))		// バリアのアイコンの色
+
 #define ICON_CORRECT_RIGHT	(4000.0f)	// アイコンの右側の補正係数
 #define ICON_CORRECT_LEFT	(4000.0f)	// アイコンの左側の補正係数
 #define ICON_CORRECT_FAR	(3800.0f)	// アイコンの奥側の補正係数
@@ -34,6 +38,7 @@
 #define ICON_REVIVAL_CNT	(20)		// 復活中のカウント
 #define ICON_DAMAGE_COL		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))		// ダメージ時の色
 #define ICON_UNRIVALED_CNT	(10)		// 無敵状態のカウント
+#define ICON_SCALE_CHANGE	(10.0f);	// 拡大縮小時の半径の拡大率
 
 //************************************************************
 //	グローバル変数
@@ -90,7 +95,7 @@ void InitIcon(void)
 	for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
 	{ // アイコンの最大表示数分繰り返す
 
-	  // 頂点座標の設定
+		// 頂点座標の設定
 		pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		pVtx[1].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		pVtx[2].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -302,32 +307,76 @@ void UpdateIcon(void)
 					g_aIcon[nCntIcon].col.a = 0.4f;
 
 					break;					// 抜け出す
+
+				case ICONSTATE_ENLARGE:		// 拡大状態
+
+					if (g_aIcon[nCntIcon].fRadius <= BARRIER_ICON_RADIUS)
+					{ // 一定の半径未満だった場合
+
+						// アイコンの半径に加算する
+						g_aIcon[nCntIcon].fRadius += ICON_SCALE_CHANGE;
+					}
+					else
+					{ // 一定の半径だった場合
+
+						// アイコンの半径に加算する
+						g_aIcon[nCntIcon].fRadius = BARRIER_ICON_RADIUS;
+					}
+
+					break;					// 抜け出す
+
+				case ICONSTATE_REDUCE:		// 縮小状態
+
+					if (g_aIcon[nCntIcon].fRadius >= 0.0f)
+					{ // 一定の半径未満だった場合
+
+						// アイコンの半径に加算する
+						g_aIcon[nCntIcon].fRadius -= ICON_SCALE_CHANGE;
+					}
+					else
+					{ // 一定の半径だった場合
+
+						// アイコンの半径に加算する
+						g_aIcon[nCntIcon].fRadius = 0.0f;
+					}
+
+					break;					// 抜け出す
 				}
 
-				if (cameraPos.x + ICON_CORRECT_RIGHT <= g_aIcon[nCntIcon].pos.x + g_aIcon[nCntIcon].fRadius)
-				{ // 右側よりも外側にアイコンがある場合
-					// アイコンを補正する
-					g_aIcon[nCntIcon].pos.x = cameraPos.x + ICON_CORRECT_RIGHT - g_aIcon[nCntIcon].fRadius;
-				}
+				if (g_aIcon[nCntIcon].type != ICONTYPE_BARRIER)
+				{ // バリアのアイコン以外の場合
 
-				if (cameraPos.x - ICON_CORRECT_LEFT >= g_aIcon[nCntIcon].pos.x - g_aIcon[nCntIcon].fRadius)
-				{ // 左側よりも外側にアイコンがある場合
-					// アイコンを補正する
-					g_aIcon[nCntIcon].pos.x = cameraPos.x - ICON_CORRECT_LEFT + g_aIcon[nCntIcon].fRadius;
-				}
+					if (cameraPos.x + ICON_CORRECT_RIGHT <= g_aIcon[nCntIcon].pos.x + g_aIcon[nCntIcon].fRadius)
+					{ // 右側よりも外側にアイコンがある場合
+						// アイコンを補正する
+						g_aIcon[nCntIcon].pos.x = cameraPos.x + ICON_CORRECT_RIGHT - g_aIcon[nCntIcon].fRadius;
+					}
 
-				if (cameraPos.z + ICON_CORRECT_FAR <= g_aIcon[nCntIcon].pos.z + g_aIcon[nCntIcon].fRadius)
-				{ // 奥側よりも外側にアイコンがある場合
-					// アイコンを補正する
-					g_aIcon[nCntIcon].pos.z = cameraPos.z + ICON_CORRECT_FAR - g_aIcon[nCntIcon].fRadius;
-				}
+					if (cameraPos.x - ICON_CORRECT_LEFT >= g_aIcon[nCntIcon].pos.x - g_aIcon[nCntIcon].fRadius)
+					{ // 左側よりも外側にアイコンがある場合
+						// アイコンを補正する
+						g_aIcon[nCntIcon].pos.x = cameraPos.x - ICON_CORRECT_LEFT + g_aIcon[nCntIcon].fRadius;
+					}
 
-				if (cameraPos.z - ICON_CORRECT_NEAR >= g_aIcon[nCntIcon].pos.z - g_aIcon[nCntIcon].fRadius)
-				{ // 手前側よりも外側にアイコンがある場合
-					// アイコンを補正する
-					g_aIcon[nCntIcon].pos.z = cameraPos.z - ICON_CORRECT_NEAR + g_aIcon[nCntIcon].fRadius;
+					if (cameraPos.z + ICON_CORRECT_FAR <= g_aIcon[nCntIcon].pos.z + g_aIcon[nCntIcon].fRadius)
+					{ // 奥側よりも外側にアイコンがある場合
+						// アイコンを補正する
+						g_aIcon[nCntIcon].pos.z = cameraPos.z + ICON_CORRECT_FAR - g_aIcon[nCntIcon].fRadius;
+					}
+
+					if (cameraPos.z - ICON_CORRECT_NEAR >= g_aIcon[nCntIcon].pos.z - g_aIcon[nCntIcon].fRadius)
+					{ // 手前側よりも外側にアイコンがある場合
+						// アイコンを補正する
+						g_aIcon[nCntIcon].pos.z = cameraPos.z - ICON_CORRECT_NEAR + g_aIcon[nCntIcon].fRadius;
+					}
 				}
 			}
+
+			//頂点座標の設定
+			pVtx[0].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].fRadius, +0.0f, +g_aIcon[nCntIcon].fRadius);
+			pVtx[1].pos = D3DXVECTOR3(+g_aIcon[nCntIcon].fRadius, +0.0f, +g_aIcon[nCntIcon].fRadius);
+			pVtx[2].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].fRadius, +0.0f, -g_aIcon[nCntIcon].fRadius);
+			pVtx[3].pos = D3DXVECTOR3(+g_aIcon[nCntIcon].fRadius, +0.0f, -g_aIcon[nCntIcon].fRadius);
 
 			// 頂点カラーの設定
 			pVtx[0].col = g_aIcon[nCntIcon].col;
@@ -464,6 +513,16 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 
 				// 色を設定
 				g_aIcon[nCntIcon].col = POLICE_ICON_COL;
+
+				break;				// 抜け出す
+
+			case ICONTYPE_BARRIER:	// バリア
+
+				// 半径を設定
+				g_aIcon[nCntIcon].fRadius = BARRIER_ICON_SET_RADIUS;
+
+				// 色を設定
+				g_aIcon[nCntIcon].col = BARRIER_ICON_COL;
 
 				break;				// 抜け出す
 			}

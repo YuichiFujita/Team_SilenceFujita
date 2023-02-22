@@ -419,7 +419,7 @@ void DrawHuman(void)
 						{ // ˆ«‚¢“z‚Ìê‡
 
 							// ©ŒÈ”­Œõ‚ğ‘ã“ü‚·‚é
-							evilMat.MatD3D.Diffuse = g_aHuman[nCntHuman].judge.col;
+							evilMat.MatD3D.Emissive = g_aHuman[nCntHuman].judge.col;
 
 							// ƒ}ƒeƒŠƒAƒ‹‚Ìİ’è
 							pDevice->SetMaterial(&evilMat.MatD3D);

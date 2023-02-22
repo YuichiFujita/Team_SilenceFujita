@@ -247,7 +247,10 @@ void UpdatePolice(void)
 
 			}
 
-			if (GetBarrierState(&g_aPolice[nCntPolice]) != BARRIERSTATE_SET)
+			if (GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_NONE   ||
+				GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_FLY	   ||
+				GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_HOMING ||
+				GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_LAND)
 			{ // バリアセット状態じゃなかった場合
 				if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC)
 				{ // 渋滞状態じゃない場合

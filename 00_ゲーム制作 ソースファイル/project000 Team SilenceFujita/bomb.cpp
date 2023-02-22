@@ -15,6 +15,7 @@
 #include "police.h"
 
 #include "input.h"
+#include "icon.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -88,6 +89,7 @@ typedef struct
 	Model        modelData;	// モデル情報
 	void        *pCar;		// 車アドレス
 	int          nCounter;	// 状態管理カウンター
+	IconInfo	 icon;		// アイコンの情報
 	bool         bUse;		// 使用状況
 }Barrier;
 
@@ -154,6 +156,10 @@ void InitBomb(void)
 		g_aBarrier[nCntBarrier].pCar      = NULL;									// 車アドレス
 		g_aBarrier[nCntBarrier].nCounter  = 0;										// バリアカウンター
 		g_aBarrier[nCntBarrier].bUse      = false;									// 使用状況
+
+		// アイコンの情報の初期化
+		g_aBarrier[nCntBarrier].icon.nIconID = NONE_ICON;		// アイコンのインデックス
+		g_aBarrier[nCntBarrier].icon.state = ICONSTATE_NONE;	// アイコンの状態
 	}
 }
 
@@ -469,6 +475,16 @@ void UpdateBarrierData(void)
 
 					// 拡大状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_ENLARGE;
+
+					// アイコンの設定処理
+					g_aBarrier[nCntBarrier].icon.nIconID = SetIcon
+					(
+						g_aBarrier[nCntBarrier].pos,
+						ICONTYPE_BARRIER,
+						&g_aBarrier[nCntBarrier].icon.nIconID,
+						&g_aBarrier[nCntBarrier].bUse,
+						&g_aBarrier[nCntBarrier].icon.state
+					);
 				}
 
 				// 処理を抜ける
@@ -483,6 +499,9 @@ void UpdateBarrierData(void)
 					g_aBarrier[nCntBarrier].scale.x += SCALE_CHANGE;
 					g_aBarrier[nCntBarrier].scale.y += SCALE_CHANGE;
 					g_aBarrier[nCntBarrier].scale.z += SCALE_CHANGE;
+
+					// アイコンの状態を拡大状態にする
+					g_aBarrier[nCntBarrier].icon.state = ICONSTATE_ENLARGE;
 				}
 				else
 				{ // 拡大率が一定値以上の場合
@@ -497,6 +516,9 @@ void UpdateBarrierData(void)
 
 					// 上昇状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_UP;
+
+					// アイコンの状態を通常状態にする
+					g_aBarrier[nCntBarrier].icon.state = ICONSTATE_NONE;
 				}
 
 				// 処理を抜ける
@@ -591,6 +613,9 @@ void UpdateBarrierData(void)
 					g_aBarrier[nCntBarrier].scale.x -= SCALE_CHANGE;
 					g_aBarrier[nCntBarrier].scale.y -= SCALE_CHANGE;
 					g_aBarrier[nCntBarrier].scale.z -= SCALE_CHANGE;
+
+					// アイコンの状態を縮小状態にする
+					g_aBarrier[nCntBarrier].icon.state = ICONSTATE_REDUCE;
 				}
 				else
 				{ // 拡大率が一定値以下の場合
@@ -650,6 +675,13 @@ void UpdateBarrierData(void)
 				// 処理を抜ける
 				break;
 			}
+
+			// アイコンの位置設定処理
+			SetPositionIcon
+			(
+				g_aBarrier[nCntBarrier].icon.nIconID, 
+				g_aBarrier[nCntBarrier].pos
+			);
 		}
 	}
 }

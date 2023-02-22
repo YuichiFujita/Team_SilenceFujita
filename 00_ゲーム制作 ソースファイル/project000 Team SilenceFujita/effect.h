@@ -18,6 +18,7 @@
 typedef enum
 {
 	EFFECTTYPE_SPARK = 0,	// ‰Î‰Ô
+	EFFECTTYPE_RAINSPRAY,	// …‚µ‚Ô‚«
 	EFFECTTYPE_NONE,		// ‚»‚Ì‘¼
 	EFECTTYPE_MAX			// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 }EFFECTTYPE;
