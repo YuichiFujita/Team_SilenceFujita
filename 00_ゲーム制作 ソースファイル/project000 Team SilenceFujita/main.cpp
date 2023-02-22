@@ -1225,7 +1225,7 @@ void TxtSetAI(void)
 
 						} while (strcmp(&aString[0], "END_SET_CAR") != 0);					// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
-																							// 車の設定
+						// 車の設定
 						SetCar(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
@@ -1259,7 +1259,7 @@ void TxtSetAI(void)
 
 						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);	// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
-																				// 人間の設定
+						// 人間の設定
 						SetHuman(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
@@ -1293,7 +1293,7 @@ void TxtSetAI(void)
 
 						} while (strcmp(&aString[0], "END_SET_POLICE") != 0);	// 読み込んだ文字列が END_SET_POLICE ではない場合ループ
 
-																				// 警察の設定
+						// 警察の設定
 						SetPolice(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_POLICE") != 0);		// 読み込んだ文字列が END_SETSTAGE_POLICE ではない場合ループ
