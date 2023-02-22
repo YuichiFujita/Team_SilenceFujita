@@ -22,6 +22,7 @@
 #include "life.h"
 #include "bomb.h"
 #include "wind.h"
+#include "weather.h"
 
 #include "meshfield.h"
 #include "Police.h"
@@ -196,6 +197,11 @@ void UpdatePlayer(void)
 
 			// クリア失敗時のプレイヤー更新
 			UpdateOverPlayer();
+		}
+
+		if (GetWeather() == WEATHERTYPE_RAIN || GetWeather() == WEATHERTYPE_THUNDER)
+		{ // 雨もしくは雷雨の場合
+			
 		}
 	}
 }
