@@ -157,10 +157,13 @@ void UpdatePolice(void)
 {
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
+
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
+
 			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
+
 				// 前回位置の更新
 				g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
@@ -308,6 +311,7 @@ void UpdatePolice(void)
 
 				if (g_aPolice[nCntPolice].pos.y < 0.0f)
 				{//Y軸の位置が0.0fだった場合
+
 					//縦への移動量を0.0fにする
 					g_aPolice[nCntPolice].move.y = 0.0f;
 
@@ -328,6 +332,7 @@ void UpdatePolice(void)
 void DrawPolice(void)
 {
 	// 変数を宣言
+	float        policeRot;						// 警察の向きの計算用
 	D3DXMATRIX   mtxScale, mtxRot, mtxTrans;	// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 
@@ -341,11 +346,16 @@ void DrawPolice(void)
 
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
+
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aPolice[nCntPolice].mtxWorld);
 
+			// 警察の向きを設定
+			policeRot = g_aPolice[nCntPolice].rot.y + D3DX_PI;
+			RotNormalize(&policeRot);	// 向きを正規化
+
 			// 向きを反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aPolice[nCntPolice].rot.y, g_aPolice[nCntPolice].rot.x, g_aPolice[nCntPolice].rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, policeRot, g_aPolice[nCntPolice].rot.x, g_aPolice[nCntPolice].rot.z);
 			D3DXMatrixMultiply(&g_aPolice[nCntPolice].mtxWorld, &g_aPolice[nCntPolice].mtxWorld, &mtxRot);
 
 			// 位置を反映

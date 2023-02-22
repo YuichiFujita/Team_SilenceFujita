@@ -30,6 +30,7 @@ const char *apTextureMeshField[] =		// テクスチャの相対パス
 	"data\\TEXTURE\\sidewalk000.png",		// 歩道のテクスチャの相対パス
 	"data\\TEXTURE\\Tile.jpg",				// タイルのテクスチャの相対パス
 	"data\\TEXTURE\\shopping_street.jpg",	// 商店街の道のテクスチャの相対パス
+	"data\\TEXTURE\\red_sidewalk.jpg",		// 歩道のテクスチャの相対パス
 };
 
 const D3DXCOLOR aColorMeshField[] =		// マップの地面カラー
@@ -38,6 +39,7 @@ const D3DXCOLOR aColorMeshField[] =		// マップの地面カラー
 	MAP_COL_ROAD,						// 曲がり角度のテクスチャの地面カラー
 	MAP_COL_ROAD,						// 交差点のテクスチャの地面カラー
 	MAP_COL_ROAD,						// 丁字路のテクスチャの地面カラー
+	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
 	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
 	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
 	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
@@ -55,6 +57,7 @@ typedef enum
 	TEXTURE_MESHFIELD_SIDEWALK,			// 歩道
 	TEXTURE_MESHFIELD_TILE,				// タイル
 	TEXTURE_MESHFIELD_SHOPPING_STREET,	// 商店街の道
+	TEXTURE_MESHFIELD_SIDEWALK2,			// 歩道
 	TEXTURE_MESHFIELD_MAX,				// この列挙型の総数
 } TEXTURE_MESHFIELD;
 

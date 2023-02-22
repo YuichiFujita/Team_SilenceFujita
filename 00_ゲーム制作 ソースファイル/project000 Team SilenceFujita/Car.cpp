@@ -290,6 +290,7 @@ void UpdateCar(void)
 void DrawCar(void)
 {
 	// 変数を宣言
+	float        carRot;						// 車の向きの計算用
 	D3DXMATRIX   mtxScale, mtxRot, mtxTrans;	// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 
@@ -304,11 +305,16 @@ void DrawCar(void)
 
 		if (g_aCar[nCntCar].bUse == true)
 		{ // オブジェクトが使用されている場合
+
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aCar[nCntCar].mtxWorld);
 
+			// 車の向きを設定
+			carRot = g_aCar[nCntCar].rot.y + D3DX_PI;
+			RotNormalize(&carRot);	// 向きを正規化
+
 			// 向きを反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aCar[nCntCar].rot.y, g_aCar[nCntCar].rot.x, g_aCar[nCntCar].rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, carRot, g_aCar[nCntCar].rot.x, g_aCar[nCntCar].rot.z);
 			D3DXMatrixMultiply(&g_aCar[nCntCar].mtxWorld, &g_aCar[nCntCar].mtxWorld, &mtxRot);
 
 			// 位置を反映
