@@ -26,6 +26,7 @@ typedef enum
 	ICONTYPE_PLAY = 0,			// プレイヤーのアイコン
 	ICONTYPE_EVIL,				// 悪い奴のアイコン
 	ICONTYPE_POLICE,			// 警察のアイコン
+	ICONTYPE_BARRIER,			// バリアのアイコン
 	ICONTYPE_MAX				// この列挙型の総数
 }ICONTYPE;
 
@@ -39,6 +40,9 @@ typedef enum
 	ICONSTATE_REVIVAL,			// 復活中
 	ICONSTATE_DAMAGE,			// ダメージ中
 	ICONSTATE_UNRIVALED,		// 無敵状態
+	ICONSTATE_FLYAWAY,			// 人が飛んでいる状態
+	ICONSTATE_ENLARGE,			// 拡大状態
+	ICONSTATE_REDUCE,			// 縮小状態
 	ICONSTATE_MAX				// この列挙型の総数
 }ICONSTATE;
 

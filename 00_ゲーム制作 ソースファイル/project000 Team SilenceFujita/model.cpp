@@ -84,12 +84,30 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
 	"data\\MODEL_PLAYER\\barrier000.x",		// バリア
 
-	// 車モデル
+	// 警察モデル
 	"data\\MODEL_OBJECT\\policecar.x",		// パトカー
-	"data\\MODEL_OBJECT\\farecar.x",		// 消防車
+
+	// 車モデル
 	"data\\MODEL_OBJECT\\car001.x",			// 自動車
+	"data\\MODEL_OBJECT\\farecar.x",		// 消防車
 	"data\\MODEL_OBJECT\\yakiimocar.x",		// 焼き芋屋
 	"data\\MODEL_OBJECT\\senkyoCar000.x",	// 選挙カー
+
+	// 人間モデル
+	"data\\MODEL_HUMAN\\body.x",			// 体
+	"data\\MODEL_HUMAN\\head.x",			// 頭
+	"data\\MODEL_HUMAN\\sleeve_l.x",		// 左腕
+	"data\\MODEL_HUMAN\\sleeve_r.x",		// 右腕
+	"data\\MODEL_HUMAN\\wrist_l.x",			// 左手首
+	"data\\MODEL_HUMAN\\wrist_r.x",			// 右手首
+	"data\\MODEL_HUMAN\\hand_l.x",			// 左手
+	"data\\MODEL_HUMAN\\hand_r.x",			// 右手
+	"data\\MODEL_HUMAN\\pants_l.x",			// 左足
+	"data\\MODEL_HUMAN\\pants_r.x",			// 右足
+	"data\\MODEL_HUMAN\\leg_l.x",			// 左腿
+	"data\\MODEL_HUMAN\\leg_r.x",			// 右腿
+	"data\\MODEL_HUMAN\\shoes_l.x",			// 左靴
+	"data\\MODEL_HUMAN\\shoes_r.x",			// 右靴
 
 	// ゲートモデル
 	"data\\MODEL_GATE\\gate000.x",			// ゲート (建物)

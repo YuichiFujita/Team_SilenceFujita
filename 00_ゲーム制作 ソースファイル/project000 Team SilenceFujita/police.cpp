@@ -157,10 +157,13 @@ void UpdatePolice(void)
 {
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
+
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
+
 			if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
+
 				// 前回位置の更新
 				g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
@@ -247,7 +250,10 @@ void UpdatePolice(void)
 
 			}
 
-			if (GetBarrierState(&g_aPolice[nCntPolice]) != BARRIERSTATE_SET)
+			if (GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_NONE   ||
+				GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_FLY	   ||
+				GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_HOMING ||
+				GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_LAND)
 			{ // バリアセット状態じゃなかった場合
 				if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC)
 				{ // 渋滞状態じゃない場合
@@ -265,7 +271,9 @@ void UpdatePolice(void)
 						POLICAR_DEPTH,						// 奥行
 						&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
 						BOOSTSTATE_NONE,					// ブーストの状態
-						&g_aPolice[nCntPolice].state		// 警察の状態
+						&g_aPolice[nCntPolice].state,		// 警察の状態
+						&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
+						&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
 					);
 
 					// ゲートとの当たり判定
@@ -303,6 +311,7 @@ void UpdatePolice(void)
 
 				if (g_aPolice[nCntPolice].pos.y < 0.0f)
 				{//Y軸の位置が0.0fだった場合
+
 					//縦への移動量を0.0fにする
 					g_aPolice[nCntPolice].move.y = 0.0f;
 
@@ -323,6 +332,7 @@ void UpdatePolice(void)
 void DrawPolice(void)
 {
 	// 変数を宣言
+	float        policeRot;						// 警察の向きの計算用
 	D3DXMATRIX   mtxScale, mtxRot, mtxTrans;	// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 
@@ -336,11 +346,16 @@ void DrawPolice(void)
 
 		if (g_aPolice[nCntPolice].bUse == true)
 		{ // オブジェクトが使用されている場合
+
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aPolice[nCntPolice].mtxWorld);
 
+			// 警察の向きを設定
+			policeRot = g_aPolice[nCntPolice].rot.y + D3DX_PI;
+			RotNormalize(&policeRot);	// 向きを正規化
+
 			// 向きを反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aPolice[nCntPolice].rot.y, g_aPolice[nCntPolice].rot.x, g_aPolice[nCntPolice].rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, policeRot, g_aPolice[nCntPolice].rot.x, g_aPolice[nCntPolice].rot.z);
 			D3DXMatrixMultiply(&g_aPolice[nCntPolice].mtxWorld, &g_aPolice[nCntPolice].mtxWorld, &mtxRot);
 
 			// 位置を反映
@@ -804,8 +819,8 @@ void PatrolCarSearch(Police *pPolice)
 	if (fDist <= POLICAR_CHASE_RANGE)
 	{ // 目的の距離が一定以内に入ったら
 
-		if (fDist <= POLICAR_TACKLE_RANGE)
-		{ // 目的の距離が一定以内に入った場合
+		if (fDist <= POLICAR_TACKLE_RANGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
+		{ // 目的の距離が一定以内に入ったかつ、無敵状態以外の場合
 
 			// タックルのカウントを0にする
 			pPolice->tackle.nTackleCnt = 0;
@@ -877,6 +892,9 @@ void PatrolBackAct(Police *pPolice)
 	pPolice->rot = pPolice->rotCopy;					// 向き
 	pPolice->move.x = 0.0f;								// 移動量
 	pPolice->policeCurve = pPolice->policeCurveCopy;	// 曲がり角の情報を代入
+	pPolice->tackle.nTackleCnt = 0;						// タックルカウント
+	pPolice->tackle.tacklemove.x = 0.0f;				// タックル時の移動量
+	pPolice->tackle.tackleState = TACKLESTATE_CHARGE;	// タックル状態
 }
 
 //============================================================

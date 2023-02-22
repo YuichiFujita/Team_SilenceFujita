@@ -7,6 +7,7 @@
 #include "bonus.h"
 
 #include "score.h"
+#include "game.h"
 #include "value.h"
 #include "2Deffect.h"
 #include "2Dparticle.h"
@@ -35,6 +36,10 @@
 
 #define SCORE_HUMAN			(500)		// 人を吹き飛ばした時のスコア
 #define DIGIT_HUMAN			(3)			// 人を吹き飛ばした時の桁数
+#define SCORE_OBJECT		(1000)		// オブジェクトを壊した時のスコア
+#define DIGIT_OBJECT		(4)			// オブジェクトを壊した時の桁数
+#define SCORE_CAR			(100)		// 車を封じ込めてる時のスコア
+#define DIGIT_CAR			(3)			// 車を封じ込めてる時の桁数
 
 //**********************************************************************************************************************
 // 上に出すか下に出すか(WHEREBONUS)
@@ -379,83 +384,107 @@ void SetBonus(ADDSCORETYPE Reason)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffBonus->Lock(0, 0, (void**)&pVtx, 0);
 
-	for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
-	{
-		if (g_aBonus[nCntBonus].bUse == false)
-		{ // 得点表示が使用されていない場合
+	if (GetGameState() == GAMESTATE_NORMAL)
+	{ // ゲームの進行が通常状態の場合
 
-			// 上に出すか下に出すかをランダムで算出する
-			nTopBotRand = rand() % WHEREBONUS_MAX;
+		for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
+		{
+			if (g_aBonus[nCntBonus].bUse == false)
+			{ // 得点表示が使用されていない場合
 
-			switch (nTopBotRand)
-			{
-			case WHEREBONUS_RIGHT:	// 右に出す
+			  // 右に出すか左に出すかをランダムで算出する
+				nTopBotRand = rand() % WHEREBONUS_MAX;
 
-				// ボーナスの位置を設定する
-				posBonus.x = BONUS_RIGHT;
-				posBonus.y = (float)(rand() % 100) + 320.0f;
+				switch (nTopBotRand)
+				{
+				case WHEREBONUS_RIGHT:	// 右に出す
 
-				break;				// 抜け出す
+										// ボーナスの位置を設定する
+					posBonus.x = BONUS_RIGHT;
+					posBonus.y = (float)(rand() % 100) + 320.0f;
 
-			case WHEREBONUS_LEFT:	// 左に出す
+					break;				// 抜け出す
 
-				// ボーナスの位置を設定する
-				posBonus.x = BONUS_LEFT;
-				posBonus.y = (float)(rand() % 100) + 220.0f;
+				case WHEREBONUS_LEFT:	// 左に出す
 
-				break;				// 抜け出す
+										// ボーナスの位置を設定する
+					posBonus.x = BONUS_LEFT;
+					posBonus.y = (float)(rand() % 100) + 220.0f;
+
+					break;				// 抜け出す
+				}
+
+				// 情報の設定
+				g_aBonus[nCntBonus].pos = D3DXVECTOR3(posBonus.x, posBonus.y, 0.0f);	// 位置
+				g_aBonus[nCntBonus].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+				g_aBonus[nCntBonus].state = BONUSSTATE_FADE;					// 状態
+				g_aBonus[nCntBonus].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);	// 色
+				g_aBonus[nCntBonus].nStateCounter = 0;							// 状態カウンター
+
+				switch (Reason)
+				{
+				case ADDSCORE_HUMAN:	// 人間を吹き飛ばした時
+
+										// スコアを設定する
+					g_aBonus[nCntBonus].nScore = SCORE_HUMAN;
+
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = DIGIT_HUMAN;
+
+					break;				// 抜け出す
+
+				case ADDSCORE_OBJECT:	// オブジェクトを壊した場合
+
+										// スコアを設定する
+					g_aBonus[nCntBonus].nScore = SCORE_OBJECT;
+
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = DIGIT_OBJECT;
+
+					break;				// 抜け出す
+
+				case ADDSCORE_CAR:		//車を封じ込めた場合
+
+										// スコアを設定する
+					g_aBonus[nCntBonus].nScore = SCORE_CAR;
+
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = DIGIT_CAR;
+
+					break;				// 抜け出す
+				}
+
+				// 頂点座標の設定
+				pVtx[0].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x - PLUS_WIDTH, g_aBonus[nCntBonus].pos.y - PLUS_HEIGHT, 0.0f);
+				pVtx[1].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x + PLUS_WIDTH, g_aBonus[nCntBonus].pos.y - PLUS_HEIGHT, 0.0f);
+				pVtx[2].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x - PLUS_WIDTH, g_aBonus[nCntBonus].pos.y + PLUS_HEIGHT, 0.0f);
+				pVtx[3].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x + PLUS_WIDTH, g_aBonus[nCntBonus].pos.y + PLUS_HEIGHT, 0.0f);
+
+				//頂点カラーの設定
+				pVtx[0].col = g_aBonus[nCntBonus].col;
+				pVtx[1].col = g_aBonus[nCntBonus].col;
+				pVtx[2].col = g_aBonus[nCntBonus].col;
+				pVtx[3].col = g_aBonus[nCntBonus].col;
+
+				//使用している状態にする
+				g_aBonus[nCntBonus].bUse = true;
+
+				// 2Dパーティクルの発生
+				Set2DParticle
+				( // 引数
+					g_aBonus[nCntBonus].pos,			// 位置
+					D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+					PARTICLE2DTYPE_BONUS_FIRE,			// 花火
+					20,									// 発生数
+					1									// 寿命
+				);
+
+				//抜け出す
+				break;
 			}
 
-			// 情報の設定
-			g_aBonus[nCntBonus].pos = D3DXVECTOR3(posBonus.x, posBonus.y, 0.0f);	// 位置
-			g_aBonus[nCntBonus].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
-			g_aBonus[nCntBonus].state = BONUSSTATE_FADE;					// 状態
-			g_aBonus[nCntBonus].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);	// 色
-			g_aBonus[nCntBonus].nStateCounter = 0;							// 状態カウンター
-
-			switch (Reason)
-			{
-			case ADDSCORE_HUMAN:	// 人間を吹き飛ばした時
-
-				// スコアを設定する
-				g_aBonus[nCntBonus].nScore = SCORE_HUMAN;
-
-				// 桁数を設定する
-				g_aBonus[nCntBonus].nDigit = DIGIT_HUMAN;
-
-				break;				// 抜け出す
-			}
-
-			// 頂点座標の設定
-			pVtx[0].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x - PLUS_WIDTH, g_aBonus[nCntBonus].pos.y - PLUS_HEIGHT, 0.0f);
-			pVtx[1].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x + PLUS_WIDTH, g_aBonus[nCntBonus].pos.y - PLUS_HEIGHT, 0.0f);
-			pVtx[2].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x - PLUS_WIDTH, g_aBonus[nCntBonus].pos.y + PLUS_HEIGHT, 0.0f);
-			pVtx[3].pos = D3DXVECTOR3(g_aBonus[nCntBonus].pos.x + PLUS_WIDTH, g_aBonus[nCntBonus].pos.y + PLUS_HEIGHT, 0.0f);
-
-			//頂点カラーの設定
-			pVtx[0].col = g_aBonus[nCntBonus].col;
-			pVtx[1].col = g_aBonus[nCntBonus].col;
-			pVtx[2].col = g_aBonus[nCntBonus].col;
-			pVtx[3].col = g_aBonus[nCntBonus].col;
-
-			//使用している状態にする
-			g_aBonus[nCntBonus].bUse = true;
-
-			// 2Dパーティクルの発生
-			Set2DParticle
-			( // 引数
-				g_aBonus[nCntBonus].pos,			// 位置
-				D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
-				PARTICLE2DTYPE_BONUS_FIRE,			// 花火
-				20,									// 発生数
-				1									// 寿命
-			);
-
-			//抜け出す
-			break;
+			pVtx += 4;			//頂点データを4つ分進める
 		}
-
-		pVtx += 4;			//頂点データを4つ分進める
 	}
 
 	//頂点バッファをアンロックする

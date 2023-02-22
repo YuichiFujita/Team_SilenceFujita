@@ -28,6 +28,7 @@
 
 #ifdef _DEBUG	// デバッグ処理
 // デバッグ表示用
+#include "buildtimer.h"
 #include "camera.h"
 #include "effect.h"
 #include "particle.h"
@@ -432,7 +433,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_TITLE;	// モードをタイトルに初期化
+	g_mode = MODE_GAME;	// モードをタイトルに初期化
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -812,6 +813,9 @@ void TxtSetStage(void)
 	// 変数を宣言
 	int        nEnd;			// テキスト読み込み終了の確認用
 	StageLimit stageLimit;		// ステージの移動範囲の代入用
+	D3DXVECTOR3 pos;			// 位置
+	D3DXVECTOR3 rot;			// 向き
+	ROTSTATE	stateRot;		// 向きの状態
 
 	// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
@@ -872,6 +876,50 @@ void TxtSetStage(void)
 
 				// ステージの移動範囲の設定
 				SetLimitStage(stageLimit);
+			}
+
+			//------------------------------------------------
+			//	ゲートの設定処理
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "SETSTAGE_GATE") == 0)
+			{ // 読み込んだ文字列が SETSTAGE_GATE の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETSTAGE_GATE ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_GATE") == 0)
+					{ // 読み込んだ文字列が SET_GATE の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_GATE ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);			// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);			// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "COLLROT") == 0)
+							{ // 読み込んだ文字列が COLLROT の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%d", &stateRot);								// 向き状態を読み込む
+							}
+						} while (strcmp(&aString[0], "END_SET_GATE") != 0);	// 読み込んだ文字列が END_SET_GATE ではない場合ループ
+
+						// ゲートの設定処理
+						SetGate(pos, rot, stateRot);
+					}
+				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
 		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
 		
@@ -1177,7 +1225,7 @@ void TxtSetAI(void)
 
 						} while (strcmp(&aString[0], "END_SET_CAR") != 0);					// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
-																							// 車の設定
+						// 車の設定
 						SetCar(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
@@ -1211,7 +1259,7 @@ void TxtSetAI(void)
 
 						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);	// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
-																				// 人間の設定
+						// 人間の設定
 						SetHuman(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
@@ -1245,7 +1293,7 @@ void TxtSetAI(void)
 
 						} while (strcmp(&aString[0], "END_SET_POLICE") != 0);	// 読み込んだ文字列が END_SET_POLICE ではない場合ループ
 
-																				// 警察の設定
+						// 警察の設定
 						SetPolice(pos);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_POLICE") != 0);		// 読み込んだ文字列が END_SETSTAGE_POLICE ではない場合ループ
@@ -1667,10 +1715,12 @@ void DrawDebug(void)
 	float       cameraDis    = GetCameraDis();		// カメラの距離
 	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
 	int         nNumParticle = GetNumParticle();	// パーティクルの総数
+	int			nNumObject = GetNumObject();		// オブジェクトの数
 	Car *pCar = GetCarData();						// 車の情報を取得する
 	Police *pPolice = GetPoliceData();
 	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
 	int nNumWeather = GetNumWeather();				// 降っている物の総数を取得する
+	int nNumBuild = GetNumBuildTimer();				// 再建築タイマーの総数取得処理
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1708,8 +1758,12 @@ void DrawDebug(void)
 		" 　警察の位置：[%.3f,%.3f,%.3f]\n"
 		" 　警察のスピード：[%.3f]\n"
 		" 　人間の位置：[%.3f,%.3f,%.3f]\n"
-		" 　降っている物の総数：%d"
-		" 　現在の爆弾ゲージ：%d",
+		" 　降っている物の総数：%d\n"
+		" 　現在の爆弾ゲージ：%d\n"
+		"　 オブジェクトの数：%d\n"
+		" 　再建築タイマーの数：%d\n"
+		" 　警察の状態：%d\n"
+		" 　警察のタックル状態：%d",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1731,7 +1785,11 @@ void DrawDebug(void)
 		pPolice->move.x,
 		HumanPos.x, HumanPos.y, HumanPos.z,
 		nNumWeather,
-		pPlayer->bomb.nCounter
+		pPlayer->bomb.nCounter,
+		nNumObject,
+		nNumBuild,
+		pPolice->state,
+		pPolice->tackle.tackleState
 	);
 
 	//--------------------------------------------------------

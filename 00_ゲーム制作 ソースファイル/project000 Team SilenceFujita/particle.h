@@ -17,6 +17,8 @@
 //**********************************************************************************************************************
 #define SPAWN_PARTICLE_EXPLOSION	(8)		// パーティクル (爆発) のエフェクト数
 #define SPAWN_PARTICLE_DAMAGE		(6)		// パーティクル (ダメージ) のエフェクト数
+#define SPAWN_PARTICLE_DUST			(4)		// パーティクル（埃）のエフェクト数
+#define SPAWN_PARTICLE_RAINSPRAY	(8)		// パーティクル（水しぶき）のエフェクト数
 
 //**********************************************************************************************************************
 //	列挙型定義 (PARTICLETYPE)
@@ -28,6 +30,8 @@ typedef enum
 	PARTICLETYPE_DAMAGE,		// パーティクル (ダメージ)
 	PARTICLETYPE_BOOST,			// パーティクル (ブースト)
 	PARTICLETYPE_SPARK,			// パーティクル（火花）
+	PARTICLETYPE_DUST,			// パーティクル (埃)
+	PARTICLETYPE_RAINSPRAY,		// パーティクル（水飛沫）
 	PARTICLETYPE_MAX,			// この列挙型の総数
 } PARTICLETYPE;
 

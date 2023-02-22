@@ -20,7 +20,8 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	BUILDSTATE_APPEAR = 0,				// 出現状態
+	BUILDSTATE_WAIT = 0,				// 待機状態
+	BUILDSTATE_APPEAR,					// 出現状態
 	BUILDSTATE_COUNT,					// カウント状態
 	BUILDSTATE_DISAPPEAR,				// 消滅状態
 	BUILDSTATE_MAX						// この列挙型の総数
@@ -34,5 +35,14 @@ void UninitBuildtimer(void);			// 再建築の終了処理
 void UpdateBuildtimer(void);			// 再建築の更新処理
 void DrawBuildtimer(void);				// 再建築の描画処理
 void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object object);	// 再建築の設定処理
+
+//**********************************************************************************************************************
+//デバッグ表示用
+//**********************************************************************************************************************
+#ifdef _DEBUG
+
+int GetNumBuildTimer(void);				// 再建築タイマーの総数取得処理
+
+#endif // _DEBUG
 
 #endif

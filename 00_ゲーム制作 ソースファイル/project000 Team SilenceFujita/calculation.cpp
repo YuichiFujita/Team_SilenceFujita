@@ -14,6 +14,7 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
+#include "flash.h"
 #include "gate.h"
 #include "Human.h"
 #include "icon.h"
@@ -230,7 +231,9 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 	}
 
 	for (int nCntHuman = 0; nCntHuman < 64; nCntHuman++)
-	{
+	{ // オブジェクトの最大表示数分繰り返す
+
+		// 人間の設定
 		SetHuman(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}
 }
@@ -351,9 +354,6 @@ void DrawAllAroundChunk(void)
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
-	//------------------------------------------------------------------------------------------------------------------
-	//	メインカメラの描画
-	//------------------------------------------------------------------------------------------------------------------
 	// カメラの設定
 	SetCamera(CAMERATYPE_MAIN);
 
@@ -416,6 +416,9 @@ void InitResultChunk(void)
 
 	// アイコンの初期化
 	InitIcon();
+
+	// フラッシュの初期化
+	InitFlash();
 }
 
 //==================================================================================
@@ -428,6 +431,9 @@ void UninitResultChunk(void)
 
 	// アイコンの終了
 	UninitIcon();
+
+	// フラッシュの終了
+	UninitFlash();
 }
 
 //==================================================================================
@@ -472,9 +478,6 @@ bool UpdateAllClear(RESULTSTATE state)
 			||  fabsf(pPlayer->pos.z - pPlayer->oldPos.z) >= 0.5f)
 			{ // 移動が一定値以上行われている場合
 
-				//// プレイヤーの更新
-				//UpdatePlayer();
-
 				// 更新を終了していない状態にする
 				bAllClear = false;
 			}
@@ -488,9 +491,6 @@ bool UpdateAllClear(RESULTSTATE state)
 
 				if (pGate->state != GATESTATE_STOP)
 				{ // 停止状態ではない場合
-
-					//// ゲートの更新
-					//UpdateGate();
 
 					// 更新を終了していない状態にする
 					bAllClear = false;
@@ -517,9 +517,6 @@ bool UpdateAllClear(RESULTSTATE state)
 
 		if (pBonus->bUse == true)
 		{ // 使用されている場合
-
-			//// ボーナスの更新
-			//UpdateBonus();
 
 			// 更新を終了していない状態にする
 			bAllClear = false;

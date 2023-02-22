@@ -81,12 +81,30 @@ typedef enum
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
 	MODELTYPE_PLAYER_BARRIER,			// バリア
 
-	// 車モデル
+	// 警察モデル
 	MODELTYPE_CAR_POLICE,				// パトカー
-	MODELTYPE_CAR_FARECAR,				// 消防車
+
+	// 車モデル
 	MODELTYPE_CAR_CAR001,				// 自動車
+	MODELTYPE_CAR_FARECAR,				// 消防車
 	MODELTYPE_CAR_YAKIIMOCAR,			// 石焼き芋屋
 	MODELTYPE_CAR_ELECTIONCAR,			// 選挙カー
+
+	// 人間モデル
+	MODELTYPE_HUMAN_BODY,				// 体
+	MODELTYPE_HUMAN_HEAD,				// 頭
+	MODELTYPE_HUMAN_SLEEVE_L,			// 左腕
+	MODELTYPE_HUMAN_SLEEVE_R,			// 右腕
+	MODELTYPE_HUMAN_WRIST_L,			// 左手首
+	MODELTYPE_HUMAN_WRIST_R,			// 右手首
+	MODELTYPE_HUMAN_HAND_L,				// 左手
+	MODELTYPE_HUMAN_HAND_R,				// 右手
+	MODELTYPE_HUMAN_PANTS_L,			// 左足
+	MODELTYPE_HUMAN_PANTS_R,			// 右足
+	MODELTYPE_HUMAN_LEG_L,				// 左腿
+	MODELTYPE_HUMAN_LEG_R,				// 右腿
+	MODELTYPE_HUMAN_SHOES_L,			// 左靴
+	MODELTYPE_HUMAN_SHOES_R,			// 右靴
 
 	// ゲートモデル
 	MODELTYPE_OBJECT_GATE000,			// ゲート (建物)
@@ -111,8 +129,12 @@ typedef enum
 #define MODEL_OBJ_MAX	(int(MODELTYPE_PLAYER_CAR))		// オブジェクトのモデルの総数
 #define FROM_PLAYER		(int(MODELTYPE_PLAYER_CAR))		// プレイヤーのモデル列挙の開始地点
 #define MODEL_PLAY_MAX	(2)								// プレイヤーのモデルの総数
-#define FROM_CAR		(int(MODELTYPE_CAR_POLICE))		// 車のモデル列挙の開始地点
-#define MODEL_CAR_MAX	(5)								// 車のモデルの総数
+#define FROM_POLI		(int(MODELTYPE_CAR_POLICE))		// 警察のモデル列挙の開始地点
+#define MODEL_POLI_MAX	(1)								// 警察のモデルの総数
+#define FROM_CAR		(int(MODELTYPE_CAR_CAR001))		// 車のモデル列挙の開始地点
+#define MODEL_CAR_MAX	(4)								// 車のモデルの総数
+#define FROM_HUMAN		(int(MODELTYPE_HUMAN_BODY))		// 人間のモデル列挙の開始地点
+#define MODEL_HUMAN_MAX	(14)							// 人間のモデルの総数
 #define FROM_GATE		(int(MODELTYPE_OBJECT_GATE000))	// ゲートのモデル列挙の開始地点
 #define MODEL_GATE_MAX	(2)								// ゲートのモデルの総数
 #define FROM_EDIT		(int(MODELTYPE_EDIT_COLLISION))	// エディットのモデル列挙の開始地点

@@ -25,6 +25,7 @@
 #include "camera.h"
 #include "Car.h"
 #include "effect.h"
+#include "flash.h"
 #include "gate.h"
 #include "icon.h"
 #include "junk.h"
@@ -196,6 +197,9 @@ void InitGame(void)
 	// ポーズの初期化
 	InitPause();
 
+	// フラッシュの初期化
+	InitFlash();
+
 	// ファイルをロードする全体処理
 	LoadFileChunk
 	( // 引数
@@ -324,6 +328,9 @@ void UninitGame(void)
 	// ポーズの終了
 	UninitPause();
 
+	// フラッシュの終了
+	UninitFlash();
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
 	UninitEditmain();
@@ -440,13 +447,14 @@ void UpdateGame(void)
 	// ライトの更新
 	UpdateLight();
 
-	// カメラの更新
-	UpdateCamera();
-
 	if (g_nGameMode == GAMEMODE_EDIT)
 	{ // エディットモードだった場合
 
 #ifdef _DEBUG	// デバッグ処理
+
+		// カメラの更新
+		UpdateCamera();
+
 		// エディットメインの更新
 		UpdateEditmain();
 #endif
@@ -462,6 +470,9 @@ void UpdateGame(void)
 
 			// 天気の更新処理
 			UpdateWeather();
+
+			// フラッシュの更新処理
+			UpdateFlash();
 
 			// メッシュドームの更新
 			UpdateMeshDome();
@@ -483,6 +494,9 @@ void UpdateGame(void)
 
 			// プレイヤーの更新
 			UpdatePlayer();
+
+			// カメラの更新
+			UpdateCamera();
 
 			// タイヤ痕の更新
 			UpdateTireMark();
@@ -744,6 +758,9 @@ void DrawGame(void)
 	// 2Dパーティクルの描画
 	Draw2DParticle();
 #endif
+
+	// フラッシュの描画
+	DrawFlash();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合

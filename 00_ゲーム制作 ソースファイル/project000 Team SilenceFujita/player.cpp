@@ -22,6 +22,7 @@
 #include "life.h"
 #include "bomb.h"
 #include "wind.h"
+#include "weather.h"
 
 #include "meshfield.h"
 #include "Police.h"
@@ -72,7 +73,6 @@
 //------------------------------------------------------------
 //	無音世界 (サイレンス・ワールド) マクロ定義
 //------------------------------------------------------------
-#define BOMB_CNT		(2400)		// ボム再使用時間
 #define SUB_BOMB_CNT	(10)		// 使用待機時のゲージの減算量
 
 //************************************************************
@@ -151,7 +151,7 @@ void InitPlayer(void)
 
 	// 爆弾の情報の初期化
 	g_player.bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
-	g_player.bomb.nCounter = BOMB_CNT;							// 攻撃管理カウンター
+	g_player.bomb.nCounter = BOMB_WAIT_CNT;						// 攻撃管理カウンター
 
 	// アイコンの情報の初期化
 	g_player.icon.nIconID = NONE_ICON;							// アイコンのインデックス
@@ -434,7 +434,9 @@ void HitPlayer(Player *pPlayer, int nDamage)
 void UpdateNormalPlayer(void)
 {
 	// 変数を宣言
-	int nTrafficCnt = 0;	// 引数設定用
+	int nTrafficCnt = 0;		// 引数設定用
+	int nTackleCnt = 0;			// 引数設定用
+	float fTackleSpeed = 0.0f;	// 引数設定用
 	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	// 前回位置の更新
@@ -513,14 +515,17 @@ void UpdateNormalPlayer(void)
 		PLAY_DEPTH,				// 奥行
 		&nTrafficCnt,			// 渋滞カウント
 		g_player.boost.state,	// ブーストの状態
-		&policeState			// 警察の状態
+		&policeState,			// 警察の状態
+		&nTackleCnt,			// タックルカウント
+		&fTackleSpeed			// タックル時の移動量
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
 	SmashCollision
 	( // 引数
 		g_player.pos, 
-		g_player.modelData.fRadius
+		g_player.modelData.fRadius,
+		g_player.move.x
 	);				
 
 	// ゲートとの当たり判定
@@ -629,6 +634,9 @@ void UpdateClearPlayer(void)
 //============================================================
 void UpdateOverPlayer(void)
 {
+	int nTackleCnt = 0;			// 引数設定用
+	float fTackleSpeed = 0.0f;	// 引数設定用
+
 	// 変数を宣言
 	int nTrafficCnt = 0;	// 引数設定用
 
@@ -669,14 +677,17 @@ void UpdateOverPlayer(void)
 		PLAY_DEPTH,				// 奥行
 		&nTrafficCnt,			// 渋滞カウント
 		g_player.boost.state,	// ブーストの状態
-		&policeState			// 警察の状態
+		&policeState,			// 警察の状態
+		&nTackleCnt,			// タックルカウント
+		&fTackleSpeed			// タックル時の移動量
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
 	SmashCollision
 	( // 引数
 		g_player.pos, 
-		g_player.modelData.fRadius
+		g_player.modelData.fRadius,
+		g_player.move.x
 	);				
 
 	// ゲートとの当たり判定
@@ -1094,6 +1105,30 @@ void UpdateBoost(void)
 			// タイヤ痕を出す
 			SetTireMark(D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
 				g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
+
+			if (GetWeather() == WEATHERTYPE_RAIN || GetWeather() == WEATHERTYPE_THUNDER)
+			{ // 雨もしくは雷雨の場合
+
+				// 雨の水しぶきのエフェクト
+				SetParticle
+				(
+					D3DXVECTOR3(g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y, g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f),
+					D3DXCOLOR(0.3f, 0.3f, 1.0f, 1.0f),
+					PARTICLETYPE_RAINSPRAY,
+					SPAWN_PARTICLE_RAINSPRAY,
+					2
+				);
+
+				// 雨の水しぶきのエフェクト
+				SetParticle
+				(
+					D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y, g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f),
+					D3DXCOLOR(0.3f, 0.3f, 1.0f, 1.0f),
+					PARTICLETYPE_RAINSPRAY,
+					SPAWN_PARTICLE_RAINSPRAY,
+					2
+				);
+			}
 		}
 		else
 		{ // カウンターが 0以下の場合
@@ -1383,7 +1418,7 @@ void UpdateSilenceWorld(void)
 
 	case ATTACKSTATE_WAIT:	// 攻撃待機状態
 
-		if (g_player.bomb.nCounter < BOMB_CNT)
+		if (g_player.bomb.nCounter < BOMB_WAIT_CNT)
 		{ // カウンターが一定値より小さい場合
 
 			// カウンターを加算

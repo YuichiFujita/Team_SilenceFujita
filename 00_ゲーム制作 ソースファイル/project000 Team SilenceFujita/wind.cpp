@@ -374,8 +374,8 @@ void CollisionWind(Human *pHuman)
 		&&  LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
 		{ // 四辺の内側にいる場合 (当たっている場合)
 
-			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY)
-			{ // 風を使用しているかつ、人が吹き飛んでいない場合
+			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY && pHuman->judge.state == JUDGESTATE_EVIL)
+			{ // 風を使用しているかつ、人が吹き飛んでいない時かつ、悪い奴だった場合
 
 				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;
@@ -407,6 +407,9 @@ void FlyAwayHuman(Human *pHuman, Player player)
 
 	// 飛ばす
 	pHuman->pos += pHuman->move;
+
+	// 人が飛んでいる状態にする
+	pHuman->icon.state = ICONSTATE_FLYAWAY;
 }
 
 //============================================================

@@ -41,7 +41,10 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	CARTYPE_NORMAL = 0,					// 普通の車
+	CARTYPE_CAR001 = 0,					// 普通の車
+	CARTYPE_FIRECAR,					// 消防車
+	CARTYPE_YAKIIMOCAR,					// 焼き芋カー
+	CARTYPE_ELECTIONCAR,				// 選挙カー
 	CARTYPE_MAX							// この列挙型の総数
 }CARTYPE;
 
@@ -69,7 +72,9 @@ typedef struct
 	BOMBSTATE    bombState;				// ボムの状態
 	D3DXMATERIAL MatCopy[MAX_MATERIAL];	// マテリアルのコピー
 	IconInfo	 icon;					// アイコンの情報
+	CARTYPE		 type;					// 種類
 	int			 nShadowID;				// 影のインデックス
+	int			 nBombCount;			// ボム中のカウント
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか

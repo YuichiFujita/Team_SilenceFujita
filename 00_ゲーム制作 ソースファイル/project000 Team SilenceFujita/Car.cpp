@@ -12,6 +12,7 @@
 #include "model.h"
 #include "calculation.h"
 
+#include "bonus.h"
 #include "Car.h"
 #include "shadow.h"
 #include "sound.h"
@@ -47,6 +48,8 @@
 #define CAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 #define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
+
+#define CAR_BOMB_BONUS_CNT		(180)		// ボム状態の時ボーナスが入るカウント数
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -85,7 +88,9 @@ void InitCar(void)
 		g_aCar[nCntCar].move        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aCar[nCntCar].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
+		g_aCar[nCntCar].type		= CARTYPE_CAR001;					// 種類
 		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
+		g_aCar[nCntCar].nBombCount = 0;									// ボム中のカウント
 		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
 		g_aCar[nCntCar].bMove       = false;							// 移動しているか
 		g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
@@ -133,6 +138,8 @@ void UninitCar(void)
 //======================================================================================================================
 void UpdateCar(void)
 {
+	int nTackleCnt = 0;			// 引数設定用
+	float fTackleMove = 0.0f;	// 引数設定用
 	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
@@ -143,9 +150,6 @@ void UpdateCar(void)
 			{ // バリア内状態ではない場合
 				// 前回位置の更新
 				g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;
-
-				// オブジェクトの着地の更新処理
-				LandObject(&g_aCar[nCntCar].pos, &g_aCar[nCntCar].move, &g_aCar[nCntCar].bJump);
 
 				//----------------------------------------------------
 				//	影の更新
@@ -191,8 +195,15 @@ void UpdateCar(void)
 				}
 			}
 
-			if (GetBarrierState(&g_aCar[nCntCar]) != BARRIERSTATE_SET)
-			{ // バリアセット状態じゃなかった場合
+			if (GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_NONE	 ||
+				GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_FLY	 ||
+				GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_HOMING ||
+				GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_LAND)
+			{ // バリアが展開されてなかった場合
+
+				// ボム中のカウントを初期化する
+				g_aCar[nCntCar].nBombCount = 0;
+
 				if (g_aCar[nCntCar].state != CARSTATE_TRAFFIC)
 				{ // 渋滞状態じゃない場合
 					//----------------------------------------------------
@@ -208,7 +219,9 @@ void UpdateCar(void)
 						CAR_DEPTH,						// 奥行
 						&g_aCar[nCntCar].nTrafficCnt,	// 渋滞カウント
 						BOOSTSTATE_NONE,				// ブースト状態
-						&policeState					// 警察の状態
+						&policeState,					// 警察の状態
+						&nTackleCnt,					// タックルカウント
+						&fTackleMove					// タックル時の移動量
 					);
 
 					// 車の停止処理
@@ -243,9 +256,27 @@ void UpdateCar(void)
 					TACKLESTATE_CHARGE					// 状態
 				);
 			}
+			else
+			{ // バリアセット状態の場合
+
+				if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+				{ // 悪い奴の場合
+
+					// ボム中のカウントを加算する
+					g_aCar[nCntCar].nBombCount++;
+
+					if (g_aCar[nCntCar].nBombCount % CAR_BOMB_BONUS_CNT == 0)
+					{ // ボムカウントが一定数になった場合
+
+					  // ボーナスの設定処理
+						SetBonus(ADDSCORE_CAR);
+					}
+				}
+			}
 
 			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
+
 				// 車の補正の更新処理
 				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 			}
@@ -259,6 +290,7 @@ void UpdateCar(void)
 void DrawCar(void)
 {
 	// 変数を宣言
+	float        carRot;						// 車の向きの計算用
 	D3DXMATRIX   mtxScale, mtxRot, mtxTrans;	// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 
@@ -273,11 +305,16 @@ void DrawCar(void)
 
 		if (g_aCar[nCntCar].bUse == true)
 		{ // オブジェクトが使用されている場合
+
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aCar[nCntCar].mtxWorld);
 
+			// 車の向きを設定
+			carRot = g_aCar[nCntCar].rot.y + D3DX_PI;
+			RotNormalize(&carRot);	// 向きを正規化
+
 			// 向きを反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aCar[nCntCar].rot.y, g_aCar[nCntCar].rot.x, g_aCar[nCntCar].rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, carRot, g_aCar[nCntCar].rot.x, g_aCar[nCntCar].rot.z);
 			D3DXMatrixMultiply(&g_aCar[nCntCar].mtxWorld, &g_aCar[nCntCar].mtxWorld, &mtxRot);
 
 			// 位置を反映
@@ -382,6 +419,8 @@ void DrawCar(void)
 //======================================================================================================================
 void SetCar(D3DXVECTOR3 pos)
 {
+	int nCarType;
+
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -392,6 +431,7 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;				// 前回の位置
 			g_aCar[nCntCar].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aCar[nCntCar].bombState	= BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aCar[nCntCar].nBombCount	= 0;								// ボム中のカウント
 			g_aCar[nCntCar].bJump		= false;							// ジャンプしているかどうか
 			g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
 			g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態
@@ -400,8 +440,14 @@ void SetCar(D3DXVECTOR3 pos)
 			// 使用している状態にする
 			g_aCar[nCntCar].bUse = true;
 
+			// 車の種類をランダムで算出する
+			nCarType = rand() % CARTYPE_MAX;
+
+			// 車の種類を設定する
+			g_aCar[nCntCar].type =(CARTYPE)(nCarType);
+
 			// モデル情報を設定
-			g_aCar[nCntCar].modelData = GetModelData((rand() % MODEL_CAR_MAX) + FROM_CAR);	// モデル情報
+			g_aCar[nCntCar].modelData = GetModelData(nCarType + FROM_CAR);	// モデル情報
 
 			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
 
@@ -438,14 +484,14 @@ void SetCar(D3DXVECTOR3 pos)
 			// ジャッジの情報の設定
 			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			if (nCntCar % 2 == 0)
-			{ // 2の倍数だった場合
+			if (g_aCar[nCntCar].type == CARTYPE_ELECTIONCAR)
+			{ // 悪いやつだった場合
 
 				g_aCar[nCntCar].judge.state = JUDGESTATE_EVIL;					// 善悪
 				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
 			}
 			else
-			{ // 上記以外
+			{ // 良い奴だった場合
 
 				g_aCar[nCntCar].judge.state = JUDGESTATE_JUSTICE;				// 善悪
 				g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態

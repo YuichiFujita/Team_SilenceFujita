@@ -29,6 +29,17 @@ typedef enum
 }JUNKSTATE;
 
 //**********************************************************************************************************************
+//	列挙型定義 (SCALETYPE)
+//**********************************************************************************************************************
+typedef enum
+{
+	SCALETYPE_SMALL = 0,				// 小さいがれき
+	SCALETYPE_NORMAL,					// 普通のがれき
+	SCALETYPE_BIG,						// 大きいがれき
+	SCALETYPE_MAX						// この列挙型の総数
+}SCALETYPE;
+
+//**********************************************************************************************************************
 //	構造体定義 (Junk)
 //**********************************************************************************************************************
 typedef struct
@@ -38,6 +49,7 @@ typedef struct
 	D3DXVECTOR3	 scale;					// 拡大率
 	D3DXVECTOR3  scaleMove;				// 拡大率の移動量
 	D3DXVECTOR3  rot;					// 向き
+	D3DXVECTOR3	 rotMove;				// 向きの移動量
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	Model        modelData;				// モデル情報
 	D3DXMATERIAL matCopy[MAX_MATERIAL];	// マテリアルのコピー
@@ -53,7 +65,7 @@ void InitJunk(void);					// がれきの初期化処理
 void UninitJunk(void);					// がれきの終了処理
 void UpdateJunk(void);					// がれきの更新処理
 void DrawJunk(void);					// がれきの描画処理
-void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// がれきの設定処理
+void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot, SCALETYPE scale, D3DMATERIAL9 col);	// がれきの設定処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
