@@ -330,7 +330,7 @@ void DrawHuman(void)
 			D3DXMatrixIdentity(&g_aHuman[nCntHuman].mtxWorld);
 
 			// Œü‚«‚ð”½‰f
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aHuman[nCntHuman].rot.y, g_aHuman[nCntHuman].rot.x, g_aHuman[nCntHuman].rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aHuman[nCntHuman].rot.y + D3DX_PI, g_aHuman[nCntHuman].rot.x, g_aHuman[nCntHuman].rot.z);
 			D3DXMatrixMultiply(&g_aHuman[nCntHuman].mtxWorld, &g_aHuman[nCntHuman].mtxWorld, &mtxRot);
 
 			// ˆÊ’u‚ð”½‰f
