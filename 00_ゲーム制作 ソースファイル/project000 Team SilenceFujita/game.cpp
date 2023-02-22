@@ -24,6 +24,7 @@
 #include "buildtimer.h"
 #include "camera.h"
 #include "Car.h"
+#include "Combo.h"
 #include "effect.h"
 #include "flash.h"
 #include "gate.h"
@@ -170,6 +171,9 @@ void InitGame(void)
 	// 爆弾の初期化
 	InitBomb();
 
+	// コンボの初期化
+	InitCombo();
+
 	// エフェクトの初期化
 	InitEffect();
 
@@ -300,6 +304,9 @@ void UninitGame(void)
 
 	// 爆弾の終了
 	UninitBomb();
+
+	// コンボの終了
+	UninitCombo();
 
 	// エフェクトの終了
 	UninitEffect();
@@ -560,6 +567,9 @@ void UpdateGame(void)
 			// スコアの更新
 			UpdateScore();
 
+			// コンボの更新
+			UpdateCombo();
+
 			// ボーナスの更新処理
 			UpdateBonus();
 
@@ -745,6 +755,9 @@ void DrawGame(void)
 
 	// 速度バーの描画
 	DrawVelocity();
+
+	// コンボの描画
+	DrawCombo();
 
 	// スコアの描画
 	DrawScore();

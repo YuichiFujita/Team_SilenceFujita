@@ -13,6 +13,7 @@
 #include "calculation.h"
 
 #include "camera.h"
+#include "Combo.h"
 #include "gate.h"
 #include "object.h"
 #include "particle.h"
@@ -43,7 +44,7 @@
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.08f)		// 移動量の減速係数
-#define UNRIVALED_CNT	(10)		// 無敵時にチカチカさせるカウント
+#define UNRIVALED_CNT	(20)		// 無敵時にチカチカさせるカウント
 
 #define PLAY_CLEAR_MOVE		(4.0f)	// クリア成功時のプレイヤーの自動移動量
 #define REV_PLAY_CLEAR_MOVE	(0.1f)	// クリア成功時のプレイヤーの減速係数
