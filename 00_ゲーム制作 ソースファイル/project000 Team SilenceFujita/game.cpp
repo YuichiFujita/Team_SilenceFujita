@@ -498,8 +498,8 @@ void UpdateGame(void)
 			// 爆弾の更新
 			UpdateBomb();
 
-			// プレイヤーの更新
-			UpdatePlayer();
+			// プレイヤーのゲーム更新
+			UpdateGamePlayer();
 
 			// カメラの更新
 			UpdateCamera();

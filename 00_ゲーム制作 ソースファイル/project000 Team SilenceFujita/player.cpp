@@ -77,13 +77,27 @@
 #define SUB_BOMB_CNT	(10)		// 使用待機時のゲージの減算量
 
 //************************************************************
+//	列挙型定義 (PLAYMOVESTATE)
+//************************************************************
+typedef enum
+{
+	PLAYMOVESTATE_NONE = 0,			// 何もしない状態
+	PLAYMOVESTATE_ACCEL,			// 前進状態
+	PLAYMOVESTATE_BACK,				// 後退状態
+	PLAYMOVESTATE_ROTATE,			// 旋回状態
+	PLAYMOVESTATE_BRAKE,			// 停止状態
+	PLAYMOVESTATE_MAX				// この列挙型の総数
+}PLAYMOVESTATE;
+
+//************************************************************
 //	プロトタイプ宣言
 //************************************************************
 void UpdateNormalPlayer(void);		// 通常時のプレイヤー更新処理
 void UpdateClearPlayer(void);		// クリア成功時のプレイヤー更新処理
 void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
 
-void MovePlayer(void);				// プレイヤーの移動量の更新処理
+PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake);		// プレイヤーの移動量の更新処理
+
 void PosPlayer(void);				// プレイヤーの位置の更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
 
@@ -174,9 +188,9 @@ void UninitPlayer(void)
 }
 
 //============================================================
-//	プレイヤーの更新処理
+//	プレイヤーのゲーム更新処理
 //============================================================
-void UpdatePlayer(void)
+void UpdateGamePlayer(void)
 {
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
@@ -199,6 +213,178 @@ void UpdatePlayer(void)
 			// クリア失敗時のプレイヤー更新
 			UpdateOverPlayer();
 		}
+	}
+}
+
+//============================================================
+//	プレイヤーのチュートリアル更新処理
+//============================================================
+void UpdateTutorialPlayer(void)
+{
+	// 変数を宣言
+	int   nTrafficCnt  = 0;		// 引数設定用
+	int   nTackleCnt   = 0;		// 引数設定用
+	float fTackleSpeed = 0.0f;	// 引数設定用
+	POLICESTATE   policeState   = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
+	PLAYMOVESTATE currentPlayer = PLAYMOVESTATE_NONE;	// 現在のプレイヤーの動き
+
+	if (g_player.bUse == true)
+	{ // プレイヤーが使用されている場合
+
+		// 前回位置の更新
+		g_player.oldPos = g_player.pos;
+
+#if 0
+		// 状態の更新
+		if (g_player.nCounterState > 0)
+		{ // カウンターが 0より大きい場合
+
+			// カウンターを減算
+			g_player.nCounterState--;
+
+			if (g_player.nCounterState == UNR_TIME_PLAY)
+			{ // カウンターが一定値の場合
+
+				// 無敵状態にする
+				g_player.state = ACTIONSTATE_UNRIVALED;
+
+				// 無敵状態の状態にする
+				g_player.icon.state = ICONSTATE_UNRIVALED;
+			}
+			else if (g_player.nCounterState <= 0)
+			{ // カウンターが 0以下の場合
+
+				// 通常状態にする
+				g_player.state = ACTIONSTATE_NORMAL;
+
+				// 無しの状態にする
+				g_player.icon.state = ICONSTATE_NONE;
+			}
+		}
+#endif
+
+		// 加速の更新
+		UpdateBoost();
+
+		// プレイヤーの移動量の更新
+		currentPlayer = MovePlayer(true, true, true);
+
+		// プレイヤーの位置の更新
+		PosPlayer();
+
+		// プレイヤーの着地の更新
+		LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
+		
+		// プレイヤーのドリフト
+		DriftPlayer();
+
+		// プレイヤーの加速
+		SlumBoostPlayer();
+
+		// プレイヤーの送風
+		FlyAwayPlayer();
+
+		// プレイヤーの爆弾
+		SilenceWorldPlayer();
+
+		// 送風の更新
+		UpdateFlyAway();
+
+		// 爆弾の更新
+		UpdateSilenceWorld();
+
+#if 0
+		// プレイヤーのカメラの状態変化
+		CameraChangePlayer();
+#endif
+
+		//--------------------------------------------------------
+		//	当たり判定
+		//--------------------------------------------------------
+		// オブジェクトとの当たり判定
+		CollisionObject
+		( // 引数
+			&g_player.pos,			// 現在の位置
+			&g_player.oldPos,		// 前回の位置
+			&g_player.move,			// 移動量
+			PLAY_WIDTH,				// 横幅
+			PLAY_DEPTH,				// 奥行
+			&nTrafficCnt,			// 渋滞カウント
+			g_player.boost.state,	// ブーストの状態
+			&policeState,			// 警察の状態
+			&nTackleCnt,			// タックルカウント
+			&fTackleSpeed			// タックル時の移動量
+		);
+
+		// 吹っ飛ぶオブジェクトとの当たり判定
+		SmashCollision
+		( // 引数
+			g_player.pos, 
+			g_player.modelData.fRadius,
+			g_player.move.x
+		);				
+
+		// ゲートとの当たり判定
+		CollisionGate
+		( // 引数
+			&g_player.pos,		// 現在の位置
+			&g_player.oldPos,	// 前回の位置
+			&g_player.move,		// 移動量
+			PLAY_WIDTH,			// 横幅
+			PLAY_DEPTH			// 奥行
+		);	
+
+		// 車の停止処理
+		CollisionStopCar
+		( // 引数
+			g_player.pos,				//位置
+			g_player.rot,				//向き
+			&g_player.move,				//移動量
+			g_player.modelData.fRadius,	//半径
+			COLLOBJECTTYPE_PLAYER,		//対象のタイプ
+			&nTrafficCnt
+		);
+
+		// 車同士の当たり判定
+		CollisionCarBody
+		( // 引数
+			&g_player.pos,
+			&g_player.oldPos,
+			g_player.rot,
+			&g_player.move,
+			PLAY_WIDTH,
+			PLAY_DEPTH,
+			COLLOBJECTTYPE_PLAYER,
+			&nTrafficCnt,
+			TACKLESTATE_CHARGE
+		);
+
+		//--------------------------------------------------------
+		//	影の更新
+		//--------------------------------------------------------
+		// 影の位置設定
+		SetPositionShadow
+		( // 引数
+			g_player.nShadowID,	// 影のインデックス
+			g_player.pos,		// 位置
+			g_player.rot,		// 向き
+			NONE_SCALE			// 拡大率
+		);
+
+		// プレイヤーの補正の更新処理
+		RevPlayer();
+
+#if 0
+		//--------------------------------------------------------
+		//	アイコンの更新
+		//--------------------------------------------------------
+		// アイコンの位置設定
+		SetPositionIcon
+		(
+			g_player.icon.nIconID, 
+			g_player.pos
+		);
+#endif
 	}
 }
 
@@ -474,7 +660,7 @@ void UpdateNormalPlayer(void)
 	UpdateBoost();
 
 	// プレイヤーの移動量の更新
-	MovePlayer();
+	MovePlayer(true, true, true);
 
 	// プレイヤーの位置の更新
 	PosPlayer();
@@ -745,128 +931,168 @@ void UpdateOverPlayer(void)
 //============================================================
 //	プレイヤーの移動量の更新処理
 //============================================================
-void MovePlayer(void)
+PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 {
-	if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
-	{ // 前進の操作が行われた場合
+	// 変数を宣言
+	PLAYMOVESTATE currentPlayer = PLAYMOVESTATE_NONE;	// 現在のプレイヤーの動き
 
-		// 移動量を更新
-		g_player.move.x += MOVE_FORWARD;
+	if (bMove)
+	{ // 移動の操作が可能な場合
 
-		// 移動している状態にする
-		g_player.bMove = true;
-	}
-	else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyL2Press(0) == true)
-	{ // 後退の操作が行われた場合
+		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
+		{ // 前進の操作が行われた場合
 
-		if (g_player.move.x >= 5.0f)
-		{ // 移動量が一定以上だった場合
-		
-			// ドリフトする
-			g_player.drift.bDrift = true;
-			
-			// 移動している状態にする
-			g_player.bMove = true;
-		}
-		else
-		{ // 移動量が一定以下だった場合
-		
+			// 前進状態にする
+			currentPlayer = PLAYMOVESTATE_ACCEL;
+
 			// 移動量を更新
-			g_player.move.x -= MOVE_BACKWARD;
+			g_player.move.x += MOVE_FORWARD;
 
 			// 移動している状態にする
 			g_player.bMove = true;
 		}
-	}
-	else
-	{ // 移動していない場合
+		else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyL2Press(0) == true)
+		{ // 後退の操作が行われた場合
 
-		// 移動していない状態にする
-		g_player.bMove = false;
-	}
+			// 後退状態にする
+			currentPlayer = PLAYMOVESTATE_BACK;
 
-	if (GetKeyboardPress(DIK_A) == true || GetJoyStickPressLX(0) < 0)
-	{ // 左方向の操作が行われた場合
+			if (bRotate)
+			{ // 旋回の操作が可能な場合
 
-		if (g_player.drift.bDrift == true)
-		{ // ドリフト中だった場合
-		
-			// 向きを更新
-			g_player.rot.y -= 0.04f;
-		}
-		else
-		{ // ドリフト中じゃ無かった場合
-		
-			// 向きを更新
-			g_player.rot.y -= MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+				if (g_player.move.x >= 5.0f)
+				{ // 移動量が一定以上だった場合
 
-			if (g_player.move.x >= SUB_MOVE_VALUE)
-			{ // 移動量が一定値以上の場合
+					// ドリフトする
+					g_player.drift.bDrift = true;
+				}
+				else
+				{ // 移動量が一定以下だった場合
+
+					// 移動量を更新
+					g_player.move.x -= MOVE_BACKWARD;
+				}
+			}
+			else
+			{ // 旋回の操作が不可能な場合
 
 				// 移動量を更新
-				g_player.move.x -= SUB_MOVE;
+				g_player.move.x -= MOVE_BACKWARD;
+			}
 
-				if (g_player.move.x < SUB_MOVE_VALUE)
-				{ // 移動量が一定値より小さい場合
+			// 移動している状態にする
+			g_player.bMove = true;
+		}
+		else
+		{ // 移動していない場合
 
-					// 最低限の移動量を代入
-					g_player.move.x = SUB_MOVE_VALUE;
+			// 移動していない状態にする
+			g_player.bMove = false;
+		}
+	}
+
+	if (bRotate)
+	{ // 旋回の操作が可能な場合
+
+		if (GetKeyboardPress(DIK_A) == true || GetJoyStickPressLX(0) < 0)
+		{ // 左方向の操作が行われた場合
+
+			// 旋回状態にする
+			currentPlayer = PLAYMOVESTATE_ROTATE;
+
+			if (g_player.drift.bDrift == true)
+			{ // ドリフト中だった場合
+
+				// 向きを更新
+				g_player.rot.y -= 0.04f;
+			}
+			else
+			{ // ドリフト中じゃ無かった場合
+
+				// 向きを更新
+				g_player.rot.y -= MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+
+				if (g_player.move.x >= SUB_MOVE_VALUE)
+				{ // 移動量が一定値以上の場合
+
+					// 移動量を更新
+					g_player.move.x -= SUB_MOVE;
+
+					if (g_player.move.x < SUB_MOVE_VALUE)
+					{ // 移動量が一定値より小さい場合
+
+						// 最低限の移動量を代入
+						g_player.move.x = SUB_MOVE_VALUE;
+					}
 				}
 			}
 		}
-	}
-	else if (GetKeyboardPress(DIK_D) == true || GetJoyStickPressLX(0) > 0)
-	{ // 右方向の操作が行われた場合
+		else if (GetKeyboardPress(DIK_D) == true || GetJoyStickPressLX(0) > 0)
+		{ // 右方向の操作が行われた場合
 
-		if (g_player.drift.bDrift == true)
-		{ // ドリフト中だった場合
-		
-			// 向きを更新
-			g_player.rot.y += 0.04f;
-		}
-		else
-		{ // ドリフト中じゃなかった場合
-		
-			// 向きを更新
-			g_player.rot.y += MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+			// 旋回状態にする
+			currentPlayer = PLAYMOVESTATE_ROTATE;
 
-			if (g_player.move.x >= SUB_MOVE_VALUE)
-			{ // 移動量が一定値以上の場合
+			if (g_player.drift.bDrift == true)
+			{ // ドリフト中だった場合
 
-				// 移動量を更新
-				g_player.move.x -= SUB_MOVE;
+				// 向きを更新
+				g_player.rot.y += 0.04f;
+			}
+			else
+			{ // ドリフト中じゃなかった場合
 
-				if (g_player.move.x < SUB_MOVE_VALUE)
-				{ // 移動量が一定値より小さい場合
+				// 向きを更新
+				g_player.rot.y += MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
 
-					// 最低限の移動量を代入
-					g_player.move.x = SUB_MOVE_VALUE;
+				if (g_player.move.x >= SUB_MOVE_VALUE)
+				{ // 移動量が一定値以上の場合
+
+					// 移動量を更新
+					g_player.move.x -= SUB_MOVE;
+
+					if (g_player.move.x < SUB_MOVE_VALUE)
+					{ // 移動量が一定値より小さい場合
+
+						// 最低限の移動量を代入
+						g_player.move.x = SUB_MOVE_VALUE;
+					}
 				}
 			}
 		}
-	}
-	else
-	{ // A・Dキーを押していない場合
-	
-		// ドリフトしていない状態にする
-		g_player.drift.bDrift = false;
+		else
+		{ // A・Dキーを押していない場合
+
+			// ドリフトしていない状態にする
+			g_player.drift.bDrift = false;
+		}
 	}
 
 	if (GetKeyboardPress(DIK_X) == true || GetJoyKeyPress(JOYKEY_X, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
-		// 移動量を減速
-		g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
+		if (bBrake)
+		{ // 停止の操作が可能な場合
 
-		// 移動量の補正
-		if (g_player.move.x <=  DEL_MOVE_ABS
-		&&  g_player.move.x >= -DEL_MOVE_ABS)
-		{ // 移動量が削除の範囲内の場合
+			// 停止状態にする
+			currentPlayer = PLAYMOVESTATE_BRAKE;
 
-			// 移動量を削除
-			g_player.move.x = 0.0f;
+			// 移動量を減速
+			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
+
+			// 移動量の補正
+			if (g_player.move.x <= DEL_MOVE_ABS
+			&&  g_player.move.x >= -DEL_MOVE_ABS)
+			{ // 移動量が削除の範囲内の場合
+
+				// 移動量を削除
+				g_player.move.x = 0.0f;
+			}
 		}
 	}
+
+	// 現在のプレイヤーの動きを返す
+	return currentPlayer;
 }
 
 //============================================================

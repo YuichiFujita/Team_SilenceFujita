@@ -57,70 +57,31 @@
 #define TUTORIAL_WIDTH		(360.0f)	// チュートリアルの幅 / 2 (横)
 #define TUTORIAL_HEIGHT		(160.0f)	// チュートリアルの幅 / 2 (高さ)
 
-#if 0
-#define SET_ENEMY_X_00		(180.0f)	// 敵の位置 (x)
-#define SET_ENEMY_Y_00		(-80.0f)	// 敵の位置 (y)
-#define SET_ENEMY_Z_00		(-90.0f)	// 敵の位置 (z)
-#define SET_ENEMY_ROT_00	(0)			// 敵の向き
-#define SET_ENEMY_TYPE_00	(1)			// 敵の種類
-
-#define SET_ENEMY_X_01		(0.0f)		// 敵の位置 (x)
-#define SET_ENEMY_Y_01		(-80.0f)	// 敵の位置 (y)
-#define SET_ENEMY_Z_01		(90.0f)		// 敵の位置 (z)
-#define SET_ENEMY_ROT_01	(0)			// 敵の向き
-#define SET_ENEMY_TYPE_01	(0)			// 敵の種類
-
-#define SET_ENEMY_X_02		(-180.0f)	// 敵の位置 (x)
-#define SET_ENEMY_Y_02		(-80.0f)	// 敵の位置 (y)
-#define SET_ENEMY_Z_02		(-90.0f)	// 敵の位置 (z)
-#define SET_ENEMY_ROT_02	(0)			// 敵の向き
-#define SET_ENEMY_TYPE_02	(1)			// 敵の種類
-
-#define SET_OBJECT_X_00		(180.0f)	// オブジェクトの位置 (x)
-#define SET_OBJECT_Y_00		(0.0f)		// オブジェクトの位置 (y)
-#define SET_OBJECT_Z_00		(90.0f)		// オブジェクトの位置 (z)
-#define SET_OBJECT_ROT_00	(315)		// オブジェクトの向き
-#define SET_OBJECT_BREAK_00	(1)			// オブジェクトの壊れ方の種類
-#define SET_OBJECT_TYPE_00	(7)			// オブジェクトの種類
-
-#define SET_OBJECT_X_01		(0.0f)		// オブジェクトの位置 (x)
-#define SET_OBJECT_Y_01		(0.0f)		// オブジェクトの位置 (y)
-#define SET_OBJECT_Z_01		(180.0f)	// オブジェクトの位置 (z)
-#define SET_OBJECT_ROT_01	(0)			// オブジェクトの向き
-#define SET_OBJECT_BREAK_01	(1)			// オブジェクトの壊れ方の種類
-#define SET_OBJECT_TYPE_01	(6)			// オブジェクトの種類
-
-#define SET_OBJECT_X_02		(-180.0f)	// オブジェクトの位置 (x)
-#define SET_OBJECT_Y_02		(0.0f)		// オブジェクトの位置 (y)
-#define SET_OBJECT_Z_02		(90.0f)		// オブジェクトの位置 (z)
-#define SET_OBJECT_ROT_02	(45)		// オブジェクトの向き
-#define SET_OBJECT_BREAK_02	(1)			// オブジェクトの壊れ方の種類
-#define SET_OBJECT_TYPE_02	(7)			// オブジェクトの種類
-#endif
-
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
-const int aNextLesson[] =	// チュートリアルのカウンター
+const int aNextLesson[] =	// レッスンのカウンター
 {
-	120,	// レッスン0 (移動) のテクスチャ相対パス
-	3,		// レッスン1 (ジャンプ) のテクスチャ相対パス
-	3,		// レッスン2 (攻撃) のテクスチャ相対パス
-	1,		// レッスン3 (討伐) のテクスチャ相対パス
-	1,		// レッスン4 (破壊) のテクスチャ相対パス
-	1,		// レッスン5 (回復) のテクスチャ相対パス
-	0,		// レッスン6 (時間) のテクスチャ相対パス
+	0,		// レッスン0 (移動)     のレッスンカウンター
+	0,		// レッスン1 (旋回)     のレッスンカウンター
+	0,		// レッスン2 (停止)     のレッスンカウンター
+	0,		// レッスン3 (視点変更) のレッスンカウンター
+	0,		// レッスン4 (破滅疾走) のレッスンカウンター
+	0,		// レッスン5 (吹飛散風) のレッスンカウンター
+	0,		// レッスン6 (無音世界) のレッスンカウンター
+	0,		// レッスン7 (脱出)     のレッスンカウンター
 };
 
 const char *apTextureTutorial[] =		// テクスチャの相対パス
 {
-	"data\\TEXTURE\\ui005.png",	// レッスン0 (移動) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン1 (ジャンプ) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン2 (攻撃) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン3 (討伐) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン4 (破壊) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン5 (回復) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン6 (時間) のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン0 (移動)     のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン1 (旋回)     のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン2 (停止)     のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン3 (視点変更) のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン4 (破滅疾走) のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン5 (吹飛散風) のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン6 (無音世界) のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.png",	// レッスン7 (脱出)     のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
@@ -476,57 +437,49 @@ void UpdateTutorial(void)
 		// 処理を抜ける
 		break;
 
-	case LESSON_01:	// レッスン1 (ジャンプ)
+	case LESSON_01:	// レッスン1 (旋回)
 
 		// 無し
 
 		// 処理を抜ける
 		break;
 
-	case LESSON_02:	// レッスン2 (攻撃)
+	case LESSON_02:	// レッスン2 (停止)
 
 		// 無し
 
 		// 処理を抜ける
 		break;
 
-	case LESSON_03:	// レッスン3 (討伐)
+	case LESSON_03:	// レッスン3 (視点変更)
 
-		//if (CheckNumEnemy() == 0)
-		//{ // 敵の総数が 0の場合
-
-		//	// レッスンの状態の加算
-		//	AddLessonState();
-		//}
+		// 無し
 
 		// 処理を抜ける
 		break;
 
-	case LESSON_04:	// レッスン4 (破壊)
+	case LESSON_04:	// レッスン4 (破滅疾走)
 
-		//if (CheckNumBreakObject() == 0)
-		//{ // 壊れるオブジェクトの総数が 0の場合
-
-		//	// レッスンの状態の加算
-		//	AddLessonState();
-		//}
+		// 無し
 
 		// 処理を抜ける
 		break;
 
-	case LESSON_05:	// レッスン5 (回復)
+	case LESSON_05:	// レッスン5 (吹飛散風)
 
-		//if (CheckNumItem() == 0)
-		//{ // アイテムの総数が 0の場合
-
-		//	// レッスンの状態の加算
-		//	AddLessonState();
-		//}
+		// 無し
 
 		// 処理を抜ける
 		break;
 
-	case LESSON_06:	// レッスン6 (時間)
+	case LESSON_06:	// レッスン6 (無音世界)
+
+		// 無し
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_07:	// レッスン7 (脱出)
 
 		// 無し
 
@@ -568,9 +521,6 @@ void UpdateTutorial(void)
 	// ライトの更新
 	UpdateLight();
 
-	// 天気の更新処理
-	UpdateWeather();
-
 	// メッシュドームの更新
 	UpdateMeshDome();
 
@@ -589,8 +539,8 @@ void UpdateTutorial(void)
 	// 爆弾の更新
 	UpdateBomb();
 
-	// プレイヤーの更新
-	UpdatePlayer();
+	// プレイヤーのチュートリアル更新
+	UpdateTutorialPlayer();
 
 	// カメラの更新
 	UpdateCamera();
@@ -799,89 +749,49 @@ void AddLessonState(void)
 				// 処理を抜ける
 				break;
 
-			case LESSON_01:	// レッスン1 (ジャンプ)
+			case LESSON_01:	// レッスン1 (旋回)
 
 				// 無し
 
 				// 処理を抜ける
 				break;
 
-			case LESSON_02:	// レッスン2 (攻撃)
+			case LESSON_02:	// レッスン2 (停止)
 
 				// 無し
 
 				// 処理を抜ける
 				break;
 
-			case LESSON_03:	// レッスン3 (討伐)
-
-				//// 敵の設定
-				//SetEnemy
-				//( // 引数
-				//	D3DXVECTOR3(SET_ENEMY_X_00, SET_ENEMY_Y_00, SET_ENEMY_Z_00),	// 位置
-				//	D3DXVECTOR3(0.0f, D3DXToRadian(SET_ENEMY_ROT_00), 0.0f),		// 向き
-				//	SET_ENEMY_TYPE_00												// 種類
-				//);
-
-				//// 敵の設定
-				//SetEnemy
-				//( // 引数
-				//	D3DXVECTOR3(SET_ENEMY_X_01, SET_ENEMY_Y_01, SET_ENEMY_Z_01),	// 位置
-				//	D3DXVECTOR3(0.0f, D3DXToRadian(SET_ENEMY_ROT_01), 0.0f),		// 向き
-				//	SET_ENEMY_TYPE_01												// 種類
-				//);
-
-				//// 敵の設定
-				//SetEnemy
-				//( // 引数
-				//	D3DXVECTOR3(SET_ENEMY_X_02, SET_ENEMY_Y_02, SET_ENEMY_Z_02),	// 位置
-				//	D3DXVECTOR3(0.0f, D3DXToRadian(SET_ENEMY_ROT_02), 0.0f),		// 向き
-				//	SET_ENEMY_TYPE_02												// 種類
-				//);
-
-				// 処理を抜ける
-				break;
-
-			case LESSON_04:	// レッスン4 (破壊)
-
-				//// オブジェクトの設定
-				//SetObject
-				//( // 引数
-				//	D3DXVECTOR3(SET_OBJECT_X_00, SET_OBJECT_Y_00, SET_OBJECT_Z_00),	// 位置
-				//	D3DXVECTOR3(0.0f, D3DXToRadian(SET_OBJECT_ROT_00), 0.0f),		// 向き
-				//	SET_OBJECT_BREAK_00,											// 壊れ方の種類
-				//	SET_OBJECT_TYPE_00												// オブジェクトの種類
-				//);
-
-				//// オブジェクトの設定
-				//SetObject
-				//( // 引数
-				//	D3DXVECTOR3(SET_OBJECT_X_01, SET_OBJECT_Y_01, SET_OBJECT_Z_01),	// 位置
-				//	D3DXVECTOR3(0.0f, D3DXToRadian(SET_OBJECT_ROT_01), 0.0f),		// 向き
-				//	SET_OBJECT_BREAK_01,											// 壊れ方の種類
-				//	SET_OBJECT_TYPE_01												// オブジェクトの種類
-				//);
-
-				//// オブジェクトの設定
-				//SetObject
-				//( // 引数
-				//	D3DXVECTOR3(SET_OBJECT_X_02, SET_OBJECT_Y_02, SET_OBJECT_Z_02),	// 位置
-				//	D3DXVECTOR3(0.0f, D3DXToRadian(SET_OBJECT_ROT_02), 0.0f),		// 向き
-				//	SET_OBJECT_BREAK_02,											// 壊れ方の種類
-				//	SET_OBJECT_TYPE_02												// オブジェクトの種類
-				//);
-
-				// 処理を抜ける
-				break;
-
-			case LESSON_05:	// レッスン5 (回復)
+			case LESSON_03:	// レッスン3 (視点変更)
 
 				// 無し
 
 				// 処理を抜ける
 				break;
 
-			case LESSON_06:	// レッスン6 (時間)
+			case LESSON_04:	// レッスン4 (破滅疾走)
+
+				// 無し
+
+				// 処理を抜ける
+				break;
+
+			case LESSON_05:	// レッスン5 (吹飛散風)
+
+				// 無し
+
+				// 処理を抜ける
+				break;
+
+			case LESSON_06:	// レッスン6 (無音世界)
+
+				// 無し
+
+				// 処理を抜ける
+				break;
+
+			case LESSON_07:	// レッスン7 (脱出)
 
 				// 無し
 
