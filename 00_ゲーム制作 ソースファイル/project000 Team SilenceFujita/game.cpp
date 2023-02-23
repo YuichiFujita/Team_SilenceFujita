@@ -20,6 +20,7 @@
 #include "3DValue.h"
 #include "ability.h"
 #include "billboard.h"
+#include "bomb.h"
 #include "bonus.h"
 #include "buildtimer.h"
 #include "camera.h"
@@ -54,12 +55,10 @@
 #include "SoundDJ.h"
 #endif
 
-#include "bomb.h"
-
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define RESULT_TIME		(120)		// リザルトまでの余韻フレーム
+#define END_GAME_TIME	(120)		// ゲーム終了までの余韻フレーム
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -352,7 +351,7 @@ void UpdateGame(void)
 			g_bGameEnd = true;
 
 			// ゲーム画面の状態設定
-			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
+			SetGameState(GAMESTATE_END, END_GAME_TIME);	// 終了状態
 
 			if (GetExit().bExit == true)
 			{ // クリアに成功した場合

@@ -73,6 +73,13 @@ void InitWeather(void)
 
 	switch (g_WeatherMode)
 	{
+	case MODE_TUTORIAL:	// チュートリアル
+
+		// 天気を晴れに設定する
+		g_Weather = WEATHERTYPE_SUNNY;
+
+		break;			// 抜け出す
+
 	case MODE_GAME:		// ゲーム
 
 		// 天気を設定する

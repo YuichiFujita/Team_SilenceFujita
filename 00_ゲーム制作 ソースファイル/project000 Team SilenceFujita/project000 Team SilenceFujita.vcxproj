@@ -202,6 +202,7 @@
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="tiremark.cpp" />
     <ClCompile Include="title.cpp" />
+    <ClCompile Include="tutorial.cpp" />
     <ClCompile Include="value.cpp" />
     <ClCompile Include="velocity.cpp" />
     <ClCompile Include="weather.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="timer.h" />
     <ClInclude Include="tiremark.h" />
     <ClInclude Include="title.h" />
+    <ClInclude Include="tutorial.h" />
     <ClInclude Include="value.h" />
     <ClInclude Include="velocity.h" />
     <ClInclude Include="weather.h" />

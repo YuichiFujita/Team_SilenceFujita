@@ -39,11 +39,21 @@ void InitLight(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
 	switch (mode)
-	{
+	{ // モードごとの処理
+	case MODE_TUTORIAL:	// チュートリアル
+		
+		// 拡散光カラーを設定
+		aDiffuse[0] = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
+		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+
+		// 処理を抜ける
+		break;
+
 	case MODE_GAME:		// ゲーム
 
 		switch (weather)
-		{
+		{ // 天候ごとの処理
 		case WEATHERTYPE_SUNNY:		// 晴れ
 
 			// 拡散光カラーを設定
@@ -51,7 +61,8 @@ void InitLight(void)
 			aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
 			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-			break;					// 抜け出す
+			// 処理を抜ける
+			break;
 
 		case WEATHERTYPE_RAIN:		// 雨
 
@@ -60,7 +71,8 @@ void InitLight(void)
 			aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
 			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-			break;					// 抜け出す
+			// 処理を抜ける
+			break;
 
 		case WEATHERTYPE_SNOW:		// 雪
 
@@ -69,7 +81,8 @@ void InitLight(void)
 			aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
 			aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-			break;					// 抜け出す
+			// 処理を抜ける
+			break;
 
 		case WEATHERTYPE_THUNDER:	// 雷雨
 
@@ -78,10 +91,12 @@ void InitLight(void)
 			aDiffuse[1] = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
 			aDiffuse[2] = D3DXCOLOR(0.1f, 0.1f, 0.1f, 1.0f);
 
-			break;					// 抜け出す
+			// 処理を抜ける
+			break;
 		}
 
-		break;			// 抜け出す
+		// 処理を抜ける
+		break;
 
 	case MODE_RESULT:	// リザルト
 
@@ -103,7 +118,8 @@ void InitLight(void)
 			aDiffuse[2] = D3DXCOLOR(0.3f, 0.1f, 0.1f, 1.0f);
 		}
 
-		break;			// 抜け出す
+		// 処理を抜ける
+		break;
 
 	case MODE_RANKING:	// ランキング
 		
@@ -112,7 +128,8 @@ void InitLight(void)
 		aDiffuse[1] = D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);
 		aDiffuse[2] = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-		break;			// 抜け出す
+		// 処理を抜ける
+		break;
 	}
 
 	// 方向ベクトルを設定
