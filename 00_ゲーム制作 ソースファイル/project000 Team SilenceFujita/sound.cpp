@@ -36,8 +36,12 @@ DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};						// オーディオデータサイズ
 // サウンドの情報
 SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 {
-	{ "data/BGM/bgm000.wav", -1 },		// BGM
-	{ "data/SE/move000.wav", 0 },		// SE
+	{ "data/BGM/bgm000.wav", -1 },			// BGM
+	{ "data/BGM/game_bgm000.wav", -1 },		// ゲーム内BGM000
+	{ "data/BGM/game_bgm001.wav", -1 },		// ゲーム内BGM001
+	{ "data/BGM/title_bgm000.wav", -1 },	// タイトル内BGM000
+	{ "data/BGM/result_bgm000.wav", -1 },	// リザルト内BGM000
+	{ "data/SE/move000.wav", 0 },			// SE
 };
 
 //======================================================================================================================

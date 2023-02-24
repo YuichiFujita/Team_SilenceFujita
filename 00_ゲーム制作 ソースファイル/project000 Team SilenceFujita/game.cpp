@@ -215,6 +215,9 @@ void InitGame(void)
 		true	// AI
 	);
 
+	//// サウンドの再生※AnarchyCars
+	//PlaySound(SOUND_LABEL_GAME_BGM_000);	// BGM (ゲーム画面)
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
 	InitEditmain();
@@ -333,6 +336,9 @@ void UninitGame(void)
 
 	// フラッシュの終了
 	UninitFlash();
+
+	// BGMの停止
+	StopSound();
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
@@ -477,17 +483,17 @@ void UpdateGame(void)
 			// フラッシュの更新処理
 			UpdateFlash();
 
-			// メッシュフィールドの更新
-			UpdateMeshField();
-
-			// メッシュウォールの更新
-			UpdateMeshWall();
-
 			// メッシュドームの更新
 			UpdateMeshDome();
 
 			// メッシュシリンダーの更新
 			UpdateMeshCylinder();
+
+			// メッシュフィールドの更新
+			UpdateMeshField();
+
+			// メッシュウォールの更新
+			UpdateMeshWall();
 
 			// 送風機の更新
 			UpdateWind();

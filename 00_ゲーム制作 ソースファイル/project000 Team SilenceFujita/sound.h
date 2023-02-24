@@ -17,9 +17,13 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	SOUND_LABEL_BGM_ = 0,				// BGM
-	SOUND_LABEL_SE_,					// SE
-	SOUND_LABEL_MAX,					// この列挙型の総数
+	SOUND_LABEL_BGM_ = 0,			// BGM
+	SOUND_LABEL_GAME_BGM_000,		// ゲーム内BGM000
+	SOUND_LABEL_GAME_BGM_001,		// ゲーム内BGM001
+	SOUND_LABEL_TITLE_BGM_000,		// タイトル内BGM000
+	SOUND_LABEL_RESULT_BGM_000,		// リザルト内BGM000
+	SOUND_LABEL_SE_,				// SE
+	SOUND_LABEL_MAX,				// この列挙型の総数
 } SOUND_LABEL;
 
 //**********************************************************************************************************************

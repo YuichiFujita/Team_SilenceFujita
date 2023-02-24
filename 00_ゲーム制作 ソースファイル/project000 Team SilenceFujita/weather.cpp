@@ -83,7 +83,7 @@ void InitWeather(void)
 	case MODE_GAME:		// ƒQ[ƒ€
 
 		// “V‹C‚ğİ’è‚·‚é
-		nRandWeather = rand() % WEATHER_RAND/*RAIN_RAND*/;
+		nRandWeather = rand() % WEATHER_RAND;
 
 		if (nRandWeather <= SUNNY_RAND)
 		{ // °‚ê‚Ìê‡

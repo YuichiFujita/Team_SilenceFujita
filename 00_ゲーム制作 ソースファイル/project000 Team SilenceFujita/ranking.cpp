@@ -180,6 +180,9 @@ void UninitRanking(void)
 
 	// アイコンの終了
 	UninitIcon();
+
+	//サウンドの停止（リザルトからのBGM）
+	StopSound();
 }
 
 //=====================================
