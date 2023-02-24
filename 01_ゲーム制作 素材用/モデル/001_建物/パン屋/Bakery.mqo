@@ -2,13 +2,13 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos -141.7782 -136.9081 937.5000
+	pos 32.4683 -113.3465 2400.0000
 	lookat 0.0000 0.0000 0.0000
-	head 13.3964
-	pich 0.1192
+	head 18.7464
+	pich 0.0492
 	bank 0.0000
 	ortho 0
-	zoom2 8.0000
+	zoom2 3.1250
 	amb 0.250 0.250 0.250
 	dirlights 1 {
 		light {
@@ -18,9 +18,9 @@ Scene {
 	}
 }
 Material 5 {
-	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("Bakery.png")
-	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("BakerySignboard.png")
-	"mat3" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("BakeryFront.png")
+	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("data\TEXTURE\Bakery.png")
+	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("data\TEXTURE\BakerySignboard.png")
+	"mat3" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("data\TEXTURE\BakeryFront.png")
 	"mat4" col(1.000 0.933 0.773 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 	"mat5" col(1.000 0.769 0.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 }
