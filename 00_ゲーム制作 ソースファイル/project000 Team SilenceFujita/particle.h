@@ -32,6 +32,7 @@ typedef enum
 	PARTICLETYPE_SPARK,			// パーティクル（火花）
 	PARTICLETYPE_DUST,			// パーティクル (埃)
 	PARTICLETYPE_RAINSPRAY,		// パーティクル（水飛沫）
+	PARTICLETYPE_SMOKING,		// パーティクル（タバコの煙）
 	PARTICLETYPE_MAX,			// この列挙型の総数
 } PARTICLETYPE;
 

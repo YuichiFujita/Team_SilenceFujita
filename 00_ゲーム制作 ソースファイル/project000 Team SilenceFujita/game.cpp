@@ -20,10 +20,12 @@
 #include "3DValue.h"
 #include "ability.h"
 #include "billboard.h"
+#include "bomb.h"
 #include "bonus.h"
 #include "buildtimer.h"
 #include "camera.h"
 #include "Car.h"
+#include "Combo.h"
 #include "effect.h"
 #include "flash.h"
 #include "gate.h"
@@ -54,12 +56,10 @@
 #include "SoundDJ.h"
 #endif
 
-#include "bomb.h"
-
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define RESULT_TIME		(120)		// リザルトまでの余韻フレーム
+#define END_GAME_TIME	(120)		// ゲーム終了までの余韻フレーム
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -169,6 +169,9 @@ void InitGame(void)
 
 	// 爆弾の初期化
 	InitBomb();
+
+	// コンボの初期化
+	InitCombo();
 
 	// エフェクトの初期化
 	InitEffect();
@@ -301,6 +304,9 @@ void UninitGame(void)
 	// 爆弾の終了
 	UninitBomb();
 
+	// コンボの終了
+	UninitCombo();
+
 	// エフェクトの終了
 	UninitEffect();
 
@@ -352,7 +358,7 @@ void UpdateGame(void)
 			g_bGameEnd = true;
 
 			// ゲーム画面の状態設定
-			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
+			SetGameState(GAMESTATE_END, END_GAME_TIME);	// 終了状態
 
 			if (GetExit().bExit == true)
 			{ // クリアに成功した場合
@@ -492,8 +498,8 @@ void UpdateGame(void)
 			// 爆弾の更新
 			UpdateBomb();
 
-			// プレイヤーの更新
-			UpdatePlayer();
+			// プレイヤーのゲーム更新
+			UpdateGamePlayer();
 
 			// カメラの更新
 			UpdateCamera();
@@ -559,6 +565,9 @@ void UpdateGame(void)
 
 			// スコアの更新
 			UpdateScore();
+
+			// コンボの更新
+			UpdateCombo();
 
 			// ボーナスの更新処理
 			UpdateBonus();
@@ -745,6 +754,9 @@ void DrawGame(void)
 
 	// 速度バーの描画
 	DrawVelocity();
+
+	// コンボの描画
+	DrawCombo();
 
 	// スコアの描画
 	DrawScore();
