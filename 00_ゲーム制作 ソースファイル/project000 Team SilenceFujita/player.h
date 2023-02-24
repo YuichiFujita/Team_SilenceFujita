@@ -136,10 +136,11 @@ typedef struct
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
-void InitPlayer(void);		// プレイヤーの初期化処理
-void UninitPlayer(void);	// プレイヤーの終了処理
-void UpdatePlayer(void);	// プレイヤーの更新処理
-void DrawPlayer(void);		// プレイヤーの描画処理
+void InitPlayer(void);				// プレイヤーの初期化処理
+void UninitPlayer(void);			// プレイヤーの終了処理
+void UpdateGamePlayer(void);		// プレイヤーのゲーム更新処理
+void UpdateTutorialPlayer(void);	// プレイヤーのチュートリアル更新処理
+void DrawPlayer(void);				// プレイヤーの描画処理
 
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// プレイヤーの位置・向きの設定処理
 void HealPlayer(Player *pPlayer, int nHeal);				// プレイヤーの回復判定

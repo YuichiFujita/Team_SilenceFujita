@@ -20,6 +20,7 @@
 #include "3DValue.h"
 #include "ability.h"
 #include "billboard.h"
+#include "bomb.h"
 #include "bonus.h"
 #include "buildtimer.h"
 #include "camera.h"
@@ -55,12 +56,10 @@
 #include "SoundDJ.h"
 #endif
 
-#include "bomb.h"
-
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define RESULT_TIME		(120)		// リザルトまでの余韻フレーム
+#define END_GAME_TIME	(120)		// ゲーム終了までの余韻フレーム
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -212,12 +211,15 @@ void InitGame(void)
 		true,	// ステージ
 		true,	// 当たり判定
 		true,	// 影
-		true,	// オブジェクト
+		true,	// オブジェクトsw
 		true	// AI
 	);
 
 	// ゲートの設定処理
 	SetGate(D3DXVECTOR3(1500.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
+
+	//// サウンドの再生※AnarchyCars
+	//PlaySound(SOUND_LABEL_GAME_BGM_000);	// BGM (ゲーム画面)
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
@@ -338,6 +340,9 @@ void UninitGame(void)
 	// フラッシュの終了
 	UninitFlash();
 
+	// BGMの停止
+	StopSound();
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
 	UninitEditmain();
@@ -359,7 +364,7 @@ void UpdateGame(void)
 			g_bGameEnd = true;
 
 			// ゲーム画面の状態設定
-			SetGameState(GAMESTATE_END, RESULT_TIME);	// 終了状態
+			SetGameState(GAMESTATE_END, END_GAME_TIME);	// 終了状態
 
 			if (GetExit().bExit == true)
 			{ // クリアに成功した場合
@@ -499,8 +504,8 @@ void UpdateGame(void)
 			// 爆弾の更新
 			UpdateBomb();
 
-			// プレイヤーの更新
-			UpdatePlayer();
+			// プレイヤーのゲーム更新
+			UpdateGamePlayer();
 
 			// カメラの更新
 			UpdateCamera();
