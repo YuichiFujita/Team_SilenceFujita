@@ -15,6 +15,7 @@
 #include "fade.h"
 
 #include "title.h"
+#include "tutorial.h"
 #include "game.h"
 #include "result.h"
 #include "ranking.h"
@@ -433,7 +434,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_GAME;	// モードをタイトルに初期化
+	g_mode = MODE_GAME;			// モードをタイトルに初期化
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -470,7 +471,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	// フェードの初期化
 	InitFade(g_mode);
 
-	//ランキングのリセット
+	// ランキングのリセット
 	ResetRanking();
 
 #ifdef _DEBUG	// デバッグ処理
@@ -507,6 +508,9 @@ void Uninit(void)
 
 	// タイトル画面の終了
 	UninitTitle();
+
+	// チュートリアル画面の終了
+	UninitTutorial();
 
 	// ゲーム画面の終了
 	UninitGame();
@@ -563,6 +567,14 @@ void Update(void)
 
 		// タイトル画面の更新
 		UpdateTitle();
+
+		// 処理から抜ける
+		break;
+
+	case MODE_TUTORIAL:	// チュートリアル画面
+
+		// チュートリアル画面の更新
+		UpdateTutorial();
 
 		// 処理から抜ける
 		break;
@@ -637,6 +649,14 @@ void Draw(void)
 			// 処理から抜ける
 			break;
 
+		case MODE_TUTORIAL:	// チュートリアル画面
+
+			// チュートリアル画面の描画
+			DrawTutorial();
+
+			// 処理から抜ける
+			break;
+
 		case MODE_GAME:		// ゲーム画面
 
 			// ゲーム画面の描画
@@ -699,6 +719,14 @@ void SetMode(MODE mode)
 		// 処理から抜ける
 		break;
 
+	case MODE_TUTORIAL:	// チュートリアル画面
+
+		// チュートリアル画面の終了
+		UninitTutorial();
+
+		// 処理から抜ける
+		break;
+
 	case MODE_GAME:		// ゲーム画面
 
 		// ゲーム画面の終了
@@ -736,6 +764,14 @@ void SetMode(MODE mode)
 
 		// タイトル画面の初期化
 		InitTitle();
+
+		// 処理から抜ける
+		break;
+
+	case MODE_TUTORIAL:	// チュートリアル画面
+
+		// チュートリアル画面の初期化
+		InitTutorial();
 
 		// 処理から抜ける
 		break;

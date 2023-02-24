@@ -26,6 +26,7 @@
 const char *apTextureEffect[] =		// テクスチャの相対パス
 {
 	"data\\TEXTURE\\effect000.jpg",	// エフェクトのテクスチャの相対パス
+	"data\\TEXTURE\\effect002.tga",	// エフェクトのテクスチャの相対パス(煙)
 };
 
 //**********************************************************************************************************************
@@ -34,6 +35,7 @@ const char *apTextureEffect[] =		// テクスチャの相対パス
 typedef enum
 {
 	TEXTURE_EFFECT_NORMAL = 0,		// エフェクト (通常)
+	TEXTURE_EFFECT_SMOKE,			// エフェクト（煙）
 	TEXTURE_EFFECT_MAX,				// この列挙型の総数
 } TEXTURE_EFFECT;
 
@@ -211,6 +213,10 @@ void UpdateEffect(void)
 
 				break;					// 抜け出す
 
+			case EFFECTTYPE_SMOKE:		// 煙
+
+				break;					//抜け出す
+
 			default:					// その他
 
 				// 特に無し
@@ -326,8 +332,22 @@ void DrawEffect(void)
 			// 頂点フォーマットの設定
 			pDevice->SetFVF(FVF_VERTEX_3D);
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_NORMAL]);
+			switch (g_aEffect[nCntEffect].effectType)
+			{
+			case EFFECTTYPE_SMOKE:	// 煙
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_SMOKE]);
+
+				break;				// 抜け出す
+
+			default:
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_NORMAL]);
+
+				break;
+			}
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntEffect * 4, 2);

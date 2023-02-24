@@ -38,6 +38,7 @@ void ParticleBoost(Particle *pParticle);		// ブーストエフェクト
 void ParticleSpark(Particle *pParticle);		// 火花エフェクト
 void ParticleDust(Particle *pParticle);			// 埃エフェクト
 void ParticleRainSpray(Particle *pParticle);	// 雨の水しぶきエフェクト
+void ParticleSmoking(Particle *pParticle);		// タバコの煙エフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -169,6 +170,14 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 
 				// 水しぶきエフェクト
 				ParticleRainSpray(&g_aParticle[nCntParticle]);
+
+				// 処理を抜ける
+				break;
+
+			case PARTICLETYPE_SMOKING:
+
+				// タバコの煙エフェクト
+				ParticleSmoking(&g_aParticle[nCntParticle]);
 
 				// 処理を抜ける
 				break;
@@ -441,6 +450,52 @@ void ParticleRainSpray(Particle *pParticle)
 			fRadius,		// 半径
 			0.2f,			// 減算量 (半径)
 			EFFECTTYPE_RAINSPRAY		// 火花
+		);
+	}
+}
+
+//======================================================================================================================
+// タバコの煙エフェクト
+//======================================================================================================================
+void ParticleSmoking(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;		// エフェクトの移動量の代入用
+	float fRadius;			// エフェクトの半径の代入用
+	int nLife;				// エフェクトの寿命の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = D3DX_PI;
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= (float)(rand() % 5 - 2);
+		move.y *= (float)(rand() % 7);
+		move.z *= (float)(rand() % 5 - 2);
+
+		// 半径をランダムに設定
+		fRadius = (float)(rand() % 50 + 30.0f);
+
+		// 寿命を設定
+		nLife = (rand() % 20) + 100;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,		// 位置
+			move,				// 移動量
+			pParticle->col,		// 色
+			nLife,				// 寿命
+			fRadius,			// 半径
+			0.1f,				// 減算量 (半径)
+			EFFECTTYPE_SMOKE	// 煙
 		);
 	}
 }
