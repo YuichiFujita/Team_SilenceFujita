@@ -385,6 +385,9 @@ void HitPlayer(Player *pPlayer, int nDamage)
 		// 引数のダメージ分を体力から減算
 		pPlayer->nLife -= nDamage;
 
+		// コンボの倍率処理
+		MagnificCombo(COMBO_INTERRUPTION);
+
 		if (pPlayer->nLife > 0)
 		{ // 体力が残っている場合
 

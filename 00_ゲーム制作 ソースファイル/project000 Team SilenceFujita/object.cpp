@@ -14,6 +14,7 @@
 
 #include "buildtimer.h"
 #include "bonus.h"
+#include "Combo.h"
 #include "junk.h"
 #include "object.h"
 #include "particle.h"
@@ -861,7 +862,7 @@ void HitObject(Object *pObject, int nDamage)
 			}
 
 			// ボーナスの設定処理
-			SetBonus(ADDSCORE_OBJECT);	
+			SetBonus(ADDSCORE_OBJECT);
 
 			//// アイテムの設定
 			//SetItem(pObject->pos, ITEMTYPE_HEAL);

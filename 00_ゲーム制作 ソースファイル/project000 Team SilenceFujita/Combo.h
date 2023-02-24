@@ -35,5 +35,6 @@ void UninitCombo(void);							// コンボの終了処理
 void UpdateCombo(void);							// コンボの更新処理
 void DrawCombo(void);							// コンボの描画処理
 void MagnificCombo(int nMagni);					// コンボの倍率処理
+void AddComboScore(int nScore);					// コンボのスコアの加算処理
 
 #endif
