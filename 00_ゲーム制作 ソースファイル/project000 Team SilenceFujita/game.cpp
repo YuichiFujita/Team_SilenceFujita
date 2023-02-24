@@ -215,9 +215,6 @@ void InitGame(void)
 		true	// AI
 	);
 
-	// ゲートの設定処理
-	SetGate(D3DXVECTOR3(1500.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
-
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
 	InitEditmain();
@@ -480,17 +477,17 @@ void UpdateGame(void)
 			// フラッシュの更新処理
 			UpdateFlash();
 
-			// メッシュドームの更新
-			UpdateMeshDome();
-
-			// メッシュシリンダーの更新
-			UpdateMeshCylinder();
-
 			// メッシュフィールドの更新
 			UpdateMeshField();
 
 			// メッシュウォールの更新
 			UpdateMeshWall();
+
+			// メッシュドームの更新
+			UpdateMeshDome();
+
+			// メッシュシリンダーの更新
+			UpdateMeshCylinder();
 
 			// 送風機の更新
 			UpdateWind();
@@ -549,7 +546,7 @@ void UpdateGame(void)
 			// 体力バーの更新
 			UpdateLife();
 
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif
