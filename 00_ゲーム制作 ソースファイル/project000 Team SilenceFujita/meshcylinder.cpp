@@ -15,6 +15,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define MAX_MESHCYLINDER	(4)			// メッシュシリンダーの最大数
+#define RES_PLUS_POS_Y		(100.0f)	// リザルト時の y座標の加算量
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -324,6 +325,11 @@ void DrawMeshCylinder(void)
 	// ライティングを無効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
+	// αテストを有効にする
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);		// αテストの有効 / 無効の設定
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);	// αテストの設定
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 200);				// αテストの参照値設定
+
 	for (int nCntMeshCylinder = 0; nCntMeshCylinder < MAX_MESHCYLINDER; nCntMeshCylinder++)
 	{ // メッシュシリンダーの最大表示数分繰り返す
 
@@ -374,6 +380,11 @@ void DrawMeshCylinder(void)
 
 	// ライティングを有効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+
+	// αテストを無効にする
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);		// αテストの有効 / 無効の設定
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);	// αテストの設定
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);					// αテストの参照値設定
 }
 
 //======================================================================================================================
@@ -394,7 +405,10 @@ void SetMeshCylinder(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius, float fHei
 			g_aMeshCylinder[nCntMeshCylinder].fHeight     = fHeight;		// 縦幅
 			g_aMeshCylinder[nCntMeshCylinder].nPartWidth  = nPartWidth;		// 横の分割数
 			g_aMeshCylinder[nCntMeshCylinder].nPartHeight = nPartHeight;	// 縦の分割数
-			g_aMeshCylinder[nCntMeshCylinder].nType       = nType;			// 種類
+			g_aMeshCylinder[nCntMeshCylinder].nType       = nType;			// 種類]
+
+			// リザルトの場合 y座標を加算
+			g_aMeshCylinder[nCntMeshCylinder].pos.y += (GetMode() == MODE_RESULT) ? RES_PLUS_POS_Y : 0;
 
 			// 使用している状態にする
 			g_aMeshCylinder[nCntMeshCylinder].bUse = true;
