@@ -195,18 +195,18 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 		SetCurvePoint();
 	}
 
-	if (bStage == true)
-	{ // ステージを読み込む場合
-
-		// ステージのセットアップ
-		TxtSetStage();
-	}
-
 	if (bCollision == true)
 	{ // 当たり判定を読み込む場合
 
 		// 当たり判定のセットアップ
 		TxtSetCollision();
+	}
+
+	if (bStage == true)
+	{ // ステージを読み込む場合
+
+		// ステージのセットアップ
+		TxtSetStage();
 	}
 
 	if (bShadow == true)

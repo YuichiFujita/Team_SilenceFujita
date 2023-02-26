@@ -955,7 +955,7 @@ void TxtSetStage(void)
 						// ゲートの設定処理
 						SetGate(pos, rot, stateRot);
 					}
-				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);		// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
+				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
 		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
 		

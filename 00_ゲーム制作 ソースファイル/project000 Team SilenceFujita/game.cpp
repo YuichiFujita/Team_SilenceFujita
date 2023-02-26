@@ -211,12 +211,9 @@ void InitGame(void)
 		true,	// ステージ
 		true,	// 当たり判定
 		true,	// 影
-		true,	// オブジェクトsw
+		true,	// オブジェクト
 		true	// AI
 	);
-
-	// ゲートの設定処理
-	SetGate(D3DXVECTOR3(1500.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
 
 	//// サウンドの再生※AnarchyCars
 	//PlaySound(SOUND_LABEL_GAME_BGM_000);	// BGM (ゲーム画面)
@@ -555,7 +552,7 @@ void UpdateGame(void)
 			// 体力バーの更新
 			UpdateLife();
 
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif
