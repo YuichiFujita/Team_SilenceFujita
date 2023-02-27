@@ -201,6 +201,30 @@ void UpdateGate(void)
 
 				// 処理を抜ける
 				break;
+
+			case GATESTATE_OPEN:	// 開き状態
+
+				// 重力をかける
+				g_aGate[nCntGate].doorData.fMove += GATE_GRAVITY;
+
+				// 位置を更新する
+				g_aGate[nCntGate].doorData.fPos += g_aGate[nCntGate].doorData.fMove;
+
+				if (g_aGate[nCntGate].doorData.fPos >= GATE_DOOR_PLUSPOS)
+				{ // 地面に到達した場合
+
+					// 位置を補正する
+					g_aGate[nCntGate].doorData.fPos = GATE_DOOR_PLUSPOS;
+
+					// 移動量を設定する
+					g_aGate[nCntGate].doorData.fMove = 0.0f;
+
+					// バウンド状態にする
+					g_aGate[nCntGate].state = GATESTATE_FLY;
+				}
+
+				// 処理を抜ける
+				break;
 			}
 		}
 	}
@@ -307,7 +331,7 @@ void DrawGate(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot)
+void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot, bool bOpen)
 {
 	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -319,9 +343,18 @@ void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot)
 			g_aGate[nCntGate].pos = pos;	// 位置
 			g_aGate[nCntGate].rot = rot;	// 向き
 
+			if (bOpen == true)
+			{ // オープン状態の場合
+				g_aGate[nCntGate].state = GATESTATE_FLY;				// 状態
+				g_aGate[nCntGate].doorData.fPos = GATE_DOOR_PLUSPOS;	// 位置
+			}
+			else
+			{ // クローズ状態だった場合
+				g_aGate[nCntGate].state = GATESTATE_STOP;				// 状態
+				g_aGate[nCntGate].doorData.fPos = 0.0f;					// 位置
+			}
+
 			// 情報を初期化
-			g_aGate[nCntGate].state          = GATESTATE_FLY;		// 状態
-			g_aGate[nCntGate].doorData.fPos  = GATE_DOOR_PLUSPOS;	// 位置
 			g_aGate[nCntGate].doorData.fMove = 0.0f;				// 移動量
 
 			// モデル情報を設定

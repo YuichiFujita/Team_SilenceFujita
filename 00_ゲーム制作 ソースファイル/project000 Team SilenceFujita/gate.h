@@ -32,6 +32,7 @@ typedef enum
 	GATESTATE_LAND,				// 落下状態
 	GATESTATE_BOUND,			// バウンド状態
 	GATESTATE_STOP,				// 停止状態
+	GATESTATE_OPEN,				// 開く状態
 	GATESTATE_MAX,				// この列挙型の総数
 } GATESTATE;
 
@@ -78,7 +79,7 @@ void UninitGate(void);			// オブジェクトの終了処理
 void UpdateGate(void);			// オブジェクトの更新処理
 void DrawGate(void);			// オブジェクトの描画処理
 
-void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot);												// オブジェクトの設定処理
+void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot, bool bOpen);									// オブジェクトの設定処理
 void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth);	// オブジェクトとの当たり判定
 void CollisionExitGate(Gate *pGate);																			// ゲートの脱出判定
 

@@ -275,7 +275,7 @@ void InitTutorial(void)
 	);
 
 	// ゲートの設定処理
-	SetGate(D3DXVECTOR3(1500.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
+	SetGate(D3DXVECTOR3(1500.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0, false);
 
 	//// サウンドの再生
 	//PlaySound(SOUND_LABEL_BGM_001);	// BGM (チュートリアル画面)
