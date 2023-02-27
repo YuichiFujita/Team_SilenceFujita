@@ -444,6 +444,9 @@ void UpdateGame(void)
 			else
 			{ // カウンターが 0以下の場合
 
+				// コンボの倍率処理(得点の代入処理)
+				MagnificCombo(COMBO_INTERRUPTION);
+
 				// モード選択 (リザルト画面に移行)
 				SetFade(MODE_RESULT);
 			}
