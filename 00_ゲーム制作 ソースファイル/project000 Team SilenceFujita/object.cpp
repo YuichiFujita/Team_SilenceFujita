@@ -923,6 +923,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
 
 							// コンボの倍率処理
 							MagnificCombo(COMBO_INTERRUPTION);
@@ -985,6 +988,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
 
 							// コンボの倍率処理
 							MagnificCombo(COMBO_INTERRUPTION);
@@ -1054,6 +1060,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
 
 							// コンボの倍率処理
 							MagnificCombo(COMBO_INTERRUPTION);
@@ -1116,6 +1125,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
 
 							// コンボの倍率処理
 							MagnificCombo(COMBO_INTERRUPTION);
@@ -1196,6 +1208,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
 
 								// コンボの倍率処理
 								MagnificCombo(COMBO_INTERRUPTION);
@@ -1258,6 +1273,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
 
 								// コンボの倍率処理
 								MagnificCombo(COMBO_INTERRUPTION);
@@ -1327,6 +1345,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
 
 								// コンボの倍率処理
 								MagnificCombo(COMBO_INTERRUPTION);
@@ -1389,6 +1410,9 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
 
 								// コンボの倍率処理
 								MagnificCombo(COMBO_INTERRUPTION);
