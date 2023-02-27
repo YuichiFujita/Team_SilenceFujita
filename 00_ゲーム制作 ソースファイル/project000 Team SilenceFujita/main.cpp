@@ -434,11 +434,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_TITLE;			// モードをタイトルに初期化
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;			// モードをタイトルに初期化
+	g_mode = MODE_TUTORIAL;			// モードをチュートリアルに初期化
+#else
+	g_mode = MODE_TITLE;			// モードをタイトルに初期化
 #endif
-
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -795,6 +795,7 @@ void SetMode(MODE mode)
 
 		// 処理から抜ける
 		break;
+
 	case MODE_RANKING:	// ランキング画面
 
 		// ランキング画面の初期化
@@ -851,8 +852,8 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 void TxtSetStage(void)
 {
 	// 変数を宣言
-	int        nEnd;			// テキスト読み込み終了の確認用
-	StageLimit stageLimit;		// ステージの移動範囲の代入用
+	int         nEnd;			// テキスト読み込み終了の確認用
+	StageLimit  stageLimit;		// ステージの移動範囲の代入用
 	D3DXVECTOR3 pos;			// 位置
 	D3DXVECTOR3 rot;			// 向き
 	ROTSTATE	stateRot;		// 向きの状態
@@ -976,7 +977,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_GATE") != 0);	// 読み込んだ文字列が END_SET_GATE ではない場合ループ
 
 						// ゲートの設定処理
-						SetGate(pos, rot, stateRot, bOpen);
+						SetGate(pos, D3DXToRadian(rot), stateRot, bOpen);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
@@ -1132,7 +1133,7 @@ void TxtSetObject(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_COMPLETE);
+						//SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_COMPLETE);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
@@ -1278,16 +1279,16 @@ void TxtSetAI(void)
 
 							if (strcmp(&aString[0], "POS") == 0)
 							{ // 読み込んだ文字列が POS の場合
-								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);			// 位置を読み込む
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 							}
 
-						} while (strcmp(&aString[0], "END_SET_CAR") != 0);					// 読み込んだ文字列が END_SET_CAR ではない場合ループ
+						} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 						// 車の設定
 						SetCar(pos);
 					}
-				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
+				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);				// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
 			}
 
 			//------------------------------------------------
@@ -1298,7 +1299,7 @@ void TxtSetAI(void)
 				do
 				{ // 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 
-				  // ファイルから文字列を読み込む
+					// ファイルから文字列を読み込む
 					fscanf(pFile, "%s", &aString[0]);
 
 					if (strcmp(&aString[0], "SET_HUMAN") == 0)
@@ -1307,21 +1308,21 @@ void TxtSetAI(void)
 						do
 						{ // 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
-						  // ファイルから文字列を読み込む
+							// ファイルから文字列を読み込む
 							fscanf(pFile, "%s", &aString[0]);
 
 							if (strcmp(&aString[0], "POS") == 0)
 							{ // 読み込んだ文字列が POS の場合
-								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
-								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);				// 位置を読み込む
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 							}
 
-						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);	// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 						// 人間の設定
 						SetHuman(pos);
 					}
-				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}
 
 			//------------------------------------------------
@@ -1822,7 +1823,8 @@ void DrawDebug(void)
 		"　 オブジェクトの数：%d\n"
 		" 　再建築タイマーの数：%d\n"
 		" 　警察の状態：%d\n"
-		" 　警察のタックル状態：%d",
+		" 　警察のタックル状態：%d\n"
+		" 　チュートリアルのレッスン：%d\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1848,7 +1850,8 @@ void DrawDebug(void)
 		nNumObject,
 		nNumBuild,
 		pPolice->state,
-		pPolice->tackle.tackleState
+		pPolice->tackle.tackleState,
+		GetLessonState()
 	);
 
 	//--------------------------------------------------------
