@@ -859,7 +859,6 @@ void TxtSetLesson(LESSON_SETUP lesson)
 	int         nShadowType;	// 影の種類の代入用
 	int         nCollisionType;	// 当たり判定の種類の代入用
 	int         nNumMat;		// マテリアル数の代入用
-	bool        bShadow;		// 影の ON / OFF の代入
 	ROTSTATE    stateRot;		// 向き状態
 
 	// 変数配列を宣言

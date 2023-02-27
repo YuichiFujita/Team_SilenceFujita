@@ -977,7 +977,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_GATE") != 0);	// 読み込んだ文字列が END_SET_GATE ではない場合ループ
 
 						// ゲートの設定処理
-						SetGate(pos, rot, stateRot, bOpen);
+						SetGate(pos, D3DXToRadian(rot), stateRot, bOpen);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
