@@ -434,7 +434,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
+	g_mode = MODE_TITLE;			// モードをタイトルに初期化
+#ifdef _DEBUG	// デバッグ処理
 	g_mode = MODE_GAME;			// モードをタイトルに初期化
+#endif
+
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
