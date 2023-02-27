@@ -434,11 +434,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_TITLE;			// モードをタイトルに初期化
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;			// モードをタイトルに初期化
+	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
+#else
+	g_mode = MODE_TITLE;			// モードをタイトルに初期化
 #endif
-
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -795,6 +795,7 @@ void SetMode(MODE mode)
 
 		// 処理から抜ける
 		break;
+
 	case MODE_RANKING:	// ランキング画面
 
 		// ランキング画面の初期化
@@ -851,8 +852,8 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 void TxtSetStage(void)
 {
 	// 変数を宣言
-	int        nEnd;			// テキスト読み込み終了の確認用
-	StageLimit stageLimit;		// ステージの移動範囲の代入用
+	int         nEnd;			// テキスト読み込み終了の確認用
+	StageLimit  stageLimit;		// ステージの移動範囲の代入用
 	D3DXVECTOR3 pos;			// 位置
 	D3DXVECTOR3 rot;			// 向き
 	ROTSTATE	stateRot;		// 向きの状態
@@ -1803,7 +1804,8 @@ void DrawDebug(void)
 		"　 オブジェクトの数：%d\n"
 		" 　再建築タイマーの数：%d\n"
 		" 　警察の状態：%d\n"
-		" 　警察のタックル状態：%d",
+		" 　警察のタックル状態：%d\n"
+		" 　チュートリアルのレッスン：%d\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1829,7 +1831,8 @@ void DrawDebug(void)
 		nNumObject,
 		nNumBuild,
 		pPolice->state,
-		pPolice->tackle.tackleState
+		pPolice->tackle.tackleState,
+		GetLessonState()
 	);
 
 	//--------------------------------------------------------

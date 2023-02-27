@@ -9,6 +9,7 @@
 //************************************************************
 #include "main.h"
 #include "input.h"
+#include "tutorial.h"
 #include "game.h"
 #include "calculation.h"
 
@@ -45,6 +46,7 @@
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.08f)		// 移動量の減速係数
 #define UNRIVALED_CNT	(20)		// 無敵時にチカチカさせるカウント
+#define STATE_MOVE		(1.5f)		// 停止・旋回時の判定範囲
 
 #define PLAY_CLEAR_MOVE		(4.0f)	// クリア成功時のプレイヤーの自動移動量
 #define REV_PLAY_CLEAR_MOVE	(0.1f)	// クリア成功時のプレイヤーの減速係数
@@ -90,6 +92,15 @@ typedef enum
 }PLAYMOVESTATE;
 
 //************************************************************
+//	構造体定義 (PlayCamTutorial)
+//************************************************************
+typedef struct
+{
+	bool bForward;					// 前向きカメラの状況
+	bool bFirst;					// 一人称カメラの状況
+}PlayCamTutorial;
+
+//************************************************************
 //	プロトタイプ宣言
 //************************************************************
 void UpdateNormalPlayer(void);		// 通常時のプレイヤー更新処理
@@ -114,7 +125,8 @@ void UpdateSilenceWorld(void);		// 爆弾の更新処理
 //************************************************************
 //	グローバル変数
 //************************************************************
-Player g_player;	// プレイヤー情報
+Player          g_player;			// プレイヤー情報
+PlayCamTutorial g_tutorialCamera;	// チュートリアルのカメラ変更情報
 
 //============================================================
 //	プレイヤーの初期化処理
@@ -164,12 +176,16 @@ void InitPlayer(void)
 	g_player.wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
 
 	// 爆弾の情報の初期化
-	g_player.bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
-	g_player.bomb.nCounter = BOMB_WAIT_CNT;						// 攻撃管理カウンター
+	g_player.bomb.state    = ATTACKSTATE_NONE;	// 攻撃状態
+	g_player.bomb.nCounter = BOMB_WAIT_CNT;		// 攻撃管理カウンター
 
 	// アイコンの情報の初期化
-	g_player.icon.nIconID = NONE_ICON;							// アイコンのインデックス
-	g_player.icon.state = ICONSTATE_NONE;						// アイコンの状態
+	g_player.icon.nIconID = NONE_ICON;			// アイコンのインデックス
+	g_player.icon.state   = ICONSTATE_NONE;		// アイコンの状態
+
+	// チュートリアルのカメラ変更情報を初期化
+	g_tutorialCamera.bForward = false;			// 前向きカメラの状況
+	g_tutorialCamera.bFirst   = false;			// 一人称カメラの状況
 
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -286,10 +302,8 @@ void UpdateTutorialPlayer(void)
 		// 爆弾の更新
 		UpdateSilenceWorld();
 
-#if 0
 		// プレイヤーのカメラの状態変化
 		CameraChangePlayer();
-#endif
 
 		//--------------------------------------------------------
 		//	当たり判定
@@ -367,17 +381,61 @@ void UpdateTutorialPlayer(void)
 		// プレイヤーの補正の更新処理
 		RevPlayer();
 
-#if 0
 		//--------------------------------------------------------
-		//	アイコンの更新
+		//	チュートリアルの更新
 		//--------------------------------------------------------
-		// アイコンの位置設定
-		SetPositionIcon
-		(
-			g_player.icon.nIconID, 
-			g_player.pos
-		);
-#endif
+		switch (GetLessonState())
+		{ // レッスンごとの処理
+		case LESSON_00:	// レッスン0 (移動)
+
+			if (currentPlayer == PLAYMOVESTATE_ACCEL
+			||  currentPlayer == PLAYMOVESTATE_BACK)
+			{ // 現在のプレイヤーの動きが移動状態の場合
+
+				// レッスンの状態の加算
+				AddLessonState();
+			}
+
+			// 処理を抜ける
+			break;
+
+		case LESSON_01:	// レッスン1 (旋回)
+
+			if (currentPlayer == PLAYMOVESTATE_ROTATE)
+			{ // 現在のプレイヤーの動きが旋回状態の場合
+
+				// レッスンの状態の加算
+				AddLessonState();
+			}
+
+			// 処理を抜ける
+			break;
+
+		case LESSON_02:	// レッスン2 (停止)
+
+			if (currentPlayer == PLAYMOVESTATE_BRAKE)
+			{ // 現在のプレイヤーの動きが停止状態の場合
+
+				// レッスンの状態の加算
+				AddLessonState();
+			}
+
+			// 処理を抜ける
+			break;
+
+		case LESSON_03:	// レッスン3 (視点変更)
+
+			if (g_tutorialCamera.bForward == true
+			&&  g_tutorialCamera.bFirst   == true)
+			{ // どちらのカメラも変更した場合
+
+				// レッスンの状態の加算
+				AddLessonState();
+			}
+
+			// 処理を抜ける
+			break;
+		}
 	}
 }
 
@@ -970,11 +1028,16 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		if (GetKeyboardPress(DIK_A) == true || GetJoyStickPressLX(0) < 0)
 		{ // 左方向の操作が行われた場合
 
-			// 旋回状態にする
-			currentPlayer = PLAYMOVESTATE_ROTATE;
-
 			// 向きを更新
 			g_player.rot.y -= MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+
+			if (g_player.move.x <= -STATE_MOVE
+			||  g_player.move.x >=  STATE_MOVE)
+			{ // 移動量が一定値の範囲外の場合
+
+				// 旋回状態にする
+				currentPlayer = PLAYMOVESTATE_ROTATE;
+			}
 
 			if (g_player.move.x >= SUB_MOVE_VALUE)
 			{ // 移動量が一定値以上の場合
@@ -993,11 +1056,16 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		else if (GetKeyboardPress(DIK_D) == true || GetJoyStickPressLX(0) > 0)
 		{ // 右方向の操作が行われた場合
 
-			// 旋回状態にする
-			currentPlayer = PLAYMOVESTATE_ROTATE;
-
 			// 向きを更新
 			g_player.rot.y += MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+
+			if (g_player.move.x <= -STATE_MOVE
+			||  g_player.move.x >=  STATE_MOVE)
+			{ // 移動量が一定値の範囲外の場合
+
+				// 旋回状態にする
+				currentPlayer = PLAYMOVESTATE_ROTATE;
+			}
 
 			if (g_player.move.x >= SUB_MOVE_VALUE)
 			{ // 移動量が一定値以上の場合
@@ -1021,11 +1089,16 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		if (bBrake)
 		{ // 停止の操作が可能な場合
 
-			// 停止状態にする
-			currentPlayer = PLAYMOVESTATE_BRAKE;
-
 			// 移動量を減速
 			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
+
+			if (g_player.move.x <= -STATE_MOVE
+			||  g_player.move.x >=  STATE_MOVE)
+			{ // 移動量が一定値の範囲外の場合
+
+				// 停止状態にする
+				currentPlayer = PLAYMOVESTATE_BRAKE;
+			}
 
 			// 移動量の補正
 			if (g_player.move.x <= DEL_MOVE_ABS
@@ -1214,6 +1287,9 @@ void CameraChangePlayer(void)
 
 		// カメラの状態を変える
 		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYCAMESTATE_MAX;
+
+		// 前向きカメラを変更した情報を残す
+		g_tutorialCamera.bForward = true;
 	}
 
 	if (GetKeyboardTrigger(DIK_K) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true)
@@ -1221,6 +1297,9 @@ void CameraChangePlayer(void)
 
 		// 一人称カメラの状況を変える
 		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
+
+		// 一人称カメラを変更した情報を残す
+		g_tutorialCamera.bFirst = true;
 	}
 }
 
