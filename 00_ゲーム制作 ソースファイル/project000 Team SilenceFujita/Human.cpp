@@ -50,6 +50,18 @@
 #define REACTION_HUMAN_RANGE	(170.0f)	// ƒŠƒAƒNƒVƒ‡ƒ“‚·‚élŠÔ‚Ì”ÍˆÍ
 #define REACTION_CAR_RANGE		(50.0f)		// ƒŠƒAƒNƒVƒ‡ƒ“‚·‚éÔ‚Ì”ÍˆÍ
 
+#define RESURRECT_CNT			(300)		// •œŠˆ‚Ü‚Å‚ÌƒJƒEƒ“ƒg
+
+//**********************************************************************************************************************
+//	\‘¢‘Ì’è‹`(Resurrect)
+//**********************************************************************************************************************
+typedef struct
+{
+	Human	humanDate;			// lŠÔ‚Ìî•ñ
+	int		nResurCount;		// •œŠˆ‚ÌƒJƒEƒ“ƒg
+	bool	bUse;				// g—pó‹µ
+}Resurrect;
+
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾
 //**********************************************************************************************************************
@@ -63,6 +75,8 @@ void CollisionCarHuman(Human *pHuman);				// lŠÔ‚ÆÔ‚Ì“–‚½‚è”»’è
 void CurveRotHuman(Human *pHuman);					// lŠÔ‚ÌŠp“xXVˆ—
 void WalkHuman(Human *pHuman);						// lŠÔ‚Ì•à‚­ˆ—
 void PassingHuman(Human *pHuman);					// lŠÔ‚Ì‚·‚êˆá‚¢ˆ—
+void SetResurrection(Human human);					// •œŠˆî•ñ‚Ìİ’èˆ—
+void ResurrectionHuman(Human human);				// lŠÔ‚Ì•œŠˆˆ—
 
 void UpdateMotionHuman(Human *pHuman);						// lŠÔƒ‚[ƒVƒ‡ƒ“‚ÌXVˆ—
 void SetMotionHuman(Human *pHuman, MOTIONTYPE type);		// lŠÔƒ‚[ƒVƒ‡ƒ“‚Ìİ’èˆ—
@@ -72,6 +86,7 @@ void TxtSetHuman(HumanParts *setParts, KeyInfo *setmotion);	// lŠÔ‚ÌƒZƒbƒgƒAƒbƒ
 //	ƒOƒ[ƒoƒ‹•Ï”
 //**********************************************************************************************************************
 Human g_aHuman[MAX_HUMAN];	// lŠÔ‚Ìî•ñ
+Resurrect g_aResurrect[MAX_HUMAN];		// lŠÔ‚Ì•œŠˆî•ñ
 
 //======================================================================================================================
 //	lŠÔ‚Ì‰Šú‰»ˆ—
@@ -156,6 +171,10 @@ void InitHuman(void)
 			g_aHuman[nCntHuman].curveInfo.curveInfo.curveAngle[nCntCur] = CURVE_RIGHT;						// ‰E‚É‹È‚ª‚é
 			g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[nCntCur]  = DASH_RIGHT;						// ‰E‚ÉŒü‚©‚Á‚Ä‘–‚Á‚Ä‚¢‚é
 		}
+
+		// •œŠˆŠÖŒW‚Ìî•ñ‚Ì‰Šú‰»
+		g_aResurrect[nCntHuman].nResurCount = 0;			// ƒJƒEƒ“ƒg
+		g_aResurrect[nCntHuman].bUse = false;				// g—p‚µ‚Ä‚¢‚È‚¢
 	}
 }
 
@@ -259,6 +278,9 @@ void UpdateHuman(void)
 				if (g_aHuman[nCntHuman].pos.y <= 0.0f)
 				{ // ˆÊ’u‚ª0.0fˆÈ‰º‚É‚È‚Á‚½ê‡
 
+					// •œŠˆî•ñ‚Ìİ’èˆ—
+					SetResurrection(g_aHuman[nCntHuman]);
+
 					// g—p‚µ‚Ä‚¢‚È‚¢
 					g_aHuman[nCntHuman].bUse = false;
 				}
@@ -299,6 +321,22 @@ void UpdateHuman(void)
 
 			// ƒ‚[ƒVƒ‡ƒ“‚ÌXV
 			UpdateMotionHuman(&g_aHuman[nCntHuman]);
+		}
+
+		if (g_aResurrect[nCntHuman].bUse == true)
+		{ // •œŠˆŠÖŒW‚Ìî•ñ‚ğg—p‚µ‚Ä‚¢‚½ê‡
+
+			// •œŠˆƒJƒEƒ“ƒg‚ğ‰ÁZ‚·‚é
+			g_aResurrect[nCntHuman].nResurCount++;
+
+			if (g_aResurrect[nCntHuman].nResurCount >= RESURRECT_CNT)
+			{ // •œŠˆƒJƒEƒ“ƒg‚ªˆê’è”‚É‚È‚Á‚½ê‡
+
+				// g—p‚µ‚È‚¢
+				g_aResurrect[nCntHuman].bUse = false;
+
+				ResurrectionHuman(g_aResurrect[nCntHuman].humanDate);
+			}
 		}
 	}
 }
@@ -1578,6 +1616,136 @@ void TxtSetHuman(HumanParts *setParts, KeyInfo *setMotion)
 
 		// ƒGƒ‰[ƒƒbƒZ[ƒWƒ{ƒbƒNƒX
 		MessageBox(NULL, "lŠÔ‚ÌƒZƒbƒgƒAƒbƒvƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚É¸”sI", "ŒxI", MB_ICONWARNING);
+	}
+}
+
+//======================================================================================================================
+// •œŠˆî•ñ‚Ìİ’èˆ—
+//======================================================================================================================
+void SetResurrection(Human human)
+{
+	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
+	{
+		if (g_aResurrect[nCnt].bUse == false)
+		{ // •œŠˆ‚Ìî•ñ‚ğg—p‚µ‚Ä‚¢‚È‚¢ê‡
+			
+			// •œŠˆŠÖŒW‚Ìî•ñ‚Ìİ’è
+			g_aResurrect[nCnt].humanDate = human;		// lŠÔ‚Ìƒf[ƒ^‚ğ‘ã“ü‚·‚é
+			g_aResurrect[nCnt].nResurCount = 0;			// •œŠˆƒJƒEƒ“ƒg
+			g_aResurrect[nCnt].bUse = true;				// g—pó‹µ
+
+			// ˆ—‚©‚ç”²‚¯‚é
+			break;										
+		}
+	}
+}
+
+//======================================================================================================================
+// lŠÔ‚Ì•œŠˆˆ—
+//======================================================================================================================
+void ResurrectionHuman(Human human)
+{
+	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
+	{
+		if (g_aHuman[nCnt].bUse == false)
+		{ // lŠÔ‚ğg—p‚µ‚Ä‚¢‚È‚¢ê‡
+
+			// ˆø”‚ÌˆÊ’u‚ğ‘ã“ü
+			g_aHuman[nCnt].pos = human.pos;			// Œ»İ‚ÌˆÊ’u
+			g_aHuman[nCnt].posOld = human.pos;		// ‘O‰ñ‚ÌˆÊ’u
+
+			// î•ñ‚ğ‰Šú‰»
+			g_aHuman[nCnt].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ˆÚ“®—Ê
+			g_aHuman[nCnt].bJump = false;							// ƒWƒƒƒ“ƒv‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
+			g_aHuman[nCnt].bMove = false;							// ˆÚ“®‚µ‚Ä‚¢‚È‚¢
+			g_aHuman[nCnt].state = HUMANSTATE_WALK;					// •à‚«ó‘Ô
+
+			// ˆÚ“®—Ê‚ÌÅ‘å’l‚ğİ’è
+			g_aHuman[nCnt].fMaxMove = (float)(rand() % HUMAN_RANDAM_MOVE + HUMAN_MOVE_LEAST);
+
+			// g—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
+			g_aHuman[nCnt].bUse = true;
+
+			// í—Ş‚ğİ’è‚·‚é
+			g_aHuman[nCnt].type = human.type;
+
+			// ‰e‚ÌƒCƒ“ƒfƒbƒNƒX‚ğİ’è
+			g_aHuman[nCnt].nShadowID = SetCircleShadow
+			( // ˆø”
+				0.5f,							// ƒ¿’l
+				HUMAN_WIDTH,					// ”¼Œa
+				&g_aHuman[nCnt].nShadowID,	// ‰e‚Ìe‚Ì‰eƒCƒ“ƒfƒbƒNƒX
+				&g_aHuman[nCnt].bUse		// ‰e‚Ìe‚Ìg—pó‹µ
+			);
+
+			// ‰e‚ÌˆÊ’uİ’è
+			SetPositionShadow(g_aHuman[nCnt].nShadowID, g_aHuman[nCnt].pos, g_aHuman[nCnt].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+
+			// ˆÚ“®‚Ìí—Ş‚ğİ’è‚·‚é
+			g_aHuman[nCnt].typeMove = (MOVETYPE)(rand() % MOVETYPE_MAX);
+
+			// ‹È‚ª‚èŠpî•ñ‚Ìİ’u
+			g_aHuman[nCnt].curveInfo.actionState = HUMANACT_WALK;							// ó‘Ô
+			g_aHuman[nCnt].curveInfo.nRandamRoute = rand() % MAX_HUMAN_ROUTE;				// ƒ‹[ƒg‚Ìí—Ş
+			g_aHuman[nCnt].curveInfo.rotDest = g_aHuman[nCnt].rot;							// –Ú•W‚ÌŒü‚«
+			g_aHuman[nCnt].rot.y = GetDefaultRot(g_aHuman[nCnt].curveInfo.nRandamRoute);	// ‰Šú‚ÌŒü‚«
+			g_aHuman[nCnt].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCnt].curveInfo.nRandamRoute);	// ƒ‹[ƒg
+
+			switch (g_aHuman[nCnt].curveInfo.curveInfo.dashAngle[0])
+			{
+			case DASH_RIGHT:	// ‰E‚ÉŒü‚©‚Á‚Ä‘–‚Á‚Ä‚¢‚é
+
+				// ˆÊ’u‚ğ•â³‚·‚é
+				g_aHuman[nCnt].pos.z = g_aHuman[nCnt].curveInfo.curveInfo.curvePoint[0].z - (HUMAN_WIDTH * 2);
+
+				break;			// ”²‚¯o‚·
+
+			case DASH_LEFT:		// ¶‚ÉŒü‚©‚Á‚Ä‘–‚Á‚Ä‚¢‚é
+
+				// ˆÊ’u‚ğ•â³‚·‚é
+				g_aHuman[nCnt].pos.z = g_aHuman[nCnt].curveInfo.curveInfo.curvePoint[0].z + (HUMAN_WIDTH * 2);
+
+				break;			// ”²‚¯o‚·
+
+			case DASH_FAR:		// ‰œ‚ÉŒü‚©‚Á‚Ä‘–‚Á‚Ä‚¢‚é
+
+				// ˆÊ’u‚ğ•â³‚·‚é
+				g_aHuman[nCnt].pos.x = g_aHuman[nCnt].curveInfo.curveInfo.curvePoint[0].x + (HUMAN_WIDTH * 2);
+
+				break;			// ”²‚¯o‚·
+
+			case DASH_NEAR:		// è‘O‚ÉŒü‚©‚Á‚Ä‘–‚Á‚Ä‚¢‚é
+
+				// ˆÊ’u‚ğ•â³‚·‚é
+				g_aHuman[nCnt].pos.x = g_aHuman[nCnt].curveInfo.curveInfo.curvePoint[0].x - (HUMAN_WIDTH * 2);
+
+				break;			// ”²‚¯o‚·
+			}
+
+			// ƒWƒƒƒbƒW‚Ìî•ñ‚Ìİ’è
+			g_aHuman[nCnt].judge.col = JUDGE_WHITE;			// ƒsƒJƒsƒJ‚ÌF
+
+			g_aHuman[nCnt].judge.state = JUDGESTATE_EVIL;			// ‘Pˆ«
+			g_aHuman[nCnt].judge.ticatica = CHICASTATE_BLACKOUT;	// ƒ`ƒJƒ`ƒJó‘Ô
+
+			// ƒAƒCƒRƒ“‚Ìî•ñ‚Ì‰Šú‰»
+			g_aHuman[nCnt].icon.nIconID = NONE_ICON;				// ƒAƒCƒRƒ“‚ÌƒCƒ“ƒfƒbƒNƒX
+			g_aHuman[nCnt].icon.state = ICONSTATE_NONE;				// ƒAƒCƒRƒ“‚Ìó‘Ô
+
+
+			// ƒAƒCƒRƒ“‚Ìİ’èˆ—
+			g_aHuman[nCnt].icon.nIconID = SetIcon
+			( // ˆø”
+				g_aHuman[nCnt].pos,
+				ICONTYPE_EVIL,
+				&g_aHuman[nCnt].icon.nIconID,
+				&g_aHuman[nCnt].bUse,
+				&g_aHuman[nCnt].icon.state
+			);
+
+			// ˆ—‚ğ”²‚¯‚é
+			break;
+		}
 	}
 }
 

@@ -519,6 +519,11 @@ bool UpdateAllClear(RESULTSTATE state)
 		}
 	}
 
+	// プレイヤーの情報の初期化
+	pPlayer->boost.state = BOOSTSTATE_NONE;			// プレイヤーのブースト状態
+	pPlayer->bomb.state = ATTACKSTATE_NONE;			// プレイヤーのボム状態
+	pPlayer->wind.bUseWind = false;					// 風の使用状況
+
 	// 更新状況を返す
 	return bAllClear;
 }

@@ -109,7 +109,6 @@ FileMode g_fileMode;			//ファイルの入出力の種類
 bool g_bRankTrance;				//遷移の有無
 int g_nNewScoreNumber = -1;		//ニュースコアの番号
 
-
 //====================================
 //= ランキングの初期化処理
 //=====================================
@@ -158,7 +157,6 @@ void InitRanking(void)
 		true,	// オブジェクト
 		true	// AI
 	);
-
 
 	//スコアのソート
 	SortRankingScore();
