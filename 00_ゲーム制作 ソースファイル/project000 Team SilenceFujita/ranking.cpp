@@ -33,6 +33,15 @@
 //**********************************************
 //* マクロ
 //**********************************************
+
+#define RANK_FILE_MODE		(FILE_MODE_TXT)					//ランキングファイルの入出力モード
+#define RANK_FILE_TXT		("data\\TXT\\rank.txt")			//ランキングのスコアのテキストファイル
+#define RANK_FILE_BIN		("data\\BIN\\rank.bin")			//ランキングのスコアのバイナリファイル
+
+#define RANK_FLASH_MAX		(1.0f)	//点滅の最大値
+#define RANK_FLASH_MIN		(0.3f)	//点滅の最小値
+#define RANK_FLASH_INTERVAL	(0.02f)	//点滅の間隔
+
 //**********************************
 //* ランキングスコアの数値関係
 //**********************************
@@ -47,12 +56,6 @@
 #define RANK_INTERVAL_X		(80.0f)					//スコアの間隔（X）
 #define RANK_INTERVAL_Y		(90.0f)					//スコアの間隔（Y）
 #define RANK_MAX_NUMBER		(99999999)				//スコアの最大数
-#define RANK_ALPHA			(1.0f)					//スコアのアルファ値
-
-
-#define RANK_FILE_MODE		(FILE_MODE_BIN)					//ランキングファイルの入出力モード
-#define RANK_FILE_TXT		("data\\TXT\\rank.txt")			//ランキングのスコアのテキストファイル
-#define RANK_FILE_BIN		("data\\BIN\\rank.bin")			//ランキングのスコアのバイナリファイル
 
 //**********************************
 //* ランキングニュースコアの数値関係
@@ -60,14 +63,13 @@
 #define	RANK_NEW_NUM_PLACE	(8)							//ニュースコアの桁数
 #define RANK_NEW_TEX		(1)							//ニュースコアのテクスチャ
 #define RANK_NEW_COLUMN		(1)							//ニュースコアを分ける列
-#define RANK_NEW_POS_X		(SCREEN_WIDTH * 0.65f)		//ニュースコアの開始位置（X)
+#define RANK_NEW_POS_X		(SCREEN_WIDTH * 0.670f)		//ニュースコアの開始位置（X)
 #define RANK_NEW_POS_Y		(SCREEN_HEIGHT * 0.8f)		//ニュースコアの開始位置（Y）	
 #define RANK_NEW_SIZE_X		(40.0f)						//ニュースコアの大きさ（X）
 #define RANK_NEW_SIZE_Y		(30.0f)						//ニュースコアの大きさ（Y）
 #define RANK_NEW_INTERVAL_X	(60.0f)						//ニュースコアの間隔（X）
 #define RANK_NEW_INTERVAL_Y	(0.0f)						//ニュースコアの間隔（Y）
 #define RANK_NEW_MAX_NUMBER	(99999999)					//ニュースコアの最大数
-#define RANK_NEW_ALPHA		(1.0f)						//ニュースコアのアルファ値
 
 //**********************************************
 //* 列挙型
@@ -88,27 +90,15 @@ typedef struct
 	bool bUse;				//使用しているか
 }RankingScore;
 
-//**********************************
-//* ランキングのスコア
-//**********************************
-typedef struct
-{
-	D3DXVECTOR3 pos;	//位置
-	D3DXCOLOR col;		//色
-	int nScore;			//スコア
-	bool bUse;			//使用しているか
-}RankingNewScore;
-
 //***************************************************************
 // グローバル変数宣言
 //***************************************************************
-RankingScore g_aRankScore[RANK_MAX];		//ランキングでのスコアの情報
-RankingNewScore g_aRankNewScore;			//ランキングのニュースコアの情報
+RankingScore g_aRankScore[RANK_MAX];	//ランキングでのスコアの情報
+RankingScore g_aRankNewScore;			//ランキングのニュースコアの情報
 
 FileMode g_fileMode;			//ファイルの入出力の種類
 bool g_bRankTrance;				//遷移の有無
 int g_nNewScoreNumber = -1;		//ニュースコアの番号
-
 
 //====================================
 //= ランキングの初期化処理
@@ -138,6 +128,7 @@ void InitRanking(void)
 		g_aRankNewScore.nScore = pScore;
 		g_aRankNewScore.pos = D3DXVECTOR3(RANK_NEW_POS_X, RANK_NEW_POS_Y, 0.0f);
 		g_aRankNewScore.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		g_aRankScore[nCutRank].bFlash = false;
 		g_aRankNewScore.bUse = true;
 	}
 
@@ -208,6 +199,33 @@ void UpdateRanking(void)
 	//　パトカーの更新処理
 	UpdatePolice();
 
+	//------*****点滅の処理******------
+
+	if (g_nNewScoreNumber != -1)
+	{//ランキングが更新されたとき
+		//更新されたスコアとニュースコア
+		if (g_aRankScore[g_nNewScoreNumber].bFlash == false)
+		{
+			g_aRankScore[g_nNewScoreNumber].col.a -= RANK_FLASH_INTERVAL;
+			g_aRankNewScore.col.a -= RANK_FLASH_INTERVAL;
+			if (g_aRankScore[g_nNewScoreNumber].col.a <= RANK_FLASH_MIN)
+			{
+				g_aRankScore[g_nNewScoreNumber].bFlash = true;
+				g_aRankNewScore.bFlash = true;
+			}
+		}
+		else if (g_aRankScore[g_nNewScoreNumber].bFlash == true)
+		{
+			g_aRankScore[g_nNewScoreNumber].col.a += RANK_FLASH_INTERVAL;
+			g_aRankNewScore.col.a += RANK_FLASH_INTERVAL;
+			if (g_aRankScore[g_nNewScoreNumber].col.a >= RANK_FLASH_MAX)
+			{
+				g_aRankScore[g_nNewScoreNumber].bFlash = false;
+				g_aRankNewScore.bFlash = false;
+			}
+		}
+	}
+
 	//------*****入力の判定******------
 
 	//フェードの情報を取得
@@ -252,7 +270,7 @@ void DrawRanking(void)
 			RANK_SIZE_X,
 			RANK_SIZE_Y,
 			RANK_INTERVAL_X,
-			RANK_ALPHA);
+			g_aRankScore[nCount].col.a);
 
 		// 数値の描画
 		DrawValue(RANK_NUM_PLACE, VALUETYPE_NORMAL);
@@ -268,7 +286,7 @@ void DrawRanking(void)
 			RANK_NEW_SIZE_X,
 			RANK_NEW_SIZE_Y,
 			RANK_NEW_INTERVAL_X,
-			RANK_NEW_ALPHA);
+			g_aRankNewScore.col.a);
 
 		// 数値の描画
 		DrawValue(RANK_NUM_PLACE, VALUETYPE_RED);
