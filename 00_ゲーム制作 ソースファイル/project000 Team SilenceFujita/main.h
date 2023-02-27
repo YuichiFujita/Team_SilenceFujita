@@ -35,8 +35,9 @@
 #define FVF_VERTEX_2D	(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)				// 頂点フォーマット [2D]
 #define FVF_VERTEX_3D	(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 頂点フォーマット [3D]
 
-#define STAGE_SETUP_TXT	"data\\TXT\\stage.txt"		// ステージセットアップ用のテキストファイルの相対パス
-#define COLL_SETUP_TXT	"data\\TXT\\collision.txt"	// 当たり判定セットアップ用のテキストファイルの相対パス
+#define TUTORIAL_STAGE_SETUP_TXT	"data\\TXT\\stageTutorial.txt"	// チュートリアルのステージセットアップ用のテキストファイルの相対パス
+#define GAME_STAGE_SETUP_TXT		"data\\TXT\\stageGame.txt"		// ゲームのステージセットアップ用のテキストファイルの相対パス
+#define COLL_SETUP_TXT				"data\\TXT\\collision.txt"		// 当たり判定セットアップ用のテキストファイルの相対パス
 
 #define SCREEN_WIDTH	(1280)	// ウインドウの幅
 #define SCREEN_HEIGHT	(720)	// ウインドウの高さ

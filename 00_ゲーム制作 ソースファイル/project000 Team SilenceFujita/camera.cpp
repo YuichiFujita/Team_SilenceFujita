@@ -134,7 +134,6 @@ void InitCamera(void)
 {
 	MODE mode  = GetMode();			// ƒ‚[ƒh‚Ìó‘Ô
 	g_roadType = ROADTYPE(rand() % int(ROAD_CAMERA_TYPE_MAX));
-	g_roadType = ROADTYPE(1);
 
 	// ƒJƒƒ‰‚Ìó‘Ô‚ğ‰Šú‰»
 	g_CameraState = CAMERASTATE_NORMAL;

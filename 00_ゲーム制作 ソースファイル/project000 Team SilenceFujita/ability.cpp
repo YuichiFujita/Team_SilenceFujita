@@ -308,6 +308,18 @@ void InitAbi(void)
 //======================================================================================================================
 void UninitAbi(void)
 {
+	// テクスチャの破棄
+	for (int nCntAbility = 0; nCntAbility < TEXTURE_ABI_MAX; nCntAbility++)
+	{ // 使用するテクスチャ数分繰り返す
+
+		if (g_apTextureAbility[nCntAbility] != NULL)
+		{ // 変数 (g_apTextureAbility) がNULLではない場合
+
+			g_apTextureAbility[nCntAbility]->Release();
+			g_apTextureAbility[nCntAbility] = NULL;
+		}
+	}
+
 	// 頂点バッファの破棄
 	if (g_pVtxBuffAbility != NULL)
 	{ // 変数 (g_pVtxBuffAbility) がNULLではない場合

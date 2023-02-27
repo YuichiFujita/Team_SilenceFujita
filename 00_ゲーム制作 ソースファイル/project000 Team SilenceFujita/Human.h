@@ -129,6 +129,7 @@ typedef struct
 	D3DXVECTOR3  posOld;				// 前回の位置
 	D3DXVECTOR3  move;					// 移動量
 	float		 fMaxMove;				// 移動量の最大数
+	float		 fLandPos;				// 着地点
 	D3DXVECTOR3  rot;					// 向き
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	MotionInfo   motion;				// モーション情報

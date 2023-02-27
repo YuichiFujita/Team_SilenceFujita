@@ -102,7 +102,6 @@ void PosPlayer(void);				// プレイヤーの位置の更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
 
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
-void DriftPlayer(void);				// プレイヤーのドリフト処理
 void SlumBoostPlayer(void);			// プレイヤーの加速処理
 void FlyAwayPlayer(void);			// プレイヤーの送風処理
 void SilenceWorldPlayer(void);		// プレイヤーの爆弾処理
@@ -171,9 +170,6 @@ void InitPlayer(void)
 	// アイコンの情報の初期化
 	g_player.icon.nIconID = NONE_ICON;							// アイコンのインデックス
 	g_player.icon.state = ICONSTATE_NONE;						// アイコンの状態
-
-	// ドリフトの情報の初期化
-	g_player.drift.bDrift = false;	// ドリフト状況
 
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -274,9 +270,6 @@ void UpdateTutorialPlayer(void)
 
 		// プレイヤーの着地の更新
 		LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
-		
-		// プレイヤーのドリフト
-		DriftPlayer();
 
 		// プレイヤーの加速
 		SlumBoostPlayer();
@@ -571,6 +564,9 @@ void HitPlayer(Player *pPlayer, int nDamage)
 		// 引数のダメージ分を体力から減算
 		pPlayer->nLife -= nDamage;
 
+		// コンボの倍率処理
+		MagnificCombo(COMBO_INTERRUPTION);
+
 		if (pPlayer->nLife > 0)
 		{ // 体力が残っている場合
 
@@ -667,9 +663,6 @@ void UpdateNormalPlayer(void)
 
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
-	
-	// プレイヤーのドリフト
-	DriftPlayer();
 
 	// プレイヤーの加速
 	SlumBoostPlayer();
@@ -957,28 +950,8 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			// 後退状態にする
 			currentPlayer = PLAYMOVESTATE_BACK;
 
-			if (bRotate)
-			{ // 旋回の操作が可能な場合
-
-				if (g_player.move.x >= 5.0f)
-				{ // 移動量が一定以上だった場合
-
-					// ドリフトする
-					g_player.drift.bDrift = true;
-				}
-				else
-				{ // 移動量が一定以下だった場合
-
-					// 移動量を更新
-					g_player.move.x -= MOVE_BACKWARD;
-				}
-			}
-			else
-			{ // 旋回の操作が不可能な場合
-
-				// 移動量を更新
-				g_player.move.x -= MOVE_BACKWARD;
-			}
+			// 移動量を更新
+			g_player.move.x -= MOVE_BACKWARD;
 
 			// 移動している状態にする
 			g_player.bMove = true;
@@ -1000,30 +973,20 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			// 旋回状態にする
 			currentPlayer = PLAYMOVESTATE_ROTATE;
 
-			if (g_player.drift.bDrift == true)
-			{ // ドリフト中だった場合
+			// 向きを更新
+			g_player.rot.y -= MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
 
-				// 向きを更新
-				g_player.rot.y -= 0.04f;
-			}
-			else
-			{ // ドリフト中じゃ無かった場合
+			if (g_player.move.x >= SUB_MOVE_VALUE)
+			{ // 移動量が一定値以上の場合
 
-				// 向きを更新
-				g_player.rot.y -= MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+				// 移動量を更新
+				g_player.move.x -= SUB_MOVE;
 
-				if (g_player.move.x >= SUB_MOVE_VALUE)
-				{ // 移動量が一定値以上の場合
+				if (g_player.move.x < SUB_MOVE_VALUE)
+				{ // 移動量が一定値より小さい場合
 
-					// 移動量を更新
-					g_player.move.x -= SUB_MOVE;
-
-					if (g_player.move.x < SUB_MOVE_VALUE)
-					{ // 移動量が一定値より小さい場合
-
-						// 最低限の移動量を代入
-						g_player.move.x = SUB_MOVE_VALUE;
-					}
+					// 最低限の移動量を代入
+					g_player.move.x = SUB_MOVE_VALUE;
 				}
 			}
 		}
@@ -1033,38 +996,22 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			// 旋回状態にする
 			currentPlayer = PLAYMOVESTATE_ROTATE;
 
-			if (g_player.drift.bDrift == true)
-			{ // ドリフト中だった場合
+			// 向きを更新
+			g_player.rot.y += MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
 
-				// 向きを更新
-				g_player.rot.y += 0.04f;
-			}
-			else
-			{ // ドリフト中じゃなかった場合
+			if (g_player.move.x >= SUB_MOVE_VALUE)
+			{ // 移動量が一定値以上の場合
 
-				// 向きを更新
-				g_player.rot.y += MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+				// 移動量を更新
+				g_player.move.x -= SUB_MOVE;
 
-				if (g_player.move.x >= SUB_MOVE_VALUE)
-				{ // 移動量が一定値以上の場合
+				if (g_player.move.x < SUB_MOVE_VALUE)
+				{ // 移動量が一定値より小さい場合
 
-					// 移動量を更新
-					g_player.move.x -= SUB_MOVE;
-
-					if (g_player.move.x < SUB_MOVE_VALUE)
-					{ // 移動量が一定値より小さい場合
-
-						// 最低限の移動量を代入
-						g_player.move.x = SUB_MOVE_VALUE;
-					}
+					// 最低限の移動量を代入
+					g_player.move.x = SUB_MOVE_VALUE;
 				}
 			}
-		}
-		else
-		{ // A・Dキーを押していない場合
-
-			// ドリフトしていない状態にする
-			g_player.drift.bDrift = false;
 		}
 	}
 
@@ -1195,19 +1142,6 @@ Player *GetPlayer(void)
 {
 	// プレイヤー本体の情報アドレスを返す
 	return &g_player;
-}
-
-//============================================================
-//	プレイヤーのドリフト処理
-//============================================================
-void DriftPlayer(void)
-{
-	if (g_player.drift.bDrift == true)
-	{ // ドリフトしている場合
-
-		// 移動量を少し下げる
-		g_player.move.x += (0.0f - g_player.move.x) * 0.04f;
-	}
 }
 
 //============================================================

@@ -14,6 +14,7 @@
 
 #include "buildtimer.h"
 #include "bonus.h"
+#include "Combo.h"
 #include "junk.h"
 #include "object.h"
 #include "particle.h"
@@ -31,6 +32,7 @@
 #define DAMAGE_TIME_OBJ			(20)							// ダメージ状態を保つ時間
 #define UNR_TIME_OBJ			(DAMAGE_TIME_OBJ - 10)			// 無敵状態に変更する時間
 #define JUNK_POS_Y				(0.7f)							// がれきが出現する位置の倍率(Y軸)
+#define SPARK_SPEED				(13.0f)							// 火花が出るスピード
 
 #define OBJECT_GRAVITY			(-1.5f)							// オブジェクトの重力
 #define SMASH_WIDTH_MAGNI		(3.0f)							// 吹き飛びの幅の倍率
@@ -861,7 +863,7 @@ void HitObject(Object *pObject, int nDamage)
 			}
 
 			// ボーナスの設定処理
-			SetBonus(ADDSCORE_OBJECT);	
+			SetBonus(ADDSCORE_OBJECT);
 
 			//// アイテムの設定
 			//SetItem(pObject->pos, ITEMTYPE_HEAL);
@@ -910,7 +912,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						// 位置を補正
 						pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMin.z - fDepth - 0.01f;
 
-						if (pMove->x >= 13.0f)
+						if (pMove->x >= SPARK_SPEED)
 						{ // 移動量が一定以上の場合
 							// パーティクルの設定処理
 							SetParticle
@@ -921,6 +923,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
+
+							// コンボの倍率処理
+							MagnificCombo(COMBO_INTERRUPTION);
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -969,7 +977,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						// 位置を補正
 						pPos->z = g_aObject[nCntObject].pos.z + g_aObject[nCntObject].modelData.vtxMax.z + fDepth + 0.01f;
 
-						if (pMove->x >= 13.0f)
+						if (pMove->x >= SPARK_SPEED)
 						{ // 移動量が一定以上の場合
 							// パーティクルの設定処理
 							SetParticle
@@ -980,6 +988,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
+
+							// コンボの倍率処理
+							MagnificCombo(COMBO_INTERRUPTION);
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -1035,7 +1049,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						// 位置を補正
 						pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMin.x - fWidth - 0.01f;
 
-						if (pMove->x >= 13.0f)
+						if (pMove->x >= SPARK_SPEED)
 						{ // 移動量が一定以上の場合
 							// パーティクルの設定処理
 							SetParticle
@@ -1046,6 +1060,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
+
+							// コンボの倍率処理
+							MagnificCombo(COMBO_INTERRUPTION);
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -1094,7 +1114,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						// 位置を補正
 						pPos->x = g_aObject[nCntObject].pos.x + g_aObject[nCntObject].modelData.vtxMax.x + fWidth + 0.01f;
 
-						if (pMove->x >= 13.0f)
+						if (pMove->x >= SPARK_SPEED)
 						{ // 移動量が一定以上の場合
 							// パーティクルの設定処理
 							SetParticle
@@ -1105,6 +1125,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								10,													// 生成数
 								2													// 寿命
 							);
+						}
+						else
+						{ // 移動量が一定未満の場合
+
+							// コンボの倍率処理
+							MagnificCombo(COMBO_INTERRUPTION);
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -1171,7 +1197,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							// 位置を補正
 							pPos->z = collPos.z - g_aObject[nCntObject].collInfo.fDepth[nCntColl] - fDepth - 0.01f;
 
-							if (pMove->x >= 13.0f)
+							if (pMove->x >= SPARK_SPEED)
 							{ // 移動量が一定以上の場合
 								// パーティクルの設定処理
 								SetParticle
@@ -1182,6 +1208,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
 							}
 
 							if (state == BOOSTSTATE_UP)
@@ -1230,7 +1262,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							// 位置を補正
 							pPos->z = collPos.z + g_aObject[nCntObject].collInfo.fDepth[nCntColl] + fDepth + 0.01f;
 
-							if (pMove->x >= 13.0f)
+							if (pMove->x >= SPARK_SPEED)
 							{ // 移動量が一定以上の場合
 							  // パーティクルの設定処理
 								SetParticle
@@ -1241,6 +1273,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
 							}
 
 							if (state == BOOSTSTATE_UP)
@@ -1296,7 +1334,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							// 位置を補正
 							pPos->x = collPos.x - g_aObject[nCntObject].collInfo.fWidth[nCntColl] - fWidth - 0.01f;
 
-							if (pMove->x >= 13.0f)
+							if (pMove->x >= SPARK_SPEED)
 							{ // 移動量が一定以上の場合
 								// パーティクルの設定処理
 								SetParticle
@@ -1307,6 +1345,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
 							}
 
 							if (state == BOOSTSTATE_UP)
@@ -1355,7 +1399,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							// 位置を補正
 							pPos->x = collPos.x + g_aObject[nCntObject].collInfo.fWidth[nCntColl] + fWidth + 0.01f;
 
-							if (pMove->x >= 13.0f)
+							if (pMove->x >= SPARK_SPEED)
 							{ // 移動量が一定以上の場合
 								// パーティクルの設定処理
 								SetParticle
@@ -1366,6 +1410,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									10,													// 生成数
 									2													// 寿命
 								);
+							}
+							else
+							{ // 移動量が一定未満の場合
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
 							}
 
 							if (state == BOOSTSTATE_UP)

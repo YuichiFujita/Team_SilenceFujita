@@ -6,6 +6,7 @@
 //=======================================
 #include "bonus.h"
 
+#include "Combo.h"
 #include "score.h"
 #include "game.h"
 #include "value.h"
@@ -174,7 +175,7 @@ void UpdateBonus(void)
 {
 	int nCntBonus;					//回数の変数を宣言する
 
-	D3DXVECTOR3 ScorePos = D3DXVECTOR3(SCORE_POS_X, SCORE_POS_Y, 0.0f);		// スコアの位置を取得
+	D3DXVECTOR3 ScorePos = D3DXVECTOR3(900.0f, 400.0f, 0.0f);		// スコアの位置を取得
 
 	VERTEX_2D *pVtx;				//頂点情報へのポインタ
 
@@ -240,8 +241,14 @@ void UpdateBonus(void)
 					// 使用しない
 					g_aBonus[nCntBonus].bUse = false;
 
-					// スコアを加算する
-					AddScore(g_aBonus[nCntBonus].nScore);
+					//// スコアを加算する
+					//AddScore(g_aBonus[nCntBonus].nScore);
+
+					// コンボのスコアの加算処理
+					AddComboScore(g_aBonus[nCntBonus].nScore);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
 
 					// 2Dパーティクルの発生
 					Set2DParticle
@@ -262,8 +269,14 @@ void UpdateBonus(void)
 					// 使用しない
 					g_aBonus[nCntBonus].bUse = false;
 
-					// スコアを加算する
-					AddScore(g_aBonus[nCntBonus].nScore);
+					//// スコアを加算する
+					//AddScore(g_aBonus[nCntBonus].nScore);
+
+					// コンボのスコアの加算処理
+					AddComboScore(g_aBonus[nCntBonus].nScore);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
 
 					// 2Dパーティクルの発生
 					Set2DParticle

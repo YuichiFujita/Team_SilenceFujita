@@ -17,6 +17,7 @@
 #define COMBO_NUMBER_SHIFT		(20.0f)							// 数字のずらす数
 
 #define MAX_CONBOCOUNT			(999)							// コンボカウントの最大
+#define COMBOSTOP_CNT			(600)							// コンボの止まるカウント
 #define DIGIT_ONE				(1)								// 1桁の境界
 #define DIGIT_TWO				(10)							// 2桁の境界
 #define DIGIT_THREE				(100)							// 3桁の境界
@@ -31,10 +32,12 @@ typedef enum
 //プロトタイプ宣言
 
 //グローバル変数宣言
-LPDIRECT3DTEXTURE9 g_pTextureCombo[COMBOTEX_MAX] = {};				//テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffCombo = NULL;					//頂点バッファへのポインタ
+LPDIRECT3DTEXTURE9 g_pTextureCombo[COMBOTEX_MAX] = {};			// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffCombo = NULL;					// 頂点バッファへのポインタ
 
-Combo g_Combo;													//コンボの情報
+Combo g_Combo;													// コンボの情報
+int g_nComboScore;												// 倍率でかけるスコア
+int g_nComboCount;												// コンボが止まるまでのカウント
 
 //テクスチャファイル名
 const char *c_apFilenameCombo[COMBOTEX_MAX] =
@@ -53,12 +56,18 @@ void InitCombo(void)
 	pDevice = GetDevice();
 
 	// 情報の初期化
-	g_Combo.pos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f);	// 位置
+	g_Combo.pos = D3DXVECTOR3(1150.0f, 400.0f, 0.0f);		// 位置
 	g_Combo.nMagni		= 0;								// 倍率
 	g_Combo.nDigit		= 0;								// 桁数
 	g_Combo.nMoveCount  = 0;								// 移動カウント
 	g_Combo.bMoveUp		= true;								// 上に移動しているか下に移動しているか
 	g_Combo.bUse		= false;							// 使用状況
+
+	// 倍率でかけるスコアを初期化
+	g_nComboScore = 0;
+
+	// コンボが止まるまでのカウントを初期化
+	g_nComboCount = 0;
 
 	for (int nCntTexture = 0; nCntTexture < COMBOTEX_MAX; nCntTexture++)
 	{//テクスチャの設定
@@ -160,11 +169,21 @@ void UpdateCombo(void)
 	if (g_Combo.bUse == true)
 	{//使用していた場合
 
+		// コンボの止まるカウントを加算
+		g_nComboCount++;
+
 		//頂点座標の設定
 		pVtx[0].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
 		pVtx[1].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
 		pVtx[2].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
 		pVtx[3].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
+
+		if (g_nComboCount >= COMBOSTOP_CNT)
+		{ // カウントが一定数に達したら
+
+			// コンボの倍率処理(スコア加算)
+			MagnificCombo(COMBO_INTERRUPTION);
+		}
 	}
 
 	//頂点バッファをアンロックする
@@ -218,6 +237,24 @@ void DrawCombo(void)
 			g_Combo.nDigit,
 			VALUETYPE_RED
 		);
+
+		// 数値の設定処理
+		SetValue
+		(
+			D3DXVECTOR3(g_Combo.pos.x - 100.0f, g_Combo.pos.y, g_Combo.pos.z),
+			g_nComboScore,
+			VAL_MAX_SCORE,
+			COMBO_NUMBER_X,
+			COMBO_NUMBER_Y,
+			COMBO_NUMBER_SHIFT,
+			1.0f);
+
+		// 数値の描画処理
+		DrawValue
+		(
+			VAL_SCO_DIGIT,
+			VALUETYPE_NORMAL
+		);
 	}
 }
 
@@ -229,8 +266,17 @@ void MagnificCombo(int nMagni)
 	if (nMagni <= COMBO_INTERRUPTION)
 	{ // 倍率が-1以下だった場合
 
+		// スコアの加算処理
+		AddScore(g_nComboScore * g_Combo.nMagni);
+
 		// 倍率を0にする
 		g_Combo.nMagni = 0;
+
+		// 倍率でかけるスコアを初期化
+		g_nComboScore = 0;
+
+		// コンボの止まるカウントを初期化
+		g_nComboCount = 0;
 	}
 	else
 	{ // 倍率が0よりも高かった場合
@@ -255,6 +301,29 @@ void MagnificCombo(int nMagni)
 
 			// 桁数を設定する
 			g_Combo.nDigit = 1;
+		}
+
+		// コンボの止まるカウントを初期化
+		g_nComboCount = 0;
+	}
+}
+
+//===========================================
+// コンボ倍率のスコアの加算処理
+//===========================================
+void AddComboScore(int nScore)
+{
+	if (g_nComboScore < VAL_MAX_SCORE)
+	{ // 現在のスコアの値がスコアの最大値より小さい場合
+
+		// スコアに引数の値を加算
+		g_nComboScore += nScore;
+
+		if (g_nComboScore > VAL_MAX_SCORE)
+		{ // 現在のスコアの値がスコアの最大値より大きい場合
+
+			// スコアを補正
+			g_nComboScore = VAL_MAX_SCORE;
 		}
 	}
 }

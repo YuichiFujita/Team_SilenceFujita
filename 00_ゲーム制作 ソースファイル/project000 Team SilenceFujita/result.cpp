@@ -283,6 +283,9 @@ void InitResult(void)
 			false	// AI
 		);
 	}
+
+	////サウンドの再生（ランキング終了まで）※AnarchyCars
+	//PlaySound(SOUND_LABEL_RESULT_BGM_000);
 }
 
 //======================================
@@ -290,8 +293,8 @@ void InitResult(void)
 //======================================
 void UninitResult(void)
 {
-	//サウンドの停止
-	StopSound();
+	////サウンドの停止
+	//StopSound();
 
 	// リザルトの終了全体処理
 	UninitResultChunk();			

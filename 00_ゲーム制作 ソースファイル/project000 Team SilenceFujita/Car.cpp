@@ -14,6 +14,7 @@
 
 #include "bonus.h"
 #include "Car.h"
+#include "Combo.h"
 #include "shadow.h"
 #include "sound.h"
 #include "player.h"
@@ -268,7 +269,7 @@ void UpdateCar(void)
 					if (g_aCar[nCntCar].nBombCount % CAR_BOMB_BONUS_CNT == 0)
 					{ // ボムカウントが一定数になった場合
 
-					  // ボーナスの設定処理
+						// ボーナスの設定処理
 						SetBonus(ADDSCORE_CAR);
 					}
 				}

@@ -215,8 +215,8 @@ void InitGame(void)
 		true	// AI
 	);
 
-	// ゲートの設定処理
-	SetGate(D3DXVECTOR3(1500.0f, 10.0f, 11500.0f), D3DXVECTOR3(0.0f, D3DXToRadian(0), 0.0f), ROTSTATE_0);
+	//// サウンドの再生※AnarchyCars
+	//PlaySound(SOUND_LABEL_GAME_BGM_000);	// BGM (ゲーム画面)
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
@@ -337,9 +337,15 @@ void UninitGame(void)
 	// フラッシュの終了
 	UninitFlash();
 
+	// BGMの停止
+	StopSound();
+
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
 	UninitEditmain();
+
+	// BGMの停止
+	StopSoundDJ();
 #endif
 }
 
@@ -440,6 +446,9 @@ void UpdateGame(void)
 			}
 			else
 			{ // カウンターが 0以下の場合
+
+				// コンボの倍率処理(得点の代入処理)
+				MagnificCombo(COMBO_INTERRUPTION);
 
 				// モード選択 (リザルト画面に移行)
 				SetFade(MODE_RESULT);

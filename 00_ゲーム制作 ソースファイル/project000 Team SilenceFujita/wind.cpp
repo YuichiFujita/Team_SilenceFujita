@@ -13,6 +13,7 @@
 #include "calculation.h"
 
 #include "camera.h"
+#include "Combo.h"
 #include "input.h"
 #include "particle.h"
 #include "object.h"

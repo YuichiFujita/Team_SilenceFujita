@@ -514,7 +514,7 @@ void TxtSetMeshField(void)
 	FILE *pFile;				// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
-	pFile = fopen(STAGE_SETUP_TXT, "r");
+	pFile = (GetMode() == MODE_TUTORIAL) ? fopen(TUTORIAL_STAGE_SETUP_TXT, "r") : fopen(GAME_STAGE_SETUP_TXT, "r");
 
 	if (pFile != NULL)
 	{ // ファイルが開けた場合
