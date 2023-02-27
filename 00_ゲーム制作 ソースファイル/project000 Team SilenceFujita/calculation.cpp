@@ -229,13 +229,6 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 		// AI系のセットアップ
 		TxtSetAI();
 	}
-
-	for (int nCntHuman = 0; nCntHuman < 64; nCntHuman++)
-	{ // オブジェクトの最大表示数分繰り返す
-
-		// 人間の設定
-		SetHuman(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	}
 }
 
 //==================================================================================

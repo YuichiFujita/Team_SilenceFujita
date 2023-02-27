@@ -434,7 +434,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_GAME;			// モードをタイトルに初期化
+	g_mode = MODE_TUTORIAL;			// モードをタイトルに初期化
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -860,7 +860,7 @@ void TxtSetStage(void)
 	FILE *pFile;		// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
-	pFile = fopen(STAGE_SETUP_TXT, "r");
+	pFile = (g_mode == MODE_TUTORIAL) ? fopen(TUTORIAL_STAGE_SETUP_TXT, "r") : fopen(GAME_STAGE_SETUP_TXT, "r");
 
 	if (pFile != NULL)
 	{ // ファイルが開けた場合
