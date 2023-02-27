@@ -343,6 +343,9 @@ void UninitGame(void)
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
 	UninitEditmain();
+
+	// BGMの停止
+	StopSoundDJ();
 #endif
 }
 

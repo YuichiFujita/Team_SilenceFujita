@@ -243,7 +243,7 @@ void DrawCombo(void)
 		(
 			D3DXVECTOR3(g_Combo.pos.x - 100.0f, g_Combo.pos.y, g_Combo.pos.z),
 			g_nComboScore,
-			99999,
+			VAL_MAX_SCORE,
 			COMBO_NUMBER_X,
 			COMBO_NUMBER_Y,
 			COMBO_NUMBER_SHIFT,
