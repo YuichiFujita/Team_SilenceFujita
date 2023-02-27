@@ -132,7 +132,7 @@ void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3
 //==================================================================================
 //	地面の上に立つかメッシュフィールドの上にいるかの判定に使用
 //==================================================================================
-void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
+float LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
 {
 	// 変数を宣言
 	float fLandPosY = CollisionMeshField(*pPos);		// 着地点
@@ -155,6 +155,9 @@ void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
 		// ジャンプしている状態にする
 		*pbJump = true;
 	}
+
+	// 着地点を返す
+	return fLandPosY;
 }
 
 //==================================================================================
@@ -228,13 +231,6 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 
 		// AI系のセットアップ
 		TxtSetAI();
-	}
-
-	for (int nCntHuman = 0; nCntHuman < 64; nCntHuman++)
-	{ // オブジェクトの最大表示数分繰り返す
-
-		// 人間の設定
-		SetHuman(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}
 }
 
@@ -525,6 +521,11 @@ bool UpdateAllClear(RESULTSTATE state)
 			break;
 		}
 	}
+
+	// プレイヤーの情報の初期化
+	pPlayer->boost.state = BOOSTSTATE_NONE;			// プレイヤーのブースト状態
+	pPlayer->bomb.state = ATTACKSTATE_NONE;			// プレイヤーのボム状態
+	pPlayer->wind.bUseWind = false;					// 風の使用状況
 
 	// 更新状況を返す
 	return bAllClear;

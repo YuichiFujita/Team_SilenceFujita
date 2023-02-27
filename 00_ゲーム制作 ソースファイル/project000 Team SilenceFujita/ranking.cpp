@@ -150,7 +150,6 @@ void InitRanking(void)
 		true	// AI
 	);
 
-
 	//スコアのソート
 	SortRankingScore();
 }
