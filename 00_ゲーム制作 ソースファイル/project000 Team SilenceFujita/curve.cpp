@@ -37,7 +37,6 @@
 //**********************************************************************************************************************
 CURVEINFO g_aCurveInfo[MAX_CURVEPOINT];						// 車のカーブの情報
 HUMANCURVEINFO g_aCurveHuman[MAX_HUMAN_ROUTE];				// 人間のカーブの情報
-float g_aDefaultRot[MAX_HUMAN_ROUTE];						// 最初の曲がり角
 
 //======================================================================================================================
 // カーブの情報の初期化処理
@@ -665,12 +664,6 @@ void SetCurvePoint(void)
 			if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_RIGHT)
 			{ // 右方向に移動していた場合
 
-				if (nCnt == 0)
-				{ // 一回目の場合
-					// 向きを90度に設定する
-					g_aDefaultRot[nCntCur] = D3DXToRadian(90);
-				}
-
 				if (g_aCurveHuman[nCntCur].roadPos[nCnt] == ROADPOS_RIGHT)
 				{ // 曲がり角より右側を通る場合
 					// 曲がるポイントのZ軸を75.0f戻す
@@ -718,12 +711,6 @@ void SetCurvePoint(void)
 			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_LEFT)
 			{ // 左方向に移動していた場合
 
-				if (nCnt == 0)
-				{ // 一回目の場合
-					// 向きを-90度に設定する
-					g_aDefaultRot[nCntCur] = D3DXToRadian(-90);
-				}
-
 				if (g_aCurveHuman[nCntCur].roadPos[nCnt] == ROADPOS_RIGHT)
 				{ // 曲がり角より右側を通る場合
 					// 曲がるポイントのZ軸を75.0f進める
@@ -770,12 +757,6 @@ void SetCurvePoint(void)
 			}
 			else if (g_aCurveHuman[nCntCur].dashAngle[nCnt] == DASH_FAR)
 			{ // 奥方向に移動していた場合
-
-				if (nCnt == 0)
-				{ // 一回目の場合
-					// 向きを0度に設定する
-					g_aDefaultRot[nCntCur] = D3DXToRadian(0);
-				}
 
 				if (g_aCurveHuman[nCntCur].roadPos[nCnt] == ROADPOS_RIGHT)
 				{ // 曲がり角より右側を通る場合
@@ -850,12 +831,6 @@ void SetCurvePoint(void)
 						g_aCurveHuman[nCntCur].curvePoint[nCnt].z -= (SHIFT_HUMAN_CURVE + (HUMAN_WIDTH * 2));
 					}
 
-					if (nCnt == 0)
-					{ // 一回目の場合
-						// 向きを-180度に設定する
-						g_aDefaultRot[nCntCur] = D3DXToRadian(-180);
-					}
-
 					break;				// 抜け出す
 
 				case CURVE_LEFT:		// 左に曲がる
@@ -869,12 +844,6 @@ void SetCurvePoint(void)
 					{ // 次の通るところが曲がり角より左だったら
 						// 曲がるポイントのZ軸を75.0f進める
 						g_aCurveHuman[nCntCur].curvePoint[nCnt].z += (SHIFT_HUMAN_CURVE + (HUMAN_WIDTH * 2));
-					}
-
-					if (nCnt == 0)
-					{ // 一回目の場合
-						// 向きを180度に設定する
-						g_aDefaultRot[nCntCur] = D3DXToRadian(180);
 					}
 
 					break;				// 抜け出す
@@ -891,13 +860,4 @@ HUMANCURVEINFO GetHumanRoute(int nID)
 {
 	// カーブの情報を返す
 	return g_aCurveHuman[nID];
-}
-
-//============================================================
-// 人間の初期向きの取得処理
-//============================================================
-float GetDefaultRot(int nID)
-{
-	// 初期向きを返す
-	return g_aDefaultRot[nID];
 }

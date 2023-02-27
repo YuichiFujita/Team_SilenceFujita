@@ -141,6 +141,7 @@ typedef struct
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
+	bool		 bRecur;				// 復活するかどうか
 	HUMANSTATE	 state;					// 状態
 	HUMANCURVE	 curveInfo;				// 曲がり角の情報
 	Judge		 judge;					// ジャッジ
@@ -153,7 +154,7 @@ void InitHuman(void);					// 人間の初期化処理
 void UninitHuman(void);					// 人間の終了処理
 void UpdateHuman(void);					// 人間の更新処理
 void DrawHuman(void);					// 人間の描画処理
-void SetHuman(D3DXVECTOR3 pos);			// 人間の設定処理
+void SetHuman(D3DXVECTOR3 pos, int walk, bool bRecur, int type);			// 人間の設定処理
 Human *GetHumanData(void);				// 人間の取得処理
 
 //**********************************************************************************************************************
