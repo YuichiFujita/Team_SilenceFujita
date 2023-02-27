@@ -565,9 +565,6 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 //=======================================================================================================
 void SetPositionIcon(int nIconID, D3DXVECTOR3 pos)
 {
-	// 変数を宣言
-	D3DXMATRIX mtxScale, mtxRot, mtxTrans;		// 計算用マトリックス
-
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 

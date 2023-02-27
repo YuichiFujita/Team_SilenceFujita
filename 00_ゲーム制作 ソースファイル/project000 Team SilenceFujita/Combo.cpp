@@ -17,6 +17,7 @@
 #define COMBO_NUMBER_SHIFT		(20.0f)							// 数字のずらす数
 
 #define MAX_CONBOCOUNT			(999)							// コンボカウントの最大
+#define COMBOSTOP_CNT			(600)							// コンボの止まるカウント
 #define DIGIT_ONE				(1)								// 1桁の境界
 #define DIGIT_TWO				(10)							// 2桁の境界
 #define DIGIT_THREE				(100)							// 3桁の境界
@@ -36,6 +37,7 @@ LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffCombo = NULL;					// 頂点バッファへのポインタ
 
 Combo g_Combo;													// コンボの情報
 int g_nComboScore;												// 倍率でかけるスコア
+int g_nComboCount;												// コンボが止まるまでのカウント
 
 //テクスチャファイル名
 const char *c_apFilenameCombo[COMBOTEX_MAX] =
@@ -61,8 +63,11 @@ void InitCombo(void)
 	g_Combo.bMoveUp		= true;								// 上に移動しているか下に移動しているか
 	g_Combo.bUse		= false;							// 使用状況
 
-	// 倍率でかけるスコアを初期化する
+	// 倍率でかけるスコアを初期化
 	g_nComboScore = 0;
+
+	// コンボが止まるまでのカウントを初期化
+	g_nComboCount = 0;
 
 	for (int nCntTexture = 0; nCntTexture < COMBOTEX_MAX; nCntTexture++)
 	{//テクスチャの設定
@@ -164,11 +169,21 @@ void UpdateCombo(void)
 	if (g_Combo.bUse == true)
 	{//使用していた場合
 
+		// コンボの止まるカウントを加算
+		g_nComboCount++;
+
 		//頂点座標の設定
 		pVtx[0].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
 		pVtx[1].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
 		pVtx[2].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
 		pVtx[3].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
+
+		if (g_nComboCount >= COMBOSTOP_CNT)
+		{ // カウントが一定数に達したら
+
+			// コンボの倍率処理(スコア加算)
+			MagnificCombo(COMBO_INTERRUPTION);
+		}
 	}
 
 	//頂点バッファをアンロックする
@@ -228,7 +243,7 @@ void DrawCombo(void)
 		(
 			D3DXVECTOR3(g_Combo.pos.x - 100.0f, g_Combo.pos.y, g_Combo.pos.z),
 			g_nComboScore,
-			99999,
+			VAL_MAX_SCORE,
 			COMBO_NUMBER_X,
 			COMBO_NUMBER_Y,
 			COMBO_NUMBER_SHIFT,
@@ -257,8 +272,11 @@ void MagnificCombo(int nMagni)
 		// 倍率を0にする
 		g_Combo.nMagni = 0;
 
-		// 倍率でかけるスコアを初期化する
+		// 倍率でかけるスコアを初期化
 		g_nComboScore = 0;
+
+		// コンボの止まるカウントを初期化
+		g_nComboCount = 0;
 	}
 	else
 	{ // 倍率が0よりも高かった場合
@@ -284,6 +302,9 @@ void MagnificCombo(int nMagni)
 			// 桁数を設定する
 			g_Combo.nDigit = 1;
 		}
+
+		// コンボの止まるカウントを初期化
+		g_nComboCount = 0;
 	}
 }
 
