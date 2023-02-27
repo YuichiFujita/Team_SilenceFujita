@@ -84,6 +84,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 void CollisionExitGate(Gate *pGate);																			// ゲートの脱出判定
 
 void AllShutOutGate(void);		// ゲートの全閉め処理
+void AllOpenGate(void);			// ゲートの全開け処理
 Gate *GetGateData(void);		// オブジェクトの取得処理
 Exit GetExit(void);				// 脱出の情報の取得処理
 Collision *GetCollGate(void);	// ゲートの当たり判定の取得処理

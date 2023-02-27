@@ -112,6 +112,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].posOld    = g_aHuman[nCntHuman].pos;		// 前回の位置
 		g_aHuman[nCntHuman].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aHuman[nCntHuman].fMaxMove  = 0.0f;							// 移動量の最大数
+		g_aHuman[nCntHuman].fLandPos  = 0.0f;							// 着地点
 		g_aHuman[nCntHuman].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aHuman[nCntHuman].nShadowID = NONE_SHADOW;					// 影のインデックス
 		g_aHuman[nCntHuman].bJump     = false;							// ジャンプしているかどうか
@@ -205,7 +206,7 @@ void UpdateHuman(void)
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;
 
 			// オブジェクトの着地の更新処理
-			LandObject(&g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].bJump);
+			g_aHuman[nCntHuman].fLandPos = LandObject(&g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].bJump);
 
 			//----------------------------------------------------
 			//	影の更新
@@ -275,7 +276,7 @@ void UpdateHuman(void)
 				g_aHuman[nCntHuman].pos.x += g_aHuman[nCntHuman].move.x;
 				g_aHuman[nCntHuman].pos.z += g_aHuman[nCntHuman].move.z;
 
-				if (g_aHuman[nCntHuman].pos.y <= 0.0f)
+				if (g_aHuman[nCntHuman].pos.y <= g_aHuman[nCntHuman].fLandPos)
 				{ // 位置が0.0f以下になった場合
 
 					// 復活情報の設定処理
@@ -505,6 +506,7 @@ void SetHuman(D3DXVECTOR3 pos)
 
 			// 情報を初期化
 			g_aHuman[nCntHuman].move     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aHuman[nCntHuman].fLandPos = 0.0f;							// 着地点
 			g_aHuman[nCntHuman].bJump    = false;							// ジャンプしているかどうか
 			g_aHuman[nCntHuman].bMove    = false;							// 移動していない
 			g_aHuman[nCntHuman].state    = HUMANSTATE_WALK;					// 歩き状態

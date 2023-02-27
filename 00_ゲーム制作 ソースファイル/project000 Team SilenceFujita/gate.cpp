@@ -23,6 +23,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define GATE_GRAVITY			(1.0f)		// 重力
+#define GATE_OPEN				(2.5f)		// ゲートの開く速度
 #define GATE_DOOR_PLUSPOS		(285.0f)	// ドアの初期位置の y座標加算量
 #define GATE_EXIT_WIDESIZE_MUL	(0.3f)		// 脱出口の横位置加算量の倍率
 #define GATE_EXIT_FORWARDPLUS	(150.0f)	// 脱出口の前方加算量
@@ -131,6 +132,11 @@ void UninitGate(void)
 //======================================================================================================================
 void UpdateGate(void)
 {
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{
+		AllOpenGate();
+	}
+
 	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -205,7 +211,7 @@ void UpdateGate(void)
 			case GATESTATE_OPEN:	// 開き状態
 
 				// 重力をかける
-				g_aGate[nCntGate].doorData.fMove += GATE_GRAVITY;
+				g_aGate[nCntGate].doorData.fMove = GATE_OPEN;
 
 				// 位置を更新する
 				g_aGate[nCntGate].doorData.fPos += g_aGate[nCntGate].doorData.fMove;
@@ -628,11 +634,28 @@ void AllShutOutGate(void)
 	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		if (g_aGate[nCntGate].bUse == true)
+		if (g_aGate[nCntGate].bUse == true && g_aGate[nCntGate].state != GATESTATE_STOP && g_aGate[nCntGate].state != GATESTATE_OPEN)
 		{ // オブジェクトが使用されている場合
 
 			// 落下状態にする
 			g_aGate[nCntGate].state = GATESTATE_LAND;
+		}
+	}
+}
+
+//======================================================================================================================
+//	ゲートの全開け処理
+//======================================================================================================================
+void AllOpenGate(void)
+{
+	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
+	{ // オブジェクトの最大表示数分繰り返す
+
+		if (g_aGate[nCntGate].bUse == true && g_aGate[nCntGate].state != GATESTATE_FLY)
+		{ // オブジェクトが使用されている場合
+
+			// 開放状態にする
+			g_aGate[nCntGate].state = GATESTATE_OPEN;
 		}
 	}
 }
