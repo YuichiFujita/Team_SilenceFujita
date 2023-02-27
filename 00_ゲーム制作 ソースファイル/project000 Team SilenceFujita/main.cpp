@@ -857,6 +857,7 @@ void TxtSetStage(void)
 	D3DXVECTOR3 pos;			// 位置
 	D3DXVECTOR3 rot;			// 向き
 	ROTSTATE	stateRot;		// 向きの状態
+	bool		bOpen;			// 開閉状況
 
 	// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
@@ -955,10 +956,28 @@ void TxtSetStage(void)
 								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
 								fscanf(pFile, "%d", &stateRot);								// 向き状態を読み込む
 							}
+							else if (strcmp(&aString[0], "OPEN") == 0)
+							{ // 読み込んだ文字列が OPEN の場合
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%s", &aString[0]);							// 向き状態を読み込む
+
+								if (strcmp(&aString[0], "TRUE") == 0)
+								{ // trueの場合
+
+									// 開き状態
+									bOpen = true;
+								}
+								else
+								{ // falseの場合
+
+									// 閉じ状態
+									bOpen = false;
+								}
+							}
 						} while (strcmp(&aString[0], "END_SET_GATE") != 0);	// 読み込んだ文字列が END_SET_GATE ではない場合ループ
 
 						// ゲートの設定処理
-						SetGate(pos, rot, stateRot);
+						SetGate(pos, rot, stateRot, bOpen);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}

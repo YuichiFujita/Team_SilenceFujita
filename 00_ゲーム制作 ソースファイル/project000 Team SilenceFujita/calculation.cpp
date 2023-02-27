@@ -132,7 +132,7 @@ void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3
 //==================================================================================
 //	地面の上に立つかメッシュフィールドの上にいるかの判定に使用
 //==================================================================================
-void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
+float LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
 {
 	// 変数を宣言
 	float fLandPosY = CollisionMeshField(*pPos);		// 着地点
@@ -155,6 +155,9 @@ void LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump)
 		// ジャンプしている状態にする
 		*pbJump = true;
 	}
+
+	// 着地点を返す
+	return fLandPosY;
 }
 
 //==================================================================================
