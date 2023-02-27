@@ -42,6 +42,7 @@ void UpdateTutorial(void);									// チュートリアル画面の更新処理
 void DrawTutorial(void);									// チュートリアル画面の描画処理
 void AddLessonState(void);									// レッスンの状態の加算処理
 void SetTutorialState(TUTORIALSTATE state, int nCounter);	// チュートリアル画面の設定処理
-TUTORIALSTATE GetLessonState(void);							// レッスンの状態の取得処理
+LESSON GetLessonState(void);								// レッスンの状態の取得処理
+TUTORIALSTATE GetTutorialState(void);						// チュートリアルの状態の取得処理
 
 #endif

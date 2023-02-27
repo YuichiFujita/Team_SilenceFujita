@@ -9,7 +9,6 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "calculation.h"
-#include "input.h"
 #include "model.h"
 
 #include "gate.h"
@@ -132,11 +131,6 @@ void UninitGate(void)
 //======================================================================================================================
 void UpdateGate(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{
-		AllOpenGate();
-	}
-
 	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -441,7 +435,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 		{ // オブジェクトが使用されている場合
 
 			// 繰り返し数を設定
-			nNumLoop = (g_aGate[nCntGate].state != GATESTATE_FLY) ? MODEL_GATE_MAX : 1;
+			nNumLoop = (g_aGate[nCntGate].state != GATESTATE_FLY || g_aGate[nCntGate].state != GATESTATE_OPEN) ? MODEL_GATE_MAX : 1;
 
 			for (int nCntCollGate = 0; nCntCollGate < nNumLoop; nCntCollGate++)
 			{ // 設定された繰り返し数分ループ

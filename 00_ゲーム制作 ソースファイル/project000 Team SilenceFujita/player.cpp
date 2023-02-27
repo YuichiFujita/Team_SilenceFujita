@@ -103,7 +103,8 @@ typedef struct
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
-void UpdateNormalPlayer(void);		// 通常時のプレイヤー更新処理
+void UpdateGameNorPlayer(void);		// ゲーム通常時のプレイヤー更新処理
+void UpdateTutorialNorPlayer(void);	// チュートリアル通常時のプレイヤー更新処理
 void UpdateClearPlayer(void);		// クリア成功時のプレイヤー更新処理
 void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
 
@@ -117,8 +118,8 @@ void SlumBoostPlayer(void);			// プレイヤーの加速処理
 void FlyAwayPlayer(void);			// プレイヤーの送風処理
 void SilenceWorldPlayer(void);		// プレイヤーの爆弾処理
 
-void UpdateBoost(void);				// 加速の更新処理
-void SetBoost(void);				// 加速の設定処理
+void UpdateSlumBoost(void);			// 加速の更新処理
+void SetSlumBoost(void);			// 加速の設定処理
 void UpdateFlyAway(void);			// 送風の更新処理
 void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
@@ -210,8 +211,8 @@ void UpdateGamePlayer(void)
 		if (GetGameState() == GAMESTATE_NORMAL)
 		{ // ゲームが通常状態の場合
 
-			// 通常時のプレイヤー更新
-			UpdateNormalPlayer();
+			// ゲーム通常時のプレイヤー更新
+			UpdateGameNorPlayer();
 		}
 		else if (GetResultState() == RESULTSTATE_CLEAR)
 		{ // リザルトがクリア成功状態の場合
@@ -233,208 +234,20 @@ void UpdateGamePlayer(void)
 //============================================================
 void UpdateTutorialPlayer(void)
 {
-	// 変数を宣言
-	int   nTrafficCnt  = 0;		// 引数設定用
-	int   nTackleCnt   = 0;		// 引数設定用
-	float fTackleSpeed = 0.0f;	// 引数設定用
-	POLICESTATE   policeState   = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
-	PLAYMOVESTATE currentPlayer = PLAYMOVESTATE_NONE;	// 現在のプレイヤーの動き
-
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
 
-		// 前回位置の更新
-		g_player.oldPos = g_player.pos;
+		if (GetTutorialState() == TUTORIALSTATE_NORMAL)
+		{ // チュートリアルが通常状態の場合
 
-#if 0
-		// 状態の更新
-		if (g_player.nCounterState > 0)
-		{ // カウンターが 0より大きい場合
-
-			// カウンターを減算
-			g_player.nCounterState--;
-
-			if (g_player.nCounterState == UNR_TIME_PLAY)
-			{ // カウンターが一定値の場合
-
-				// 無敵状態にする
-				g_player.state = ACTIONSTATE_UNRIVALED;
-
-				// 無敵状態の状態にする
-				g_player.icon.state = ICONSTATE_UNRIVALED;
-			}
-			else if (g_player.nCounterState <= 0)
-			{ // カウンターが 0以下の場合
-
-				// 通常状態にする
-				g_player.state = ACTIONSTATE_NORMAL;
-
-				// 無しの状態にする
-				g_player.icon.state = ICONSTATE_NONE;
-			}
+			// チュートリアル通常時のプレイヤー更新
+			UpdateTutorialNorPlayer();
 		}
-#endif
+		else if (GetTutorialState() == TUTORIALSTATE_END)
+		{ // チュートリアルが終了状態の場合
 
-		// 加速の更新
-		UpdateBoost();
-
-		// プレイヤーの移動量の更新
-		currentPlayer = MovePlayer(true, true, true);
-
-		// プレイヤーの位置の更新
-		PosPlayer();
-
-		// プレイヤーの着地の更新
-		LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
-
-		// プレイヤーの加速
-		SlumBoostPlayer();
-
-		// プレイヤーの送風
-		FlyAwayPlayer();
-
-		// プレイヤーの爆弾
-		SilenceWorldPlayer();
-
-		// 送風の更新
-		UpdateFlyAway();
-
-		// 爆弾の更新
-		UpdateSilenceWorld();
-
-		// プレイヤーのカメラの状態変化
-		CameraChangePlayer();
-
-		//--------------------------------------------------------
-		//	当たり判定
-		//--------------------------------------------------------
-		// オブジェクトとの当たり判定
-		CollisionObject
-		( // 引数
-			&g_player.pos,			// 現在の位置
-			&g_player.oldPos,		// 前回の位置
-			&g_player.move,			// 移動量
-			PLAY_WIDTH,				// 横幅
-			PLAY_DEPTH,				// 奥行
-			&nTrafficCnt,			// 渋滞カウント
-			g_player.boost.state,	// ブーストの状態
-			&policeState,			// 警察の状態
-			&nTackleCnt,			// タックルカウント
-			&fTackleSpeed			// タックル時の移動量
-		);
-
-		// 吹っ飛ぶオブジェクトとの当たり判定
-		SmashCollision
-		( // 引数
-			g_player.pos, 
-			g_player.modelData.fRadius,
-			g_player.move.x
-		);				
-
-		// ゲートとの当たり判定
-		CollisionGate
-		( // 引数
-			&g_player.pos,		// 現在の位置
-			&g_player.oldPos,	// 前回の位置
-			&g_player.move,		// 移動量
-			PLAY_WIDTH,			// 横幅
-			PLAY_DEPTH			// 奥行
-		);	
-
-		// 車の停止処理
-		CollisionStopCar
-		( // 引数
-			g_player.pos,				//位置
-			g_player.rot,				//向き
-			&g_player.move,				//移動量
-			g_player.modelData.fRadius,	//半径
-			COLLOBJECTTYPE_PLAYER,		//対象のタイプ
-			&nTrafficCnt
-		);
-
-		// 車同士の当たり判定
-		CollisionCarBody
-		( // 引数
-			&g_player.pos,
-			&g_player.oldPos,
-			g_player.rot,
-			&g_player.move,
-			PLAY_WIDTH,
-			PLAY_DEPTH,
-			COLLOBJECTTYPE_PLAYER,
-			&nTrafficCnt,
-			TACKLESTATE_CHARGE
-		);
-
-		//--------------------------------------------------------
-		//	影の更新
-		//--------------------------------------------------------
-		// 影の位置設定
-		SetPositionShadow
-		( // 引数
-			g_player.nShadowID,	// 影のインデックス
-			g_player.pos,		// 位置
-			g_player.rot,		// 向き
-			NONE_SCALE			// 拡大率
-		);
-
-		// プレイヤーの補正の更新処理
-		RevPlayer();
-
-		//--------------------------------------------------------
-		//	チュートリアルの更新
-		//--------------------------------------------------------
-		switch (GetLessonState())
-		{ // レッスンごとの処理
-		case LESSON_00:	// レッスン0 (移動)
-
-			if (currentPlayer == PLAYMOVESTATE_ACCEL
-			||  currentPlayer == PLAYMOVESTATE_BACK)
-			{ // 現在のプレイヤーの動きが移動状態の場合
-
-				// レッスンの状態の加算
-				AddLessonState();
-			}
-
-			// 処理を抜ける
-			break;
-
-		case LESSON_01:	// レッスン1 (旋回)
-
-			if (currentPlayer == PLAYMOVESTATE_ROTATE)
-			{ // 現在のプレイヤーの動きが旋回状態の場合
-
-				// レッスンの状態の加算
-				AddLessonState();
-			}
-
-			// 処理を抜ける
-			break;
-
-		case LESSON_02:	// レッスン2 (停止)
-
-			if (currentPlayer == PLAYMOVESTATE_BRAKE)
-			{ // 現在のプレイヤーの動きが停止状態の場合
-
-				// レッスンの状態の加算
-				AddLessonState();
-			}
-
-			// 処理を抜ける
-			break;
-
-		case LESSON_03:	// レッスン3 (視点変更)
-
-			if (g_tutorialCamera.bForward == true
-			&&  g_tutorialCamera.bFirst   == true)
-			{ // どちらのカメラも変更した場合
-
-				// レッスンの状態の加算
-				AddLessonState();
-			}
-
-			// 処理を抜ける
-			break;
+			// クリア成功時のプレイヤー更新
+			UpdateClearPlayer();
 		}
 	}
 }
@@ -670,9 +483,9 @@ void HitPlayer(Player *pPlayer, int nDamage)
 }
 
 //============================================================
-//	通常時のプレイヤー更新処理
+//	ゲーム通常時のプレイヤー更新処理
 //============================================================
-void UpdateNormalPlayer(void)
+void UpdateGameNorPlayer(void)
 {
 	// 変数を宣言
 	int nTrafficCnt = 0;		// 引数設定用
@@ -711,7 +524,7 @@ void UpdateNormalPlayer(void)
 	}
 
 	// 加速の更新
-	UpdateBoost();
+	UpdateSlumBoost();
 
 	// プレイヤーの移動量の更新
 	MovePlayer(true, true, true);
@@ -825,6 +638,237 @@ void UpdateNormalPlayer(void)
 
 	// プレイヤーの補正の更新処理
 	RevPlayer();
+}
+
+//============================================================
+//	チュートリアル通常時のプレイヤー更新処理
+//============================================================
+void UpdateTutorialNorPlayer(void)
+{
+	// 変数を宣言
+	int   nTrafficCnt  = 0;		// 引数設定用
+	int   nTackleCnt   = 0;		// 引数設定用
+	float fTackleSpeed = 0.0f;	// 引数設定用
+	POLICESTATE   policeState   = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
+	PLAYMOVESTATE currentPlayer = PLAYMOVESTATE_NONE;	// 現在のプレイヤーの動き
+
+	// 変数配列を宣言
+	bool aControl[3];			// 操作の制限用
+
+	// 操作の宣言を設定
+	switch (GetLessonState())
+	{ // レッスンごとの処理
+	case LESSON_00:	// レッスン0 (移動)
+
+		// 操作の制限を設定
+		aControl[0] = true;		// 移動
+		aControl[1] = false;	// 旋回
+		aControl[2] = false;	// 停止
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_01:	// レッスン1 (旋回)
+
+		// 操作の制限を設定
+		aControl[0] = true;		// 移動
+		aControl[1] = true;		// 旋回
+		aControl[2] = false;	// 停止
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_02:	// レッスン2 (停止)
+
+		// 操作の制限を設定
+		aControl[0] = true;		// 移動
+		aControl[1] = true;		// 旋回
+		aControl[2] = true;		// 停止
+
+		// 処理を抜ける
+		break;
+	}
+
+	// 前回位置の更新
+	g_player.oldPos = g_player.pos;
+
+	// 加速の更新
+	UpdateSlumBoost();
+
+	// プレイヤーの移動量の更新
+	currentPlayer = MovePlayer(aControl[0], aControl[1], aControl[2]);
+
+	// プレイヤーの位置の更新
+	PosPlayer();
+
+	// プレイヤーの着地の更新
+	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
+
+	if (GetLessonState() >= LESSON_04)
+	{ // レッスン4に挑戦中、またはクリアしている場合
+
+		// プレイヤーの加速
+		SlumBoostPlayer();
+	}
+
+	if (GetLessonState() >= LESSON_05)
+	{ // レッスン5に挑戦中、またはクリアしている場合
+
+		// プレイヤーの送風
+		FlyAwayPlayer();
+	}
+
+	if (GetLessonState() >= LESSON_06)
+	{ // レッスン6に挑戦中、またはクリアしている場合
+
+		// プレイヤーの爆弾
+		SilenceWorldPlayer();
+	}
+
+	// 送風の更新
+	UpdateFlyAway();
+
+	// 爆弾の更新
+	UpdateSilenceWorld();
+
+	if (GetLessonState() >= LESSON_03)
+	{ // レッスン3に挑戦中、またはクリアしている場合
+
+		// プレイヤーのカメラの状態変化
+		CameraChangePlayer();
+	}
+
+	//--------------------------------------------------------
+	//	当たり判定
+	//--------------------------------------------------------
+	// オブジェクトとの当たり判定
+	CollisionObject
+	( // 引数
+		&g_player.pos,			// 現在の位置
+		&g_player.oldPos,		// 前回の位置
+		&g_player.move,			// 移動量
+		PLAY_WIDTH,				// 横幅
+		PLAY_DEPTH,				// 奥行
+		&nTrafficCnt,			// 渋滞カウント
+		g_player.boost.state,	// ブーストの状態
+		&policeState,			// 警察の状態
+		&nTackleCnt,			// タックルカウント
+		&fTackleSpeed			// タックル時の移動量
+	);
+
+	// 吹っ飛ぶオブジェクトとの当たり判定
+	SmashCollision
+	( // 引数
+		g_player.pos, 
+		g_player.modelData.fRadius,
+		g_player.move.x
+	);				
+
+	// ゲートとの当たり判定
+	CollisionGate
+	( // 引数
+		&g_player.pos,		// 現在の位置
+		&g_player.oldPos,	// 前回の位置
+		&g_player.move,		// 移動量
+		PLAY_WIDTH,			// 横幅
+		PLAY_DEPTH			// 奥行
+	);	
+
+	// 車の停止処理
+	CollisionStopCar
+	( // 引数
+		g_player.pos,				//位置
+		g_player.rot,				//向き
+		&g_player.move,				//移動量
+		g_player.modelData.fRadius,	//半径
+		COLLOBJECTTYPE_PLAYER,		//対象のタイプ
+		&nTrafficCnt
+	);
+
+	// 車同士の当たり判定
+	CollisionCarBody
+	( // 引数
+		&g_player.pos,
+		&g_player.oldPos,
+		g_player.rot,
+		&g_player.move,
+		PLAY_WIDTH,
+		PLAY_DEPTH,
+		COLLOBJECTTYPE_PLAYER,
+		&nTrafficCnt,
+		TACKLESTATE_CHARGE
+	);
+
+	//--------------------------------------------------------
+	//	影の更新
+	//--------------------------------------------------------
+	// 影の位置設定
+	SetPositionShadow
+	( // 引数
+		g_player.nShadowID,	// 影のインデックス
+		g_player.pos,		// 位置
+		g_player.rot,		// 向き
+		NONE_SCALE			// 拡大率
+	);
+
+	// プレイヤーの補正の更新処理
+	RevPlayer();
+
+	//--------------------------------------------------------
+	//	チュートリアルの更新
+	//--------------------------------------------------------
+	switch (GetLessonState())
+	{ // レッスンごとの処理
+	case LESSON_00:	// レッスン0 (移動)
+
+		if (currentPlayer == PLAYMOVESTATE_ACCEL
+		||  currentPlayer == PLAYMOVESTATE_BACK)
+		{ // 現在のプレイヤーの動きが移動状態の場合
+
+			// レッスンの状態の加算
+			AddLessonState();
+		}
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_01:	// レッスン1 (旋回)
+
+		if (currentPlayer == PLAYMOVESTATE_ROTATE)
+		{ // 現在のプレイヤーの動きが旋回状態の場合
+
+			// レッスンの状態の加算
+			AddLessonState();
+		}
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_02:	// レッスン2 (停止)
+
+		if (currentPlayer == PLAYMOVESTATE_BRAKE)
+		{ // 現在のプレイヤーの動きが停止状態の場合
+
+			// レッスンの状態の加算
+			AddLessonState();
+		}
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_03:	// レッスン3 (視点変更)
+
+		if (g_tutorialCamera.bForward == true
+		&&  g_tutorialCamera.bFirst   == true)
+		{ // どちらのカメラも変更した場合
+
+			// レッスンの状態の加算
+			AddLessonState();
+		}
+
+		// 処理を抜ける
+		break;
+	}
 }
 
 //============================================================
@@ -1226,7 +1270,7 @@ void SlumBoostPlayer(void)
 	{ // 加速の操作が行われている場合
 
 		// 加速の設定
-		SetBoost();
+		SetSlumBoost();
 	}
 }
 
@@ -1306,7 +1350,7 @@ void CameraChangePlayer(void)
 //============================================================
 //	加速の更新処理
 //============================================================
-void UpdateBoost(void)
+void UpdateSlumBoost(void)
 {
 	// 変数を宣言
 	D3DXVECTOR3 posLeft, posRight;	// ブーストの放出位置
@@ -1454,7 +1498,7 @@ void UpdateBoost(void)
 //============================================================
 //	加速の設定処理
 //============================================================
-void SetBoost(void)
+void SetSlumBoost(void)
 {
 	if (g_player.boost.state == BOOSTSTATE_NONE
 	&&  g_player.move.x      >= BOOST_OK_MOVE)

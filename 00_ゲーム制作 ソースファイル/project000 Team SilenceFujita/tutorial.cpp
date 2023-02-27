@@ -79,9 +79,9 @@ const int aNextLesson[] =	// レッスンのカウンター
 	120,	// レッスン1 (旋回)     のレッスンカウンター
 	30,		// レッスン2 (停止)     のレッスンカウンター
 	1,		// レッスン3 (視点変更) のレッスンカウンター
-	0,		// レッスン4 (破滅疾走) のレッスンカウンター
-	0,		// レッスン5 (吹飛散風) のレッスンカウンター
-	0,		// レッスン6 (無音世界) のレッスンカウンター
+	1,		// レッスン4 (破滅疾走) のレッスンカウンター
+	1,		// レッスン5 (吹飛散風) のレッスンカウンター
+	1,		// レッスン6 (無音世界) のレッスンカウンター
 	0,		// レッスン7 (脱出)     のレッスンカウンター
 };
 
@@ -429,6 +429,15 @@ void UninitTutorial(void)
 //======================================================================================================================
 void UpdateTutorial(void)
 {
+#if 1
+#include "input.h"
+
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{
+		AddLessonState();
+	}
+#endif
+
 	if (g_bTutorialEnd == false)
 	{ // 遷移設定がされていない場合
 
@@ -441,65 +450,6 @@ void UpdateTutorial(void)
 			// ゲーム画面の状態設定
 			SetTutorialState(TUTORIALSTATE_END, END_TUTORIAL_TIME);	// 終了状態
 		}
-	}
-
-	switch (g_nLessonState)
-	{ // レッスンごとの処理
-	case LESSON_00:	// レッスン0 (移動)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_01:	// レッスン1 (旋回)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_03:	// レッスン3 (視点変更)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_04:	// レッスン4 (破滅疾走)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_05:	// レッスン5 (吹飛散風)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_06:	// レッスン6 (無音世界)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_07:	// レッスン7 (脱出)
-
-		// 無し
-
-		// 処理を抜ける
-		break;
 	}
 
 	switch (g_tutorialState)
@@ -787,28 +737,32 @@ void AddLessonState(void)
 
 			case LESSON_04:	// レッスン4 (破滅疾走)
 
-				// 無し
+				// レッスンのセットアップ
+				TxtSetLesson(LESSON_SETUP_SLUMBOOST);
 
 				// 処理を抜ける
 				break;
 
 			case LESSON_05:	// レッスン5 (吹飛散風)
 
-				// 無し
+				// レッスンのセットアップ
+				TxtSetLesson(LESSON_SETUP_FLYAWAY);
 
 				// 処理を抜ける
 				break;
 
 			case LESSON_06:	// レッスン6 (無音世界)
 
-				// 無し
+				// レッスンのセットアップ
+				TxtSetLesson(LESSON_SETUP_SILENCEWORLD);
 
 				// 処理を抜ける
 				break;
 
 			case LESSON_07:	// レッスン7 (脱出)
 
-				// 無し
+				// ゲートの全開け処理
+				AllOpenGate();
 
 				// 処理を抜ける
 				break;
@@ -835,11 +789,19 @@ void SetTutorialState(TUTORIALSTATE state, int nCounter)
 //======================================================================================================================
 //	レッスンの状態の取得処理
 //======================================================================================================================
-TUTORIALSTATE GetLessonState(void)
+LESSON GetLessonState(void)
 {
 	// レッスンの状態を返す
-	return (TUTORIALSTATE)g_nLessonState;
+	return (LESSON)g_nLessonState;
+}
 
+//======================================================================================================================
+//	チュートリアルの状態の取得処理
+//======================================================================================================================
+TUTORIALSTATE GetTutorialState(void)
+{
+	// チュートリアルの状態を返す
+	return g_tutorialState;
 }
 
 //======================================================================================================================
@@ -884,11 +846,11 @@ void TxtSetLesson(LESSON_SETUP lesson)
 			{ // レッスンごとの処理
 			case LESSON_SETUP_SLUMBOOST:	// レッスン4 (破滅疾走) の読み込み
 
-				if (strcmp(&aString[0], "SETSTAGE_OBJECT") == 0)
-				{ // 読み込んだ文字列が SETSTAGE_OBJECT の場合
+				if (strcmp(&aString[0], "SETLESSON_OBJECT") == 0)
+				{ // 読み込んだ文字列が SETLESSON_OBJECT の場合
 
 					do
-					{ // 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
+					{ // 読み込んだ文字列が END_SETLESSON_OBJECT ではない場合ループ
 
 						// ファイルから文字列を読み込む
 						fscanf(pFile, "%s", &aString[0]);
@@ -974,12 +936,12 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									}
 								}
 
-							} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
+							} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);		// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 							// オブジェクトの設定
 							SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY);
 						}
-					} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
+					} while (strcmp(&aString[0], "END_SETLESSON_OBJECT") != 0);			// 読み込んだ文字列が END_SETLESSON_OBJECT ではない場合ループ
 				}
 
 				// 処理を抜ける
@@ -987,15 +949,77 @@ void TxtSetLesson(LESSON_SETUP lesson)
 
 			case LESSON_SETUP_FLYAWAY:		// レッスン5 (吹飛散風) の読み込み
 
+				if (strcmp(&aString[0], "SETSTAGE_HUMAN") == 0)
+				{ // 読み込んだ文字列が SETSTAGE_HUMAN の場合
+					do
+					{ // 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+
+						// ファイルから文字列を読み込む
+						fscanf(pFile, "%s", &aString[0]);
+
+						if (strcmp(&aString[0], "SET_HUMAN") == 0)
+						{ // 読み込んだ文字列が SET_HUMAN の場合
+
+							do
+							{ // 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+								// ファイルから文字列を読み込む
+								fscanf(pFile, "%s", &aString[0]);
+
+								if (strcmp(&aString[0], "POS") == 0)
+								{ // 読み込んだ文字列が POS の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+								}
+
+							} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+							// 人間の設定
+							SetHuman(pos);
+						}
+					} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+				}
+
 				// 処理を抜ける
 				break;
 
 			case LESSON_SETUP_SILENCEWORLD:	// レッスン6 (無音世界) の読み込み
 
+				if (strcmp(&aString[0], "SETLESSON_CAR") == 0)
+				{ // 読み込んだ文字列が SETLESSON_CAR の場合
+					do
+					{ // 読み込んだ文字列が END_SETLESSON_CAR ではない場合ループ
+
+						// ファイルから文字列を読み込む
+						fscanf(pFile, "%s", &aString[0]);
+
+						if (strcmp(&aString[0], "SET_CAR") == 0)
+						{ // 読み込んだ文字列が SET_CAR の場合
+
+							do
+							{ // 読み込んだ文字列が END_SET_CAR ではない場合ループ
+
+								// ファイルから文字列を読み込む
+								fscanf(pFile, "%s", &aString[0]);
+
+								if (strcmp(&aString[0], "POS") == 0)
+								{ // 読み込んだ文字列が POS の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+								}
+
+							} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
+
+							// 車の設定
+							SetCar(pos);
+						}
+					} while (strcmp(&aString[0], "END_SETLESSON_CAR") != 0);			// 読み込んだ文字列が END_SETLESSON_CAR ではない場合ループ
+				}
+
 				// 処理を抜ける
 				break;
 			}
-		} while (nEnd != EOF);														// 読み込んだ文字列が EOF ではない場合ループ
+		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
 		
 		// ファイルを閉じる
 		fclose(pFile);
