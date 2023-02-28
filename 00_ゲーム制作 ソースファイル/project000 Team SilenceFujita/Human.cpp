@@ -217,7 +217,7 @@ void UpdateHuman(void)
 			SetPositionShadow
 			( // 引数
 				g_aHuman[nCntHuman].nShadowID,		// 影のインデックス
-				g_aHuman[nCntHuman].pos,			// 位置
+				D3DXVECTOR3(g_aHuman[nCntHuman].pos.x, g_aHuman[nCntHuman].fLandPos, g_aHuman[nCntHuman].pos.z),			// 位置
 				g_aHuman[nCntHuman].rot,			// 向き
 				NONE_SCALE							// 拡大率
 			);
@@ -530,7 +530,13 @@ void SetHuman(D3DXVECTOR3 pos, int walk,bool bRecur,int type)
 			);
 
 			// 影の位置設定
-			SetPositionShadow(g_aHuman[nCntHuman].nShadowID, g_aHuman[nCntHuman].pos, g_aHuman[nCntHuman].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+			SetPositionShadow
+			(
+				g_aHuman[nCntHuman].nShadowID, 
+				g_aHuman[nCntHuman].pos,
+				g_aHuman[nCntHuman].rot, 
+				D3DXVECTOR3(1.0f, 1.0f, 1.0f)
+			);
 
 			switch (g_aHuman[nCntHuman].typeMove)
 			{
@@ -1660,7 +1666,13 @@ void ResurrectionHuman(Human human)
 			);
 
 			// 影の位置設定
-			SetPositionShadow(g_aHuman[nCnt].nShadowID, g_aHuman[nCnt].pos, g_aHuman[nCnt].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+			SetPositionShadow
+			(
+				g_aHuman[nCnt].nShadowID,
+				g_aHuman[nCnt].pos,
+				g_aHuman[nCnt].rot,
+				D3DXVECTOR3(1.0f, 1.0f, 1.0f)
+			);
 
 			// 復活する
 			g_aHuman[nCnt].bRecur = true;
