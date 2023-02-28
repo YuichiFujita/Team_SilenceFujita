@@ -459,6 +459,37 @@ void UpdateTutorial(void)
 		}
 	}
 
+	switch (g_nLessonState)
+	{ // レッスンごとの処理
+	case LESSON_04:	// レッスン4 (破滅疾走)
+
+
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_05:	// レッスン5 (吹飛散風)
+
+
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_06:	// レッスン6 (無音世界)
+
+
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_07:	// レッスン7 (脱出)
+
+
+
+		// 処理を抜ける
+		break;
+	}
+
 	switch (g_tutorialState)
 	{ // 状態ごとの処理
 	case TUTORIALSTATE_NORMAL:		// 通常状態
@@ -751,7 +782,7 @@ void AddLessonState(void)
 			case LESSON_04:	// レッスン4 (破滅疾走)
 
 				// レッスンのセットアップ
-				//TxtSetLesson(LESSON_SETUP_SLUMBOOST);
+				TxtSetLesson(LESSON_SETUP_SLUMBOOST);
 
 				// 処理を抜ける
 				break;
