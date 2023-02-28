@@ -76,7 +76,8 @@
 //------------------------------------------------------------
 //	無音世界 (サイレンス・ワールド) マクロ定義
 //------------------------------------------------------------
-#define SUB_BOMB_CNT	(10)		// 使用待機時のゲージの減算量
+#define BOMB_CANCEL_CNT	(14)		// 攻撃キャンセル時の二回押しの猶予フレーム
+#define SUB_BOMB_CNT	(4)			// 使用待機時のゲージの減算量
 
 //************************************************************
 //	列挙型定義 (PLAYMOVESTATE)
@@ -177,8 +178,10 @@ void InitPlayer(void)
 	g_player.wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
 
 	// 爆弾の情報の初期化
-	g_player.bomb.state    = ATTACKSTATE_NONE;	// 攻撃状態
-	g_player.bomb.nCounter = BOMB_WAIT_CNT;		// 攻撃管理カウンター
+	g_player.bomb.state           = ATTACKSTATE_NONE;	// 攻撃状態
+	g_player.bomb.nCounterState   = BOMB_WAIT_CNT;		// 攻撃管理カウンター
+	g_player.bomb.nCounterControl = 0;					// 操作管理カウンター
+	g_player.bomb.bShot           = false;				// 発射待機状況
 
 	// アイコンの情報の初期化
 	g_player.icon.nIconID = NONE_ICON;			// アイコンのインデックス
@@ -1135,7 +1138,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_X) == true || GetJoyKeyPress(JOYKEY_X, 0) == true)
+	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_X, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
@@ -1274,7 +1277,7 @@ Player *GetPlayer(void)
 //============================================================
 void SlumBoostPlayer(void)
 {
-	if (GetKeyboardPress(DIK_SPACE) == true || GetJoyKeyPress(JOYKEY_A, 0) == true)
+	if (GetKeyboardPress(DIK_LSHIFT) == true || GetJoyKeyPress(JOYKEY_A, 0) == true)
 	{ // 加速の操作が行われている場合
 
 		// 加速の設定
@@ -1310,22 +1313,65 @@ void FlyAwayPlayer(void)
 //============================================================
 void SilenceWorldPlayer(void)
 {
-	if (GetKeyboardTrigger(DIK_RETURN) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
-	{ // 攻撃モードの変更の操作が行われた場合
+	if (g_player.bomb.state == ATTACKSTATE_BOMB)
+	{ // 攻撃状態がボム攻撃状態の場合
 
-		if (g_player.bomb.state != ATTACKSTATE_WAIT)
-		{ // 攻撃状態が攻撃待機状態ではない場合
+		if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
+		{ // 攻撃モードの変更の操作が行われた場合
 
-			// 攻撃モードを変更
-			g_player.bomb.state = (ATTACKSTATE)((g_player.bomb.state + 1) % ATTACKSTATE_MAX);
+			if (g_player.bomb.bShot == true)
+			{ // 発射待機状態の場合
+
+				// 発射待機状態を取り消す
+				g_player.bomb.bShot = false;
+
+				// 操作管理カウンターを初期化
+				g_player.bomb.nCounterControl = 0;
+
+				// 攻撃待機状態にする
+				g_player.bomb.state = ATTACKSTATE_WAIT;
+			}
+			else
+			{ // 発射待機状態ではない場合
+
+				// 発射待機状態にする
+				g_player.bomb.bShot = true;
+
+				// 操作管理カウンターを初期化
+				g_player.bomb.nCounterControl = 0;
+			}
+		}
+
+		if (g_player.bomb.bShot == true)
+		{ // 発射待機状態の場合
+
+			// カウンターを加算
+			g_player.bomb.nCounterControl++;
+
+			if (g_player.bomb.nCounterControl >= BOMB_CANCEL_CNT)
+			{ // カウンターが一定値以上の場合
+
+				// バリアの発射
+				ShotBarrier();
+
+				// 発射待機状態を取り消す
+				g_player.bomb.bShot = false;
+			}
 		}
 	}
+	else
+	{ // 攻撃状態がボム攻撃状態ではない場合
 
-	if (GetKeyboardTrigger(DIK_BACKSPACE) == true)
-	{ // 爆弾の発射の操作が行われた場合
+		if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
+		{ // 攻撃モードの変更の操作が行われた場合
 
-		// バリアの発射
-		ShotBarrier();
+			if (g_player.bomb.state != ATTACKSTATE_WAIT)
+			{ // 攻撃状態が攻撃待機状態ではない場合
+
+				// 攻撃モードを変更
+				g_player.bomb.state = (ATTACKSTATE)((g_player.bomb.state + 1) % ATTACKSTATE_MAX);
+			}
+		}
 	}
 }
 
@@ -1697,17 +1743,17 @@ void UpdateSilenceWorld(void)
 
 	case ATTACKSTATE_BOMB:	// ボム攻撃状態
 
-		if (g_player.bomb.nCounter > 0)
+		if (g_player.bomb.nCounterState > 0)
 		{ // カウンターが 0より大きい場合
 
 			// カウンターを減算
-			g_player.bomb.nCounter -= SUB_BOMB_CNT;
+			g_player.bomb.nCounterState -= SUB_BOMB_CNT;
 
-			if (g_player.bomb.nCounter < 0)
+			if (g_player.bomb.nCounterState < 0)
 			{ // カウンターが 0を下回った場合
 
 				// カウンターを補正
-				g_player.bomb.nCounter = 0;
+				g_player.bomb.nCounterState = 0;
 			}
 		}
 		else
@@ -1722,11 +1768,11 @@ void UpdateSilenceWorld(void)
 
 	case ATTACKSTATE_WAIT:	// 攻撃待機状態
 
-		if (g_player.bomb.nCounter < BOMB_WAIT_CNT)
+		if (g_player.bomb.nCounterState < BOMB_WAIT_CNT)
 		{ // カウンターが一定値より小さい場合
 
 			// カウンターを加算
-			g_player.bomb.nCounter++;
+			g_player.bomb.nCounterState++;
 		}
 		else
 		{ // カウンターが一定値以上の場合

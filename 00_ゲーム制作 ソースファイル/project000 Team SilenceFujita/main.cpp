@@ -1877,7 +1877,7 @@ void DrawDebug(void)
 		pPolice->move.x,
 		HumanPos.x, HumanPos.y, HumanPos.z,
 		nNumWeather,
-		pPlayer->bomb.nCounter,
+		pPlayer->bomb.nCounterState,
 		nNumObject,
 		nNumBuild,
 		pPolice->state,
