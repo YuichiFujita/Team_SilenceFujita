@@ -66,10 +66,11 @@ void UninitJunk(void);					// がれきの終了処理
 void UpdateJunk(void);					// がれきの更新処理
 void DrawJunk(void);					// がれきの描画処理
 void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot, SCALETYPE scale, D3DMATERIAL9 col);	// がれきの設定処理
+Junk *GetJunkData(void);															// がれきの取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
 //**********************************************************************************************************************
-int GetNumJunk(void);			// オブジェクトの総数取得処理
+int GetNumJunk(void);					// オブジェクトの総数取得処理
 
 #endif

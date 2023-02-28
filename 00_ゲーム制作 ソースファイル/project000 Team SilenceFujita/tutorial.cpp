@@ -27,6 +27,7 @@
 #include "Car.h"
 #include "Combo.h"
 #include "effect.h"
+#include "flash.h"
 #include "gate.h"
 #include "icon.h"
 #include "junk.h"
@@ -47,55 +48,78 @@
 #include "weather.h"
 #include "wind.h"
 
-//**********************************************************************************************************************
-//	列挙型定義 (LESSON_SETUP)
-//**********************************************************************************************************************
-typedef enum
-{
-	LESSON_SETUP_SLUMBOOST = 0,	// レッスン4 (破滅疾走) の読み込み
-	LESSON_SETUP_FLYAWAY,		// レッスン5 (吹飛散風) の読み込み
-	LESSON_SETUP_SILENCEWORLD,	// レッスン6 (無音世界) の読み込み
-	LESSON_SETUP_MAX			// この列挙型の総数
-} LESSON_SETUP;
+#include "input.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
 #define LESSON_SETUP_TXT	"data\\TXT\\lesson.txt"	// チュートリアルのレッスンセットアップ用のテキストファイルの相対パス
 
-#define MAX_TUTORIAL		(1)			// 使用するポリゴン数
-#define END_TUTORIAL_TIME	(120)		// チュートリアル終了までの余韻フレーム
+#define MAX_TUTO		(2)			// 使用するポリゴン数
+#define END_TUTO_TIME	(120)		// チュートリアル終了までの余韻フレーム
 
-#define TUTORIAL_POS_X		(910.0f)	// チュートリアルの絶対座標 (x)
-#define TUTORIAL_POS_Y		(160.0f)	// チュートリアルの絶対座標 (y)
-#define TUTORIAL_WIDTH		(360.0f)	// チュートリアルの幅 / 2 (横)
-#define TUTORIAL_HEIGHT		(160.0f)	// チュートリアルの幅 / 2 (高さ)
+#define TUTORIAL_POS_X	(910.0f)	// チュートリアルの絶対座標 (x)
+#define TUTORIAL_POS_Y	(160.0f)	// チュートリアルの絶対座標 (y)
+#define TUTORIAL_WIDTH	(320.0f)	// チュートリアルの幅 / 2 (横)
+#define TUTORIAL_HEIGHT	(120.0f)	// チュートリアルの幅 / 2 (高さ)
+
+#define TUTO_BG_POS_X	(910.0f)	// チュートリアルの背景の絶対座標 (x)
+#define TUTO_BG_POS_Y	(160.0f)	// チュートリアルの背景の絶対座標 (y)
+#define TUTO_BG_WIDTH	(360.0f)	// チュートリアルの背景の幅 / 2 (横)
+#define TUTO_BG_HEIGHT	(160.0f)	// チュートリアルの背景の幅 / 2 (高さ)
+
+#define RESET_POS_Z		(-2000.0f)	// プレイヤー再設定時の z座標
+
+//**********************************************************************************************************************
+//	列挙型定義 (TEXTURE_TUTORIAL)
+//**********************************************************************************************************************
+typedef enum
+{
+	TEXTURE_TUTORIAL_BG = 0,		// 背景
+	TEXTURE_TUTORIAL_MAX,			// この列挙型の総数
+} TEXTURE_TUTORIAL;
+
+//**********************************************************************************************************************
+//	列挙型定義 (LESSON_SETUP)
+//**********************************************************************************************************************
+typedef enum
+{
+	LESSON_SETUP_SLUMBOOST = 0,		// レッスン4 (破滅疾走) の読み込み
+	LESSON_SETUP_FLYAWAY,			// レッスン5 (吹飛散風) の読み込み
+	LESSON_SETUP_SILENCEWORLD,		// レッスン6 (無音世界) の読み込み
+	LESSON_SETUP_MAX				// この列挙型の総数
+} LESSON_SETUP;
 
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
+const char *apTextureTutorial[] =	// チュートリアルテクスチャの相対パス
+{
+	"data\\TEXTURE\\ui005.png",		// チュートリアル背景のテクスチャ相対パス
+};
+
 const int aNextLesson[] =	// レッスンのカウンター
 {
 	240,	// レッスン0 (移動)     のレッスンカウンター
-	120,	// レッスン1 (旋回)     のレッスンカウンター
+	150,	// レッスン1 (旋回)     のレッスンカウンター
 	30,		// レッスン2 (停止)     のレッスンカウンター
-	1,		// レッスン3 (視点変更) のレッスンカウンター
-	1,		// レッスン4 (破滅疾走) のレッスンカウンター
-	1,		// レッスン5 (吹飛散風) のレッスンカウンター
-	1,		// レッスン6 (無音世界) のレッスンカウンター
+	60,		// レッスン3 (視点変更) のレッスンカウンター
+	30,		// レッスン4 (破滅疾走) のレッスンカウンター
+	60,		// レッスン5 (吹飛散風) のレッスンカウンター
+	120,	// レッスン6 (無音世界) のレッスンカウンター
 	0,		// レッスン7 (脱出)     のレッスンカウンター
 };
 
-const char *apTextureTutorial[] =		// テクスチャの相対パス
+const char *apTextureLesson[] =		// レッスンテクスチャの相対パス
 {
-	"data\\TEXTURE\\ui005.png",	// レッスン0 (移動)     のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン1 (旋回)     のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン2 (停止)     のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン3 (視点変更) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン4 (破滅疾走) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン5 (吹飛散風) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン6 (無音世界) のテクスチャ相対パス
-	"data\\TEXTURE\\ui005.png",	// レッスン7 (脱出)     のテクスチャ相対パス
+	"data\\TEXTURE\\lesson000.png",	// レッスン0 (移動)     のテクスチャ相対パス
+	"data\\TEXTURE\\lesson001.png",	// レッスン1 (旋回)     のテクスチャ相対パス
+	"data\\TEXTURE\\lesson002.png",	// レッスン2 (停止)     のテクスチャ相対パス
+	"data\\TEXTURE\\lesson003.png",	// レッスン3 (視点変更) のテクスチャ相対パス
+	"data\\TEXTURE\\lesson004.png",	// レッスン4 (破滅疾走) のテクスチャ相対パス
+	"data\\TEXTURE\\lesson005.png",	// レッスン5 (吹飛散風) のテクスチャ相対パス
+	"data\\TEXTURE\\lesson006.png",	// レッスン6 (無音世界) のテクスチャ相対パス
+	"data\\TEXTURE\\lesson007.png",	// レッスン7 (脱出)     のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
@@ -104,14 +128,18 @@ const char *apTextureTutorial[] =		// テクスチャの相対パス
 bool CheckNextSlumBoost(void);			// 破滅疾走のレッスン終了の確認処理
 bool CheckNextFlyAway(void);			// 吹飛散風のレッスン終了の確認処理
 bool CheckNextSilenceWorld(void);		// 無音世界のレッスン終了の確認処理
+void AllFalseSilenceWorld(void);		// 無音世界のレッスン終了後の削除処理
+
+void ResetPlayer(void);					// プレイヤーの再設定処理
 
 void TxtSetLesson(LESSON_SETUP lesson);	// レッスンのセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-LPDIRECT3DTEXTURE9      g_apTextureTutorial[LESSON_MAX] = {};	// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTutorial = NULL;				// 頂点バッファへのポインタ
+LPDIRECT3DTEXTURE9      g_apTextureTutorial[TEXTURE_TUTORIAL_MAX] = {};	// チュートリアルテクスチャへのポインタ
+LPDIRECT3DTEXTURE9      g_apTextureLesson[LESSON_MAX] = {};				// レッスンテクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTutorial = NULL;						// 頂点バッファへのポインタ
 
 TUTORIALSTATE g_tutorialState;			// チュートリアルの状態
 int           g_nLessonState;			// レッスンの状態
@@ -131,19 +159,28 @@ void InitTutorial(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	VERTEX_2D        *pVtx;						// 頂点情報へのポインタ
 
-	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
+	// チュートリアルテクスチャの読み込み
+	for (int nCntTutorial = 0; nCntTutorial < TEXTURE_TUTORIAL_MAX; nCntTutorial++)
 	{ // 使用するテクスチャ数分繰り返す
 
 		// テクスチャの読み込み
 		D3DXCreateTextureFromFile(pDevice, apTextureTutorial[nCntTutorial], &g_apTextureTutorial[nCntTutorial]);
 	}
 
+	// レッスンテクスチャの読み込み
+	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
+	{ // 使用するテクスチャ数分繰り返す
+
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice, apTextureLesson[nCntTutorial], &g_apTextureLesson[nCntTutorial]);
+	}
+
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
 	( // 引数
-		sizeof(VERTEX_2D) * 4 * MAX_TUTORIAL,	// 必要頂点数
+		sizeof(VERTEX_2D) * 4 * MAX_TUTO,	// 必要頂点数
 		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_2D,							// 頂点フォーマット
+		FVF_VERTEX_2D,						// 頂点フォーマット
 		D3DPOOL_MANAGED,
 		&g_pVtxBuffTutorial,
 		NULL
@@ -162,11 +199,14 @@ void InitTutorial(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffTutorial->Lock(0, 0, (void**)&pVtx, 0);
 
+	//------------------------------------------------------------------------------------------------------------------
+	//	背景の初期化
+	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[0].pos = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[0].pos = D3DXVECTOR3(TUTO_BG_POS_X - TUTO_BG_WIDTH, TUTO_BG_POS_Y - TUTO_BG_HEIGHT, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(TUTO_BG_POS_X + TUTO_BG_WIDTH, TUTO_BG_POS_Y - TUTO_BG_HEIGHT, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(TUTO_BG_POS_X - TUTO_BG_WIDTH, TUTO_BG_POS_Y + TUTO_BG_HEIGHT, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(TUTO_BG_POS_X + TUTO_BG_WIDTH, TUTO_BG_POS_Y + TUTO_BG_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[0].rhw = 1.0f;
@@ -185,6 +225,33 @@ void InitTutorial(void)
 	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	レッスンの初期化
+	//------------------------------------------------------------------------------------------------------------------
+	// 頂点座標を設定
+	pVtx[4].pos = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+
+	// rhw の設定
+	pVtx[4].rhw = 1.0f;
+	pVtx[5].rhw = 1.0f;
+	pVtx[6].rhw = 1.0f;
+	pVtx[7].rhw = 1.0f;
+
+	// 頂点カラーの設定
+	pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+	pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+	pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+	pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+
+	// テクスチャ座標の設定
+	pVtx[4].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[5].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[6].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffTutorial->Unlock();
@@ -288,6 +355,9 @@ void InitTutorial(void)
 	// スコアの初期化
 	InitScore();
 
+	// フラッシュの初期化
+	InitFlash();
+
 	// ファイルをロードする全体処理
 	LoadFileChunk
 	( // 引数
@@ -312,8 +382,8 @@ void UninitTutorial(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	チュートリアルの終了
 	//------------------------------------------------------------------------------------------------------------------
-	// テクスチャの破棄
-	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
+	// チュートリアルテクスチャの破棄
+	for (int nCntTutorial = 0; nCntTutorial < TEXTURE_TUTORIAL_MAX; nCntTutorial++)
 	{ // 使用するテクスチャ数分繰り返す
 
 		if (g_apTextureTutorial[nCntTutorial] != NULL)
@@ -321,6 +391,18 @@ void UninitTutorial(void)
 
 			g_apTextureTutorial[nCntTutorial]->Release();
 			g_apTextureTutorial[nCntTutorial] = NULL;
+		}
+	}
+
+	// レッスンテクスチャの破棄
+	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
+	{ // 使用するテクスチャ数分繰り返す
+
+		if (g_apTextureLesson[nCntTutorial] != NULL)
+		{ // 変数 (g_apTextureLesson) がNULLではない場合
+
+			g_apTextureLesson[nCntTutorial]->Release();
+			g_apTextureLesson[nCntTutorial] = NULL;
 		}
 	}
 
@@ -431,6 +513,9 @@ void UninitTutorial(void)
 	// スコアの終了
 	UninitScore();
 
+	// フラッシュの終了
+	UninitFlash();
+
 	//// サウンドの停止
 	//StopSound();
 }
@@ -440,15 +525,6 @@ void UninitTutorial(void)
 //======================================================================================================================
 void UpdateTutorial(void)
 {
-#if 1
-#include "input.h"
-
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{
-		AddLessonState();
-	}
-#endif
-
 	if (g_bTutorialEnd == false)
 	{ // 遷移設定がされていない場合
 
@@ -459,7 +535,7 @@ void UpdateTutorial(void)
 			g_bTutorialEnd = true;
 
 			// ゲーム画面の状態設定
-			SetTutorialState(TUTORIALSTATE_END, END_TUTORIAL_TIME);	// 終了状態
+			SetTutorialState(TUTORIALSTATE_END, END_TUTO_TIME);	// 終了状態
 		}
 	}
 
@@ -467,21 +543,36 @@ void UpdateTutorial(void)
 	{ // レッスンごとの処理
 	case LESSON_04:	// レッスン4 (破滅疾走)
 
+		if (CheckNextSlumBoost() == true)
+		{ // 次のレッスンに遷移可能な場合
 
+			// レッスンの状態の加算
+			AddLessonState();
+		}
 
 		// 処理を抜ける
 		break;
 
 	case LESSON_05:	// レッスン5 (吹飛散風)
 
+		if (CheckNextFlyAway() == true)
+		{ // 次のレッスンに遷移可能な場合
 
+			// レッスンの状態の加算
+			AddLessonState();
+		}
 
 		// 処理を抜ける
 		break;
 
 	case LESSON_06:	// レッスン6 (無音世界)
 
+		if (CheckNextSilenceWorld() == true)
+		{ // 次のレッスンに遷移可能な場合
 
+			// レッスンの状態の加算
+			AddLessonState();
+		}
 
 		// 処理を抜ける
 		break;
@@ -527,6 +618,9 @@ void UpdateTutorial(void)
 	//------------------------------------------------------------------------------------------------------------------
 	// ライトの更新
 	UpdateLight();
+
+	// フラッシュの更新処理
+	UpdateFlash();
 
 	// メッシュドームの更新
 	UpdateMeshDome();
@@ -705,15 +799,6 @@ void DrawTutorial(void)
 	// スコアの描画
 	DrawScore();
 
-	// ボーナスの描画
-	DrawBonus();
-
-	// 2Dエフェクトの描画
-	Draw2DEffect();
-
-	// 2Dパーティクルの描画
-	Draw2DParticle();
-
 	//------------------------------------------------------------------------------------------------------------------
 	//	チュートリアルの描画
 	//------------------------------------------------------------------------------------------------------------------
@@ -726,11 +811,38 @@ void DrawTutorial(void)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
+	//------------------------------------------------------------------------------------------------------------------
+	//	背景の描画
+	//------------------------------------------------------------------------------------------------------------------
 	// テクスチャの設定
-	pDevice->SetTexture(0, g_apTextureTutorial[g_nLessonState]);
+	pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_BG]);
 
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	レッスンの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// テクスチャの設定
+	pDevice->SetTexture(0, g_apTextureLesson[g_nLessonState]);
+
+	// ポリゴンの描画
+	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	UIの描画
+	//------------------------------------------------------------------------------------------------------------------
+	// ボーナスの描画
+	DrawBonus();
+
+	// 2Dエフェクトの描画
+	Draw2DEffect();
+
+	// 2Dパーティクルの描画
+	Draw2DParticle();
+
+	// フラッシュの描画
+	DrawFlash();
 }
 
 //======================================================================================================================
@@ -809,12 +921,21 @@ void AddLessonState(void)
 
 			case LESSON_07:	// レッスン7 (脱出)
 
+				// 無音世界のレッスン終了後の削除処理
+				AllFalseSilenceWorld();
+
 				// ゲートの全開け処理
 				AllOpenGate();
 
 				// 処理を抜ける
 				break;
 			}
+
+			// フラッシュの設定
+			SetFlash(REV_TUTORIAL_ALPHA);
+
+			// プレイヤーの再設定
+			ResetPlayer();
 
 			//// サウンドの再生
 			//PlaySound(SOUND_LABEL_SE_DEC_00);	// SE (決定00)
@@ -862,6 +983,7 @@ bool CheckNextSlumBoost(void)
 
 	// ポインタを宣言
 	Object *pObject = GetObjectData();		// オブジェクトの情報
+	Junk   *pJunk   = GetJunkData();		// がれきの情報
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++, pObject++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -881,6 +1003,20 @@ bool CheckNextSlumBoost(void)
 		}
 	}
 
+	for (int nCntJunk = 0; nCntJunk < MAX_JUNK; nCntJunk++, pJunk++)
+	{ // がれきの最大表示数分繰り返す
+
+		if (pJunk->bUse == true)
+		{ // がれきが使用されている場合
+
+			// 次のレッスン遷移をできない状態にする
+			bNext = false;
+
+			// 処理を抜ける
+			break;
+		}
+	}
+
 	// 次のレッスン遷移状況を返す
 	return bNext;
 }
@@ -893,26 +1029,22 @@ bool CheckNextFlyAway(void)
 	// 変数を宣言
 	bool bNext = true;		// 次のレッスン遷移状況
 
-	//// ポインタを宣言
-	//Object *pObject = GetObjectData();		// オブジェクトの情報
+	// ポインタを宣言
+	Human *pHuman = GetHumanData();		// 人間の情報
 
-	//for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++, pObject++)
-	//{ // オブジェクトの最大表示数分繰り返す
+	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++, pHuman++)
+	{ // 人間の最大表示数分繰り返す
 
-	//	if (pObject->bUse == true)
-	//	{ // オブジェクトが使用されている場合
+		if (pHuman->bUse == true)
+		{ // 人間が使用されている場合
 
-	//		if (pObject->nBreakType == BREAKTYPE_ON)
-	//		{ // 破壊可能オブジェクトの場合
+			// 次のレッスン遷移をできない状態にする
+			bNext = false;
 
-	//			// 次のレッスン遷移をできない状態にする
-	//			bNext = false;
-
-	//			// 処理を抜ける
-	//			break;
-	//		}
-	//	}
-	//}
+			// 処理を抜ける
+			break;
+		}
+	}
 
 	// 次のレッスン遷移状況を返す
 	return bNext;
@@ -924,31 +1056,97 @@ bool CheckNextFlyAway(void)
 bool CheckNextSilenceWorld(void)
 {
 	// 変数を宣言
-	bool bNext = true;		// 次のレッスン遷移状況
+	bool bNext = false;		// 次のレッスン遷移状況
 
-	//// ポインタを宣言
-	//Object *pObject = GetObjectData();		// オブジェクトの情報
+	// ポインタを宣言
+	Barrier *pBarrier = GetBarrierData();	// バリアの情報
 
-	//for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++, pObject++)
-	//{ // オブジェクトの最大表示数分繰り返す
+	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier++)
+	{ // バリアの最大表示数分繰り返す
 
-	//	if (pObject->bUse == true)
-	//	{ // オブジェクトが使用されている場合
+		if (pBarrier->bUse == true)
+		{ // バリアが使用されている場合
 
-	//		if (pObject->nBreakType == BREAKTYPE_ON)
-	//		{ // 破壊可能オブジェクトの場合
+			if (pBarrier->state == BARRIERSTATE_SET)
+			{ // バリアが完成状態の場合
 
-	//			// 次のレッスン遷移をできない状態にする
-	//			bNext = false;
+				// 次のレッスン遷移をできる状態にする
+				bNext = true;
 
-	//			// 処理を抜ける
-	//			break;
-	//		}
-	//	}
-	//}
+				// 処理を抜ける
+				break;
+			}
+		}
+	}
 
 	// 次のレッスン遷移状況を返す
 	return bNext;
+}
+
+//======================================================================================================================
+//	無音世界のレッスン終了後の削除処理
+//======================================================================================================================
+void AllFalseSilenceWorld(void)
+{
+	// ポインタを宣言
+	Car     *pCar     = GetCarData();		// 車の情報
+	Barrier *pBarrier = GetBarrierData();	// バリアの情報
+
+	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
+	{ // 車の最大表示数分繰り返す
+
+		// 車を使用していない状態にする
+		pCar->bUse = false;
+	}
+
+	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier++)
+	{ // バリアの最大表示数分繰り返す
+
+		// バリアを使用していない状態にする
+		pBarrier->bUse = false;
+	}
+}
+
+//======================================================================================================================
+//	プレイヤーの再設定処理
+//======================================================================================================================
+void ResetPlayer(void)
+{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+
+	// 位置を設定
+	pPlayer->pos    = D3DXVECTOR3(0.0f, 0.0f, RESET_POS_Z);		// 現在の位置
+	pPlayer->oldPos = D3DXVECTOR3(0.0f, 0.0f, RESET_POS_Z);		// 前回の位置
+
+	// 向きを設定
+	pPlayer->rot     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の向き
+	pPlayer->destRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 目標の向き
+
+	// 本体情報の初期化
+	pPlayer->move          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+	pPlayer->state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
+	pPlayer->nLife         = PLAY_LIFE;							// 体力
+	pPlayer->nCounterState = 0;									// 状態管理カウンター
+	pPlayer->bMove         = false;								// 移動状況
+	pPlayer->bJump         = false;								// ジャンプ状況
+	pPlayer->nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
+	pPlayer->bCameraFirst  = false;								// 一人称カメラの状況
+
+	// ブーストの情報の初期化
+	pPlayer->boost.plusMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 追加移動量
+	pPlayer->boost.state    = BOOSTSTATE_NONE;					// 加速状態
+	pPlayer->boost.nCounter = 0;								// 加速管理カウンター
+
+	// 風の情報の初期化
+	pPlayer->wind.bUseWind     = false;							// 風の使用状況
+	pPlayer->wind.nCircleCount = 0;								// どこに出すか
+	pPlayer->wind.nCount       = 0;								// 風を出すカウント
+	pPlayer->wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
+
+	// 爆弾の情報の初期化
+	pPlayer->bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
+	pPlayer->bomb.nCounter = BOMB_WAIT_CNT;						// 攻撃管理カウンター
 }
 
 //======================================================================================================================

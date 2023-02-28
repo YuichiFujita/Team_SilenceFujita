@@ -1076,7 +1076,7 @@ void SetThunder(D3DXVECTOR3 pos, D3DXVECTOR2 fRadius)
 			{ // 距離が一定以内だった場合
 
 				// フラッシュの設定処理
-				SetFlash();
+				SetFlash(REV_WEATHER_ALPHA);
 			}
 
 			// 使用している状態にする
