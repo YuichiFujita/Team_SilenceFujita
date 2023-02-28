@@ -835,6 +835,9 @@ void TxtSetLesson(LESSON_SETUP lesson)
 	int         nCollisionType;	// 当たり判定の種類の代入用
 	int         nNumMat;		// マテリアル数の代入用
 	ROTSTATE    stateRot;		// 向き状態
+	int			nWalk;			// 歩きタイプの変数
+	bool		bRecur;			// 復活の変数
+	int			type;			// 種類
 
 	// 変数配列を宣言
 	char         aString[MAX_STRING];	// テキストの文字列の代入用
@@ -984,11 +987,39 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 									fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 								}
+								else if (strcmp(&aString[0], "WALK") == 0)
+								{ // 読み込んだ文字列が WALK の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%d", &nWalk);						// 歩きのタイプを読み込む
+								}
+								else if (strcmp(&aString[0], "RECUR") == 0)
+								{ // 読み込んだ文字列が RECUR の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%s", &aString[0]);					// 復活状況を読み込む
+
+									if (strcmp(&aString[0], "TRUE") == 0)
+									{ // 読み込んだ文字列が TRUE の場合
+
+										// 復活する
+										bRecur = true;
+									}
+									else
+									{ // 読み込んだ文字列が FALSE の場合
+
+										// 復活しない
+										bRecur = false;
+									}
+								}
+								else if (strcmp(&aString[0], "TYPE") == 0)
+								{ // 読み込んだ文字列が TYPE の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%d", &type);							// 種類を読み込む
+								}
 
 							} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 							// 人間の設定
-							SetHuman(pos);
+							SetHuman(pos, nWalk, bRecur, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_HUMAN") != 0);			// 読み込んだ文字列が END_SETLESSON_HUMAN ではない場合ループ
 				}
