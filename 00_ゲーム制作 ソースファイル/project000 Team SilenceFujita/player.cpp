@@ -372,20 +372,24 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	g_player.rot     = rot;		// 現在の向き
 	g_player.destRot = rot;		// 目標の向き
 
-	// モデル情報を設定
-	g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
+	if (g_player.bUse == false)
+	{ // プレイヤーが使用されていない場合
 
-	// 影のインデックスを設定
-	g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
+		// モデル情報を設定
+		g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
 
-	// アイコンのインデックスを設定
-	g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
+		// 影のインデックスを設定
+		g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
 
-	// 影の位置設定
-	SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
+		// アイコンのインデックスを設定
+		g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
 
-	// 使用している状態にする
-	g_player.bUse = true;
+		// 影の位置設定
+		SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
+
+		// 使用している状態にする
+		g_player.bUse = true;
+	}
 }
 
 //============================================================
