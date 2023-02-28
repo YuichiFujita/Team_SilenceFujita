@@ -37,7 +37,6 @@
 #include "EditObject.h"
 #include "EditCollision.h"
 #include "EditBillboard.h"
-#include "SoundDJ.h"
 #include "weather.h"
 
 // メモリリーク出力用
@@ -479,8 +478,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	ResetRanking();
 
 #ifdef _DEBUG	// デバッグ処理
-	// サウンドDJの初期化
-	InitSoundDJ(hWnd);
 
 	// デバッグの初期化
 	InitDebug();
@@ -548,8 +545,6 @@ void Uninit(void)
 	}
 
 #ifdef _DEBUG	// デバッグ処理
-	// サウンドDJの終了
-	UninitSoundDJ();
 
 	// デバッグの終了
 	UninitDebug();
