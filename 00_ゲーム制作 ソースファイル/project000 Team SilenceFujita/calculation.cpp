@@ -178,6 +178,13 @@ void RotNormalize(float *rot)
 //==================================================================================
 void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI)
 {
+	if (bCollision == true)
+	{ // 当たり判定を読み込む場合
+
+		// 当たり判定のセットアップ
+		TxtSetCollision();
+	}
+
 	if (bStage == true)
 	{ // ステージを読み込む場合
 
@@ -203,13 +210,6 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 
 		// 曲がり角の設定処理
 		SetCurvePoint();
-	}
-
-	if (bCollision == true)
-	{ // 当たり判定を読み込む場合
-
-		// 当たり判定のセットアップ
-		TxtSetCollision();
 	}
 
 	if (bShadow == true)

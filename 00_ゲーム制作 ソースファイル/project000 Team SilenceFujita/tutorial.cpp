@@ -56,10 +56,10 @@
 #define MAX_TUTO		(2)			// 使用するポリゴン数
 #define END_TUTO_TIME	(120)		// チュートリアル終了までの余韻フレーム
 
-#define TUTORIAL_POS_X	(910.0f)	// チュートリアルの絶対座標 (x)
-#define TUTORIAL_POS_Y	(160.0f)	// チュートリアルの絶対座標 (y)
-#define TUTORIAL_WIDTH	(320.0f)	// チュートリアルの幅 / 2 (横)
-#define TUTORIAL_HEIGHT	(120.0f)	// チュートリアルの幅 / 2 (高さ)
+#define TUTORIAL_POS_X	(930.0f)	// チュートリアルの絶対座標 (x)
+#define TUTORIAL_POS_Y	(150.0f)	// チュートリアルの絶対座標 (y)
+#define TUTORIAL_WIDTH	(360.0f)	// チュートリアルの幅 / 2 (横)
+#define TUTORIAL_HEIGHT	(150.0f)	// チュートリアルの幅 / 2 (高さ)
 
 #define TUTO_BG_POS_X	(910.0f)	// チュートリアルの背景の絶対座標 (x)
 #define TUTO_BG_POS_Y	(160.0f)	// チュートリアルの背景の絶対座標 (y)
@@ -243,10 +243,10 @@ void InitTutorial(void)
 	pVtx[7].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
-	pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
-	pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
-	pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+	pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// テクスチャ座標の設定
 	pVtx[4].tex = D3DXVECTOR2(0.0f, 0.0f);
