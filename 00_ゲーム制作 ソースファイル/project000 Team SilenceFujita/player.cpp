@@ -45,7 +45,7 @@
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
 #define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.08f)		// 移動量の減速係数
-#define UNRIVALED_CNT	(20)		// 無敵時にチカチカさせるカウント
+#define UNRIVALED_CNT	(10)		// 無敵時にチカチカさせるカウント
 #define STATE_MOVE		(1.5f)		// 停止・旋回時の判定範囲
 
 #define PLAY_CLEAR_MOVE		(4.0f)	// クリア成功時のプレイヤーの自動移動量
@@ -316,13 +316,6 @@ void DrawPlayer(void)
 
 			case ACTIONSTATE_UNRIVALED:	// 無敵状態
 
-				if (g_player.nCounterState % UNRIVALED_CNT == 0)
-				{ // 一定時間経過時
-
-					// 透明状況の入れ替え
-					g_player.bUnrivaled = g_player.bUnrivaled ? false : true;
-				}
-
 				if (g_player.bUnrivaled == true)
 				{ // 透明状況の場合
 
@@ -524,6 +517,17 @@ void UpdateGameNorPlayer(void)
 
 			// 無しの状態にする
 			g_player.icon.state = ICONSTATE_NONE;
+		}
+
+		if (g_player.state == ACTIONSTATE_UNRIVALED)
+		{ // プレイヤーの状態が無敵の場合
+
+			if (g_player.nCounterState % UNRIVALED_CNT == 0)
+			{ // 一定時間経過時
+
+				// 透明状況の入れ替え
+				g_player.bUnrivaled = g_player.bUnrivaled ? false : true;
+			}
 		}
 	}
 
