@@ -715,6 +715,8 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 //======================================================================================================================
 void HitObject(Object *pObject, int nDamage)
 {
+	int nMode = GetMode();			// モードの取得処理
+
 	if (pObject->state == ACTIONSTATE_NORMAL && pObject->appear.state == APPEARSTATE_COMPLETE && pObject->bUse == true)
 	{ // オブジェクトが通常状態かつ、出現完了状態の場合
 
@@ -759,8 +761,16 @@ void HitObject(Object *pObject, int nDamage)
 				2									// 寿命
 			);
 
-			// 再建築タイマーの設定処理
-			SetBuildtimer(pObject->pos, 600, *pObject);
+			switch (nMode)
+			{
+			case MODE_GAME:			// ゲームの場合
+
+				// 再建築タイマーの設定処理
+				SetBuildtimer(pObject->pos, 600, *pObject);
+
+				// 処理から抜ける
+				break;
+			}
 
 			switch (pObject->nCollisionType)
 			{

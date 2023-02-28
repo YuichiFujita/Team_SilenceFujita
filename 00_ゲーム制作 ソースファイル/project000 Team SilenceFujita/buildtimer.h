@@ -20,8 +20,6 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	BUILDSTATE_WAIT = 0,				// 待機状態
-	BUILDSTATE_APPEAR,					// 出現状態
 	BUILDSTATE_COUNT,					// カウント状態
 	BUILDSTATE_DISAPPEAR,				// 消滅状態
 	BUILDSTATE_MAX						// この列挙型の総数
