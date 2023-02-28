@@ -184,16 +184,6 @@ void UpdateCar(void)
 					//位置を0.0fに戻す
 					g_aCar[nCntCar].pos.y = 0.0f;
 				}
-
-				if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
-				{ // 悪者だった場合
-
-					// ジャッジの更新処理
-					UpdateJudge(&g_aCar[nCntCar].judge);
-
-					// アイコンの位置設定処理
-					SetPositionIcon(g_aCar[nCntCar].icon.nIconID, g_aCar[nCntCar].pos);
-				}
 			}
 
 			if (GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_NONE	 ||
@@ -280,6 +270,16 @@ void UpdateCar(void)
 
 				// 車の補正の更新処理
 				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
+			}
+
+			if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+			{ // 悪者だった場合
+
+				// ジャッジの更新処理
+				UpdateJudge(&g_aCar[nCntCar].judge);
+
+				// アイコンの位置設定処理
+				SetPositionIcon(g_aCar[nCntCar].icon.nIconID, g_aCar[nCntCar].pos);
 			}
 		}
 	}

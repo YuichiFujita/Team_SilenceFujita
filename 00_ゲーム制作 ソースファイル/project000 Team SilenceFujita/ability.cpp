@@ -837,7 +837,7 @@ void UpdateAbiBomb(void)
 	{ // ボムが加速状態の場合
 
 		// ボムの使用時間を計算
-		fCurrentBomb = (float)pPlayer->bomb.nCounter;
+		fCurrentBomb = (float)pPlayer->bomb.nCounterState;
 	}
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得

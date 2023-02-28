@@ -93,7 +93,9 @@ typedef struct
 typedef struct
 {
 	ATTACKSTATE state;				// 攻撃状態
-	int         nCounter;			// 攻撃管理カウンター
+	int         nCounterState;		// 攻撃管理カウンター
+	int         nCounterControl;	// 操作管理カウンター
+	bool        bShot;				// 発射待機状況
 }PlayerBomb;
 
 //************************************************************

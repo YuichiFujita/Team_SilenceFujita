@@ -303,7 +303,7 @@ void ShotBarrier(void)
 					pPlayer->bomb.state = ATTACKSTATE_WAIT;
 
 					// カウンターを初期化
-					pPlayer->bomb.nCounter = 0;
+					pPlayer->bomb.nCounterState = 0;
 
 					// 使用している状態にする
 					g_aBarrier[nCntBarrier].bUse = true;
@@ -862,7 +862,7 @@ void ChangeAim(void)
 	if (g_nCurrentMaxBomb > 0)
 	{ // 狙える車が 0より多い場合
 
-		if (GetKeyboardTrigger(DIK_RIGHT) == true || GetJoyKeyTrigger(JOYKEY_R1, 0)/* || GetJoyStickPressRX(0) > 0*/)
+		if (GetKeyboardTrigger(DIK_M) == true || GetJoyKeyTrigger(JOYKEY_R1, 0))
 		{ // 右の車へ変更する捜査が行われた場合
 
 			// 選択している車のインデックスを変更
@@ -871,7 +871,7 @@ void ChangeAim(void)
 			// 現在狙っている車のアドレスを変更
 			g_pCurrentAim = g_aBomb[g_nID].pCar;
 		}
-		else if (GetKeyboardTrigger(DIK_LEFT) == true || GetJoyKeyTrigger(JOYKEY_L1, 0)/* || GetJoyStickPressRX(0) < 0*/)
+		else if (GetKeyboardTrigger(DIK_N) == true || GetJoyKeyTrigger(JOYKEY_L1, 0))
 		{ // 左の車へ変更する捜査が行われた場合
 
 			// 選択している車のインデックスを変更

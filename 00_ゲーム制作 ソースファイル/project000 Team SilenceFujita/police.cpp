@@ -185,16 +185,6 @@ void UpdatePolice(void)
 					NONE_SCALE							// 拡大率
 				);
 
-				//----------------------------------------------------
-				//	アイコンの更新
-				//----------------------------------------------------
-				// アイコンの位置設定
-				SetPositionIcon
-				( // 引数
-					g_aPolice[nCntPolice].icon.nIconID,		// アイコンのインデックス
-					g_aPolice[nCntPolice].pos			// 位置
-				);
-
 				switch (g_aPolice[nCntPolice].state)
 				{//状態で判断する
 				case POLICESTATE_PATROL:		// パトロール状態
@@ -322,6 +312,16 @@ void UpdatePolice(void)
 				// プレイヤーの補正の更新処理
 				RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 			}
+
+			//----------------------------------------------------
+			//	アイコンの更新
+			//----------------------------------------------------
+			// アイコンの位置設定
+			SetPositionIcon
+			( // 引数
+				g_aPolice[nCntPolice].icon.nIconID,	// アイコンのインデックス
+				g_aPolice[nCntPolice].pos			// 位置
+			);
 		}
 	}
 }
