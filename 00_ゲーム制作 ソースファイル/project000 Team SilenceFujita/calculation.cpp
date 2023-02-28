@@ -232,18 +232,6 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 		// AI系のセットアップ
 		TxtSetAI();
 	}
-
-	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
-	{
-		// 人間の設定処理
-		SetHuman
-		(
-			D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-			MOVETYPE_MOVE,
-			true,
-			HUMANTYPE_001
-		);
-	}
 }
 
 //==================================================================================
