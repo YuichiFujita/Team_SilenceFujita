@@ -189,8 +189,8 @@ void UpdatePolice(void)
 				{//状態で判断する
 				case POLICESTATE_PATROL:		// パトロール状態
 
-					// 警察のパトロール行動処理
-					PatrolPoliceAct(&g_aPolice[nCntPolice]);
+					// 移動量を更新
+					g_aPolice[nCntPolice].move.x += POLI_MOVE_FORWARD;
 
 					// 車の停止処理
 					CollisionStopCar
@@ -202,6 +202,9 @@ void UpdatePolice(void)
 						COLLOBJECTTYPE_POLICE,			//対象のサイズ
 						&g_aPolice[nCntPolice].nTrafficCnt
 					);
+
+					// 警察のパトロール行動処理
+					PatrolPoliceAct(&g_aPolice[nCntPolice]);
 
 					break;						// 抜け出す
 
@@ -771,9 +774,6 @@ void PatrolPoliceAct(Police *pPolice)
 	Player *pPlayer = GetPlayer();					//プレイヤーの情報を取得する
 
 	float fDist;									//目標の距離
-
-	// 移動量を更新
-	pPolice->move.x += POLI_MOVE_FORWARD;
 
 	// 移動している状態にする
 	pPolice->bMove = true;

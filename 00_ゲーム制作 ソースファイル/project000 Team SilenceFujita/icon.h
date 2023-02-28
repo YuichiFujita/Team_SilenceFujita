@@ -27,6 +27,8 @@ typedef enum
 	ICONTYPE_EVIL,				// 悪い奴のアイコン
 	ICONTYPE_POLICE,			// 警察のアイコン
 	ICONTYPE_BARRIER,			// バリアのアイコン
+	ICONTYPE_GATE_VERT,			// ゲートの奥手前のアイコン
+	ICONTYPE_GATE_HORIZ,		// ゲートの左右のアイコン
 	ICONTYPE_MAX				// この列挙型の総数
 }ICONTYPE;
 
@@ -75,7 +77,7 @@ typedef struct
 	D3DXCOLOR	col;				// 色
 	D3DXCOLOR	colCopy;			// 色のコピー
 	ICONALPHA	alpha;				// 透明度の状態
-	float		fRadius;			// 半径
+	D3DXVECTOR3	radius;				// 半径
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	int        *pIconIDParent;		// アイコンの親のアイコンインデックス
 	int			nCounter;			// カウンター
