@@ -11,7 +11,11 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include <windows.h>
+#include <mmdeviceapi.h>					// 音量調節に必要
+#include <endpointvolume.h>					// 音量調節に必要
 #include <stdio.h>
+#include <locale.h>							// 音量調節に必要
+#include <tchar.h>							// 音量調節に必要
 #include <time.h>
 #include "d3dx9.h"							// 描画処理に必要
 #define  DIRECTINPUT_VERSION	(0x0800)	// ビルド時の警告対処用マクロ
@@ -24,6 +28,7 @@
 //**********************************************************************************************************************
 #pragma comment(lib, "d3d9.lib")			// 描画処理に必要
 #pragma comment(lib, "d3dx9.lib")			// [d3d9.lib]の拡張ライブラリ
+#pragma comment(lib, "dsound.lib")			// 音関係に必要
 #pragma comment(lib, "dxguid.lib")			// DirectXコンポーネント (部品) 使用に必要
 #pragma comment(lib, "winmm.lib")			// システム時刻取得に必要
 #pragma comment(lib, "dinput8.lib")			// 入力処理に必要

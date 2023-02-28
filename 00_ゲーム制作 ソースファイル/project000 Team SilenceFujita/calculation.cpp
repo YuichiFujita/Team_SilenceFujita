@@ -178,6 +178,13 @@ void RotNormalize(float *rot)
 //==================================================================================
 void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI)
 {
+	if (bStage == true)
+	{ // ステージを読み込む場合
+
+		// ステージのセットアップ
+		TxtSetStage();
+	}
+
 	// カーブの情報の初期化処理
 	InitCurveInfo();
 
@@ -203,13 +210,6 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 
 		// 当たり判定のセットアップ
 		TxtSetCollision();
-	}
-
-	if (bStage == true)
-	{ // ステージを読み込む場合
-
-		// ステージのセットアップ
-		TxtSetStage();
 	}
 
 	if (bShadow == true)

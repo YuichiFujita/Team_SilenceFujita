@@ -65,6 +65,10 @@ void InitGate(void)
 		g_aGate[nCntGate].modelData.size     = INIT_SIZE;			// 大きさ
 		g_aGate[nCntGate].modelData.fRadius  = 0.0f;				// 半径
 
+		// アイコンの情報の初期化
+		g_aGate[nCntGate].icon.nIconID = NONE_ICON;					// アイコンのインデックス
+		g_aGate[nCntGate].icon.state = ICONSTATE_NONE;				// アイコンの状態
+
 		// 当たり判定情報の初期化
 		for (int nCntCollGate = 0; nCntCollGate < MODEL_GATE_MAX; nCntCollGate++)
 		{ // ゲートの種類の総数分繰り返す
@@ -226,6 +230,13 @@ void UpdateGate(void)
 				// 処理を抜ける
 				break;
 			}
+
+			// アイコンの位置設定処理
+			SetPositionIcon
+			(
+				g_aGate[nCntGate].icon.nIconID,
+				g_aGate[nCntGate].pos
+			);
 		}
 	}
 }
@@ -363,6 +374,34 @@ void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot, bool bOpen)
 
 			// 使用している状態にする
 			g_aGate[nCntGate].bUse = true;
+
+			if (stateRot == ROTSTATE_0
+			 || stateRot == ROTSTATE_180)
+			{ // 角度が0度、または180度の場合
+
+				// アイコンの設定処理
+				g_aGate[nCntGate].icon.nIconID = SetIcon
+				(
+					g_aGate[nCntGate].pos,
+					ICONTYPE_GATE_VERT,
+					&g_aGate[nCntGate].icon.nIconID,
+					&g_aGate[nCntGate].bUse,
+					&g_aGate[nCntGate].icon.state
+				);
+			}
+			else
+			{ // 角度が90度、または270度の場合
+
+				// アイコンの設定処理
+				g_aGate[nCntGate].icon.nIconID = SetIcon
+				(
+					g_aGate[nCntGate].pos,
+					ICONTYPE_GATE_HORIZ,
+					&g_aGate[nCntGate].icon.nIconID,
+					&g_aGate[nCntGate].bUse,
+					&g_aGate[nCntGate].icon.state
+				);
+			}
 
 			// 当たり判定情報を設定
 			for (int nCntCollGate = 0; nCntCollGate < MODEL_GATE_MAX; nCntCollGate++)

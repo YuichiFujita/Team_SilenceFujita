@@ -13,6 +13,7 @@
 #include "main.h"
 #include "model.h"
 #include "object.h"
+#include "icon.h"
 
 #ifdef _DEBUG	// デバッグ処理
 
@@ -59,6 +60,7 @@ typedef struct
 	GATESTATE	 state;						// 状態
 	Coll_Info    collInfo[MODEL_GATE_MAX];	// 当たり判定情報
 	Door         doorData;					// 鉄板の情報
+	IconInfo	 icon;						// アイコンの情報
 	bool         bUse;						// 使用状況
 }Gate;
 
