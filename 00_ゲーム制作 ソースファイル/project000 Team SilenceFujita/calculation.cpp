@@ -233,14 +233,16 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 		TxtSetAI();
 	}
 
-	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++)
+	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
 	{
-		SetCar(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	}
-
-	for (int nCnt = 0; nCnt < MAX_POLICE; nCnt++)
-	{
-		SetPolice(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		// lŠÔ‚ÌÝ’èˆ—
+		SetHuman
+		(
+			D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+			MOVETYPE_MOVE,
+			true,
+			HUMANTYPE_001
+		);
 	}
 }
 

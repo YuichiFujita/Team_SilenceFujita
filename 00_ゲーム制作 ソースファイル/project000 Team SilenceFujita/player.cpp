@@ -1334,24 +1334,36 @@ void SilenceWorldPlayer(void)
 //============================================================
 void CameraChangePlayer(void)
 {
-	if (GetKeyboardTrigger(DIK_J) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true)
+	if (GetKeyboardPress(DIK_J) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true)
 	{ // カメラ方向の変更操作が行われた場合
 
-		// カメラの状態を変える
-		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYCAMESTATE_MAX;
+		// カメラの状態をバックカメラにする
+		g_player.nCameraState = PLAYCAMESTATE_BACK;
 
 		// 前向きカメラを変更した情報を残す
 		g_tutorialCamera.bForward = true;
 	}
+	else
+	{ // カメラの方向の変更操作が行われていない場合
 
-	if (GetKeyboardTrigger(DIK_K) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true)
+		// カメラの状態を正面カメラにする
+		g_player.nCameraState = PLAYCAMESTATE_NORMAL;
+	}
+
+	if (GetKeyboardPress(DIK_K) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true)
 	{ // 一人称カメラの ON / OFF の変更操作が行われた場合
 
-		// 一人称カメラの状況を変える
-		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
+		// 一人称カメラの状況をtrueにする
+		g_player.bCameraFirst = true;
 
 		// 一人称カメラを変更した情報を残す
 		g_tutorialCamera.bFirst = true;
+	}
+	else
+	{ // 一人称カメラの ON/OFFの変更操作が行われた場合
+
+		// 一人称カメラの状況をfalseにする
+		g_player.bCameraFirst = false;
 	}
 }
 
