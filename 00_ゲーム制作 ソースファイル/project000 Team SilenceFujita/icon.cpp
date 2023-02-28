@@ -322,14 +322,14 @@ void UpdateIcon(void)
 
 						// アイコンの半径に加算する
 						g_aIcon[nCntIcon].radius.x += ICON_SCALE_CHANGE;
-						g_aIcon[nCntIcon].radius.y += ICON_SCALE_CHANGE;
+						g_aIcon[nCntIcon].radius.z += ICON_SCALE_CHANGE;
 					}
 					else
 					{ // 一定の半径だった場合
 
 						// アイコンの半径に加算する
 						g_aIcon[nCntIcon].radius.x = BARRIER_ICON_RADIUS;
-						g_aIcon[nCntIcon].radius.y = BARRIER_ICON_RADIUS;
+						g_aIcon[nCntIcon].radius.z = BARRIER_ICON_RADIUS;
 					}
 
 					break;					// 抜け出す
@@ -341,14 +341,14 @@ void UpdateIcon(void)
 
 						// アイコンの半径に加算する
 						g_aIcon[nCntIcon].radius.x -= ICON_SCALE_CHANGE;
-						g_aIcon[nCntIcon].radius.y -= ICON_SCALE_CHANGE;
+						g_aIcon[nCntIcon].radius.z -= ICON_SCALE_CHANGE;
 					}
 					else
 					{ // 一定の半径だった場合
 
 						// アイコンの半径に加算する
 						g_aIcon[nCntIcon].radius.x = 0.0f;
-						g_aIcon[nCntIcon].radius.y = 0.0f;
+						g_aIcon[nCntIcon].radius.z = 0.0f;
 					}
 
 					break;					// 抜け出す

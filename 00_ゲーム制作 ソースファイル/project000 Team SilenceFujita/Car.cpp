@@ -167,8 +167,8 @@ void UpdateCar(void)
 				// プレイヤーの位置の更新
 				PosCar(&g_aCar[nCntCar].move, &g_aCar[nCntCar].pos, &g_aCar[nCntCar].rot, g_aCar[nCntCar].bMove);
 
-				//車のカーブ処理
-				CurveCar(&g_aCar[nCntCar]);
+				// 移動量を更新
+				g_aCar[nCntCar].move.x += CAR_MOVE_FORWARD;
 
 				if (g_aCar[nCntCar].state == CARSTATE_TRAFFIC)
 				{ // 渋滞状態だった場合
@@ -277,6 +277,9 @@ void UpdateCar(void)
 
 			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
+
+				//車のカーブ処理
+				CurveCar(&g_aCar[nCntCar]);
 
 				// 車の補正の更新処理
 				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
@@ -706,9 +709,6 @@ void CurveCar(Car *pCar)
 //============================================================
 void DashCarAction(Car *pCar)
 {
-	// 移動量を更新
-	pCar->move.x += CAR_MOVE_FORWARD;
-
 	// 移動している状態にする
 	pCar->bMove = true;
 
