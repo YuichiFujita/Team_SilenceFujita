@@ -25,6 +25,7 @@
 #include "buildtimer.h"
 #include "camera.h"
 #include "Car.h"
+#include "Combo.h"
 #include "effect.h"
 #include "gate.h"
 #include "icon.h"
@@ -262,6 +263,9 @@ void InitTutorial(void)
 	// 爆弾の初期化
 	InitBomb();
 
+	// コンボの初期化
+	InitCombo();
+
 	// エフェクトの初期化
 	InitEffect();
 
@@ -401,6 +405,9 @@ void UninitTutorial(void)
 
 	// 爆弾の終了
 	UninitBomb();
+
+	// コンボの終了
+	UninitCombo();
 
 	// エフェクトの終了
 	UninitEffect();
@@ -564,6 +571,9 @@ void UpdateTutorial(void)
 	// スコアの更新
 	UpdateScore();
 
+	// コンボの更新
+	UpdateCombo();
+
 	// ボーナスの更新処理
 	UpdateBonus();
 
@@ -654,6 +664,9 @@ void DrawTutorial(void)
 	// 速度バーの描画
 	DrawVelocity();
 
+	// コンボの描画
+	DrawCombo();
+
 	// スコアの描画
 	DrawScore();
 
@@ -738,7 +751,7 @@ void AddLessonState(void)
 			case LESSON_04:	// レッスン4 (破滅疾走)
 
 				// レッスンのセットアップ
-				TxtSetLesson(LESSON_SETUP_SLUMBOOST);
+				//TxtSetLesson(LESSON_SETUP_SLUMBOOST);
 
 				// 処理を抜ける
 				break;
@@ -952,10 +965,10 @@ void TxtSetLesson(LESSON_SETUP lesson)
 
 			case LESSON_SETUP_FLYAWAY:		// レッスン5 (吹飛散風) の読み込み
 
-				if (strcmp(&aString[0], "SETSTAGE_HUMAN") == 0)
-				{ // 読み込んだ文字列が SETSTAGE_HUMAN の場合
+				if (strcmp(&aString[0], "SETLESSON_HUMAN") == 0)
+				{ // 読み込んだ文字列が SETLESSON_HUMAN の場合
 					do
-					{ // 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+					{ // 読み込んだ文字列が END_SETLESSON_HUMAN ではない場合ループ
 
 						// ファイルから文字列を読み込む
 						fscanf(pFile, "%s", &aString[0]);
@@ -1008,7 +1021,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							// 人間の設定
 							SetHuman(pos, nWalk, bRecur, type);
 						}
-					} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+					} while (strcmp(&aString[0], "END_SETLESSON_HUMAN") != 0);			// 読み込んだ文字列が END_SETLESSON_HUMAN ではない場合ループ
 				}
 
 				// 処理を抜ける
