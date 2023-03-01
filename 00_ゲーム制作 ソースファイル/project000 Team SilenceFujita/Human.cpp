@@ -323,7 +323,8 @@ void UpdateHuman(void)
 				BOOSTSTATE_NONE,				// ブースト状態
 				&policeState,					// 警察の状態
 				&nTackleCnt,					// タックルカウント
-				&fMove							// タックル時の移動量
+				&fMove,							// タックル時の移動量
+				COLLOBJECTTYPE_HUMAN
 			);
 
 			// プレイヤーの補正の更新処理

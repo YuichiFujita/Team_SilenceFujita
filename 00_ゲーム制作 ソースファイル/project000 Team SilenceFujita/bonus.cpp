@@ -9,6 +9,7 @@
 #include "Combo.h"
 #include "score.h"
 #include "game.h"
+#include "Police.h"
 #include "value.h"
 #include "2Deffect.h"
 #include "2Dparticle.h"
@@ -247,6 +248,9 @@ void UpdateBonus(void)
 					// コンボのスコアの加算処理
 					AddComboScore(g_aBonus[nCntBonus].nScore);
 
+					// 増援の得点を増やす
+					GetReinforce()->nBonus += 1;
+
 					// コンボの倍率処理
 					MagnificCombo(1);
 
@@ -274,6 +278,9 @@ void UpdateBonus(void)
 
 					// コンボのスコアの加算処理
 					AddComboScore(g_aBonus[nCntBonus].nScore);
+
+					// 増援の得点を増やす
+					GetReinforce()->nBonus += 1;
 
 					// コンボの倍率処理
 					MagnificCombo(1);

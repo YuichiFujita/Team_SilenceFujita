@@ -541,11 +541,15 @@ void UpdateBarrierData(void)
 				else
 				{ // カウンターが 0以下の場合
 
-					if (DownBarrier(nCntBarrier) == true)
-					{ // 下降可能だった場合
+					if (GetMode() != MODE_TUTORIAL)
+					{ // 現在のモードがチュートリアルではない場合
 
-						// 下降状態にする
-						g_aBarrier[nCntBarrier].state = BARRIERSTATE_DOWN;
+						if (DownBarrier(nCntBarrier) == true)
+						{ // 下降可能だった場合
+
+							// 下降状態にする
+							g_aBarrier[nCntBarrier].state = BARRIERSTATE_DOWN;
+						}
 					}
 				}
 

@@ -76,8 +76,9 @@
 //------------------------------------------------------------
 //	無音世界 (サイレンス・ワールド) マクロ定義
 //------------------------------------------------------------
-#define BOMB_CANCEL_CNT	(18)		// 攻撃キャンセル時の二回押しの猶予フレーム
-#define SUB_BOMB_CNT	(4)			// 使用待機時のゲージの減算量
+#define BOMB_CANCEL_CNT			(18)		// 攻撃キャンセル時の二回押しの猶予フレーム
+#define SUB_BOMB_CNT			(4)			// 使用待機時のゲージの減算量
+#define TUTO_HEAL_BOMB_CNT		(80)		// チュートリアル時のボムのクールタイムの回復待機フレーム
 
 //************************************************************
 //	列挙型定義 (PLAYMOVESTATE)
@@ -93,13 +94,14 @@ typedef enum
 }PLAYMOVESTATE;
 
 //************************************************************
-//	構造体定義 (PlayCamTutorial)
+//	構造体定義 (TutorialInfo)
 //************************************************************
 typedef struct
 {
+	int  nCounterHeal;				// ボムの回復管理カウンター
 	bool bForward;					// 前向きカメラの状況
 	bool bFirst;					// 一人称カメラの状況
-}PlayCamTutorial;
+}TutorialInfo;
 
 //************************************************************
 //	プロトタイプ宣言
@@ -124,11 +126,13 @@ void SetSlumBoost(void);			// 加速の設定処理
 void UpdateFlyAway(void);			// 送風の更新処理
 void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
+void AbiHealPlayer(void);			// 能力ゲージの回復処理
+
 //************************************************************
 //	グローバル変数
 //************************************************************
-Player          g_player;			// プレイヤー情報
-PlayCamTutorial g_tutorialCamera;	// チュートリアルのカメラ変更情報
+Player       g_player;		// プレイヤー情報
+TutorialInfo g_tutoInfo;	// チュートリアル情報
 
 //============================================================
 //	プレイヤーの初期化処理
@@ -187,9 +191,10 @@ void InitPlayer(void)
 	g_player.icon.nIconID = NONE_ICON;			// アイコンのインデックス
 	g_player.icon.state   = ICONSTATE_NONE;		// アイコンの状態
 
-	// チュートリアルのカメラ変更情報を初期化
-	g_tutorialCamera.bForward = false;			// 前向きカメラの状況
-	g_tutorialCamera.bFirst   = false;			// 一人称カメラの状況
+	// チュートリアルの情報の初期化
+	g_tutoInfo.nCounterHeal = 0;				// ボムの回復管理カウンター
+	g_tutoInfo.bForward     = false;			// 前向きカメラの状況
+	g_tutoInfo.bFirst       = false;			// 一人称カメラの状況
 
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -579,7 +584,8 @@ void UpdateGameNorPlayer(void)
 		g_player.boost.state,	// ブーストの状態
 		&policeState,			// 警察の状態
 		&nTackleCnt,			// タックルカウント
-		&fTackleSpeed			// タックル時の移動量
+		&fTackleSpeed,			// タックル時の移動量
+		COLLOBJECTTYPE_PLAYER
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -749,6 +755,9 @@ void UpdateTutorialNorPlayer(void)
 		CameraChangePlayer();
 	}
 
+	// 能力ゲージの回復
+	AbiHealPlayer();
+
 	//--------------------------------------------------------
 	//	当たり判定
 	//--------------------------------------------------------
@@ -764,7 +773,8 @@ void UpdateTutorialNorPlayer(void)
 		g_player.boost.state,	// ブーストの状態
 		&policeState,			// 警察の状態
 		&nTackleCnt,			// タックルカウント
-		&fTackleSpeed			// タックル時の移動量
+		&fTackleSpeed,			// タックル時の移動量
+		COLLOBJECTTYPE_PLAYER
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -869,8 +879,8 @@ void UpdateTutorialNorPlayer(void)
 
 	case LESSON_03:	// レッスン3 (視点変更)
 
-		if (g_tutorialCamera.bForward == true
-		&&  g_tutorialCamera.bFirst   == true)
+		if (g_tutoInfo.bForward == true
+		&&  g_tutoInfo.bFirst   == true)
 		{ // どちらのカメラも変更した場合
 
 			// レッスンの状態の加算
@@ -982,7 +992,8 @@ void UpdateOverPlayer(void)
 		g_player.boost.state,	// ブーストの状態
 		&policeState,			// 警察の状態
 		&nTackleCnt,			// タックルカウント
-		&fTackleSpeed			// タックル時の移動量
+		&fTackleSpeed,			// タックル時の移動量
+		COLLOBJECTTYPE_PLAYER
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -1407,7 +1418,7 @@ void CameraChangePlayer(void)
 		g_player.nCameraState = PLAYCAMESTATE_BACK;
 
 		// 前向きカメラを変更した情報を残す
-		g_tutorialCamera.bForward = true;
+		g_tutoInfo.bForward = true;
 	}
 	else
 	{ // カメラの方向の変更操作が行われていない場合
@@ -1423,7 +1434,7 @@ void CameraChangePlayer(void)
 		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
 
 		// 一人称カメラを変更した情報を残す
-		g_tutorialCamera.bFirst = true;
+		g_tutoInfo.bFirst = true;
 	}
 }
 
@@ -1773,6 +1784,9 @@ void UpdateSilenceWorld(void)
 		else
 		{ // カウンターが 0以下の場合
 
+			// バリアの発射
+			ShotBarrier();
+
 			// 攻撃待機状態にする
 			g_player.bomb.state = ATTACKSTATE_WAIT;
 		}
@@ -1797,6 +1811,58 @@ void UpdateSilenceWorld(void)
 
 		// 処理を抜ける
 		break;
+	}
+}
+
+//============================================================
+//	能力ゲージの回復処理
+//============================================================
+void AbiHealPlayer(void)
+{
+	// ポインタを宣言
+	WindInfo *pWindInfo = GetWindInfo();	// 風の情報
+
+	if (g_player.boost.state == BOOSTSTATE_WAIT)
+	{ // スラムブーストが待機状態の場合
+
+		// カウンターを初期化
+		g_player.boost.nCounter = 0;
+
+		// 何もしない状態にする
+		g_player.boost.state = BOOSTSTATE_NONE;
+	}
+
+	if (pWindInfo->state == WIND_COOLDOWN)
+	{ // フライアウェイがクールダウン状態の場合
+
+		// カウンターを補正する
+		pWindInfo->nUseCounter = 0;
+
+		// 使用可能にする
+		pWindInfo->state = WIND_USABLE;
+	}
+
+	if (g_player.bomb.state == ATTACKSTATE_WAIT)
+	{ // サイレンスワールドが待機状態の場合
+
+		// カウンターを加算
+		g_tutoInfo.nCounterHeal++;
+
+		if (g_tutoInfo.nCounterHeal >= TUTO_HEAL_BOMB_CNT)
+		{ // カウンターが一定値以上の場合
+
+			// カウンターを設定
+			g_player.bomb.nCounterState = BOMB_WAIT_CNT;
+
+			// 何もしない状態にする
+			g_player.bomb.state = ATTACKSTATE_NONE;
+		}
+	}
+	else
+	{ // サイレンスワールドが待機状態ではない場合
+
+		// カウンターを初期化
+		g_tutoInfo.nCounterHeal = 0;
 	}
 }
 

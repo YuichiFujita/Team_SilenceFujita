@@ -577,6 +577,9 @@ void UpdateGame(void)
 
 			// アイコンの更新
 			UpdateIcon();
+
+			// 警察の追加処理
+			AddPolice();					
 		}
 		else
 		{ // ポーズ状態の場合

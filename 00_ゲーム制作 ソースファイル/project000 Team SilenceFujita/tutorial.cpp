@@ -113,7 +113,7 @@ const int aNextLesson[] =	// レッスンのカウンター
 {
 	240,	// レッスン0 (移動)     のレッスンカウンター
 	150,	// レッスン1 (旋回)     のレッスンカウンター
-	30,		// レッスン2 (停止)     のレッスンカウンター
+	20,		// レッスン2 (停止)     のレッスンカウンター
 	60,		// レッスン3 (視点変更) のレッスンカウンター
 	30,		// レッスン4 (破滅疾走) のレッスンカウンター
 	60,		// レッスン5 (吹飛散風) のレッスンカウンター
@@ -142,6 +142,9 @@ void DrawTutorialUi(void);				// チュートリアルのUIの描画処理
 bool CheckNextSlumBoost(void);			// 破滅疾走のレッスン終了の確認処理
 bool CheckNextFlyAway(void);			// 吹飛散風のレッスン終了の確認処理
 bool CheckNextSilenceWorld(void);		// 無音世界のレッスン終了の確認処理
+
+void AllFalseSlumBoost(void);			// 破滅疾走のレッスン終了後の削除処理
+void AllFalseFlyAway(void);				// 吹飛散風のレッスン終了後の削除処理
 void AllFalseSilenceWorld(void);		// 無音世界のレッスン終了後の削除処理
 
 void ResetPlayer(void);					// プレイヤーの再設定処理
@@ -593,11 +596,6 @@ void UninitTutorial(void)
 //======================================================================================================================
 void UpdateTutorial(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{
-		g_nLessonState++;
-	}
-
 	if (g_bTutorialEnd == false)
 	{ // 遷移設定がされていない場合
 
@@ -951,6 +949,9 @@ void AddLessonState(void)
 
 			case LESSON_05:	// レッスン5 (吹飛散風)
 
+				// 破滅疾走のレッスン終了後の削除
+				AllFalseSlumBoost();
+
 				// レッスンのセットアップ
 				TxtSetLesson(LESSON_SETUP_FLYAWAY);
 
@@ -958,6 +959,9 @@ void AddLessonState(void)
 				break;
 
 			case LESSON_06:	// レッスン6 (無音世界)
+
+				// 吹飛散風のレッスン終了後の削除
+				AllFalseFlyAway();
 
 				// レッスンのセットアップ
 				TxtSetLesson(LESSON_SETUP_SILENCEWORLD);
@@ -967,10 +971,10 @@ void AddLessonState(void)
 
 			case LESSON_07:	// レッスン7 (脱出)
 
-				// 無音世界のレッスン終了後の削除処理
+				// 無音世界のレッスン終了後の削除
 				AllFalseSilenceWorld();
 
-				// ゲートの全開け処理
+				// ゲートの全開け
 				AllOpenGate();
 
 				// 処理を抜ける
@@ -1179,11 +1183,15 @@ bool CheckNextFlyAway(void)
 		if (pHuman->bUse == true)
 		{ // 人間が使用されている場合
 
-			// 次のレッスン遷移をできない状態にする
-			bNext = false;
+			if (pHuman->judge.state == JUDGESTATE_EVIL)
+			{ // 悪い奴の場合
 
-			// 処理を抜ける
-			break;
+				// 次のレッスン遷移をできない状態にする
+				bNext = false;
+
+				// 処理を抜ける
+				break;
+			}
 		}
 	}
 
@@ -1197,31 +1205,67 @@ bool CheckNextFlyAway(void)
 bool CheckNextSilenceWorld(void)
 {
 	// 変数を宣言
-	bool bNext = false;		// 次のレッスン遷移状況
+	bool bNext = true;			// 次のレッスン遷移状況
 
 	// ポインタを宣言
-	Barrier *pBarrier = GetBarrierData();	// バリアの情報
+	Car *pCar = GetCarData();	// 車の情報
 
-	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier++)
-	{ // バリアの最大表示数分繰り返す
+	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
+	{ // 車の最大表示数分繰り返す
 
-		if (pBarrier->bUse == true)
-		{ // バリアが使用されている場合
+		if (pCar->bUse == true)
+		{ // 車が使用されている場合
 
-			if (pBarrier->state == BARRIERSTATE_SET)
-			{ // バリアが完成状態の場合
+			if (pCar->judge.state == JUDGESTATE_EVIL)
+			{ // 悪い奴の場合
 
-				// 次のレッスン遷移をできる状態にする
-				bNext = true;
+				if (GetBarrierState(pCar) != BARRIERSTATE_SET)
+				{ // 車のバリア状態が完成状態ではない場合
 
-				// 処理を抜ける
-				break;
+					// 次のレッスン遷移をできる状態にする
+					bNext = false;
+
+					// 処理を抜ける
+					break;
+				}
 			}
 		}
 	}
 
 	// 次のレッスン遷移状況を返す
 	return bNext;
+}
+
+//======================================================================================================================
+//	破滅疾走のレッスン終了後の削除処理
+//======================================================================================================================
+void AllFalseSlumBoost(void)
+{
+	// ポインタを宣言
+	Object *pObject = GetObjectData();	// オブジェクトの情報
+
+	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++, pObject++)
+	{ // オブジェクトの最大表示数分繰り返す
+
+		// オブジェクトを使用していない状態にする
+		pObject->bUse = false;
+	}
+}
+
+//======================================================================================================================
+//	吹飛散風のレッスン終了後の削除処理
+//======================================================================================================================
+void AllFalseFlyAway(void)
+{
+	// ポインタを宣言
+	Human *pHuman = GetHumanData();		// 人間の情報
+
+	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++, pHuman++)
+	{ // 人間の最大表示数分繰り返す
+
+		// 人間を使用していない状態にする
+		pHuman->bUse = false;
+	}
 }
 
 //======================================================================================================================
@@ -1426,7 +1470,6 @@ void TxtSetLesson(LESSON_SETUP lesson)
 										&aMat[nCntMat].MatD3D.Ambient.a);
 									}
 								}
-
 							} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);		// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 							// オブジェクトの設定
