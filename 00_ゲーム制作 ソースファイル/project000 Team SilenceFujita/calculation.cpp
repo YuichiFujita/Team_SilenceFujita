@@ -449,13 +449,17 @@ void DrawResultChunk(void)
 bool UpdateAllClear(RESULTSTATE state)
 {
 	// 変数を宣言
-	bool bAllClear = true;				// 更新の終了確認用
+	bool bAllClear = true;	// 更新の終了確認用
 
 	// ポインタを宣言
-	Player *pPlayer = GetPlayer();		// プレイヤーの情報
-	Gate   *pGate   = GetGateData();	// ゲートの情報
-	Bonus  *pBonus  = GetBonus();		// ボーナスの情報
+	Player  *pPlayer  = GetPlayer();		// プレイヤーの情報
+	Gate    *pGate    = GetGateData();		// ゲートの情報
+	Bonus   *pBonus   = GetBonus();			// ボーナスの情報
+	Barrier *pBarrier = GetBarrierData();	// バリアの情報
 
+	//------------------------------------------------------------------------------
+	//　未終了の確認
+	//------------------------------------------------------------------------------
 	switch (state)
 	{ // リザルトの状態ごとの処理
 	case RESULTSTATE_CLEAR:		// クリア状態
@@ -522,10 +526,21 @@ bool UpdateAllClear(RESULTSTATE state)
 		}
 	}
 
+	//------------------------------------------------------------------------------
+	//　リザルトに残さない情報の初期化
+	//------------------------------------------------------------------------------
 	// プレイヤーの情報の初期化
-	pPlayer->boost.state = BOOSTSTATE_NONE;			// プレイヤーのブースト状態
-	pPlayer->bomb.state = ATTACKSTATE_NONE;			// プレイヤーのボム状態
-	pPlayer->wind.bUseWind = false;					// 風の使用状況
+	pPlayer->boost.state   = BOOSTSTATE_NONE;	// プレイヤーのブースト状態
+	pPlayer->bomb.state    = ATTACKSTATE_NONE;	// プレイヤーのボム状態
+	pPlayer->wind.bUseWind = false;				// 風の使用状況
+
+	// バリアの情報の初期化
+	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier)
+	{ // バリアの最大表示数分繰り返す
+
+		// 使用していない状態にする
+		pBarrier->bUse = false;
+	}
 
 	// 更新状況を返す
 	return bAllClear;
