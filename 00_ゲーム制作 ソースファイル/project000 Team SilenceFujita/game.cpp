@@ -209,8 +209,8 @@ void InitGame(void)
 		true	// AI
 	);
 
-	//// サウンドの再生※AnarchyCars
-	//PlaySound(SOUND_LABEL_GAME_BGM_000);	// BGM (ゲーム画面)
+	//// サウンドの再生※AnarchyCarsBGM
+	//PlaySound(SOUND_LABEL_BGM_GAME_000);	// BGM (ゲーム画面)
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
