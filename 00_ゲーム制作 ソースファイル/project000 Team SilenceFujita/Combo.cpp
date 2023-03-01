@@ -16,11 +16,10 @@
 #define COMBO_NUMBER_Y			(10.0f)							// 数字の半径(Y軸)
 #define COMBO_NUMBER_SHIFT		(20.0f)							// 数字のずらす数
 
-#define MAX_CONBOCOUNT			(999)							// コンボカウントの最大
+#define MAX_CONBOCOUNT			(99)							// コンボカウントの最大
 #define COMBOSTOP_CNT			(600)							// コンボの止まるカウント
 #define DIGIT_ONE				(1)								// 1桁の境界
 #define DIGIT_TWO				(10)							// 2桁の境界
-#define DIGIT_THREE				(100)							// 3桁の境界
 
 //コンボのテクスチャ
 typedef enum
@@ -284,13 +283,14 @@ void MagnificCombo(int nMagni)
 		// 倍率を加算する
 		g_Combo.nMagni += nMagni;
 
-		if (g_Combo.nMagni >= DIGIT_THREE)
-		{ // 100以上だった場合
+		if (g_Combo.nMagni >= MAX_CONBOCOUNT)
+		{ // 倍率が最大数以上だった場合
 
-			// 桁数を設定する
-			g_Combo.nDigit = 3;
+			// コンボの倍率を補正する
+			g_Combo.nMagni = MAX_CONBOCOUNT;
 		}
-		else if (g_Combo.nMagni >= DIGIT_TWO)
+
+		if (g_Combo.nMagni >= DIGIT_TWO)
 		{ // 10以上だった場合
 
 			// 桁数を設定する

@@ -178,6 +178,17 @@ void UpdatePolice(void)
 
 					// 警察の出現処理
 					PoliceSpawn(&g_aPolice[nCntPolice]);
+
+					// 車の停止処理
+					CollisionStopCar
+					( // 引数
+						g_aPolice[nCntPolice].pos,		//位置
+						g_aPolice[nCntPolice].rot,		//向き
+						&g_aPolice[nCntPolice].move,	//移動量
+						g_aPolice[nCntPolice].modelData.fRadius,	//半径
+						COLLOBJECTTYPE_POLICE,			//対象のサイズ
+						&g_aPolice[nCntPolice].nTrafficCnt
+					);
 				}
 
 				if (GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_NONE ||
@@ -254,6 +265,16 @@ void UpdatePolice(void)
 					// プレイヤーの補正の更新処理
 					RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 				}
+
+				//----------------------------------------------------
+				//	アイコンの更新
+				//----------------------------------------------------
+				// アイコンの位置設定
+				SetPositionIcon
+				( // 引数
+					g_aPolice[nCntPolice].icon.nIconID,	// アイコンのインデックス
+					g_aPolice[nCntPolice].pos			// 位置
+				);
 			}
 			else
 			{ // 上記以外

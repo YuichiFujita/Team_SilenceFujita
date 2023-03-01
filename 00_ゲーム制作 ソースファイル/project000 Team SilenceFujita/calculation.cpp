@@ -512,6 +512,13 @@ bool UpdateAllClear(RESULTSTATE state)
 		break;
 	}
 
+	if (pPlayer->bUse == true)
+	{ // プレイヤーを使用していた場合
+
+		// プレイヤーを使用しない
+		pPlayer->bUse = false;
+	}
+
 	for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++, pBonus++)
 	{ // ボーナスの最大表示数分繰り返す
 
