@@ -93,7 +93,9 @@ typedef struct
 typedef struct
 {
 	ATTACKSTATE state;				// 攻撃状態
-	int         nCounter;			// 攻撃管理カウンター
+	int         nCounterState;		// 攻撃管理カウンター
+	int         nCounterControl;	// 操作管理カウンター
+	bool        bShot;				// 発射待機状況
 }PlayerBomb;
 
 //************************************************************
@@ -134,9 +136,10 @@ void UpdateTutorialPlayer(void);	// プレイヤーのチュートリアル更新処理
 void DrawPlayer(void);				// プレイヤーの描画処理
 
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// プレイヤーの位置・向きの設定処理
-void HealPlayer(Player *pPlayer, int nHeal);				// プレイヤーの回復判定
-void HitPlayer(Player *pPlayer, int nDamage);				// プレイヤーのダメージ判定
-Player *GetPlayer(void);									// プレイヤーの取得処理
+
+void HealPlayer(Player *pPlayer, int nHeal);	// プレイヤーの回復判定
+void HitPlayer(Player *pPlayer, int nDamage);	// プレイヤーのダメージ判定
+Player *GetPlayer(void);						// プレイヤーの取得処理
 
 //************************************************************
 //	プロトタイプ宣言 (デバッグ用)

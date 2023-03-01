@@ -91,7 +91,8 @@ void InitCar(void)
 		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
 		g_aCar[nCntCar].type		= CARTYPE_CAR001;					// 種類
 		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
-		g_aCar[nCntCar].nBombCount = 0;									// ボム中のカウント
+		g_aCar[nCntCar].typeMove	= MOVETYPE_MOVE;					// 移動のタイプ
+		g_aCar[nCntCar].nBombCount  = 0;								// ボム中のカウント
 		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
 		g_aCar[nCntCar].bMove       = false;							// 移動しているか
 		g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
@@ -167,8 +168,12 @@ void UpdateCar(void)
 				// プレイヤーの位置の更新
 				PosCar(&g_aCar[nCntCar].move, &g_aCar[nCntCar].pos, &g_aCar[nCntCar].rot, g_aCar[nCntCar].bMove);
 
-				//車のカーブ処理
-				CurveCar(&g_aCar[nCntCar]);
+				if (g_aCar[nCntCar].typeMove == MOVETYPE_MOVE)
+				{ // 移動状態の場合
+
+					//車のカーブ処理
+					CurveCar(&g_aCar[nCntCar]);
+				}
 
 				if (g_aCar[nCntCar].state == CARSTATE_TRAFFIC)
 				{ // 渋滞状態だった場合
@@ -183,16 +188,6 @@ void UpdateCar(void)
 
 					//位置を0.0fに戻す
 					g_aCar[nCntCar].pos.y = 0.0f;
-				}
-
-				if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
-				{ // 悪者だった場合
-
-					// ジャッジの更新処理
-					UpdateJudge(&g_aCar[nCntCar].judge);
-
-					// アイコンの位置設定処理
-					SetPositionIcon(g_aCar[nCntCar].icon.nIconID, g_aCar[nCntCar].pos);
 				}
 			}
 
@@ -280,6 +275,16 @@ void UpdateCar(void)
 
 				// 車の補正の更新処理
 				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
+			}
+
+			if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+			{ // 悪者だった場合
+
+				// ジャッジの更新処理
+				UpdateJudge(&g_aCar[nCntCar].judge);
+
+				// アイコンの位置設定処理
+				SetPositionIcon(g_aCar[nCntCar].icon.nIconID, g_aCar[nCntCar].pos);
 			}
 		}
 	}
@@ -418,10 +423,8 @@ void DrawCar(void)
 //======================================================================================================================
 //	車の設定処理
 //======================================================================================================================
-void SetCar(D3DXVECTOR3 pos)
+void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 {
-	int nCarType;
-
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -429,7 +432,12 @@ void SetCar(D3DXVECTOR3 pos)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
 			g_aCar[nCntCar].pos			= pos;								// 現在の位置
-			g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;				// 前回の位置
+			g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;				// 前回の位置				
+			g_aCar[nCntCar].typeMove	= (MOVETYPE)nWalk;					// 移動のタイプ
+			g_aCar[nCntCar].rot			= rot;								// 向き
+			g_aCar[nCntCar].type		= (CARTYPE)(nType);					// 車の種類
+
+			// 情報の設定
 			g_aCar[nCntCar].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aCar[nCntCar].bombState	= BOMBSTATE_NONE;					// 何もしていない状態にする
 			g_aCar[nCntCar].nBombCount	= 0;								// ボム中のカウント
@@ -441,14 +449,8 @@ void SetCar(D3DXVECTOR3 pos)
 			// 使用している状態にする
 			g_aCar[nCntCar].bUse = true;
 
-			// 車の種類をランダムで算出する
-			nCarType = rand() % CARTYPE_MAX;
-
-			// 車の種類を設定する
-			g_aCar[nCntCar].type =(CARTYPE)(nCarType);
-
 			// モデル情報を設定
-			g_aCar[nCntCar].modelData = GetModelData(nCarType + FROM_CAR);	// モデル情報
+			g_aCar[nCntCar].modelData = GetModelData(g_aCar[nCntCar].type + FROM_CAR);	// モデル情報
 
 			D3DXMATERIAL *pMat;					//マテリアルへのポインタ
 
@@ -476,11 +478,15 @@ void SetCar(D3DXVECTOR3 pos)
 			g_aCar[nCntCar].icon.nIconID = NONE_ICON;					// アイコンのインデックス
 			g_aCar[nCntCar].icon.state = ICONSTATE_NONE;				// アイコンの状態
 
-			// 車の位置と向きの設定処理
-			SetCarPosRot(&g_aCar[nCntCar]);
-			g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;																					// スキップする曲がり角の回数
-			g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;																	// 前回の向き
-			g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;																		// 走っている状態
+			if (g_aCar[nCntCar].typeMove == MOVETYPE_MOVE)
+			{ // 移動状態の場合
+
+				// 車の位置と向きの設定処理
+				SetCarPosRot(&g_aCar[nCntCar]);
+				g_aCar[nCntCar].carCurveInfo.nSKipCnt = 0;						// スキップする曲がり角の回数
+				g_aCar[nCntCar].carCurveInfo.rotDest = g_aCar[nCntCar].rot;		// 前回の向き
+				g_aCar[nCntCar].carCurveInfo.actionState = CARACT_DASH;			// 走っている状態
+			}
 
 			// ジャッジの情報の設定
 			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色

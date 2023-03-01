@@ -16,7 +16,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_CURVEPOINT		(224)		// 曲がり角の最大数
+#define MAX_CURVEPOINT		(274)		// 曲がり角の最大数
 #define MAX_HUMAN_CURVE		(20)		// 人が曲がれる最大数
 #define MAX_HUMAN_ROUTE		(4)			// 人が歩くルート
 #define SHIFT_CAR_CURVE		(45.0f)		// 車のカーブでずらす幅
@@ -136,6 +136,5 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 CURVEINFO GetCurveInfo(int nID);		// 曲がり角の位置の取得処理
 
 HUMANCURVEINFO GetHumanRoute(int nID);	// 人間のルートの取得処理
-float GetDefaultRot(int nID);			// 人間の初期向きの取得処理
 
 #endif

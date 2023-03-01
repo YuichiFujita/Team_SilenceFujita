@@ -8,20 +8,18 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
+#include "input.h"
+
 #include "bomb.h"
 #include "calculation.h"
 #include "player.h"
 #include "car.h"
 #include "police.h"
 
-#include "input.h"
-#include "icon.h"
-
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
 #define MAX_BOMB		(128)		// 爆弾の範囲内表示の最大数
-#define MAX_BARRIER		(8)			// バリアの最大数
 
 #define BOMB_PULS		(1200.0f)	// プレイヤー位置からボム検知の中心位置へのずれ
 #define BOMB_RADIUS		(1000.0f)	// ボム検知範囲の半径
@@ -46,20 +44,10 @@
 #define MOVEPOS_ADD		(0.2f)		// 上昇・下降時の加算量
 #define DOWN_RADIUS		(240.0f)	// 下降時の下の車の確認半径
 #define CARPOS_MUL		(0.9f)		// 車の位置の乗算量
-#define SET_CNT			(2400)		// 完成時のカウント
+#define SET_CNT			(1800)		// 完成時のカウント
 #define ENLARGE_SCALE	(9.0f)		// 拡大率の補正値
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
-
-//**********************************************************************************************************************
-//	列挙型定義 (BOMBTYPE)
-//**********************************************************************************************************************
-typedef enum
-{
-	BOMBTYPE_CAR = 0,		// 車
-	BOMBTYPE_POLICE,		// 警察
-	BOMBTYPE_MAX,			// この列挙型の総数
-} BOMBTYPE;
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -72,26 +60,6 @@ typedef struct
 	float       fOrder;		// 判定距離
 	bool        bUse;		// 使用状況
 }Bomb;
-
-//**********************************************************************************************************************
-//	構造体定義 (Barrier)
-//**********************************************************************************************************************
-typedef struct
-{
-	D3DXVECTOR3  pos;		// 位置
-	D3DXVECTOR3 *pCarPos;	// 車の位置
-	D3DXVECTOR3  move;		// 移動量
-	D3DXVECTOR3  rot;		// 向き
-	D3DXVECTOR3  scale;		// 拡大率
-	D3DXMATRIX   mtxWorld;	// ワールドマトリックス
-	BARRIERSTATE state;		// 状態
-	BOMBTYPE     type;		// 種類
-	Model        modelData;	// モデル情報
-	void        *pCar;		// 車アドレス
-	int          nCounter;	// 状態管理カウンター
-	IconInfo	 icon;		// アイコンの情報
-	bool         bUse;		// 使用状況
-}Barrier;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -159,7 +127,7 @@ void InitBomb(void)
 
 		// アイコンの情報の初期化
 		g_aBarrier[nCntBarrier].icon.nIconID = NONE_ICON;		// アイコンのインデックス
-		g_aBarrier[nCntBarrier].icon.state = ICONSTATE_NONE;	// アイコンの状態
+		g_aBarrier[nCntBarrier].icon.state   = ICONSTATE_NONE;	// アイコンの状態
 	}
 }
 
@@ -335,7 +303,7 @@ void ShotBarrier(void)
 					pPlayer->bomb.state = ATTACKSTATE_WAIT;
 
 					// カウンターを初期化
-					pPlayer->bomb.nCounter = 0;
+					pPlayer->bomb.nCounterState = 0;
 
 					// 使用している状態にする
 					g_aBarrier[nCntBarrier].bUse = true;
@@ -346,6 +314,15 @@ void ShotBarrier(void)
 			}
 		}
 	}
+}
+
+//======================================================================================================================
+//	バリアの取得処理
+//======================================================================================================================
+Barrier *GetBarrierData(void)
+{
+	// バリアの情報の先頭アドレスを返す
+	return &g_aBarrier[0];
 }
 
 //======================================================================================================================
@@ -885,7 +862,7 @@ void ChangeAim(void)
 	if (g_nCurrentMaxBomb > 0)
 	{ // 狙える車が 0より多い場合
 
-		if (GetKeyboardTrigger(DIK_RIGHT) == true || GetJoyKeyTrigger(JOYKEY_R1, 0)/* || GetJoyStickPressRX(0) > 0*/)
+		if (GetKeyboardTrigger(DIK_M) == true || GetJoyKeyTrigger(JOYKEY_R1, 0))
 		{ // 右の車へ変更する捜査が行われた場合
 
 			// 選択している車のインデックスを変更
@@ -894,7 +871,7 @@ void ChangeAim(void)
 			// 現在狙っている車のアドレスを変更
 			g_pCurrentAim = g_aBomb[g_nID].pCar;
 		}
-		else if (GetKeyboardTrigger(DIK_LEFT) == true || GetJoyKeyTrigger(JOYKEY_L1, 0)/* || GetJoyStickPressRX(0) < 0*/)
+		else if (GetKeyboardTrigger(DIK_N) == true || GetJoyKeyTrigger(JOYKEY_L1, 0))
 		{ // 左の車へ変更する捜査が行われた場合
 
 			// 選択している車のインデックスを変更

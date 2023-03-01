@@ -24,7 +24,13 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_WIND			(1024)			//風の最大数
+#define MAX_WIND			(1024)			// 風の最大数
+#define HUMAN_FLY_POS_Y		(50.0f)			// 吹き飛ぶ判定が入る高さ
+#define WIND_WIDTH			(1000.0f)		// 風の範囲(X軸)
+#define WIND_DEPTH			(150.0f)		// 風の範囲(Z軸)
+#define FLYAWAY_WIDTH		(100.0f)		// 吹き飛ぶ幅
+#define FLYAWAY_HEIGHT		(25.0f)			// 吹き飛ぶ高さ
+#define FLYAWAY_DEPTH		(100.0f)		// 吹き飛ぶ高さ
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -77,7 +83,7 @@ void InitWind(void)
 	// 風の情報の初期化
 	g_WindInfo.nUseCounter = 0;										// 風のカウンターを初期化する
 	g_WindInfo.nOverHeatCounter = 0;								// オーバーヒートカウンターを初期化する
-	g_WindInfo.state = WIND_USABLE;									//使用可能状態
+	g_WindInfo.state = WIND_USABLE;									// 使用可能状態
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,
@@ -356,8 +362,8 @@ void CollisionWind(Human *pHuman)
 	// 変数配列を宣言
 	D3DXVECTOR3 vecPos[4];	// 頂点位置 ([※] 0：右上　1：左上　2：左下　3：右下)
 
-	if (pHuman->pos.y <= 50.0f)
-	{ // 300.0f以下にいる場合
+	if (pHuman->pos.y <= HUMAN_FLY_POS_Y)
+	{ // 50.0f以下にいる場合
 
 		// 四頂点の位置の計算
 		VecSizePos
@@ -365,8 +371,8 @@ void CollisionWind(Human *pHuman)
 			&vecPos[0],
 			pPlayer->pos,	// 絶対座標
 			pPlayer->rot,	// 向き
-			1000.0f,		// 横幅
-			150.0f			// 縦幅
+			WIND_WIDTH,		// 横幅
+			WIND_DEPTH		// 縦幅
 		);
 
 		if (LineOuterProduct(vecPos[0], vecPos[1], pHuman->pos) < 0
@@ -402,9 +408,9 @@ void FlyAwayHuman(Human *pHuman, Player player)
 	float FlyAngle = atan2f(pHuman->pos.x - player.pos.x, pHuman->pos.z - player.pos.z);
 
 	// 移動量を設定する
-	pHuman->move.x = sinf(FlyAngle) * 100.0f;
-	pHuman->move.y = 25.0f;
-	pHuman->move.z = cosf(FlyAngle) * 100.0f;
+	pHuman->move.x = sinf(FlyAngle) * FLYAWAY_WIDTH;
+	pHuman->move.y = FLYAWAY_HEIGHT;
+	pHuman->move.z = cosf(FlyAngle) * FLYAWAY_DEPTH;
 
 	// 飛ばす
 	pHuman->pos += pHuman->move;

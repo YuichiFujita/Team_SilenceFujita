@@ -182,6 +182,7 @@
     <ClCompile Include="junk.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
+    <ClCompile Include="Logo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
     <ClCompile Include="meshcylinder.cpp" />
@@ -199,7 +200,6 @@
     <ClCompile Include="score.cpp" />
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="sound.cpp" />
-    <ClCompile Include="SoundDJ.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="tiremark.cpp" />
     <ClCompile Include="title.cpp" />
@@ -238,6 +238,7 @@
     <ClInclude Include="junk.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />
+    <ClInclude Include="Logo.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="meshcylinder.h" />
@@ -255,7 +256,6 @@
     <ClInclude Include="score.h" />
     <ClInclude Include="shadow.h" />
     <ClInclude Include="sound.h" />
-    <ClInclude Include="SoundDJ.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="tiremark.h" />
     <ClInclude Include="title.h" />

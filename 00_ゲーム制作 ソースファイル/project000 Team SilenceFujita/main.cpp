@@ -14,6 +14,7 @@
 #include "sound.h"
 #include "fade.h"
 
+#include "Logo.h"
 #include "title.h"
 #include "tutorial.h"
 #include "game.h"
@@ -37,7 +38,6 @@
 #include "EditObject.h"
 #include "EditCollision.h"
 #include "EditBillboard.h"
-#include "SoundDJ.h"
 #include "weather.h"
 
 // メモリリーク出力用
@@ -434,11 +434,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//--------------------------------------------------------
 	//	変数の初期化
 	//--------------------------------------------------------
-	g_mode = MODE_TITLE;			// モードをタイトルに初期化
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;			// モードをタイトルに初期化
+	g_mode = MODE_TUTORIAL;			// モードをチュートリアルに初期化
+#else
+	g_mode = MODE_LOGO;				// モードをロゴに初期化
 #endif
-
 
 	// ステージの移動範囲を初期化
 	g_stageLimit.fNear  = 0.0f;		// 移動の制限位置 (手前)
@@ -479,8 +479,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	ResetRanking();
 
 #ifdef _DEBUG	// デバッグ処理
-	// サウンドDJの初期化
-	InitSoundDJ(hWnd);
 
 	// デバッグの初期化
 	InitDebug();
@@ -509,6 +507,9 @@ void Uninit(void)
 
 	// フェードの終了
 	UninitFade();
+
+	// ロゴの終了処理
+	UninitLogo();
 
 	// タイトル画面の終了
 	UninitTitle();
@@ -548,8 +549,6 @@ void Uninit(void)
 	}
 
 #ifdef _DEBUG	// デバッグ処理
-	// サウンドDJの終了
-	UninitSoundDJ();
 
 	// デバッグの終了
 	UninitDebug();
@@ -567,6 +566,14 @@ void Update(void)
 	// それぞれの画面の更新
 	switch (g_mode)
 	{ // 選択処理
+	case MODE_LOGO:		// ロゴ画面
+
+		// ロゴ画面の更新
+		UpdateLogo();
+
+		// 処理を抜ける
+		break;
+
 	case MODE_TITLE:	// タイトル画面
 
 		// タイトル画面の更新
@@ -645,6 +652,14 @@ void Draw(void)
 
 		switch (g_mode)
 		{ // 選択処理
+		case MODE_LOGO:		// ロゴ画面
+
+			// ロゴ画面の描画
+			DrawLogo();
+
+			// 処理から抜ける
+			break;
+
 		case MODE_TITLE:	// タイトル画面
 
 			// タイトル画面の描画
@@ -715,6 +730,14 @@ void SetMode(MODE mode)
 	//--------------------------------------------------------
 	switch (g_mode)
 	{
+	case MODE_LOGO:		// ロゴ画面
+
+		// ロゴ画面の終了
+		UninitLogo();
+
+		// 処理から抜ける
+		break;		
+
 	case MODE_TITLE:	// タイトル画面
 
 		// タイトル画面の終了
@@ -764,6 +787,14 @@ void SetMode(MODE mode)
 	//--------------------------------------------------------
 	switch (mode)
 	{
+	case MODE_LOGO:		// ロゴ画面
+
+		// LOGO画面の初期化
+		InitLogo();
+
+		// 処理から抜ける
+		break;
+
 	case MODE_TITLE:	// タイトル画面
 
 		// タイトル画面の初期化
@@ -795,6 +826,7 @@ void SetMode(MODE mode)
 
 		// 処理から抜ける
 		break;
+
 	case MODE_RANKING:	// ランキング画面
 
 		// ランキング画面の初期化
@@ -851,8 +883,8 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 void TxtSetStage(void)
 {
 	// 変数を宣言
-	int        nEnd;			// テキスト読み込み終了の確認用
-	StageLimit stageLimit;		// ステージの移動範囲の代入用
+	int         nEnd;			// テキスト読み込み終了の確認用
+	StageLimit  stageLimit;		// ステージの移動範囲の代入用
 	D3DXVECTOR3 pos;			// 位置
 	D3DXVECTOR3 rot;			// 向き
 	ROTSTATE	stateRot;		// 向きの状態
@@ -976,7 +1008,7 @@ void TxtSetStage(void)
 						} while (strcmp(&aString[0], "END_SET_GATE") != 0);	// 読み込んだ文字列が END_SET_GATE ではない場合ループ
 
 						// ゲートの設定処理
-						SetGate(pos, rot, stateRot, bOpen);
+						SetGate(pos, D3DXToRadian(rot), stateRot, bOpen);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
 			}
@@ -1237,6 +1269,10 @@ void TxtSetAI(void)
 	// 変数を宣言
 	int         nEnd;			// テキスト読み込み終了の確認用
 	D3DXVECTOR3 pos;			// 位置の代入用
+	D3DXVECTOR3 rot;			// 向きの代入用
+	int			nWalk;			// 歩きタイプの変数
+	bool		bRecur;			// 復活の変数
+	int			type;			// 種類
 
 	// 変数配列を宣言
 	char         aString[MAX_STRING];	// テキストの文字列の代入用
@@ -1278,16 +1314,31 @@ void TxtSetAI(void)
 
 							if (strcmp(&aString[0], "POS") == 0)
 							{ // 読み込んだ文字列が POS の場合
-								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
-								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);			// 位置を読み込む
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "WALK") == 0)
+							{ // 読み込んだ文字列が WALK の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &nWalk);						// 移動のタイプを読み込む
+							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &type);							// 種類を読み込む
 							}
 
-						} while (strcmp(&aString[0], "END_SET_CAR") != 0);					// 読み込んだ文字列が END_SET_CAR ではない場合ループ
+						} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 						// 車の設定
-						SetCar(pos);
+						SetCar(pos, rot, nWalk, type);
 					}
-				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);			// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
+				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);				// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
 			}
 
 			//------------------------------------------------
@@ -1298,7 +1349,7 @@ void TxtSetAI(void)
 				do
 				{ // 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 
-				  // ファイルから文字列を読み込む
+					// ファイルから文字列を読み込む
 					fscanf(pFile, "%s", &aString[0]);
 
 					if (strcmp(&aString[0], "SET_HUMAN") == 0)
@@ -1307,21 +1358,54 @@ void TxtSetAI(void)
 						do
 						{ // 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
-						  // ファイルから文字列を読み込む
+							// ファイルから文字列を読み込む
 							fscanf(pFile, "%s", &aString[0]);
 
 							if (strcmp(&aString[0], "POS") == 0)
 							{ // 読み込んだ文字列が POS の場合
-								fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
-								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);				// 位置を読み込む
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "WALK") == 0)
+							{ // 読み込んだ文字列が WALK の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &nWalk);						// 歩きのタイプを読み込む
+							}
+							else if (strcmp(&aString[0], "RECUR") == 0)
+							{ // 読み込んだ文字列が RECUR の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%s", &aString[0]);					// 復活状況を読み込む
+
+								if (strcmp(&aString[0], "TRUE") == 0)
+								{ // 読み込んだ文字列が TRUE の場合
+
+									// 復活する
+									bRecur = true;
+								}
+								else
+								{ // 読み込んだ文字列が FALSE の場合
+
+									// 復活しない
+									bRecur = false;
+								}
+							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &type);							// 種類を読み込む
 							}
 
-						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);	// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 						// 人間の設定
-						SetHuman(pos);
+						SetHuman(pos, rot, nWalk, bRecur, type);
 					}
-				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);		// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
+				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}
 
 			//------------------------------------------------
@@ -1822,7 +1906,8 @@ void DrawDebug(void)
 		"　 オブジェクトの数：%d\n"
 		" 　再建築タイマーの数：%d\n"
 		" 　警察の状態：%d\n"
-		" 　警察のタックル状態：%d",
+		" 　警察のタックル状態：%d\n"
+		" 　チュートリアルのレッスン：%d\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1844,11 +1929,12 @@ void DrawDebug(void)
 		pPolice->move.x,
 		HumanPos.x, HumanPos.y, HumanPos.z,
 		nNumWeather,
-		pPlayer->bomb.nCounter,
+		pPlayer->bomb.nCounterState,
 		nNumObject,
 		nNumBuild,
 		pPolice->state,
-		pPolice->tackle.tackleState
+		pPolice->tackle.tackleState,
+		GetLessonState()
 	);
 
 	//--------------------------------------------------------

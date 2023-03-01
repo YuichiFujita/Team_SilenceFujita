@@ -53,7 +53,6 @@
 
 #ifdef _DEBUG	// デバッグ処理
 #include "Editmain.h"
-#include "SoundDJ.h"
 #endif
 
 //**********************************************************************************************************************
@@ -70,7 +69,6 @@ int         g_nCounterGameState;	// 状態管理カウンター
 bool        g_bPause;				// ポーズ状態の ON / OFF
 bool        g_bGameEnd;				// モードの遷移状況
 int         g_nGameMode;			// エディットの ON / OFF
-int		    g_nSoundDJ;				// 現在流れているサウンド
 
 //======================================================================================================================
 //	ゲーム画面の初期化処理
@@ -87,10 +85,6 @@ void InitGame(void)
 	g_bPause            = false;				// ポーズ状態の ON / OFF
 	g_bGameEnd          = false;				// モードの遷移状況
 	g_nGameMode         = GAMEMODE_PLAY;		// エディットの ON / OFF
-
-#ifdef _DEBUG	// デバッグ処理
-	g_nSoundDJ = FUJITA_DJ_LABEL_ONE;			// サウンドを初期化する
-#endif
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	使用するソースファイルの初期化
@@ -215,8 +209,13 @@ void InitGame(void)
 		true	// AI
 	);
 
+<<<<<<< HEAD
 	//// サウンドの再生※AnarchyCars
 	PlaySound(SOUND_LABEL_GAME_BGM_000);	// BGM (ゲーム画面)
+=======
+	//// サウンドの再生※AnarchyCarsBGM
+	//PlaySound(SOUND_LABEL_BGM_GAME_000);	// BGM (ゲーム画面)
+>>>>>>> 713e5173d6312fb05df2bdd891f723099799b399
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
@@ -343,9 +342,6 @@ void UninitGame(void)
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの終了
 	UninitEditmain();
-
-	// BGMの停止
-	StopSoundDJ();
 #endif
 }
 
@@ -607,27 +603,6 @@ void UpdateGame(void)
 
 		// ステージの保存
 		TxtSaveStage();
-	}
-	if (GetKeyboardTrigger(DIK_F4) == true)
-	{ // [F4] が押された場合
-
-		// サウンドを変える
-		g_nSoundDJ = (g_nSoundDJ + 1) % SOUND_DJ_LABEL_MAX;
-	}
-	if (GetKeyboardTrigger(DIK_F5) == true)
-	{ // [F5] が押された場合
-
-		// サウンドの停止
-		StopSoundDJ();
-
-		// サウンドを流す
-		PlaySound(g_nSoundDJ, true);
-	}
-	if (GetKeyboardTrigger(DIK_F6) == true)
-	{ // [F6]が押された場合
-
-		// サウンドの停止
-		StopSoundDJ((SOUND_DJ_LABEL)g_nSoundDJ);
 	}
 	if (GetKeyboardTrigger(DIK_F9) == true)
 	{ // [F9] が押された場合
