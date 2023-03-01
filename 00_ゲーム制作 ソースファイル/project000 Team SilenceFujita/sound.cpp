@@ -41,6 +41,7 @@ SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 	{ "data/BGM/game_bgm001.wav", -1 },		// ゲーム内BGM001
 	{ "data/BGM/title_bgm000.wav", -1 },	// タイトル内BGM000
 	{ "data/BGM/result_bgm000.wav", -1 },	// リザルト内BGM000
+	{ "data/BGM/tutorial_bgm000.wav", -1 },	// チュートリアル内BGM000
 	{ "data/SE/move000.wav", 0 },			// SE
 };
 

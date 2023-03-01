@@ -56,18 +56,20 @@
 #define MAX_TUTO		(4)			// 使用するポリゴン数
 #define END_TUTO_TIME	(120)		// チュートリアル終了までの余韻フレーム
 
-#define TUTO_BG_POS_X	(910.0f)	// チュートリアルの背景の絶対座標 (x)
-#define TUTO_BG_POS_Y	(160.0f)	// チュートリアルの背景の絶対座標 (y)
-#define TUTO_BG_WIDTH	(360.0f)	// チュートリアルの背景の幅 / 2 (横)
-#define TUTO_BG_HEIGHT	(160.0f)	// チュートリアルの背景の幅 / 2 (高さ)
+#define TUTO_BG_POS_X	(970.0f)	// チュートリアルの背景の絶対座標 (x)
+#define TUTO_BG_POS_Y	(125.0f)	// チュートリアルの背景の絶対座標 (y)
+#define TUTO_BG_WIDTH	(300.0f)	// チュートリアルの背景の幅 / 2 (横)
+#define TUTO_BG_HEIGHT	(125.0f)	// チュートリアルの背景の幅 / 2 (高さ)
 
-#define TUTORIAL_POS_X	(930.0f)	// チュートリアルの絶対座標 (x)
-#define TUTORIAL_POS_Y	(150.0f)	// チュートリアルの絶対座標 (y)
-#define TUTORIAL_WIDTH	(360.0f)	// チュートリアルの幅 / 2 (横)
-#define TUTORIAL_HEIGHT	(150.0f)	// チュートリアルの幅 / 2 (高さ)
+#define TUTORIAL_POS_X	(990.0f)	// チュートリアルの絶対座標 (x)
+#define TUTORIAL_POS_Y	(120.0f)	// チュートリアルの絶対座標 (y)
+#define TUTORIAL_WIDTH	(300.0f)	// チュートリアルの幅 / 2 (横)
+#define TUTORIAL_HEIGHT	(125.0f)	// チュートリアルの幅 / 2 (高さ)
 
-#define TIPS_POS_X		(200.0f)	// チュートリアルの備考の絶対座標 (x)
-#define TIPS_POS_Y		(520.0f)	// チュートリアルの備考の絶対座標 (y)
+#define TIPS_POS_X		(270.0f)	// チュートリアルの備考の絶対座標 (x)
+#define TIPS_POS_Y		(600.0f)	// チュートリアルの備考の絶対座標 (y)
+#define TIPS_WIDTH		(250.0f)	// チュートリアルの備考の幅 / 2 (横)
+#define TIPS_HEIGHT		(100.0f)	// チュートリアルの備考の幅 / 2 (高さ)
 
 #define RESET_POS_Z		(-2000.0f)	// プレイヤー再設定時の z座標
 
@@ -269,10 +271,10 @@ void InitTutorial(void)
 	//	備考の背景の初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[8].pos  = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[9].pos  = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[10].pos = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[8].pos  = D3DXVECTOR3(TIPS_POS_X - TIPS_WIDTH, TIPS_POS_Y - TIPS_HEIGHT, 0.0f);
+	pVtx[9].pos  = D3DXVECTOR3(TIPS_POS_X + TIPS_WIDTH, TIPS_POS_Y - TIPS_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(TIPS_POS_X - TIPS_WIDTH, TIPS_POS_Y + TIPS_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(TIPS_POS_X + TIPS_WIDTH, TIPS_POS_Y + TIPS_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[8].rhw  = 1.0f;
@@ -296,10 +298,10 @@ void InitTutorial(void)
 	//	備考の初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[12].pos = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[13].pos = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[14].pos = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
-	pVtx[15].pos = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[12].pos = D3DXVECTOR3(TIPS_POS_X - TIPS_WIDTH, TIPS_POS_Y - TIPS_HEIGHT, 0.0f);
+	pVtx[13].pos = D3DXVECTOR3(TIPS_POS_X + TIPS_WIDTH, TIPS_POS_Y - TIPS_HEIGHT, 0.0f);
+	pVtx[14].pos = D3DXVECTOR3(TIPS_POS_X - TIPS_WIDTH, TIPS_POS_Y + TIPS_HEIGHT, 0.0f);
+	pVtx[15].pos = D3DXVECTOR3(TIPS_POS_X + TIPS_WIDTH, TIPS_POS_Y + TIPS_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[12].rhw = 1.0f;
@@ -436,8 +438,8 @@ void InitTutorial(void)
 		false	// AI
 	);
 
-	//// サウンドの再生
-	//PlaySound(SOUND_LABEL_BGM_001);	// BGM (チュートリアル画面)
+	//// サウンドの再生※AnarchyCarsBGM
+	//PlaySound(SOUND_LABEL_BGM_TUTORIAL_000);	// BGM (チュートリアル画面)
 }
 
 //======================================================================================================================
@@ -582,8 +584,8 @@ void UninitTutorial(void)
 	// フラッシュの終了
 	UninitFlash();
 
-	//// サウンドの停止
-	//StopSound();
+	// サウンドの停止
+	StopSound();
 }
 
 //======================================================================================================================
@@ -591,6 +593,11 @@ void UninitTutorial(void)
 //======================================================================================================================
 void UpdateTutorial(void)
 {
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{
+		g_nLessonState++;
+	}
+
 	if (g_bTutorialEnd == false)
 	{ // 遷移設定がされていない場合
 
@@ -1279,8 +1286,10 @@ void ResetPlayer(void)
 	pPlayer->wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
 
 	// 爆弾の情報の初期化
-	pPlayer->bomb.state    = ATTACKSTATE_NONE;					// 攻撃状態
-	pPlayer->bomb.nCounterState = BOMB_WAIT_CNT;						// 攻撃管理カウンター
+	pPlayer->bomb.state           = ATTACKSTATE_NONE;			// 攻撃状態
+	pPlayer->bomb.nCounterState   = BOMB_WAIT_CNT;				// 攻撃管理カウンター
+	pPlayer->bomb.nCounterControl = 0;							// 操作管理カウンター
+	pPlayer->bomb.bShot           = false;						// 発射待機状況
 }
 
 //======================================================================================================================
