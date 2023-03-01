@@ -14,6 +14,7 @@
 #include "sound.h"
 #include "fade.h"
 
+#include "Logo.h"
 #include "title.h"
 #include "tutorial.h"
 #include "game.h"
@@ -434,9 +435,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
+	g_mode = MODE_LOGO;			// モードをチュートリアルに初期化
 #else
-	g_mode = MODE_TITLE;			// モードをタイトルに初期化
+	g_mode = MODE_LOGO;			// モードをロゴに初期化
 #endif
 
 	// ステージの移動範囲を初期化
@@ -507,6 +508,9 @@ void Uninit(void)
 	// フェードの終了
 	UninitFade();
 
+	// ロゴの終了処理
+	UninitLogo();
+
 	// タイトル画面の終了
 	UninitTitle();
 
@@ -562,6 +566,14 @@ void Update(void)
 	// それぞれの画面の更新
 	switch (g_mode)
 	{ // 選択処理
+	case MODE_LOGO:		// ロゴ画面
+
+		// ロゴ画面の更新
+		UpdateLogo();
+
+		// 処理を抜ける
+		break;
+
 	case MODE_TITLE:	// タイトル画面
 
 		// タイトル画面の更新
@@ -640,6 +652,14 @@ void Draw(void)
 
 		switch (g_mode)
 		{ // 選択処理
+		case MODE_LOGO:		// ロゴ画面
+
+			// ロゴ画面の描画
+			DrawLogo();
+
+			// 処理から抜ける
+			break;
+
 		case MODE_TITLE:	// タイトル画面
 
 			// タイトル画面の描画
@@ -710,6 +730,14 @@ void SetMode(MODE mode)
 	//--------------------------------------------------------
 	switch (g_mode)
 	{
+	case MODE_LOGO:		// ロゴ画面
+
+		// ロゴ画面の終了
+		UninitLogo();
+
+		// 処理から抜ける
+		break;		
+
 	case MODE_TITLE:	// タイトル画面
 
 		// タイトル画面の終了
@@ -759,6 +787,14 @@ void SetMode(MODE mode)
 	//--------------------------------------------------------
 	switch (mode)
 	{
+	case MODE_LOGO:		// ロゴ画面
+
+		// LOGO画面の初期化
+		InitLogo();
+
+		// 処理から抜ける
+		break;
+
 	case MODE_TITLE:	// タイトル画面
 
 		// タイトル画面の初期化
