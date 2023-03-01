@@ -137,7 +137,7 @@ void InitResult(void)
 		g_Wheel.fRotMove = 0.2f;								// 向きの移動量
 
 		// 言葉の情報を初期化
-		g_RslWord.pos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f,150.0f, 0.0f);		// 中心
+		g_RslWord.pos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 150.0f, 0.0f);		// 中心
 		g_RslWord.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
 
 		g_nResultScore = GetScore();		// リザルトのスコア
@@ -229,7 +229,7 @@ void InitResult(void)
 			pVtx[3].col = D3DXCOLOR(0.8f, 0.0f, 0.0f, 1.0f);
 		}
 		else if (g_ResultState == RESULTSTATE_TIMEOVER
-			 ||  g_ResultState == RESULTSTATE_LIFEOVER)
+			|| g_ResultState == RESULTSTATE_LIFEOVER)
 		{ // ゲームオーバー状態の場合
 
 			//頂点カラーの設定
@@ -268,7 +268,7 @@ void InitResult(void)
 		);
 	}
 	else if (g_ResultState == RESULTSTATE_TIMEOVER
-		 ||  g_ResultState == RESULTSTATE_LIFEOVER)
+		|| g_ResultState == RESULTSTATE_LIFEOVER)
 	{ // ゲームオーバー状態の場合
 
 		// ファイルをロードする全体処理

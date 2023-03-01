@@ -8,7 +8,6 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
-#include "calculation.h"
 #include "input.h"
 #include "model.h"
 
@@ -878,7 +877,7 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 //	オブジェクトとの当たり判定
 //======================================================================================================================
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice,int *pTackleCnt,float *pTackleMove)
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice,int *pTackleCnt,float *pTackleMove,COLLOBJECTTYPE collType)
 {
 	// 変数を宣言
 	D3DXVECTOR3 collPos;	// 当たり判定の中心座標
@@ -927,8 +926,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						else
 						{ // 移動量が一定未満の場合
 
-							// コンボの倍率処理
-							MagnificCombo(COMBO_INTERRUPTION);
+							if (collType == COLLOBJECTTYPE_PLAYER)
+							{ // 当たり判定のタイプ
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
+							}
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -992,8 +995,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						else
 						{ // 移動量が一定未満の場合
 
-							// コンボの倍率処理
-							MagnificCombo(COMBO_INTERRUPTION);
+							if (collType == COLLOBJECTTYPE_PLAYER)
+							{ // 当たり判定のタイプ
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
+							}
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -1064,8 +1071,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						else
 						{ // 移動量が一定未満の場合
 
-							// コンボの倍率処理
-							MagnificCombo(COMBO_INTERRUPTION);
+							if (collType == COLLOBJECTTYPE_PLAYER)
+							{ // 当たり判定のタイプ
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
+							}
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -1129,8 +1140,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 						else
 						{ // 移動量が一定未満の場合
 
-							// コンボの倍率処理
-							MagnificCombo(COMBO_INTERRUPTION);
+							if (collType == COLLOBJECTTYPE_PLAYER)
+							{ // 当たり判定のタイプ
+
+								// コンボの倍率処理
+								MagnificCombo(COMBO_INTERRUPTION);
+							}
 						}
 
 						if (state == BOOSTSTATE_UP)
@@ -1212,8 +1227,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							else
 							{ // 移動量が一定未満の場合
 
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
+								if (collType == COLLOBJECTTYPE_PLAYER)
+								{ // 当たり判定のタイプ
+
+									// コンボの倍率処理
+									MagnificCombo(COMBO_INTERRUPTION);
+								}
 							}
 
 							if (state == BOOSTSTATE_UP)
@@ -1277,8 +1296,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							else
 							{ // 移動量が一定未満の場合
 
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
+								if (collType == COLLOBJECTTYPE_PLAYER)
+								{ // 当たり判定のタイプ
+
+									// コンボの倍率処理
+									MagnificCombo(COMBO_INTERRUPTION);
+								}
 							}
 
 							if (state == BOOSTSTATE_UP)
@@ -1349,8 +1372,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							else
 							{ // 移動量が一定未満の場合
 
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
+								if (collType == COLLOBJECTTYPE_PLAYER)
+								{ // 当たり判定のタイプ
+
+									// コンボの倍率処理
+									MagnificCombo(COMBO_INTERRUPTION);
+								}
 							}
 
 							if (state == BOOSTSTATE_UP)
@@ -1414,8 +1441,12 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							else
 							{ // 移動量が一定未満の場合
 
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
+								if (collType == COLLOBJECTTYPE_PLAYER)
+								{ // 当たり判定のタイプ
+
+									// コンボの倍率処理
+									MagnificCombo(COMBO_INTERRUPTION);
+								}
 							}
 
 							if (state == BOOSTSTATE_UP)
