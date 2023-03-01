@@ -163,5 +163,6 @@ MODE GetMode(void);						// モードの取得処理
 void SetLimitStage(StageLimit limit);	// ステージの移動範囲の設定処理
 StageLimit GetLimitStage(void);			// ステージの移動範囲の取得処理
 LPDIRECT3DDEVICE9 GetDevice(void);		// デバイスの取得処理
+int GetGateNum(void);					// ゲートの数の取得処理
 
 #endif

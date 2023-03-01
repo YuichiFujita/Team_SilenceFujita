@@ -79,6 +79,13 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\hodoukyou.x",			// 歩道橋
 	"data\\MODEL_OBJECT\\plant.x",				// 工場
 	"data\\MODEL_OBJECT\\net.x",				// 工場現場網
+	"data\\MODEL_OBJECT\\koujigenba.x",			// 工場現場ビル
+	"data\\MODEL_OBJECT\\TPOtoilet.x",			// 仮設トイレ
+	"data\\MODEL_OBJECT\\guardrail001.x",		// ガードレール
+	"data\\MODEL_OBJECT\\ramen001.x",			// ラーメン屋
+	"data\\MODEL_OBJECT\\funsui.x",				// 公園（噴水）
+	"data\\MODEL_OBJECT\\TriCorn.x",			// 三角コーン
+	"data\\MODEL_OBJECT\\TriCorn001.x",			// 三角コーン（二つ）
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
@@ -92,6 +99,7 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\farecar.x",		// 消防車
 	"data\\MODEL_OBJECT\\yakiimocar.x",		// 焼き芋屋
 	"data\\MODEL_OBJECT\\senkyoCar000.x",	// 選挙カー
+	"data\\MODEL_OBJECT\\BousouCar.x",		// 暴走車
 
 	// 人間モデル
 	"data\\MODEL_HUMAN\\body.x",			// 体

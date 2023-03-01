@@ -209,8 +209,7 @@ void InitGame(void)
 		true	// AI
 	);
 
-
-	//// サウンドの再生※AnarchyCars
+	//// サウンドの再生※AnarchyCarsBGM
 	//PlaySound(SOUND_LABEL_BGM_GAME_000);	// BGM (ゲーム画面)
 
 #ifdef _DEBUG	// デバッグ処理
@@ -578,6 +577,9 @@ void UpdateGame(void)
 
 			// アイコンの更新
 			UpdateIcon();
+
+			// 警察の追加処理
+			AddPolice();					
 		}
 		else
 		{ // ポーズ状態の場合

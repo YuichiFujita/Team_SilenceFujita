@@ -217,7 +217,8 @@ void UpdateCar(void)
 						BOOSTSTATE_NONE,				// ブースト状態
 						&policeState,					// 警察の状態
 						&nTackleCnt,					// タックルカウント
-						&fTackleMove					// タックル時の移動量
+						&fTackleMove,					// タックル時の移動量
+						COLLOBJECTTYPE_CAR
 					);
 
 					// 車の停止処理
@@ -233,7 +234,7 @@ void UpdateCar(void)
 
 					if (g_aCar[nCntCar].nTrafficCnt >= CAR_TRAFFIC_CNT)
 					{ // 渋滞に巻き込まれた場合
-					  // 渋滞状態にする
+						// 渋滞状態にする
 						g_aCar[nCntCar].state = CARSTATE_TRAFFIC;
 					}
 				}

@@ -32,8 +32,8 @@ D3DXVECTOR3 LogoPos;									// ロゴの中心
 // テクスチャファイル名
 const char *c_apFilenameLogo[LOGO_MAX] = 
 {
-	"data//TEXTURE//Start_Screen.png",
-	"data//TEXTURE//TEAM_SilenceFujita_logo000.png",
+	"data/TEXTURE/Start_Screen.png",
+	"data/TEXTURE/logo000.png",
 };
 
 //===============================
