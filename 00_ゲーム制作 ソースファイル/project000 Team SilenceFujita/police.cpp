@@ -13,12 +13,14 @@
 #include "calculation.h"
  
 #include "Car.h"
+#include "Combo.h"
 #include "gate.h"
 #include "Police.h"
 #include "shadow.h"
 #include "sound.h"
 #include "player.h"
 #include "object.h"
+#include "score.h"
 #include "meshfield.h"
 
 #ifdef _DEBUG	// デバッグ処理
@@ -51,6 +53,8 @@
 #define POLICAR_TACKLE_RANGE	(500.0f)	// タックル状態になる範囲
 #define POLICAR_SPAWN_RANGE		(1000.0f)	// スポーンしないゲートからの範囲
 
+#define ADDPOLICE_COUNT			(4)			// 警察が増えるカウント
+
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
 //**********************************************************************************************************************
@@ -76,11 +80,13 @@ void PolicePosRotCorrect(Police *pPolice);				// 警察の位置の補正処理
 void PoliceTackle(Police *pPolice);						// 警察のタックル処理
 void PoliceTrafficImprove(Police *pPolice);				// 警察の渋滞改善処理
 void PoliceSpawn(Police *pPolice);						// 警察の出現処理
+void PoliceCurveCheck(Police *pPolice);					// 警察の曲がり角チェック処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
 Police g_aPolice[MAX_POLICE];	// オブジェクトの情報
+Reinforce g_AddPolice;			// 警察の増援の情報
 
 //======================================================================================================================
 //	警察の初期化処理
@@ -141,6 +147,9 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].icon.nIconID = NONE_ICON;						// アイコンのインデックス
 		g_aPolice[nCntPolice].icon.state = ICONSTATE_NONE;					// アイコンの状態
 	}
+
+	// 援軍情報の初期化
+	g_AddPolice.nBonus = 0;													// 得点が入った回数
 }
 
 //======================================================================================================================
@@ -195,7 +204,8 @@ void UpdatePolice(void)
 							BOOSTSTATE_NONE,					// ブーストの状態
 							&g_aPolice[nCntPolice].state,		// 警察の状態
 							&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
-							&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
+							&g_aPolice[nCntPolice].tackle.tacklemove.x,	// タックル時の移動量
+							COLLOBJECTTYPE_POLICE
 						);
 
 						// ゲートとの当たり判定
@@ -350,7 +360,8 @@ void UpdatePolice(void)
 							BOOSTSTATE_NONE,					// ブーストの状態
 							&g_aPolice[nCntPolice].state,		// 警察の状態
 							&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
-							&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
+							&g_aPolice[nCntPolice].tackle.tacklemove.x,	// タックル時の移動量
+							COLLOBJECTTYPE_POLICE
 						);
 
 						// ゲートとの当たり判定
@@ -1083,6 +1094,9 @@ void PatrolBackAct(Police *pPolice)
 	pPolice->tackle.nTackleCnt = 0;						// タックルカウント
 	pPolice->tackle.tacklemove.x = 0.0f;				// タックル時の移動量
 	pPolice->tackle.tackleState = TACKLESTATE_CHARGE;	// タックル状態
+
+	// 警察の曲がり角チェック処理
+	PoliceCurveCheck(pPolice);
 }
 
 //============================================================
@@ -1113,138 +1127,8 @@ void CurvePolice(Police *pPolice)
 //============================================================
 void DashPoliceAction(Police *pPolice)
 {
-	for (int nCnt = 0; nCnt < MAX_CURVEPOINT; nCnt++)
-	{
-		switch (pPolice->policeCurve.curveInfo.dashAngle)
-		{
-		case DASH_RIGHT:		//右に走っている場合
-
-			//這わせる
-			pPolice->pos.z = pPolice->policeCurve.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
-
-			if (pPolice->pos.z == GetCurveInfo(nCnt).pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
-			{ // 同じZ軸上を走っている場合
-				if (pPolice->pos.x >= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2) &&
-					pPolice->posOld.x <= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2))
-				{ // 位置が一致した場合
-					if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
-					{ // 右に走る場合のみ
-					  // スキップカウントを減算する
-						pPolice->policeCurve.nSKipCnt--;
-
-						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
-						{ // スキップ回数が0になったまたは、行き止まりだった場合
-						  // スキップ回数を0にする
-							pPolice->policeCurve.nSKipCnt = 0;
-
-							// 曲がり角の情報を更新する
-							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
-						}
-					}
-				}
-			}
-
-			break;				//抜け出す
-
-		case DASH_LEFT:			//左を走っている場合
-
-								//這わせる
-			pPolice->pos.z = pPolice->policeCurve.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
-
-			if (pPolice->pos.z == GetCurveInfo(nCnt).pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
-			{ // 同じZ軸上を走っている場合
-				if (pPolice->pos.x <= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2) &&
-					pPolice->posOld.x >= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2))
-				{ // 位置が一致した場合
-					if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
-					{ // 左に走る場合のみ
-					  // スキップカウントを減算する
-						pPolice->policeCurve.nSKipCnt--;
-
-						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
-						{ // スキップ回数が0になった場合
-						  // スキップ回数を0にする
-							pPolice->policeCurve.nSKipCnt = 0;
-
-							// 曲がり角の情報を更新する
-							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
-						}
-					}
-				}
-			}
-
-			break;				//抜け出す
-
-		case DASH_FAR:			//奥に走っている場合
-
-								//這わせる
-			pPolice->pos.x = pPolice->policeCurve.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
-
-			if (pPolice->pos.x == GetCurveInfo(nCnt).pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
-			{ // 同じZ軸上を走っている場合
-				if (pPolice->pos.z >= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2) &&
-					pPolice->posOld.z <= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2))
-				{ // 位置が一致した場合
-					if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
-					{ // 奥に走る場合のみ
-					  // スキップカウントを減算する
-						pPolice->policeCurve.nSKipCnt--;
-
-						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
-						{ // スキップ回数が0になった場合
-						  // スキップ回数を0にする
-							pPolice->policeCurve.nSKipCnt = 0;
-
-							// 曲がり角の情報を更新する
-							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
-						}
-					}
-				}
-			}
-
-			break;				//抜け出す
-
-		case DASH_NEAR:			//奥に走っている場合
-
-								//這わせる
-			pPolice->pos.x = pPolice->policeCurve.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
-
-			if (pPolice->pos.x == GetCurveInfo(nCnt).pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
-			{ // 同じZ軸上を走っている場合
-				if (pPolice->pos.z <= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2) &&
-					pPolice->posOld.z >= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2))
-				{ // 位置が一致した場合
-					if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
-					{ // 手前に走る場合のみ
-					  // スキップカウントを減算する
-						pPolice->policeCurve.nSKipCnt--;
-
-						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
-						{ // スキップ回数が0になった場合
-						  // スキップ回数を0にする
-							pPolice->policeCurve.nSKipCnt = 0;
-
-							// 曲がり角の情報を更新する
-							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
-
-							if (pPolice->policeCurve.curveInfo.curveAngle == CURVE_LEFT)
-							{ // 曲がる方向が左方向だった場合
-							  // 角度を補正する
-								pPolice->rot.y = D3DX_PI;
-							}
-							else
-							{ // 曲がる方向が右方向だった場合
-							  // 角度を補正する
-								pPolice->rot.y = -D3DX_PI;
-							}
-						}
-					}
-				}
-			}
-
-			break;				//抜け出す
-		}
-	}
+	// 警察の曲がり角チェック処理
+	PoliceCurveCheck(pPolice);
 
 	if (pPolice->policeCurve.nSKipCnt == 0)
 	{ // スキップカウントが0の場合
@@ -1701,6 +1585,184 @@ void PoliceSpawn(Police *pPolice)
 			break;				//抜け出す
 		}
 	}
+}
+
+//======================================================================================================================
+// 警察の曲がり角チェック処理
+//======================================================================================================================
+void PoliceCurveCheck(Police *pPolice)
+{
+	for (int nCnt = 0; nCnt < MAX_CURVEPOINT; nCnt++)
+	{
+		switch (pPolice->policeCurve.curveInfo.dashAngle)
+		{
+		case DASH_RIGHT:		//右に走っている場合
+
+			//這わせる
+			pPolice->pos.z = pPolice->policeCurve.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pPolice->pos.z == GetCurveInfo(nCnt).pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pPolice->pos.x >= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2) &&
+					pPolice->posOld.x <= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
+					{ // 右に走る場合のみ
+						// スキップカウントを減算する
+						pPolice->policeCurve.nSKipCnt--;
+
+						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になったまたは、行き止まりだった場合
+							// スキップ回数を0にする
+							pPolice->policeCurve.nSKipCnt = 0;
+
+							// 曲がり角の情報を更新する
+							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
+						}
+					}
+				}
+			}
+
+			break;				//抜け出す
+
+		case DASH_LEFT:			//左を走っている場合
+
+			//這わせる
+			pPolice->pos.z = pPolice->policeCurve.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pPolice->pos.z == GetCurveInfo(nCnt).pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pPolice->pos.x <= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2) &&
+					pPolice->posOld.x >= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
+					{ // 左に走る場合のみ
+						// スキップカウントを減算する
+						pPolice->policeCurve.nSKipCnt--;
+
+						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になった場合
+							// スキップ回数を0にする
+							pPolice->policeCurve.nSKipCnt = 0;
+
+							// 曲がり角の情報を更新する
+							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
+						}
+					}
+				}
+			}
+
+			break;				//抜け出す
+
+		case DASH_FAR:			//奥に走っている場合
+
+			//這わせる
+			pPolice->pos.x = pPolice->policeCurve.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pPolice->pos.x == GetCurveInfo(nCnt).pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pPolice->pos.z >= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2) &&
+					pPolice->posOld.z <= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
+					{ // 奥に走る場合のみ
+						// スキップカウントを減算する
+						pPolice->policeCurve.nSKipCnt--;
+
+						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になった場合
+							// スキップ回数を0にする
+							pPolice->policeCurve.nSKipCnt = 0;
+
+							// 曲がり角の情報を更新する
+							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
+						}
+					}
+				}
+			}
+
+			break;				//抜け出す
+
+		case DASH_NEAR:			//奥に走っている場合
+
+			//這わせる
+			pPolice->pos.x = pPolice->policeCurve.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+
+			if (pPolice->pos.x == GetCurveInfo(nCnt).pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			{ // 同じZ軸上を走っている場合
+				if (pPolice->pos.z <= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2) &&
+					pPolice->posOld.z >= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2))
+				{ // 位置が一致した場合
+					if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
+					{ // 手前に走る場合のみ
+						// スキップカウントを減算する
+						pPolice->policeCurve.nSKipCnt--;
+
+						if (pPolice->policeCurve.nSKipCnt == 0 || GetCurveInfo(nCnt).bDeadEnd == true)
+						{ // スキップ回数が0になった場合
+							// スキップ回数を0にする
+							pPolice->policeCurve.nSKipCnt = 0;
+
+							// 曲がり角の情報を更新する
+							pPolice->policeCurve.curveInfo = GetCurveInfo(nCnt);
+
+							if (pPolice->policeCurve.curveInfo.curveAngle == CURVE_LEFT)
+							{ // 曲がる方向が左方向だった場合
+								// 角度を補正する
+								pPolice->rot.y = D3DX_PI;
+							}
+							else
+							{ // 曲がる方向が右方向だった場合
+								// 角度を補正する
+								pPolice->rot.y = -D3DX_PI;
+							}
+						}
+					}
+				}
+			}
+
+			break;				//抜け出す
+		}
+	}
+}
+
+//======================================================================================================================
+// 警察の追加処理
+//======================================================================================================================
+void AddPolice(void)
+{
+	while (g_AddPolice.nBonus >= ADDPOLICE_COUNT)
+	{ // カウントが一定数以上ならば実行
+
+		// ボーナスの回数を減算する
+		g_AddPolice.nBonus -= ADDPOLICE_COUNT;
+
+		D3DXVECTOR3 pos;		// 位置の変数
+
+		// 警察の設定処理
+		pos.x = (float)(rand() % 18000 - 9000);
+		pos.y = 0.0f;
+		pos.z = (float)(rand() % 18000 - 9000);
+
+		// 警察の設定処理
+		SetPolice(pos);
+
+		if (g_AddPolice.nBonus <= 0)
+		{ // ボーナスの回数が0を下回ったら
+
+			// ボーナスの回数を補正する
+			g_AddPolice.nBonus = 0;
+		}
+	}
+}
+
+//======================================================================================================================
+// 増援情報の取得処理
+//======================================================================================================================
+Reinforce *GetReinforce(void)
+{
+	// 増援の情報を返す
+	return &g_AddPolice;
 }
 
 #ifdef _DEBUG	// デバッグ処理
