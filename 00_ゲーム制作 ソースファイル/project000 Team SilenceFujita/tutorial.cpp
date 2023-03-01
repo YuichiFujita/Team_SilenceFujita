@@ -53,18 +53,21 @@
 //**********************************************************************************************************************
 #define LESSON_SETUP_TXT	"data\\TXT\\lesson.txt"	// チュートリアルのレッスンセットアップ用のテキストファイルの相対パス
 
-#define MAX_TUTO		(3)			// 使用するポリゴン数
+#define MAX_TUTO		(4)			// 使用するポリゴン数
 #define END_TUTO_TIME	(120)		// チュートリアル終了までの余韻フレーム
+
+#define TUTO_BG_POS_X	(910.0f)	// チュートリアルの背景の絶対座標 (x)
+#define TUTO_BG_POS_Y	(160.0f)	// チュートリアルの背景の絶対座標 (y)
+#define TUTO_BG_WIDTH	(360.0f)	// チュートリアルの背景の幅 / 2 (横)
+#define TUTO_BG_HEIGHT	(160.0f)	// チュートリアルの背景の幅 / 2 (高さ)
 
 #define TUTORIAL_POS_X	(930.0f)	// チュートリアルの絶対座標 (x)
 #define TUTORIAL_POS_Y	(150.0f)	// チュートリアルの絶対座標 (y)
 #define TUTORIAL_WIDTH	(360.0f)	// チュートリアルの幅 / 2 (横)
 #define TUTORIAL_HEIGHT	(150.0f)	// チュートリアルの幅 / 2 (高さ)
 
-#define TUTO_BG_POS_X	(910.0f)	// チュートリアルの背景の絶対座標 (x)
-#define TUTO_BG_POS_Y	(160.0f)	// チュートリアルの背景の絶対座標 (y)
-#define TUTO_BG_WIDTH	(360.0f)	// チュートリアルの背景の幅 / 2 (横)
-#define TUTO_BG_HEIGHT	(160.0f)	// チュートリアルの背景の幅 / 2 (高さ)
+#define TIPS_POS_X		(200.0f)	// チュートリアルの備考の絶対座標 (x)
+#define TIPS_POS_Y		(520.0f)	// チュートリアルの備考の絶対座標 (y)
 
 #define RESET_POS_Z		(-2000.0f)	// プレイヤー再設定時の z座標
 
@@ -74,6 +77,10 @@
 typedef enum
 {
 	TEXTURE_TUTORIAL_BG = 0,		// 背景
+	TEXTURE_TUTORIAL_SLUM,			// レッスン4 (破滅疾走) の備考
+	TEXTURE_TUTORIAL_FLY,			// レッスン5 (吹飛散風) の備考
+	TEXTURE_TUTORIAL_SILENCE,		// レッスン6 (無音世界) の備考
+	TEXTURE_TUTORIAL_EXIT,			// レッスン7 (脱出)     の備考
 	TEXTURE_TUTORIAL_MAX,			// この列挙型の総数
 } TEXTURE_TUTORIAL;
 
@@ -94,6 +101,10 @@ typedef enum
 const char *apTextureTutorial[] =	// チュートリアルテクスチャの相対パス
 {
 	"data\\TEXTURE\\ui005.png",		// チュートリアル背景のテクスチャ相対パス
+	"data\\TEXTURE\\tips000.png",	// レッスン4 (破滅疾走) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips001.png",	// レッスン5 (吹飛散風) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips002.png",	// レッスン6 (無音世界) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips003.png",	// レッスン7 (脱出)     の備考のテクスチャ相対パス
 };
 
 const int aNextLesson[] =	// レッスンのカウンター
@@ -201,7 +212,7 @@ void InitTutorial(void)
 	g_pVtxBuffTutorial->Lock(0, 0, (void**)&pVtx, 0);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	背景の初期化
+	//	レッスンの背景の初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
 	pVtx[0].pos = D3DXVECTOR3(TUTO_BG_POS_X - TUTO_BG_WIDTH, TUTO_BG_POS_Y - TUTO_BG_HEIGHT, 0.0f);
@@ -255,13 +266,13 @@ void InitTutorial(void)
 	pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	備考の初期化
+	//	備考の背景の初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[8].pos  = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[9].pos  = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
-	pVtx[10].pos = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[8].pos  = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[9].pos  = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[8].rhw  = 1.0f;
@@ -270,16 +281,43 @@ void InitTutorial(void)
 	pVtx[11].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[8].col  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-	pVtx[9].col  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-	pVtx[10].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-	pVtx[11].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+	pVtx[8].col  = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.6f);
+	pVtx[9].col  = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.6f);
+	pVtx[10].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.6f);
+	pVtx[11].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.6f);
 
 	// テクスチャ座標の設定
 	pVtx[8].tex  = D3DXVECTOR2(0.0f, 0.0f);
 	pVtx[9].tex  = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[10].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[11].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	備考の初期化
+	//------------------------------------------------------------------------------------------------------------------
+	// 頂点座標を設定
+	pVtx[12].pos = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[13].pos = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[14].pos = D3DXVECTOR3(TIPS_POS_X - TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[15].pos = D3DXVECTOR3(TIPS_POS_X + TUTORIAL_WIDTH, TIPS_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+
+	// rhw の設定
+	pVtx[12].rhw = 1.0f;
+	pVtx[13].rhw = 1.0f;
+	pVtx[14].rhw = 1.0f;
+	pVtx[15].rhw = 1.0f;
+
+	// 頂点カラーの設定
+	pVtx[12].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[13].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[14].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[15].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// テクスチャ座標の設定
+	pVtx[12].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[13].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[14].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[15].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffTutorial->Unlock();
@@ -997,7 +1035,7 @@ void DrawTutorialUi(void)
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	背景の描画
+	//	レッスンの背景の描画
 	//------------------------------------------------------------------------------------------------------------------
 	// テクスチャの設定
 	pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_BG]);
@@ -1013,6 +1051,60 @@ void DrawTutorialUi(void)
 
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+
+	if (g_nLessonState >= LESSON_04)
+	{ // 現在のレッスンがレッスン4 (破滅疾走) 以降の場合
+
+		//--------------------------------------------------------------------------------------------------------------
+		//	備考の背景の描画
+		//--------------------------------------------------------------------------------------------------------------
+		// テクスチャの設定
+		pDevice->SetTexture(0, NULL);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
+
+		//--------------------------------------------------------------------------------------------------------------
+		//	備考の描画
+		//--------------------------------------------------------------------------------------------------------------
+		switch (g_nLessonState)
+		{ // レッスンごとの処理
+		case LESSON_04:	// レッスン4 (破滅疾走)
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
+
+			// 処理を抜ける
+			break;
+
+		case LESSON_05:	// レッスン5 (吹飛散風)
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_FLY]);
+
+			// 処理を抜ける
+			break;
+
+		case LESSON_06:	// レッスン6 (無音世界)
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SILENCE]);
+
+			// 処理を抜ける
+			break;
+
+		case LESSON_07:	// レッスン7 (脱出)
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_EXIT]);
+
+			// 処理を抜ける
+			break;
+		}
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
+	}
 }
 
 //======================================================================================================================
