@@ -1398,11 +1398,26 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 									fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 								}
+								else if (strcmp(&aString[0], "ROT") == 0)
+								{ // 読み込んだ文字列が ROT の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+								}
+								else if (strcmp(&aString[0], "WALK") == 0)
+								{ // 読み込んだ文字列が WALK の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%d", &nWalk);						// 移動のタイプを読み込む
+								}
+								else if (strcmp(&aString[0], "TYPE") == 0)
+								{ // 読み込んだ文字列が TYPE の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%d", &type);							// 種類を読み込む
+								}
 
 							} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 							// 車の設定
-							SetCar(pos);
+							SetCar(pos, rot, nWalk, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_CAR") != 0);			// 読み込んだ文字列が END_SETLESSON_CAR ではない場合ループ
 				}
