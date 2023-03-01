@@ -1453,6 +1453,11 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 									fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 								}
+								else if (strcmp(&aString[0], "ROT") == 0)
+								{ // 読み込んだ文字列が ROT の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+								}
 								else if (strcmp(&aString[0], "WALK") == 0)
 								{ // 読み込んだ文字列が WALK の場合
 									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
@@ -1485,7 +1490,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 							// 人間の設定
-							SetHuman(pos, nWalk, bRecur, type);
+							SetHuman(pos, rot, nWalk, bRecur, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_HUMAN") != 0);			// 読み込んだ文字列が END_SETLESSON_HUMAN ではない場合ループ
 				}

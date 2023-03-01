@@ -29,47 +29,45 @@
 #include "Car.h"
 #include "Police.h"
 
-
 //**********************************************
 //* マクロ
 //**********************************************
-
-#define RANK_FILE_MODE		(FILE_MODE_TXT)					//ランキングファイルの入出力モード
+#define RANK_FILE_MODE		(FILE_MODE_BIN)					//ランキングファイルの入出力モード
 #define RANK_FILE_TXT		("data\\TXT\\rank.txt")			//ランキングのスコアのテキストファイル
 #define RANK_FILE_BIN		("data\\BIN\\rank.bin")			//ランキングのスコアのバイナリファイル
 
-#define RANK_FLASH_MAX		(1.0f)	//点滅の最大値
-#define RANK_FLASH_MIN		(0.3f)	//点滅の最小値
-#define RANK_FLASH_INTERVAL	(0.02f)	//点滅の間隔
+#define RANK_FLASH_MAX		(1.0f)					//点滅の最大値
+#define RANK_FLASH_MIN		(0.3f)					//点滅の最小値
+#define RANK_FLASH_INTERVAL	(0.02f)					//点滅の間隔
 
 //**********************************
 //* ランキングスコアの数値関係
 //**********************************
 #define RANK_MAX			(5)						//スコアの数
-#define	RANK_NUM_PLACE		(8)						//スコアの桁数
+#define	RANK_NUM_PLACE		(9)						//スコアの桁数
 #define RANK_TEX			(1)						//スコアのテクスチャ
 #define RANK_COLUMN			(1)						//スコアを分ける列
-#define RANK_POS_X			(SCREEN_WIDTH * 0.725f)	//スコアの開始位置（X)
-#define RANK_POS_Y			(SCREEN_HEIGHT * 0.15f)	//スコアの開始位置（Y）	
+#define RANK_POS_X			(SCREEN_WIDTH * 0.75f)	//スコアの開始位置（X)
+#define RANK_POS_Y			(SCREEN_HEIGHT * 0.13f)	//スコアの開始位置（Y）	
 #define RANK_SIZE_X			(50.0f)					//スコアの大きさ（X）
 #define RANK_SIZE_Y			(40.0f)					//スコアの大きさ（Y）
 #define RANK_INTERVAL_X		(80.0f)					//スコアの間隔（X）
 #define RANK_INTERVAL_Y		(90.0f)					//スコアの間隔（Y）
-#define RANK_MAX_NUMBER		(99999999)				//スコアの最大数
+#define RANK_MAX_NUMBER		(999999999)				//スコアの最大数
 
 //**********************************
 //* ランキングニュースコアの数値関係
 //**********************************
-#define	RANK_NEW_NUM_PLACE	(8)							//ニュースコアの桁数
+#define	RANK_NEW_NUM_PLACE	(9)							//ニュースコアの桁数
 #define RANK_NEW_TEX		(1)							//ニュースコアのテクスチャ
 #define RANK_NEW_COLUMN		(1)							//ニュースコアを分ける列
-#define RANK_NEW_POS_X		(SCREEN_WIDTH * 0.670f)		//ニュースコアの開始位置（X)
-#define RANK_NEW_POS_Y		(SCREEN_HEIGHT * 0.8f)		//ニュースコアの開始位置（Y）	
-#define RANK_NEW_SIZE_X		(40.0f)						//ニュースコアの大きさ（X）
-#define RANK_NEW_SIZE_Y		(30.0f)						//ニュースコアの大きさ（Y）
-#define RANK_NEW_INTERVAL_X	(60.0f)						//ニュースコアの間隔（X）
+#define RANK_NEW_POS_X		(SCREEN_WIDTH * 0.70f)		//ニュースコアの開始位置（X)
+#define RANK_NEW_POS_Y		(SCREEN_HEIGHT * 0.83f)		//ニュースコアの開始位置（Y）	
+#define RANK_NEW_SIZE_X		(45.0f)						//ニュースコアの大きさ（X）
+#define RANK_NEW_SIZE_Y		(35.0f)						//ニュースコアの大きさ（Y）
+#define RANK_NEW_INTERVAL_X	(65.0f)						//ニュースコアの間隔（X）
 #define RANK_NEW_INTERVAL_Y	(0.0f)						//ニュースコアの間隔（Y）
-#define RANK_NEW_MAX_NUMBER	(99999999)					//ニュースコアの最大数
+#define RANK_NEW_MAX_NUMBER	(999999999)					//ニュースコアの最大数
 
 //**********************************************
 //* 列挙型
@@ -293,7 +291,7 @@ void DrawRanking(void)
 }
 
 //=====================================
-//= ランキングのスコアの設定
+//= ランキングのスコアのソート設定
 //=====================================
 void SortRankingScore(void)
 {
@@ -302,33 +300,37 @@ void SortRankingScore(void)
 	int nTenpData;					//仮のデータ置き場
 	int nCountData;					//置き換える番号
 
-	if (g_aRankNewScore.nScore >= g_aRankScore[(RANK_MAX - 1)].nScore || g_aRankScore[(RANK_MAX - 1)].nScore == 0)
-	{
-		g_aRankScore[(RANK_MAX - 1)].nScore = g_aRankNewScore.nScore;
-		g_nNewScoreNumber = (RANK_MAX - 1);
+	if (g_aRankNewScore.nScore > 0)
+	{//ニュースコアが0より下ではないとき
+		if (g_aRankNewScore.nScore >= g_aRankScore[(RANK_MAX - 1)].nScore ||
+			g_aRankScore[(RANK_MAX - 1)].nScore == 0)
+		{//ニュースコアが一番低いスコアより大きいとき
+			g_aRankScore[(RANK_MAX - 1)].nScore = g_aRankNewScore.nScore;
+			g_nNewScoreNumber = (RANK_MAX - 1);
 
-		//要素1のデータと要素2のデータを比較
-		for (nCutRank = 0; nCutRank < (RANK_MAX - 1); nCutRank++)
-		{
-			nCountData = nCutRank;
-			//置き換え番号に要素1のデータ番号を代入
-			for (nCutScoreRank = nCutRank; nCutScoreRank < RANK_MAX; nCutScoreRank++)
+			//要素1のデータと要素2のデータを比較
+			for (nCutRank = 0; nCutRank < (RANK_MAX - 1); nCutRank++)
 			{
-				//要素2に仮の数値を代入
-				if (g_aRankScore[nCutScoreRank].nScore > g_aRankScore[nCountData].nScore)
+				nCountData = nCutRank;
+				//置き換え番号に要素1のデータ番号を代入
+				for (nCutScoreRank = nCutRank; nCutScoreRank < RANK_MAX; nCutScoreRank++)
 				{
-					if (nCutScoreRank == g_nNewScoreNumber)
+					//要素2に仮の数値を代入
+					if (g_aRankScore[nCutScoreRank].nScore > g_aRankScore[nCountData].nScore)
 					{
-						g_nNewScoreNumber = nCountData;
+						if (nCutScoreRank == g_nNewScoreNumber)
+						{
+							g_nNewScoreNumber = nCountData;
+						}
+						nCountData = nCutScoreRank;
 					}
-					nCountData = nCutScoreRank;
 				}
-			}
 
-			//データを置き換え
-			nTenpData = g_aRankScore[nCutRank].nScore;
-			g_aRankScore[nCutRank].nScore = g_aRankScore[nCountData].nScore;
-			g_aRankScore[nCountData].nScore = nTenpData;
+				//データを置き換え
+				nTenpData = g_aRankScore[nCutRank].nScore;
+				g_aRankScore[nCutRank].nScore = g_aRankScore[nCountData].nScore;
+				g_aRankScore[nCountData].nScore = nTenpData;
+			}
 		}
 	}
 }

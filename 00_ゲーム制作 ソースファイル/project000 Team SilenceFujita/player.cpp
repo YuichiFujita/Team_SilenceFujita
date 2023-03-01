@@ -1396,20 +1396,14 @@ void CameraChangePlayer(void)
 		g_player.nCameraState = PLAYCAMESTATE_NORMAL;
 	}
 
-	if (GetKeyboardPress(DIK_K) == true || GetJoyKeyPress(JOYKEY_DOWN, 0) == true)
+	if (GetKeyboardTrigger(DIK_K) == true || GetJoyKeyTrigger(JOYKEY_DOWN, 0) == true)
 	{ // 一人称カメラの ON / OFF の変更操作が行われた場合
 
 		// 一人称カメラの状況をtrueにする
-		g_player.bCameraFirst = true;
+		g_player.bCameraFirst = g_player.bCameraFirst ? false : true;
 
 		// 一人称カメラを変更した情報を残す
 		g_tutorialCamera.bFirst = true;
-	}
-	else
-	{ // 一人称カメラの ON/OFFの変更操作が行われた場合
-
-		// 一人称カメラの状況をfalseにする
-		g_player.bCameraFirst = false;
 	}
 }
 
