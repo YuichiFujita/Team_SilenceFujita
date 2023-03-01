@@ -53,7 +53,7 @@
 //**********************************************************************************************************************
 #define LESSON_SETUP_TXT	"data\\TXT\\lesson.txt"	// チュートリアルのレッスンセットアップ用のテキストファイルの相対パス
 
-#define MAX_TUTO		(2)			// 使用するポリゴン数
+#define MAX_TUTO		(3)			// 使用するポリゴン数
 #define END_TUTO_TIME	(120)		// チュートリアル終了までの余韻フレーム
 
 #define TUTORIAL_POS_X	(930.0f)	// チュートリアルの絶対座標 (x)
@@ -253,6 +253,33 @@ void InitTutorial(void)
 	pVtx[5].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[6].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	備考の初期化
+	//------------------------------------------------------------------------------------------------------------------
+	// 頂点座標を設定
+	pVtx[8].pos  = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[9].pos  = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y - TUTORIAL_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(TUTORIAL_POS_X - TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(TUTORIAL_POS_X + TUTORIAL_WIDTH, TUTORIAL_POS_Y + TUTORIAL_HEIGHT, 0.0f);
+
+	// rhw の設定
+	pVtx[8].rhw  = 1.0f;
+	pVtx[9].rhw  = 1.0f;
+	pVtx[10].rhw = 1.0f;
+	pVtx[11].rhw = 1.0f;
+
+	// 頂点カラーの設定
+	pVtx[8].col  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+	pVtx[9].col  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+	pVtx[10].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+	pVtx[11].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+
+	// テクスチャ座標の設定
+	pVtx[8].tex  = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[9].tex  = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[10].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[11].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffTutorial->Unlock();
@@ -1334,6 +1361,11 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 									fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 								}
+								else if (strcmp(&aString[0], "ROT") == 0)
+								{ // 読み込んだ文字列が ROT の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+								}
 								else if (strcmp(&aString[0], "WALK") == 0)
 								{ // 読み込んだ文字列が WALK の場合
 									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
@@ -1366,7 +1398,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 							// 人間の設定
-							SetHuman(pos, nWalk, bRecur, type);
+							SetHuman(pos, rot, nWalk, bRecur, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_HUMAN") != 0);			// 読み込んだ文字列が END_SETLESSON_HUMAN ではない場合ループ
 				}
@@ -1398,11 +1430,26 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 									fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 								}
+								else if (strcmp(&aString[0], "ROT") == 0)
+								{ // 読み込んだ文字列が ROT の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+								}
+								else if (strcmp(&aString[0], "WALK") == 0)
+								{ // 読み込んだ文字列が WALK の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%d", &nWalk);						// 移動のタイプを読み込む
+								}
+								else if (strcmp(&aString[0], "TYPE") == 0)
+								{ // 読み込んだ文字列が TYPE の場合
+									fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+									fscanf(pFile, "%d", &type);							// 種類を読み込む
+								}
 
 							} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 							// 車の設定
-							SetCar(pos);
+							SetCar(pos, rot, nWalk, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_CAR") != 0);			// 読み込んだ文字列が END_SETLESSON_CAR ではない場合ループ
 				}

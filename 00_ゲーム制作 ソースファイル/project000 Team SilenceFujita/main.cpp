@@ -434,7 +434,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_TUTORIAL;			// モードをチュートリアルに初期化
+	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
 #else
 	g_mode = MODE_TITLE;			// モードをタイトルに初期化
 #endif
@@ -1233,6 +1233,7 @@ void TxtSetAI(void)
 	// 変数を宣言
 	int         nEnd;			// テキスト読み込み終了の確認用
 	D3DXVECTOR3 pos;			// 位置の代入用
+	D3DXVECTOR3 rot;			// 向きの代入用
 	int			nWalk;			// 歩きタイプの変数
 	bool		bRecur;			// 復活の変数
 	int			type;			// 種類
@@ -1280,11 +1281,26 @@ void TxtSetAI(void)
 								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+							}
+							else if (strcmp(&aString[0], "WALK") == 0)
+							{ // 読み込んだ文字列が WALK の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &nWalk);						// 移動のタイプを読み込む
+							}
+							else if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &type);							// 種類を読み込む
+							}
 
 						} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 						// 車の設定
-						SetCar(pos);
+						SetCar(pos, rot, nWalk, type);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);				// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
 			}
@@ -1313,6 +1329,11 @@ void TxtSetAI(void)
 							{ // 読み込んだ文字列が POS の場合
 								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
 							}
 							else if (strcmp(&aString[0], "WALK") == 0)
 							{ // 読み込んだ文字列が WALK の場合
@@ -1346,7 +1367,7 @@ void TxtSetAI(void)
 						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 						// 人間の設定
-						SetHuman(pos, nWalk, bRecur, type);
+						SetHuman(pos, rot, nWalk, bRecur, type);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}
