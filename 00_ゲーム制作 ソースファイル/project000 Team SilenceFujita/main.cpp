@@ -96,6 +96,8 @@ LPDIRECT3DDEVICE9 g_pD3DDevice = NULL;	// Direct3D デバイスへのポインタ
 MODE       g_mode;			// モード切り替え用
 StageLimit g_stageLimit;	// ステージの移動範囲
 
+int g_nNumGate;				// ゲートの数
+
 #ifdef _DEBUG	// デバッグ処理
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffDebug = NULL;	// 頂点バッファへのポインタ
 LPD3DXFONT g_pFont;			// フォントへのポインタ
@@ -890,6 +892,9 @@ void TxtSetStage(void)
 	ROTSTATE	stateRot;		// 向きの状態
 	bool		bOpen;			// 開閉状況
 
+	// 変数の初期化
+	g_nNumGate = 0;				// ゲートの数
+
 	// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
 
@@ -1037,6 +1042,9 @@ void TxtSetStage(void)
 
 						// ゲートの設定処理
 						SetGate(pos, D3DXToRadian(rot), stateRot, bOpen);
+
+						// ゲートの数を加算する
+						g_nNumGate++;
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_GATE ではない場合ループ
 			}
@@ -1726,6 +1734,15 @@ void TxtSetShadow(void)
 		// エラーメッセージボックス
 		MessageBox(NULL, "影の半径ファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
+}
+
+//============================================================
+// ゲートの数の取得処理
+//============================================================
+int GetGateNum(void)
+{
+	// ゲートの数を返す
+	return g_nNumGate;
 }
 
 #ifdef _DEBUG	// デバッグ処理

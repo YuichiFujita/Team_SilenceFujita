@@ -25,8 +25,6 @@
 #define CURVE_ADD						(0.03f)				// カーブするときの向きの追加量
 #define CURVE_TXT						"data\\TXT\\Curve.txt"		// カーブ設定用のテキストファイルの相対パス
 #define HUMAN_CURVE_TXT					"data\\TXT\\HumanCurve.txt"	// 人間の曲がり角(ルート)の保存用テキストファイルの相対パス
-#define CURVE_SKIP_RANDOM				(3)					// スキップする回数のランダムの範囲
-#define CURVE_SKIP_LEAST				(2)					// スキップする回数の最低数
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言

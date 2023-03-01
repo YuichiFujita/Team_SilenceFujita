@@ -21,6 +21,8 @@
 #define MAX_HUMAN_ROUTE		(4)			// 人が歩くルート
 #define SHIFT_CAR_CURVE		(45.0f)		// 車のカーブでずらす幅
 #define SHIFT_HUMAN_CURVE	(80.0f)		// 人のカーブでずらす幅
+#define CURVE_SKIP_RANDOM	(3)			// スキップする回数のランダムの範囲
+#define CURVE_SKIP_LEAST	(2)			// スキップする回数の最低数
 
 //**********************************************************************************************************************
 //	曲がり角で曲がる角度(CURVEANGLE)
