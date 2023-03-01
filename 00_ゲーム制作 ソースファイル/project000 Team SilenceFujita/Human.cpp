@@ -500,7 +500,7 @@ void DrawHuman(void)
 //======================================================================================================================
 //	人間の設定処理
 //======================================================================================================================
-void SetHuman(D3DXVECTOR3 pos, int walk,bool bRecur,int type)
+void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 {
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -513,7 +513,8 @@ void SetHuman(D3DXVECTOR3 pos, int walk,bool bRecur,int type)
 			g_aHuman[nCntHuman].posOld   = pos;		// 前回の位置
 			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(walk);	// 移動の種類
 			g_aHuman[nCntHuman].bRecur	 = bRecur;	// 復活状況
-			g_aHuman[nCntHuman].type = (HUMANTYPE)(type);		// 種類
+			g_aHuman[nCntHuman].type	 = (HUMANTYPE)(type);		// 種類
+			g_aHuman[nCntHuman].rot		 = rot;		// 向き
 
 			// 情報を初期化
 			g_aHuman[nCntHuman].move     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量

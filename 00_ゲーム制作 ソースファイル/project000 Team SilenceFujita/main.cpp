@@ -434,7 +434,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_TUTORIAL;			// モードをチュートリアルに初期化
+	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
 #else
 	g_mode = MODE_TITLE;			// モードをタイトルに初期化
 #endif
@@ -1330,6 +1330,11 @@ void TxtSetAI(void)
 								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 								fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
 							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+							}
 							else if (strcmp(&aString[0], "WALK") == 0)
 							{ // 読み込んだ文字列が WALK の場合
 								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
@@ -1362,7 +1367,7 @@ void TxtSetAI(void)
 						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 						// 人間の設定
-						SetHuman(pos, nWalk, bRecur, type);
+						SetHuman(pos, rot, nWalk, bRecur, type);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}
