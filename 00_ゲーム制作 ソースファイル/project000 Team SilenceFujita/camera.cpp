@@ -581,9 +581,9 @@ void MoveFollowCamera(void)
 		{ // 一人称がONの場合
 
 			// 目標の視点の位置を更新
-			g_aCamera[CAMERATYPE_MAIN].posV.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * CAMERA_FORWARD_SHIFT + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * CAMERA_RIGHT_SHIFT;	// 目標注視点から距離分離れた位置
-			g_aCamera[CAMERATYPE_MAIN].posV.y = pPlayer->pos.y + CAMERA_UP_SHIFT;																			// 固定の高さ
-			g_aCamera[CAMERATYPE_MAIN].posV.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * CAMERA_FORWARD_SHIFT + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * CAMERA_RIGHT_SHIFT;	// 目標注視点から距離分離れた位置
+			g_aCamera[CAMERATYPE_MAIN].posV.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * CAMERA_FORWARD_SHIFT;	// 目標注視点から距離分離れた位置
+			g_aCamera[CAMERATYPE_MAIN].posV.y = pPlayer->pos.y + CAMERA_UP_SHIFT;								// 固定の高さ
+			g_aCamera[CAMERATYPE_MAIN].posV.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * CAMERA_FORWARD_SHIFT;	// 目標注視点から距離分離れた位置
 
 			// 目標の注始点を更新する
 			g_aCamera[CAMERATYPE_MAIN].posR.x = g_aCamera[CAMERATYPE_MAIN].posV.x - ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * sinf(g_aCamera[CAMERATYPE_MAIN].rot.y));	// 目標注視点から距離分離れた位置
@@ -626,9 +626,9 @@ void MoveFollowCamera(void)
 		{ // 一人称がONの場合
 
 			// 目標の視点の位置を更新
-			g_aCamera[CAMERATYPE_MAIN].posV.x = pPlayer->pos.x - sinf(pPlayer->rot.y) * CAMERA_BACK_SHIFT + cosf(g_aCamera[CAMERATYPE_MAIN].rot.y) * CAMERA_RIGHT_SHIFT;	// 目標注視点から距離分離れた位置
+			g_aCamera[CAMERATYPE_MAIN].posV.x = pPlayer->pos.x - sinf(pPlayer->rot.y) * CAMERA_BACK_SHIFT;	// 目標注視点から距離分離れた位置
 			g_aCamera[CAMERATYPE_MAIN].posV.y = pPlayer->pos.y + CAMERA_UP_SHIFT;							// 固定の高さ
-			g_aCamera[CAMERATYPE_MAIN].posV.z = pPlayer->pos.z - cosf(pPlayer->rot.y) * CAMERA_BACK_SHIFT + sinf(g_aCamera[CAMERATYPE_MAIN].rot.y) * CAMERA_RIGHT_SHIFT;	// 目標注視点から距離分離れた位置
+			g_aCamera[CAMERATYPE_MAIN].posV.z = pPlayer->pos.z - cosf(pPlayer->rot.y) * CAMERA_BACK_SHIFT;	// 目標注視点から距離分離れた位置
 
 			// 目標の注始点を更新する
 			g_aCamera[CAMERATYPE_MAIN].posR.x = g_aCamera[CAMERATYPE_MAIN].posV.x + ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * sinf(g_aCamera[CAMERATYPE_MAIN].rot.y));	// 目標注視点から距離分離れた位置
