@@ -44,7 +44,7 @@
 #define MOVEPOS_ADD		(0.2f)		// 上昇・下降時の加算量
 #define DOWN_RADIUS		(240.0f)	// 下降時の下の車の確認半径
 #define CARPOS_MUL		(0.9f)		// 車の位置の乗算量
-#define SET_CNT			(2400)		// 完成時のカウント
+#define SET_CNT			(1800)		// 完成時のカウント
 #define ENLARGE_SCALE	(9.0f)		// 拡大率の補正値
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
@@ -127,7 +127,7 @@ void InitBomb(void)
 
 		// アイコンの情報の初期化
 		g_aBarrier[nCntBarrier].icon.nIconID = NONE_ICON;		// アイコンのインデックス
-		g_aBarrier[nCntBarrier].icon.state = ICONSTATE_NONE;	// アイコンの状態
+		g_aBarrier[nCntBarrier].icon.state   = ICONSTATE_NONE;	// アイコンの状態
 	}
 }
 
