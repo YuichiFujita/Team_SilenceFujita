@@ -12,9 +12,9 @@
 //マクロ定義
 #define COMBO_GROUND_X			(100.0f)						// 下地の半径(X軸)
 #define COMBO_GROUND_Y			(50.0f)							// 下地の半径(Y軸)
-#define COMBO_NUMBER_X			(20.0f)							// 数字の半径(X軸)
-#define COMBO_NUMBER_Y			(10.0f)							// 数字の半径(Y軸)
-#define COMBO_NUMBER_SHIFT		(20.0f)							// 数字のずらす数
+#define COMBO_NUMBER_X			(19.0f)							// 数字の半径(X軸)
+#define COMBO_NUMBER_Y			(19.0f)							// 数字の半径(Y軸)
+#define COMBO_NUMBER_SHIFT		(26.0f)							// 数字のずらす数
 
 #define MAX_CONBOCOUNT			(999)							// コンボカウントの最大
 #define COMBOSTOP_CNT			(600)							// コンボの止まるカウント
@@ -42,7 +42,7 @@ int g_nComboCount;												// コンボが止まるまでのカウント
 //テクスチャファイル名
 const char *c_apFilenameCombo[COMBOTEX_MAX] =
 {
-	"data/TEXTURE/ComboGround.png",								//下地
+	"data/TEXTURE/ui007.png",								//下地
 };
 
 //===========================================
@@ -56,7 +56,7 @@ void InitCombo(void)
 	pDevice = GetDevice();
 
 	// 情報の初期化
-	g_Combo.pos = D3DXVECTOR3(1150.0f, 400.0f, 0.0f);		// 位置
+	g_Combo.pos = D3DXVECTOR3(1150.0f, 600.0f, 0.0f);		// 位置
 	g_Combo.nMagni		= 0;								// 倍率
 	g_Combo.nDigit		= 0;								// 桁数
 	g_Combo.nMoveCount  = 0;								// 移動カウント
