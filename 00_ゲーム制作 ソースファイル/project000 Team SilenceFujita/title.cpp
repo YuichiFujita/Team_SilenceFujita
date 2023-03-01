@@ -250,7 +250,7 @@ void UpdateTitle(void)
 			// 状態を何もしないに設定
 			g_stateTitle = TITLESTATE_NONE;
 
-			////// サウンドの再生※AnarchyCars
+			//// サウンドの再生※AnarchyCars
 			//PlaySound(SOUND_LABEL_TITLE_BGM_000);	// BGM (タイトル画面)
 		}
 
@@ -319,7 +319,7 @@ void UpdateTitle(void)
 			// 状態を何もしないに設定
 			g_stateTitle = TITLESTATE_NONE;
 
-			////// サウンドの再生※AnarchyCars
+			//// サウンドの再生※AnarchyCars
 			//PlaySound(SOUND_LABEL_TITLE_BGM_000);	// BGM (タイトル画面)
 		}
 	}
