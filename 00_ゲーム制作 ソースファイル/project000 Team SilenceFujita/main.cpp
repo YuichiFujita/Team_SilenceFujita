@@ -952,6 +952,34 @@ void TxtSetStage(void)
 			}
 
 			//------------------------------------------------
+			//	プレイヤーの設定処理
+			//------------------------------------------------
+			else if (strcmp(&aString[0], "STAGE_PLAYERSET") == 0)
+			{ // 読み込んだ文字列が STAGE_PLAYERSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_STAGE_PLAYERSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+						fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+						fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+					}
+					else if (strcmp(&aString[0], "ROT") == 0)
+					{ // 読み込んだ文字列が ROT の場合
+						fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+						fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+					}
+				} while (strcmp(&aString[0], "END_STAGE_PLAYERSET") != 0);	// 読み込んだ文字列が END_STAGE_PLAYERSET ではない場合ループ
+
+				// プレイヤーの位置・向きの設定
+				SetPositionPlayer(pos, D3DXToRadian(rot));
+			}
+
+			//------------------------------------------------
 			//	ゲートの設定処理
 			//------------------------------------------------
 			else if (strcmp(&aString[0], "SETSTAGE_GATE") == 0)
@@ -1010,7 +1038,7 @@ void TxtSetStage(void)
 						// ゲートの設定処理
 						SetGate(pos, D3DXToRadian(rot), stateRot, bOpen);
 					}
-				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_BILLBOARD ではない場合ループ
+				} while (strcmp(&aString[0], "END_SETSTAGE_GATE") != 0);	// 読み込んだ文字列が END_SETSTAGE_GATE ではない場合ループ
 			}
 		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
 		
