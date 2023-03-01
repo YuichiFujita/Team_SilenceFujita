@@ -285,7 +285,7 @@ void InitResult(void)
 	}
 
 	////サウンドの再生（ランキング終了まで）※AnarchyCars
-	//PlaySound(SOUND_LABEL_RESULT_BGM_000);
+	PlaySound(SOUND_LABEL_RESULT_BGM_000);
 }
 
 //======================================
