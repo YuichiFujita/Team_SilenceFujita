@@ -17,6 +17,7 @@
 #include "value.h"
 
 #include "score.h"
+#include "title.h"
 
 #include "calculation.h"
 #include "camera.h"
@@ -169,8 +170,12 @@ void UninitRanking(void)
 	// アイコンの終了
 	UninitIcon();
 
-	//サウンドの停止（リザルトからのBGM）
-	StopSound();
+	if (GetTitleSound == false)
+	{//タイトルサウンドが使用中じゃないとき（タイトル遷移中）
+		//サウンドの停止（リザルトからのBGM）
+		StopSound();
+	}
+
 }
 
 //=====================================
