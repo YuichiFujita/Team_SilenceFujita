@@ -10,38 +10,50 @@
 #include "value.h"
 
 //マクロ定義
-#define COMBO_GROUND_X			(100.0f)						// 下地の半径(X軸)
-#define COMBO_GROUND_Y			(50.0f)							// 下地の半径(Y軸)
-#define COMBO_NUMBER_X			(20.0f)							// 数字の半径(X軸)
-#define COMBO_NUMBER_Y			(10.0f)							// 数字の半径(Y軸)
-#define COMBO_NUMBER_SHIFT		(20.0f)							// 数字のずらす数
+#define MAX_COMBO			(2)			// 使用するポリゴン数
 
-#define MAX_CONBOCOUNT			(99)							// コンボカウントの最大
-#define COMBOSTOP_CNT			(600)							// コンボの止まるカウント
-#define DIGIT_ONE				(1)								// 1桁の境界
-#define DIGIT_TWO				(10)							// 2桁の境界
+#define MAX_CONBOCOUNT		(99)		// コンボカウントの最大
+#define COMBOSTOP_CNT		(600)		// コンボの止まるカウント
+#define DIGIT_ONE			(1)			// 1桁の境界
+#define DIGIT_TWO			(10)		// 2桁の境界
+
+#define COM_COMBO_BG_POS	(D3DXVECTOR3(1138.0f, 583.0f, 0.0f))	// コンボの背景の位置
+#define COM_SCORE_BG_POS	(D3DXVECTOR3( 918.0f, 573.0f, 0.0f))	// コンボスコアの背景の位置
+#define COM_COMBO_VAL_POS	(D3DXVECTOR3(1139.0f, 589.0f, 0.0f))	// コンボの値の位置
+#define COM_SCORE_VAL_POS	(D3DXVECTOR3(1026.0f, 576.0f, 0.0f))	// コンボスコアの値の位置
+
+#define COM_COMBO_BG_SIZE	(D3DXVECTOR3( 100.0f,  50.0f, 0.0f))	// コンボの背景サイズ
+#define COM_SCORE_BG_SIZE	(D3DXVECTOR3( 150.0f,  50.0f, 0.0f))	// コンボスコアの背景サイズ
+#define COM_COMBO_VAL_SIZE	(D3DXVECTOR3(  24.0f,  24.0f, 0.0f))	// コンボの値のサイズ
+#define COM_SCORE_VAL_SIZE	(D3DXVECTOR3(  19.0f,  19.0f, 0.0f))	// コンボスコアの値のサイズ
+
+#define COM_DIGIT_PLUS		(14.0f)		// コンボの桁増加時の位置加算量
+#define COM_COMBO_VAL_SPACE	(30.0f)		// コンボの値の空白サイズ
+#define COM_SCORE_VAL_SPACE	(26.0f)		// コンボスコアの値の空白サイズ
 
 //コンボのテクスチャ
 typedef enum
 {
-	COMBOTEX_GROUND = 0,			//下地
+	COMBOTEX_GROUND_COMBO = 0,	// コンボ下地
+	COMBOTEX_GROUND_SCORE,		// コンボスコア下地
 	COMBOTEX_MAX
 }COMBOTEX;
 
 //プロトタイプ宣言
 
 //グローバル変数宣言
-LPDIRECT3DTEXTURE9 g_pTextureCombo[COMBOTEX_MAX] = {};			// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9      g_pTextureCombo[COMBOTEX_MAX] = {};		// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffCombo = NULL;					// 頂点バッファへのポインタ
 
-Combo g_Combo;													// コンボの情報
-int g_nComboScore;												// 倍率でかけるスコア
-int g_nComboCount;												// コンボが止まるまでのカウント
+Combo g_Combo;			// コンボの情報
+int   g_nComboScore;	// 倍率でかけるスコア
+int   g_nComboCount;	// コンボが止まるまでのカウント
 
 //テクスチャファイル名
 const char *c_apFilenameCombo[COMBOTEX_MAX] =
 {
-	"data/TEXTURE/ComboGround.png",								//下地
+	"data/TEXTURE/ui006.png",	// コンボ下地
+	"data/TEXTURE/ui007.png",	// コンボスコア下地
 };
 
 //===========================================
@@ -49,18 +61,16 @@ const char *c_apFilenameCombo[COMBOTEX_MAX] =
 //===========================================
 void InitCombo(void)
 {
-	LPDIRECT3DDEVICE9 pDevice;									//デバイスへのポインタ
-
-	//デバイスの取得
-	pDevice = GetDevice();
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	VERTEX_2D *pVtx;							// 頂点情報へのポインタ
 
 	// 情報の初期化
-	g_Combo.pos = D3DXVECTOR3(1150.0f, 400.0f, 0.0f);		// 位置
-	g_Combo.nMagni		= 0;								// 倍率
-	g_Combo.nDigit		= 0;								// 桁数
-	g_Combo.nMoveCount  = 0;								// 移動カウント
-	g_Combo.bMoveUp		= true;								// 上に移動しているか下に移動しているか
-	g_Combo.bUse		= false;							// 使用状況
+	g_Combo.nMagni     = 0;		// 倍率
+	g_Combo.nDigit     = 0;		// 桁数
+	g_Combo.nMoveCount = 0;		// 移動カウント
+	g_Combo.bMoveUp    = true;	// 上に移動しているか下に移動しているか
+	g_Combo.bUse       = false;	// 使用状況
 
 	// 倍率でかけるスコアを初期化
 	g_nComboScore = 0;
@@ -69,31 +79,34 @@ void InitCombo(void)
 	g_nComboCount = 0;
 
 	for (int nCntTexture = 0; nCntTexture < COMBOTEX_MAX; nCntTexture++)
-	{//テクスチャの設定
-		//テクスチャの読み込み
-		D3DXCreateTextureFromFile(pDevice,
-			c_apFilenameCombo[nCntTexture],
-			&g_pTextureCombo[nCntTexture]);
+	{ // テクスチャの設定
+
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice, c_apFilenameCombo[nCntTexture], &g_pTextureCombo[nCntTexture]);
 	}
 
-	//頂点バッファの生成
-	pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4,
+	// 頂点バッファの生成
+	pDevice->CreateVertexBuffer
+	( // 引数
+		sizeof(VERTEX_2D) * 4 * MAX_COMBO,
 		D3DUSAGE_WRITEONLY,
 		FVF_VERTEX_2D,
 		D3DPOOL_MANAGED,
 		&g_pVtxBuffCombo,
-		NULL);
+		NULL
+	);
 
-	VERTEX_2D * pVtx;											//頂点情報へのポインタ
-
-	//頂点バッファをロックし、頂点情報へのポインタを取得
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffCombo->Lock(0, 0, (void**)&pVtx, 0);
 
+	//---------------------------------------
+	//	コンボの背景の初期化
+	//---------------------------------------
 	//頂点座標の設定
-	pVtx[0].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
+	pVtx[0].pos = D3DXVECTOR3(COM_COMBO_BG_POS.x - COM_COMBO_BG_SIZE.x, COM_COMBO_BG_POS.y - COM_COMBO_BG_SIZE.y, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(COM_COMBO_BG_POS.x + COM_COMBO_BG_SIZE.x, COM_COMBO_BG_POS.y - COM_COMBO_BG_SIZE.y, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(COM_COMBO_BG_POS.x - COM_COMBO_BG_SIZE.x, COM_COMBO_BG_POS.y + COM_COMBO_BG_SIZE.y, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(COM_COMBO_BG_POS.x + COM_COMBO_BG_SIZE.x, COM_COMBO_BG_POS.y + COM_COMBO_BG_SIZE.y, 0.0f);
 
 	//rhwの設定
 	pVtx[0].rhw = 1.0f;
@@ -112,6 +125,33 @@ void InitCombo(void)
 	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//---------------------------------------
+	//	コンボスコアの背景の初期化
+	//---------------------------------------
+	//頂点座標の設定
+	pVtx[4].pos = D3DXVECTOR3(COM_SCORE_BG_POS.x - COM_SCORE_BG_SIZE.x, COM_SCORE_BG_POS.y - COM_SCORE_BG_SIZE.y, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(COM_SCORE_BG_POS.x + COM_SCORE_BG_SIZE.x, COM_SCORE_BG_POS.y - COM_SCORE_BG_SIZE.y, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(COM_SCORE_BG_POS.x - COM_SCORE_BG_SIZE.x, COM_SCORE_BG_POS.y + COM_SCORE_BG_SIZE.y, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(COM_SCORE_BG_POS.x + COM_SCORE_BG_SIZE.x, COM_SCORE_BG_POS.y + COM_SCORE_BG_SIZE.y, 0.0f);
+
+	//rhwの設定
+	pVtx[4].rhw = 1.0f;
+	pVtx[5].rhw = 1.0f;
+	pVtx[6].rhw = 1.0f;
+	pVtx[7].rhw = 1.0f;
+
+	//頂点カラーの設定
+	pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	//テクスチャ座標の設定
+	pVtx[4].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[5].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[6].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	//頂点バッファをアンロックする
 	g_pVtxBuffCombo->Unlock();
@@ -171,12 +211,6 @@ void UpdateCombo(void)
 		// コンボの止まるカウントを加算
 		g_nComboCount++;
 
-		//頂点座標の設定
-		pVtx[0].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
-		pVtx[1].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y - COMBO_GROUND_Y, 0.0f);
-		pVtx[2].pos = D3DXVECTOR3(g_Combo.pos.x - COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
-		pVtx[3].pos = D3DXVECTOR3(g_Combo.pos.x + COMBO_GROUND_X, g_Combo.pos.y + COMBO_GROUND_Y, 0.0f);
-
 		if (g_nComboCount >= COMBOSTOP_CNT)
 		{ // カウントが一定数に達したら
 
@@ -194,10 +228,11 @@ void UpdateCombo(void)
 //===========================================
 void DrawCombo(void)
 {
-	LPDIRECT3DDEVICE9 pDevice;								//デバイスへのポインタ
+	// 変数を宣言
+	D3DXVECTOR3 pos;	// 桁ごとの倍率位置の設定用
 
-	//デバイスの取得
-	pDevice = GetDevice();
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
 	//頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0,
@@ -211,49 +246,60 @@ void DrawCombo(void)
 	if (g_Combo.bUse == true)
 	{//使用されている場合
 
-		//テクスチャの設定
-		pDevice->SetTexture(0, g_pTextureCombo[COMBOTEX_GROUND]);
+		//-----------------------------------
+		//	背景の描画
+		//-----------------------------------
+		for (int nCntCombo = 0; nCntCombo < MAX_COMBO; nCntCombo++)
+		{ // 使用するポリゴン数分繰り返す
 
-		//ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
-			0,											//描画する最初の頂点インデックス
-			2);											//描画するプリミティブ数
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_pTextureCombo[nCntCombo]);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive
+			( // 引数
+				D3DPT_TRIANGLESTRIP,	// プリミティブの種類
+				nCntCombo * 4,			// 描画する最初の頂点インデックス
+				2						// 描画するプリミティブ数
+			);
+		}
+		
+		//-----------------------------------
+		//	数値の描画
+		//-----------------------------------
+		// 桁ごとの倍率位置の設定
+		pos = COM_COMBO_VAL_POS;
+		pos.x += (g_Combo.nDigit == 2) ? COM_DIGIT_PLUS : 0;	// 2桁の場合位置をずらす
 
 		// 数値の設定処理
 		SetValue
-		(
-			g_Combo.pos,
-			g_Combo.nMagni,
-			MAX_CONBOCOUNT,
-			COMBO_NUMBER_X,
-			COMBO_NUMBER_Y,
-			COMBO_NUMBER_SHIFT,
-			1.0f);
+		( // 引数
+			pos,					// 位置
+			g_Combo.nMagni,			// 値
+			MAX_CONBOCOUNT,			// 値の最大値
+			COM_COMBO_VAL_SIZE.x,	// 横幅
+			COM_COMBO_VAL_SIZE.y,	// 縦幅
+			COM_COMBO_VAL_SPACE,	// 数値間の幅
+			1.0f					// α値
+		);
 
 		// 数値の描画処理
-		DrawValue
-		(
-			g_Combo.nDigit,
-			VALUETYPE_RED
-		);
+		DrawValue(g_Combo.nDigit, VALUETYPE_RED);
 
 		// 数値の設定処理
 		SetValue
-		(
-			D3DXVECTOR3(g_Combo.pos.x - 100.0f, g_Combo.pos.y, g_Combo.pos.z),
-			g_nComboScore,
-			VAL_MAX_SCORE,
-			COMBO_NUMBER_X,
-			COMBO_NUMBER_Y,
-			COMBO_NUMBER_SHIFT,
-			1.0f);
+		( // 引数
+			COM_SCORE_VAL_POS,		// 位置
+			g_nComboScore,			// 値
+			VAL_MAX_SCORE,			// 値の最大値
+			COM_SCORE_VAL_SIZE.x,	// 横幅
+			COM_SCORE_VAL_SIZE.y,	// 縦幅
+			COM_SCORE_VAL_SPACE,	// 数値間の幅
+			1.0f					// α値
+		);
 
 		// 数値の描画処理
-		DrawValue
-		(
-			VAL_SCO_DIGIT,
-			VALUETYPE_NORMAL
-		);
+		DrawValue(VAL_SCO_DIGIT, VALUETYPE_NORMAL);
 	}
 }
 
