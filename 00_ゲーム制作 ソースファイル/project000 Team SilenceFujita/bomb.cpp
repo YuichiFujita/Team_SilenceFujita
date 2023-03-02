@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "input.h"
+#include "sound.h"
 
 #include "bomb.h"
 #include "calculation.h"
