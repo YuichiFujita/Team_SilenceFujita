@@ -242,17 +242,8 @@ void UpdateBonus(void)
 					// 使用しない
 					g_aBonus[nCntBonus].bUse = false;
 
-					//// スコアを加算する
-					//AddScore(g_aBonus[nCntBonus].nScore);
-
 					// コンボのスコアの加算処理
 					AddComboScore(g_aBonus[nCntBonus].nScore);
-
-					// 増援の得点を増やす
-					GetReinforce()->nBonus += 1;
-
-					// コンボの倍率処理
-					MagnificCombo(1);
 
 					// 2Dパーティクルの発生
 					Set2DParticle
@@ -412,7 +403,13 @@ void SetBonus(ADDSCORETYPE Reason)
 			if (g_aBonus[nCntBonus].bUse == false)
 			{ // 得点表示が使用されていない場合
 
-			  // 右に出すか左に出すかをランダムで算出する
+				// 増援の得点を増やす
+				GetReinforce()->nBonus += 1;
+
+				// コンボの倍率処理
+				MagnificCombo(1);
+
+				// 右に出すか左に出すかをランダムで算出する
 				nTopBotRand = rand() % WHEREBONUS_MAX;
 
 				switch (nTopBotRand)

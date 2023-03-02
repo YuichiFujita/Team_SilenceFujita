@@ -140,7 +140,6 @@ void InitResult(void)
 		g_RslWord.pos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 150.0f, 0.0f);		// 中心
 		g_RslWord.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
 
-		g_nResultScore = GetScore();		// リザルトのスコア
 		g_nDispRslScore = 0;				// 表示用のスコア
 		g_bRslFade = false;					// リザルトから遷移するかどうか
 
@@ -237,6 +236,9 @@ void InitResult(void)
 			pVtx[1].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
 			pVtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
 			pVtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
+
+			// スコアの加算処理
+			AddScore(-(int)(GetScore() * 0.5f));
 		}
 
 		//テクスチャ座標の設定
@@ -248,6 +250,8 @@ void InitResult(void)
 		//頂点バッファをアンロックする
 		g_pVtxBuffResultWord->Unlock();
 	}
+
+	g_nResultScore = GetScore();		// リザルトのスコア
 
 	// リザルトの初期化全体処理
 	InitResultChunk();

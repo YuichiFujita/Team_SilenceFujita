@@ -35,6 +35,7 @@ typedef enum
 	POLICESTATE_POSBACK,				// 最初の座標に戻る
 	POLICESTATE_TACKLE,					// タックル状態
 	POLICESTATE_TRAFFIC,				// 渋滞状態
+	POLICESTATE_WAIT,					// 待機状態
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
 
@@ -83,10 +84,11 @@ typedef struct
 	CARCURVE	policeCurveCopy;		// 曲がり角の情報のコピー
 	PoliTackle  tackle;					// タックル関係の変数
 	int			nTrafficCnt;			// 渋滞カウント
+	float		fAlpha;					// 透明度
 }Police;
 
 //**********************************************************************************************************************
-//	構造体定義(AddPolice)
+//	構造体定義(Reinforce)
 //**********************************************************************************************************************
 typedef struct
 {

@@ -317,6 +317,9 @@ void MagnificCombo(int nMagni)
 		// 倍率を0にする
 		g_Combo.nMagni = 0;
 
+		// コンボ倍率を使用しない
+		g_Combo.bUse = false;
+
 		// 倍率でかけるスコアを初期化
 		g_nComboScore = 0;
 

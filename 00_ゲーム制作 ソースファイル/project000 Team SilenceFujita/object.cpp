@@ -449,6 +449,7 @@ void DrawObject(void)
 						{ // ˆ«‚¢“z‚Ìê‡
 
 							// ©ŒÈ”­Œõ‚ğ‘ã“ü‚·‚é
+							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse.a = 1.0f;
 							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Emissive = g_aObject[nCntObject].judge.col;
 
 							// ƒ}ƒeƒŠƒAƒ‹‚Ìİ’è
