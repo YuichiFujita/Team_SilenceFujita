@@ -23,7 +23,7 @@
 #define HUMAN_WIDTH	(10.0f)	// 人の縦幅
 #define HUMAN_DEPTH	(10.0f)	// 人の奥行
 
-#define MAX_PARTS	(14)	// パーツの最大数
+#define MAX_PARTS	(15)	// パーツの最大数
 #define MAX_MOTION	(6)		// モーションの最大数
 #define MAX_KEY		(8)		// キーの最大数
 
@@ -57,11 +57,9 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	MOTIONTYPE_NONE = 0,	// 待機状態
+	MOTIONTYPE_STOP = 0,	// 停止状態
 	MOTIONTYPE_MOVE,		// 移動状態
-	MOTIONTYPE_ATTACK,		// 攻撃状態
-	MOTIONTYPE_JUMP,		// ジャンプ状態
-	MOTIONTYPE_LANDING,		// 着地状態
+	MOTIONTYPE_SCARED,		// 怖がり状態
 	MOTIONTYPE_MAX,			// この列挙型の総数
 } MOTIONTYPE;
 
@@ -94,6 +92,7 @@ typedef struct
 	MOTIONTYPE type;					// モーションの状態
 	int        nPose;					// モーションのポーズ番号
 	int        nCounter;				// モーションのカウンター
+	int        nParts;					// パーツの総数
 }MotionInfo;
 
 //**********************************************************************************************************************

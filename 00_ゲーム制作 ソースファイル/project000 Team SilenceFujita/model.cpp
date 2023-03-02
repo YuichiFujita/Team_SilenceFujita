@@ -128,6 +128,9 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_HUMAN\\shoes_l.x",			// 左靴
 	"data\\MODEL_HUMAN\\shoes_r.x",			// 右靴
 
+	// 小道具モデル
+	"data\\MODEL_HUMAN\\cigaret.x",			// タバコ
+
 	// ゲートモデル
 	"data\\MODEL_GATE\\gate000.x",			// ゲート (建物)
 	"data\\MODEL_GATE\\gate001.x",			// ゲート (鉄板)
