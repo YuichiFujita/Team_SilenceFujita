@@ -55,6 +55,8 @@
 
 #define ADDPOLICE_COUNT			(4)			// 警察が増えるカウント
 
+#define NONE_NEAREST			(-1)		// 最寄りの初期値
+
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
 //**********************************************************************************************************************
@@ -79,6 +81,7 @@ void SetPolicePosRot(Police *pPolice);					// 警察の位置と向きの設定処理
 void PolicePosRotCorrect(Police *pPolice);				// 警察の位置の補正処理
 void PoliceTackle(Police *pPolice);						// 警察のタックル処理
 void PoliceTrafficImprove(Police *pPolice);				// 警察の渋滞改善処理
+void PoliceGatePos(Police *pPolice);					// 警察の出現ゲート決定処理
 void PoliceSpawn(Police *pPolice);						// 警察の出現処理
 void PoliceCurveCheck(Police *pPolice);					// 警察の曲がり角チェック処理
 
@@ -103,7 +106,6 @@ void InitPolice(void)
 		// 基本情報を初期化
 		g_aPolice[nCntPolice].pos		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_aPolice[nCntPolice].posOld	  = g_aPolice[nCntPolice].pos;		// 前回の位置
-		g_aPolice[nCntPolice].posCopy	  = g_aPolice[nCntPolice].pos;		// 最初の位置
 		g_aPolice[nCntPolice].move		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aPolice[nCntPolice].rot		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aPolice[nCntPolice].rotDest	  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
@@ -178,17 +180,6 @@ void UpdatePolice(void)
 
 					// 警察の出現処理
 					PoliceSpawn(&g_aPolice[nCntPolice]);
-
-					// 車の停止処理
-					CollisionStopCar
-					( // 引数
-						g_aPolice[nCntPolice].pos,		//位置
-						g_aPolice[nCntPolice].rot,		//向き
-						&g_aPolice[nCntPolice].move,	//移動量
-						g_aPolice[nCntPolice].modelData.fRadius,	//半径
-						COLLOBJECTTYPE_POLICE,			//対象のサイズ
-						&g_aPolice[nCntPolice].nTrafficCnt
-					);
 				}
 
 				if (GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_NONE ||
@@ -233,7 +224,7 @@ void UpdatePolice(void)
 					if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
 					{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
 
-					  // 車同士の当たり判定
+						// 車同士の当たり判定
 						CollisionCarBody
 						( // 引数
 							&g_aPolice[nCntPolice].pos,
@@ -415,6 +406,12 @@ void UpdatePolice(void)
 					}
 				}
 
+				if (g_aPolice[nCntPolice].nTrafficCnt >= POLICAR_TRAFFIC_CNT)
+				{ // 渋滞に巻き込まれた場合
+					// 渋滞状態にする
+					g_aPolice[nCntPolice].state = POLICESTATE_TRAFFIC;
+				}
+
 				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
 				{ // バリア内状態ではない場合
 
@@ -581,7 +578,7 @@ void DrawPolice(void)
 						g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a += POLI_BACK_ALPHA;
 
 						if (g_aPolice[nCntPolice].MatCopy->MatD3D.Emissive.a >= 1.0f)
-						{ // 透明度が0.0f以下になった場合
+						{ // 透明度が1.0f以下になった場合
 
 							// 透明度を下げる
 							g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a  = 1.0f;
@@ -589,7 +586,7 @@ void DrawPolice(void)
 							g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a = 1.0f;
 
 							// 最初の位置に戻す処理
-							g_aPolice[nCntPolice].state = POLICESTATE_PATROL;
+							g_aPolice[nCntPolice].state = POLICESTATE_SPAWN;
 
 							// アイコンの状態を無しにする
 							g_aPolice[nCntMat].icon.state = ICONSTATE_NONE;
@@ -644,12 +641,6 @@ void SetPolice(D3DXVECTOR3 pos)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	int nGateNum = GetGateNum();		// ゲートの数を取得する
-	int nSpawnGateNum;					// ゲートの番号
-	Gate *pGate = GetGateData();		// ゲートの情報
-	Player *pPlayer = GetPlayer();		// プレイヤーの情報
-	float fPlayRange;					// プレイヤーとゲートの範囲
-
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -658,7 +649,6 @@ void SetPolice(D3DXVECTOR3 pos)
 
 			// 引数を代入
 			g_aPolice[nCntPolice].pos		  = pos;							// 現在の位置
-			g_aPolice[nCntPolice].posCopy     = g_aPolice[nCntPolice].pos;		// 最初の位置
 			g_aPolice[nCntPolice].posOld	  = g_aPolice[nCntPolice].pos;		// 前回の位置
 
 			// 変数の設定
@@ -674,13 +664,13 @@ void SetPolice(D3DXVECTOR3 pos)
 
 			// アイコンの情報の初期化
 			g_aPolice[nCntPolice].icon.nIconID = NONE_ICON;						// アイコンのインデックス
-			g_aPolice[nCntPolice].icon.state = ICONSTATE_NONE;					// アイコンの状態
+			g_aPolice[nCntPolice].icon.state   = ICONSTATE_NONE;				// アイコンの状態
 
 			// モデル情報を設定
-			g_aPolice[nCntPolice].modelData = GetModelData(MODELTYPE_CAR_POLICE);	// モデル情報
+			g_aPolice[nCntPolice].modelData	   = GetModelData(MODELTYPE_CAR_POLICE);	// モデル情報
 
 			// 影のインデックスを設定
-			g_aPolice[nCntPolice].nShadowID = SetModelShadow
+			g_aPolice[nCntPolice].nShadowID    = SetModelShadow
 			( // 引数
 				g_aPolice[nCntPolice].modelData,	// モデル情報
 				&g_aPolice[nCntPolice].nShadowID,	// 影の親の影インデックス
@@ -722,98 +712,8 @@ void SetPolice(D3DXVECTOR3 pos)
 			g_aPolice[nCntPolice].tackle.tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// タックル時の追加移動量
 			g_aPolice[nCntPolice].tackle.tackleState = TACKLESTATE_CHARGE;						// タックル時の状態
 
-			// 出てくるゲートの番号をランダムで
-			nSpawnGateNum = rand() % nGateNum;
-
-			// プレイヤーの範囲を算出する
-			fPlayRange = sqrtf((pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) * (pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) + (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z) * (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z));
-
-			if (fPlayRange >= POLICAR_SPAWN_RANGE)
-			{ // 一定の範囲外だった場合
-
-				// 向きを代入する
-				g_aPolice[nCntPolice].rot.y = pGate[nSpawnGateNum].rot.y + D3DX_PI;
-
-				// 向きの正規化
-				RotNormalize(&g_aPolice[nCntPolice].rot.y);
-
-				if (g_aPolice[nCntPolice].rot.y == 0.0f)
-				{ // 向きが奥向きの場合
-
-					// 奥に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_FAR;
-				}
-				else if (g_aPolice[nCntPolice].rot.y == D3DX_PI * 0.5f)
-				{ // 向きが右向きの場合
-
-					// 右に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_RIGHT;
-				}
-				else if (g_aPolice[nCntPolice].rot.y == -D3DX_PI * 0.5f)
-				{ // 向きが左向きの場合
-
-					// 右に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_LEFT;
-				}
-				else if (g_aPolice[nCntPolice].rot.y == D3DX_PI
-					|| g_aPolice[nCntPolice].rot.y == -D3DX_PI)
-				{ // 向きが手前向きの場合
-
-					// 手前に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_NEAR;
-				}
-
-				// ゲートの位置
-				g_aPolice[nCntPolice].pos.x = pGate[nSpawnGateNum].pos.x;
-				g_aPolice[nCntPolice].pos.z = pGate[nSpawnGateNum].pos.z;
-			}
-			else
-			{ // 範囲内だった場合
-				while (fPlayRange <= POLICAR_SPAWN_RANGE)
-				{
-					// ゲートの数をずらす
-					nSpawnGateNum = (nSpawnGateNum + 1) % nGateNum;
-
-					// プレイヤーの範囲を算出する
-					fPlayRange = sqrtf((pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) * (pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) + (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z) * (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z));
-				}
-
-				// 向きを代入する
-				g_aPolice[nCntPolice].rot.y = pGate->rot.y + D3DX_PI;
-
-				// 向きの正規化
-				RotNormalize(&g_aPolice[nCntPolice].rot.y);
-
-				if (g_aPolice[nCntPolice].rot.y == 0.0f)
-				{ // 向きが奥向きの場合
-
-					// 奥に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_FAR;
-				}
-				else if (g_aPolice[nCntPolice].rot.y == D3DX_PI * 0.5f)
-				{ // 向きが右向きの場合
-
-					// 右に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_RIGHT;
-				}
-				else if (g_aPolice[nCntPolice].rot.y == -D3DX_PI * 0.5f)
-				{ // 向きが左向きの場合
-
-					// 右に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_LEFT;
-				}
-				else if (g_aPolice[nCntPolice].rot.y == D3DX_PI
-					|| g_aPolice[nCntPolice].rot.y == -D3DX_PI)
-				{ // 向きが手前向きの場合
-
-					// 手前に走る
-					g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_NEAR;
-				}
-
-				// ゲートの位置
-				g_aPolice[nCntPolice].pos.x = pGate->pos.x;
-				g_aPolice[nCntPolice].pos.z = pGate->pos.z;
-			}
+			// 警察の出現ゲート決定処理
+			PoliceGatePos(&g_aPolice[nCntPolice]);
 
 			// 処理を抜ける
 			break;
@@ -1107,17 +1007,15 @@ void ChasePoliceAct(Police *pPolice)
 void PatrolBackAct(Police *pPolice)
 {
 	//情報をリセットする
-	pPolice->pos = pPolice->posCopy;					// 位置
 	pPolice->posOld = pPolice->pos;						// 前回の位置
-	pPolice->rot = pPolice->rotCopy;					// 向き
 	pPolice->move.x = 0.0f;								// 移動量
 	pPolice->policeCurve = pPolice->policeCurveCopy;	// 曲がり角の情報を代入
 	pPolice->tackle.nTackleCnt = 0;						// タックルカウント
 	pPolice->tackle.tacklemove.x = 0.0f;				// タックル時の移動量
 	pPolice->tackle.tackleState = TACKLESTATE_CHARGE;	// タックル状態
 
-	// 警察の曲がり角チェック処理
-	PoliceCurveCheck(pPolice);
+	// 警察の出現ゲート決定処理
+	PoliceGatePos(pPolice);
 }
 
 //============================================================
@@ -1311,7 +1209,6 @@ void SetPolicePosRot(Police *pPolice)
 	// 曲がり角の情報を代入する
 	pPolice->policeCurve.curveInfo = GetCurveInfo(nCurveNumber);
 	pPolice->policeCurveCopy = pPolice->policeCurve;			// 曲がり角の情報のコピーを設定
-	pPolice->posCopy = GetCurveInfo(nCurveNumber).pos;
 
 	// 車の位置の補正処理
 	PolicePosRotCorrect(pPolice);
@@ -1378,9 +1275,6 @@ void PolicePosRotCorrect(Police *pPolice)
 
 		break;				// 抜け出す
 	}
-
-	// 向きのコピーを取る
-	pPolice->rotCopy.y = pPolice->rot.y;
 }
 
 //============================================================
@@ -1495,6 +1389,10 @@ void PoliceTrafficImprove(Police *pPolice)
 //============================================================
 void PoliceSpawn(Police *pPolice)
 {
+	float fLength;			// 警察との距離
+	float fNearestLen;		// 最寄りの道との距離
+	int nNearest = NONE_NEAREST;	// 最寄りの道
+
 	// 移動量を更新
 	pPolice->move.x += POLI_MOVE_FORWARD;
 
@@ -1543,68 +1441,219 @@ void PoliceSpawn(Police *pPolice)
 		{
 		case DASH_RIGHT:		//右に走っている場合
 
-			if (pPolice->pos.x >= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2) &&
-				pPolice->posOld.x <= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2))
-			{ // 位置が一致した場合
+			if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
+			{ // 走る方向が一致した場合
 
-				// 車の位置と向きの設定処理
-				SetPolicePosRot(pPolice);
-				pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+				// 距離を測る
+				fLength = fabsf(GetCurveInfo(nCnt).pos.x - pPolice->pos.x);
 
-				// パトロール状態にする
-				pPolice->state = POLICESTATE_PATROL;
+				if (nNearest == NONE_NEAREST)
+				{ // 最寄りの番号が-1の場合
+
+					// 最寄りの距離を入れる
+					fNearestLen = fLength;
+
+					// 最寄りの番号を入れる
+					nNearest = nCnt;
+				}
+				else
+				{ // 上記以外
+					if (fLength <= fNearestLen)
+					{ // 最寄りの距離の方が遠い場合
+
+						// 距離を代入する
+						fNearestLen = fLength;
+
+						// 番号を保存する
+						nNearest = nCnt;
+					}
+				}
 			}
 
 			break;				//抜け出す
 
 		case DASH_LEFT:			//左を走っている場合
 
-			if (pPolice->pos.x <= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2) &&
-				pPolice->posOld.x >= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2))
-			{ // 位置が一致した場合
+			if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
+			{ // 走る方向が一致した場合
 
-				// 車の位置と向きの設定処理
-				SetPolicePosRot(pPolice);
-				pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+				// 距離を測る
+				fLength = fabsf(GetCurveInfo(nCnt).pos.x - pPolice->pos.x);
 
-				// パトロール状態にする
-				pPolice->state = POLICESTATE_PATROL;
+				if (nNearest == NONE_NEAREST)
+				{ // 最寄りの番号が-1の場合
+
+					// 最寄りの距離を入れる
+					fNearestLen = fLength;
+
+					// 最寄りの番号を入れる
+					nNearest = nCnt;
+				}
+				else
+				{ // 上記以外
+					if (fLength <= fNearestLen)
+					{ // 最寄りの距離の方が遠い場合
+
+						// 距離を代入する
+						fNearestLen = fLength;
+
+						// 番号を保存する
+						nNearest = nCnt;
+					}
+				}
 			}
 
 			break;				//抜け出す
 
 		case DASH_FAR:			//奥に走っている場合
 
-			if (pPolice->pos.z >= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2) &&
-				pPolice->posOld.z <= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2))
-			{ // 位置が一致した場合
+			if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
+			{ // 走る方向が一致した場合
 
-				// 車の位置と向きの設定処理
-				SetPolicePosRot(pPolice);
-				pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+				// 距離を測る
+				fLength = fabsf(GetCurveInfo(nCnt).pos.z - pPolice->pos.z);
 
-				// パトロール状態にする
-				pPolice->state = POLICESTATE_PATROL;
+				if (nNearest == NONE_NEAREST)
+				{ // 最寄りの番号が-1の場合
+
+					// 最寄りの距離を入れる
+					fNearestLen = fLength;
+
+					// 最寄りの番号を入れる
+					nNearest = nCnt;
+				}
+				else
+				{ // 上記以外
+					if (fLength <= fNearestLen)
+					{ // 最寄りの距離の方が遠い場合
+
+						// 距離を代入する
+						fNearestLen = fLength;
+
+						// 番号を保存する
+						nNearest = nCnt;
+					}
+				}
 			}
 
 			break;				//抜け出す
 
 		case DASH_NEAR:			//手前に走っている場合
 
-			if (pPolice->pos.z <= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2) &&
-				pPolice->posOld.z >= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2))
-			{ // 位置が一致した場合
+			if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
+			{ // 走る方向が一致した場合
 
-				// 車の位置と向きの設定処理
-				SetPolicePosRot(pPolice);
-				pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+				// 距離を測る
+				fLength = fabsf(GetCurveInfo(nCnt).pos.z - pPolice->pos.z);
 
-				// パトロール状態にする
-				pPolice->state = POLICESTATE_PATROL;
+				if (nNearest == NONE_NEAREST)
+				{ // 最寄りの番号が-1の場合
+
+					// 最寄りの距離を入れる
+					fNearestLen = fLength;
+
+					// 最寄りの番号を入れる
+					nNearest = nCnt;
+				}
+				else
+				{ // 上記以外
+					if (fLength <= fNearestLen)
+					{ // 最寄りの距離の方が遠い場合
+
+						// 距離を代入する
+						fNearestLen = fLength;
+
+						// 番号を保存する
+						nNearest = nCnt;
+					}
+				}
 			}
 
 			break;				//抜け出す
 		}
+	}
+
+	switch (pPolice->policeCurve.curveInfo.dashAngle)
+	{
+	case DASH_RIGHT:		//右に走っている場合
+
+		if (pPolice->pos.x >= GetCurveInfo(nNearest).pos.x + (CAR_WIDTH * 2))
+		{ // 道路内に入った場合
+
+			// 車の位置と向きの設定処理
+			pPolice->pos.x = GetCurveInfo(nNearest).pos.x + (CAR_WIDTH * 2);		// 位置
+			pPolice->rot.y = 0.0f;													// 向き
+			pPolice->policeCurve.curveInfo = GetCurveInfo(nNearest);				// 曲がり角の情報
+			pPolice->policeCurveCopy = pPolice->policeCurve;						// 曲がり角の情報のコピー
+			pPolice->policeCurve.actionState = CARACT_DASH;							// 車の状態
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_FAR;					// ダッシュ方向
+			pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+
+			// パトロール状態にする
+			pPolice->state = POLICESTATE_PATROL;
+		}
+
+		break;				//抜け出す
+
+	case DASH_LEFT:			//左を走っている場合
+
+		if (pPolice->pos.x <= GetCurveInfo(nNearest).pos.x - (CAR_WIDTH * 2))
+		{ // 道路内に入った場合
+
+			// 車の位置と向きの設定処理
+			pPolice->pos.x = GetCurveInfo(nNearest).pos.x - (CAR_WIDTH * 2);		// 位置
+			pPolice->rot.y = D3DX_PI;												// 向き
+			pPolice->policeCurve.curveInfo = GetCurveInfo(nNearest);				// 曲がり角の情報
+			pPolice->policeCurveCopy = pPolice->policeCurve;						// 曲がり角の情報のコピー
+			pPolice->policeCurve.actionState = CARACT_DASH;							// 車の状態
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_NEAR;					// ダッシュ方向
+			pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+
+			// パトロール状態にする
+			pPolice->state = POLICESTATE_PATROL;
+		}
+
+		break;				//抜け出す
+
+	case DASH_FAR:			//奥に走っている場合
+
+		if (pPolice->pos.z >= GetCurveInfo(nNearest).pos.z + (CAR_WIDTH * 2))
+		{ // 道路内に入った場合
+
+			// 車の位置と向きの設定処理
+			pPolice->pos.z = GetCurveInfo(nNearest).pos.z + (CAR_WIDTH * 2);		// 位置
+			pPolice->rot.y = -D3DX_PI * 0.5f;										// 向き
+			pPolice->policeCurve.curveInfo = GetCurveInfo(nNearest);				// 曲がり角の情報
+			pPolice->policeCurveCopy = pPolice->policeCurve;						// 曲がり角の情報のコピー
+			pPolice->policeCurve.actionState = CARACT_DASH;							// 車の状態
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_LEFT;					// ダッシュ方向
+			pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+
+			// パトロール状態にする
+			pPolice->state = POLICESTATE_PATROL;
+		}
+
+		break;				//抜け出す
+
+	case DASH_NEAR:			//手前に走っている場合
+
+		if (pPolice->pos.z <= GetCurveInfo(nNearest).pos.z - (CAR_WIDTH * 2))
+		{ // 道路内に入った場合
+
+			// 車の位置と向きの設定処理
+			pPolice->pos.z = GetCurveInfo(nNearest).pos.z - (CAR_WIDTH * 2);		// 位置
+			pPolice->rot.y = D3DX_PI * 0.5f;										// 向き
+			pPolice->policeCurve.curveInfo = GetCurveInfo(nNearest);				// 曲がり角の情報
+			pPolice->policeCurveCopy = pPolice->policeCurve;						// 曲がり角の情報のコピー
+			pPolice->policeCurve.actionState = CARACT_DASH;							// 車の状態
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_RIGHT;					// ダッシュ方向
+			pPolice->policeCurve.nSKipCnt = rand() % CURVE_SKIP_RANDOM + CURVE_SKIP_LEAST;	// スキップする曲がり角の回数
+
+			// パトロール状態にする
+			pPolice->state = POLICESTATE_PATROL;
+		}
+
+		break;				//抜け出す
 	}
 }
 
@@ -1784,6 +1833,147 @@ Reinforce *GetReinforce(void)
 {
 	// 増援の情報を返す
 	return &g_AddPolice;
+}
+
+//======================================================================================================================
+// 警察の出現ゲート決定処理
+//======================================================================================================================
+void PoliceGatePos(Police *pPolice)
+{
+	int nGateNum = GetGateNum();		// ゲートの数を取得する
+	int nSpawnGateNum;					// ゲートの番号
+	Gate *pGate = GetGateData();		// ゲートの情報
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+	float fPlayRange;					// プレイヤーとゲートの範囲
+
+	// 出てくるゲートの番号をランダムで出す
+	nSpawnGateNum = /*rand() % nGateNum*/0;
+
+	// プレイヤーの範囲を算出する
+	fPlayRange = sqrtf((pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) * (pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) + (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z) * (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z));
+
+	if (fPlayRange >= POLICAR_SPAWN_RANGE)
+	{ // 一定の範囲外だった場合
+
+		switch (pGate[nSpawnGateNum].collInfo->stateRot)
+		{
+		case ROTSTATE_0:		// 0度
+
+			// 手前に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_NEAR;
+
+			// 向きを設定する
+			pPolice->rot.y = D3DX_PI;
+
+			break;
+
+		case ROTSTATE_180:		// 180度
+
+			// 奥に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_FAR;
+
+			// 向きを設定する
+			pPolice->rot.y = 0.0f;
+
+			break;
+
+		case ROTSTATE_90:		// 90度
+
+			// 左に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_LEFT;
+
+			// 向きを設定する
+			pPolice->rot.y = -D3DX_PI * 0.5f;
+
+			break;
+
+		case ROTSTATE_270:		// 270度
+
+			// 右に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_RIGHT;
+
+			// 向きを設定する
+			pPolice->rot.y = D3DX_PI * 0.5f;
+
+			break;
+
+		default:				// 上記以外
+
+			break;
+		}
+
+		// 向きの正規化
+		RotNormalize(&pPolice->rot.y);
+
+		// ゲートの位置
+		pPolice->pos.x = pGate[nSpawnGateNum].pos.x;
+		pPolice->pos.z = pGate[nSpawnGateNum].pos.z;
+	}
+	else
+	{ // 範囲内だった場合
+		while (fPlayRange <= POLICAR_SPAWN_RANGE)
+		{
+			// ゲートの数をずらす
+			nSpawnGateNum = (nSpawnGateNum + 1) % nGateNum;
+
+			// プレイヤーの範囲を算出する
+			fPlayRange = sqrtf((pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) * (pPlayer->pos.x - pGate[nSpawnGateNum].pos.x) + (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z) * (pPlayer->pos.z - pGate[nSpawnGateNum].pos.z));
+		}
+
+		switch (pGate[nSpawnGateNum].collInfo->stateRot)
+		{
+		case ROTSTATE_0:		// 0度
+
+			// 手前に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_NEAR;
+
+			// 向きを設定する
+			pPolice->rot.y = D3DX_PI;
+
+			break;
+
+		case ROTSTATE_180:		// 180度
+
+			// 奥に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_FAR;
+
+			// 向きを設定する
+			pPolice->rot.y = 0.0f;
+
+			break;
+
+		case ROTSTATE_90:		// 90度
+
+			// 左に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_LEFT;
+
+			// 向きを設定する
+			pPolice->rot.y = -D3DX_PI * 0.5f;
+
+			break;
+
+		case ROTSTATE_270:		// 270度
+
+			// 右に走る
+			pPolice->policeCurve.curveInfo.dashAngle = DASH_RIGHT;
+
+			// 向きを設定する
+			pPolice->rot.y = D3DX_PI * 0.5f;
+
+			break;
+
+		default:				// 上記以外
+
+			break;
+		}
+
+		// 向きの正規化
+		RotNormalize(&pPolice->rot.y);
+
+		// ゲートの位置
+		pPolice->pos.x = pGate[nSpawnGateNum].pos.x;
+		pPolice->pos.z = pGate[nSpawnGateNum].pos.z;
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理
