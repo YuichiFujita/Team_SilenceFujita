@@ -1521,7 +1521,7 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed)
 			fLength = (g_aObject[nCntObject].pos.x - pos.x) * (g_aObject[nCntObject].pos.x - pos.x)
 				+ (g_aObject[nCntObject].pos.z - pos.z) * (g_aObject[nCntObject].pos.z - pos.z);
 			
-			if (fLength <= ((g_aObject[nCntObject].modelData.fRadius + fRadius) * (g_aObject[nCntObject].modelData.fRadius + fRadius)))
+			if (fLength <= (((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius) * ((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius)))
 			{ // オブジェクトが当たっている
 				// 吹っ飛ばし状態にする
 				g_aObject[nCntObject].smash.State = SMASHSTATE_ON;

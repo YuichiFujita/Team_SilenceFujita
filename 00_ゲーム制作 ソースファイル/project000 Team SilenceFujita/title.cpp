@@ -250,8 +250,12 @@ void UpdateTitle(void)
 			// 状態を何もしないに設定
 			g_stateTitle = TITLESTATE_NONE;
 
-			//// サウンドの再生※AnarchyCars
-			//PlaySound(SOUND_LABEL_TITLE_BGM_000);	// BGM (タイトル画面)
+			//メインBGMの再生
+			if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+			{
+				// サウンドの再生（タイトルのメインBGM）
+				PlaySound(SOUND_LABEL_BGM_TITLE_000);
+			}
 		}
 
 		// 処理を抜ける
@@ -319,8 +323,12 @@ void UpdateTitle(void)
 			// 状態を何もしないに設定
 			g_stateTitle = TITLESTATE_NONE;
 
-			//// サウンドの再生※AnarchyCars
-			//PlaySound(SOUND_LABEL_TITLE_BGM_000);	// BGM (タイトル画面)
+			//メインBGMの再生
+			if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+			{
+				// サウンドの再生（タイトルのメインBGM）
+				PlaySound(SOUND_LABEL_BGM_TITLE_000);
+			}
 		}
 	}
 

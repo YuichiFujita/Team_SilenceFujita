@@ -284,8 +284,12 @@ void InitResult(void)
 		);
 	}
 
-	////サウンドの再生（ランキング終了まで）※AnarchyCarsBGM
-	//PlaySound(SOUND_LABEL_BGM_RESULT_000);
+	//メインBGMの再生
+	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+	{
+		//サウンドの再生（ランキング終了まで）
+		PlaySound(SOUND_LABEL_BGM_RESULT_000);
+	}
 
 }
 
