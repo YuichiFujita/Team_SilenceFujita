@@ -10,6 +10,12 @@
 #include "sound.h"
 
 //**********************************************************************************************************************
+//	マクロ定義 (追加で入れたやつ)
+//**********************************************************************************************************************
+#define SOUND_SWITCH_RELEASE	(SOUND_SWITCH_ON)		//リリースで使用する音
+#define SOUND_SWITCH_DEBUG		(SOUND_SWITCH_OFF)		//デバックで使用する音
+
+//**********************************************************************************************************************
 //	構造体定義 (SOUNDINFO)
 //**********************************************************************************************************************
 typedef struct
@@ -37,19 +43,38 @@ DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};						// オーディオデータサイズ
 SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 {
 	{ "data/BGM/bgm000.wav", -1 },			// BGM
-	{ "data/BGM/game_bgm000.wav", -1 },		// ゲーム内BGM000
-	{ "data/BGM/game_bgm001.wav", -1 },		// ゲーム内BGM001
-	{ "data/BGM/title_bgm000.wav", -1 },	// タイトル内BGM000
-	{ "data/BGM/result_bgm000.wav", -1 },	// リザルト内BGM000
-	{ "data/BGM/tutorial_bgm000.wav", -1 },	// チュートリアル内BGM000
+	{ "data/BGM/game_bgm000.wav", -1 },		// ゲーム内BGM_000
+	{ "data/BGM/game_bgm001.wav", -1 },		// ゲーム内BGM_001
+	{ "data/BGM/title_bgm000.wav", -1 },	// タイトル内BGM_000
+	{ "data/BGM/result_bgm000.wav", -1 },	// リザルト内BGM_000
+	{ "data/BGM/tutorial_bgm000.wav", -1 },	// チュートリアル内BGM_000
+	{ "data/BGM/boost000.wav", -1 },		// プレイヤー能力（ブースト）のBGM_000
+	{ "data/BGM/wind000.wav", -1 },			// プレイヤー能力（送風機）のBGM_000
 	{ "data/SE/move000.wav", 0 },			// SE
+	{ "data/BGM/bomb000.wav", 0 },			// プレイヤー能力（ボム）のSE_000
 };
+
+//**********************************************************************************************************************
+//	グローバル変数（追加で入れたやつ）
+//**********************************************************************************************************************
+SOUND_SWITCH g_soundSwitch;	//サウンドの有無の設定
 
 //======================================================================================================================
 //	サウンドの初期化処理
 //======================================================================================================================
 HRESULT InitSound(HWND hWnd)
 {
+	//追加で入れた変数の初期化
+	g_soundSwitch = SOUND_SWITCH_RELEASE;
+
+#ifdef _DEBUG	// デバッグ処理
+
+	//デバック用のサウンド設定
+	g_soundSwitch = SOUND_SWITCH_DEBUG;
+
+#endif
+
+
 	HRESULT hr;
 
 	// COMライブラリの初期化
@@ -382,3 +407,49 @@ HRESULT ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, DWORD dwB
 	return S_OK;
 }
 
+//======================================================================================================================
+//	サウンドの取得
+//======================================================================================================================
+bool GetSoundType(SOUND_TYPE SoundType)
+{
+	bool bSound = false;
+
+	switch (SoundType)
+	{
+		//メインのBGM
+	case SOUND_TYPE_MAIN_BGM:
+		if (g_soundSwitch == SOUND_SWITCH_ON)
+		{//サウンドの設定がBGMがオンのとき
+			
+			//再生
+			bSound = true;
+
+		}
+		break;
+
+		//効果音系のBGM
+	case SOUND_TYPE_SUB_BGM:
+		if (g_soundSwitch == SOUND_SWITCH_ON ||
+			g_soundSwitch == SOUND_SWITCH_NO_BGM)
+		{//サウンドの設定が効果音系BGMがオンのとき
+
+			//再生
+			bSound = true;
+
+		}
+		break;
+
+	case SOUND_TYPE_SE:
+		if (g_soundSwitch == SOUND_SWITCH_ON ||
+			g_soundSwitch == SOUND_SWITCH_NO_BGM)
+		{//サウンドの設定がSEがオンのとき
+
+			//再生
+			bSound = true;
+
+		}
+		break;
+	}
+	 
+	return bSound;
+}

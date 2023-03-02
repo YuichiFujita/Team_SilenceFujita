@@ -449,6 +449,7 @@ void DrawObject(void)
 						{ // 悪い奴の場合
 
 							// 自己発光を代入する
+							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse.a = 1.0f;
 							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Emissive = g_aObject[nCntObject].judge.col;
 
 							// マテリアルの設定
@@ -1521,7 +1522,7 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed)
 			fLength = (g_aObject[nCntObject].pos.x - pos.x) * (g_aObject[nCntObject].pos.x - pos.x)
 				+ (g_aObject[nCntObject].pos.z - pos.z) * (g_aObject[nCntObject].pos.z - pos.z);
 			
-			if (fLength <= ((g_aObject[nCntObject].modelData.fRadius + fRadius) * (g_aObject[nCntObject].modelData.fRadius + fRadius)))
+			if (fLength <= (((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius) * ((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius)))
 			{ // オブジェクトが当たっている
 				// 吹っ飛ばし状態にする
 				g_aObject[nCntObject].smash.State = SMASHSTATE_ON;

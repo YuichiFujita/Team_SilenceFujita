@@ -271,13 +271,6 @@ void UpdateCar(void)
 				}
 			}
 
-			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
-			{ // バリア内状態ではない場合
-
-				// 車の補正の更新処理
-				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
-			}
-
 			if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
 			{ // 悪者だった場合
 
@@ -286,6 +279,13 @@ void UpdateCar(void)
 
 				// アイコンの位置設定処理
 				SetPositionIcon(g_aCar[nCntCar].icon.nIconID, g_aCar[nCntCar].pos);
+			}
+
+			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
+			{ // バリア内状態ではない場合
+
+				// 車の補正の更新処理
+				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 			}
 		}
 	}

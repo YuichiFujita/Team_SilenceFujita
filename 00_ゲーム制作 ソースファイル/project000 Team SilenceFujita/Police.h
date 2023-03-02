@@ -35,6 +35,7 @@ typedef enum
 	POLICESTATE_POSBACK,				// 最初の座標に戻る
 	POLICESTATE_TACKLE,					// タックル状態
 	POLICESTATE_TRAFFIC,				// 渋滞状態
+	POLICESTATE_WAIT,					// 待機状態
 	POLICESTATE_MAX						// この列挙型の総数
 }POLICESTATE;
 
@@ -65,11 +66,9 @@ typedef struct
 {
 	D3DXVECTOR3 pos;					// 現在の位置
 	D3DXVECTOR3 posOld;					// 前回の位置
-	D3DXVECTOR3 posCopy;				// 初期位置
 	D3DXVECTOR3 move;					// 移動量
 	D3DXVECTOR3 rot;					// 向き
 	D3DXVECTOR3 rotDest;				// 目標の向き
-	D3DXVECTOR3	rotCopy;				// 最初の向き
 	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
 	Model       modelData;				// モデル情報
 	POLICESTATE state;					// 警察車両の状態
@@ -85,10 +84,11 @@ typedef struct
 	CARCURVE	policeCurveCopy;		// 曲がり角の情報のコピー
 	PoliTackle  tackle;					// タックル関係の変数
 	int			nTrafficCnt;			// 渋滞カウント
+	float		fAlpha;					// 透明度
 }Police;
 
 //**********************************************************************************************************************
-//	構造体定義(AddPolice)
+//	構造体定義(Reinforce)
 //**********************************************************************************************************************
 typedef struct
 {

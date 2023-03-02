@@ -17,6 +17,7 @@
 #include "value.h"
 
 #include "score.h"
+#include "title.h"
 
 #include "calculation.h"
 #include "camera.h"
@@ -43,17 +44,17 @@
 //**********************************
 //* ランキングスコアの数値関係
 //**********************************
-#define RANK_MAX			(5)						//スコアの数
-#define	RANK_NUM_PLACE		(9)						//スコアの桁数
-#define RANK_TEX			(1)						//スコアのテクスチャ
-#define RANK_COLUMN			(1)						//スコアを分ける列
-#define RANK_POS_X			(SCREEN_WIDTH * 0.75f)	//スコアの開始位置（X)
-#define RANK_POS_Y			(SCREEN_HEIGHT * 0.13f)	//スコアの開始位置（Y）	
-#define RANK_SIZE_X			(50.0f)					//スコアの大きさ（X）
-#define RANK_SIZE_Y			(40.0f)					//スコアの大きさ（Y）
-#define RANK_INTERVAL_X		(80.0f)					//スコアの間隔（X）
-#define RANK_INTERVAL_Y		(90.0f)					//スコアの間隔（Y）
-#define RANK_MAX_NUMBER		(999999999)				//スコアの最大数
+#define RANK_MAX			(5)							//スコアの数
+#define	RANK_NUM_PLACE		(9)							//スコアの桁数
+#define RANK_TEX			(1)							//スコアのテクスチャ
+#define RANK_COLUMN			(1)							//スコアを分ける列
+#define RANK_POS_X			(SCREEN_WIDTH * 0.75f)		//スコアの開始位置（X)
+#define RANK_POS_Y			(SCREEN_HEIGHT * 0.14f)		//スコアの開始位置（Y）	
+#define RANK_SIZE_X			(50.0f)						//スコアの大きさ（X）
+#define RANK_SIZE_Y			(40.0f)						//スコアの大きさ（Y）
+#define RANK_INTERVAL_X		(80.0f)						//スコアの間隔（X）
+#define RANK_INTERVAL_Y		(90.0f)						//スコアの間隔（Y）
+#define RANK_MAX_NUMBER		(999999999)					//スコアの最大数
 
 //**********************************
 //* ランキングニュースコアの数値関係
@@ -62,12 +63,27 @@
 #define RANK_NEW_TEX		(1)							//ニュースコアのテクスチャ
 #define RANK_NEW_COLUMN		(1)							//ニュースコアを分ける列
 #define RANK_NEW_POS_X		(SCREEN_WIDTH * 0.70f)		//ニュースコアの開始位置（X)
-#define RANK_NEW_POS_Y		(SCREEN_HEIGHT * 0.83f)		//ニュースコアの開始位置（Y）	
+#define RANK_NEW_POS_Y		(SCREEN_HEIGHT * 0.85f)		//ニュースコアの開始位置（Y）	
 #define RANK_NEW_SIZE_X		(45.0f)						//ニュースコアの大きさ（X）
 #define RANK_NEW_SIZE_Y		(35.0f)						//ニュースコアの大きさ（Y）
 #define RANK_NEW_INTERVAL_X	(65.0f)						//ニュースコアの間隔（X）
 #define RANK_NEW_INTERVAL_Y	(0.0f)						//ニュースコアの間隔（Y）
 #define RANK_NEW_MAX_NUMBER	(999999999)					//ニュースコアの最大数
+
+//**********************************
+//* 画面遷移中のランキングスコアの数値関係
+//**********************************
+#define RANK_FADE_MAX			(5)							//スコアの数
+#define	RANK_FADE_NUM_PLACE		(9)							//スコアの桁数
+#define RANK_FADE_TEX			(1)							//スコアのテクスチャ
+#define RANK_FADE_COLUMN		(1)							//スコアを分ける列
+#define RANK_FADE_POS_X			(SCREEN_WIDTH * 0.75f)		//スコアの開始位置（X)
+#define RANK_FADE_POS_Y			(SCREEN_HEIGHT * 0.23f)		//スコアの開始位置（Y）	
+#define RANK_FADE_SIZE_X		(50.0f)						//スコアの大きさ（X）
+#define RANK_FADE_SIZE_Y		(40.0f)						//スコアの大きさ（Y）
+#define RANK_FADE_INTERVAL_X	(80.0f)						//スコアの間隔（X）
+#define RANK_FADE_INTERVAL_Y	(105.0f)					//スコアの間隔（Y）
+#define RANK_FADE_MAX_NUMBER	(999999999)					//スコアの最大数
 
 //**********************************************
 //* 列挙型
@@ -112,13 +128,26 @@ void InitRanking(void)
 	//変数の初期化
 	g_bRankTrance = false;
 
-	//スコアの情報を初期化
-	for (nCutRank = 0; nCutRank < RANK_MAX; nCutRank++)
+	if (GetTitleState() != TITLESTATE_FADE)
+	{//タイトル遷移中じゃないとき
+		for (nCutRank = 0; nCutRank < RANK_MAX; nCutRank++)
+		{
+			g_aRankScore[nCutRank].pos = D3DXVECTOR3(RANK_POS_X, RANK_POS_Y, 0.0f);
+			g_aRankScore[nCutRank].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			g_aRankScore[nCutRank].bFlash = false;
+			g_aRankScore[nCutRank].bUse = true;
+		}
+	}
+	else
 	{
-		g_aRankScore[nCutRank].pos = D3DXVECTOR3(RANK_POS_X, RANK_POS_Y, 0.0f);
-		g_aRankScore[nCutRank].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		g_aRankScore[nCutRank].bFlash = false;
-		g_aRankScore[nCutRank].bUse = true;
+		//スコアの情報を初期化
+		for (nCutRank = 0; nCutRank < RANK_FADE_MAX; nCutRank++)
+		{
+			g_aRankScore[nCutRank].pos = D3DXVECTOR3(RANK_FADE_POS_X, RANK_FADE_POS_Y, 0.0f);
+			g_aRankScore[nCutRank].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			g_aRankScore[nCutRank].bFlash = false;
+			g_aRankScore[nCutRank].bUse = true;
+		}
 	}
 
 	//ニュースコアの情報を初期化
@@ -148,8 +177,13 @@ void InitRanking(void)
 		true	// AI
 	);
 
-	//スコアのソート
-	SortRankingScore();
+	if (GetTitleState() != TITLESTATE_FADE)
+	{//タイトル遷移中じゃないとき
+		
+		//スコアのソート
+		SortRankingScore();
+
+	}
 }
 
 //=====================================
@@ -169,8 +203,12 @@ void UninitRanking(void)
 	// アイコンの終了
 	UninitIcon();
 
-	//サウンドの停止（リザルトからのBGM）
-	StopSound();
+	if (GetTitleState() != TITLESTATE_FADE)
+	{//タイトル遷移中じゃないとき
+		//サウンドの停止（リザルトからのBGM）
+		StopSound();
+	}
+
 }
 
 //=====================================
@@ -255,39 +293,63 @@ void DrawRanking(void)
 	// リザルトの描画全体処理
 	DrawResultChunk();
 
-	//ランキングスコアの数値
-	for (int nCount = 0; nCount < RANK_MAX; nCount++)
-	{ // 順位が更新されている場合
-		
-		//数値を設定
-		SetValue(
-			D3DXVECTOR3(g_aRankScore[nCount].pos.x, g_aRankScore[nCount].pos.y + (nCount * RANK_INTERVAL_Y), 0.0f),
-			g_aRankScore[nCount].nScore,
-			RANK_MAX_NUMBER,
-			RANK_SIZE_X,
-			RANK_SIZE_Y,
-			RANK_INTERVAL_X,
-			g_aRankScore[nCount].col.a);
+	if (GetTitleState() != TITLESTATE_FADE)
+	{//タイトル遷移中じゃないとき
+	 //ランキングスコアの数値
+		for (int nCount = 0; nCount < RANK_MAX; nCount++)
+		{ // 順位が更新されている場合
 
-		// 数値の描画
-		DrawValue(RANK_NUM_PLACE, VALUETYPE_NORMAL);
+		  //数値を設定
+			SetValue(
+				D3DXVECTOR3(g_aRankScore[nCount].pos.x, g_aRankScore[nCount].pos.y + (nCount * RANK_INTERVAL_Y), 0.0f),
+				g_aRankScore[nCount].nScore,
+				RANK_MAX_NUMBER,
+				RANK_SIZE_X,
+				RANK_SIZE_Y,
+				RANK_INTERVAL_X,
+				g_aRankScore[nCount].col.a);
+
+			// 数値の描画
+			DrawValue(RANK_NUM_PLACE, VALUETYPE_NORMAL);
+		}
+
+		//ニュースコアの数値
+		{
+			//数値を設定
+			SetValue(
+				D3DXVECTOR3(g_aRankNewScore.pos.x, g_aRankNewScore.pos.y, 0.0f),
+				g_aRankNewScore.nScore,
+				RANK_MAX_NUMBER,
+				RANK_NEW_SIZE_X,
+				RANK_NEW_SIZE_Y,
+				RANK_NEW_INTERVAL_X,
+				g_aRankNewScore.col.a);
+
+			// 数値の描画
+			DrawValue(RANK_NUM_PLACE, VALUETYPE_RED);
+		}
+	}
+	else
+	{//タイトル遷移中の描画処理
+
+		for (int nCount = 0; nCount < RANK_FADE_MAX; nCount++)
+		{ // 順位が更新されている場合
+
+		  //数値を設定
+			SetValue(
+				D3DXVECTOR3(g_aRankScore[nCount].pos.x, g_aRankScore[nCount].pos.y + (nCount * RANK_FADE_INTERVAL_Y), 0.0f),
+				g_aRankScore[nCount].nScore,
+				RANK_FADE_MAX_NUMBER,
+				RANK_FADE_SIZE_X,
+				RANK_FADE_SIZE_Y,
+				RANK_FADE_INTERVAL_X,
+				g_aRankScore[nCount].col.a);
+
+			// 数値の描画
+			DrawValue(RANK_FADE_NUM_PLACE, VALUETYPE_NORMAL);
+		}
 	}
 
-	//ニュースコアの数値
-	{
-		//数値を設定
-		SetValue(
-			D3DXVECTOR3(g_aRankNewScore.pos.x, g_aRankNewScore.pos.y, 0.0f),
-			g_aRankNewScore.nScore,
-			RANK_MAX_NUMBER,
-			RANK_NEW_SIZE_X,
-			RANK_NEW_SIZE_Y,
-			RANK_NEW_INTERVAL_X,
-			g_aRankNewScore.col.a);
-
-		// 数値の描画
-		DrawValue(RANK_NUM_PLACE, VALUETYPE_RED);
-	}
 }
 
 //=====================================

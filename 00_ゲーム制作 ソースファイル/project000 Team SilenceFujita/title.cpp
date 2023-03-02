@@ -76,6 +76,7 @@ float g_fAlphaTitle;		// 背景の透明度
 float g_fChangeTitle;		// 透明度の変更値
 int g_nTransCount;			// 遷移カウント
 int g_nTransMode = TRANSITION_TITLE_LOGO;			// 遷移するモード
+bool g_bTitleSound;			// タイトルのサウンドの有無
 
 //======================================================================================================================
 //	タイトル画面の初期化処理
@@ -113,6 +114,11 @@ void InitTitle(void)
 	g_fAlphaTitle  = TIT_FIRST_ALPHA;						// 背景の透明度を初期化
 	g_fChangeTitle = TIT_CHANGE_ALPHA;						// 透明度の変更値を初期化
 	g_nTransCount  = 0;										// 自動遷移するまでのカウント
+
+	if (g_bTitleSound != true)
+	{//タイトルサウンドが使用中じゃない
+		g_bTitleSound = false;
+	}
 
 	// 遷移するモードを変える
 	g_nTransMode = (g_nTransMode + 1) % TRANSITION_TITLE_MAX;
@@ -212,8 +218,11 @@ void UninitTitle(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	サウンドの終了
 	//------------------------------------------------------------------------------------------------------------------
-	// サウンドの停止
-	StopSound();
+	if (g_bTitleSound == false)
+	{//タイトルのサウンドが使われていない
+		// サウンドの停止
+		StopSound();
+	}
 }
 
 //======================================================================================================================
@@ -250,8 +259,19 @@ void UpdateTitle(void)
 			// 状態を何もしないに設定
 			g_stateTitle = TITLESTATE_NONE;
 
-			//// サウンドの再生※AnarchyCars
-			//PlaySound(SOUND_LABEL_TITLE_BGM_000);	// BGM (タイトル画面)
+			//メインBGMの再生
+			if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+			{
+				if (g_bTitleSound == false)
+				{//タイトルサウンドを使用していないとき
+
+					//タイトルサウンドを使用
+					g_bTitleSound = true;
+
+					// サウンドの再生（タイトルのメインBGM）
+					PlaySound(SOUND_LABEL_BGM_TITLE_000);
+				}
+			}
 		}
 
 		// 処理を抜ける
@@ -269,6 +289,9 @@ void UpdateTitle(void)
 
 				//// サウンドの再生
 				//PlaySound(SOUND_LABEL_SE_DECISION_00);	// 決定音00 (システム)
+
+				//タイトルサウンドを使用を停止
+				g_bTitleSound = false;
 
 				// モード選択 (ゲーム画面に移行)
 				SetFade(MODE_GAME);
@@ -319,8 +342,19 @@ void UpdateTitle(void)
 			// 状態を何もしないに設定
 			g_stateTitle = TITLESTATE_NONE;
 
-			//// サウンドの再生※AnarchyCars
-			//PlaySound(SOUND_LABEL_TITLE_BGM_000);	// BGM (タイトル画面)
+			//メインBGMの再生
+			if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+			{
+				if (g_bTitleSound == false)
+				{//タイトルサウンドを使用していないとき
+
+					//タイトルサウンドを使用
+					g_bTitleSound = true;
+
+					// サウンドの再生（タイトルのメインBGM）
+					PlaySound(SOUND_LABEL_BGM_TITLE_000);
+				}
+			}
 		}
 	}
 
@@ -346,6 +380,9 @@ void UpdateTitle(void)
 
 			case TRANSITION_TITLE_LOGO:		// ロゴ画面の場合
 
+				//タイトルの状態を遷移に変更
+				g_stateTitle = TITLESTATE_FADE;
+
 				// ロゴ画面に遷移
 				SetFade(MODE_LOGO);
 
@@ -353,6 +390,9 @@ void UpdateTitle(void)
 				break;
 
 			case TRANSITION_TITLE_RANKING:	// ランキング画面の場合
+
+				//タイトルの状態を遷移に変更
+				g_stateTitle = TITLESTATE_FADE;
 
 				// ランキング画面に遷移
 				SetFade(MODE_RANKING);
@@ -390,4 +430,12 @@ void DrawTitle(void)
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntTitle * 4, 2);
 	}
+}
+
+//======================================================================================================================
+//	タイトルの状態の取得処理
+//======================================================================================================================
+TITLESTATE GetTitleState(void)
+{
+	return g_stateTitle;
 }
