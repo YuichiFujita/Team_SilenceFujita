@@ -376,7 +376,7 @@ void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot, bool bOpen)
 			g_aGate[nCntGate].bUse = true;
 
 			if (stateRot == ROTSTATE_0
-			 || stateRot == ROTSTATE_180)
+			||  stateRot == ROTSTATE_180)
 			{ // 角度が0度、または180度の場合
 
 				// アイコンの設定処理

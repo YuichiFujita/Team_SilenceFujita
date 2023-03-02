@@ -18,9 +18,9 @@
 // マクロ定義
 //**********************************************************************************************************************
 #define BONUS_MAX_VALUE		(9999)		// ボーナスの最大値
-#define BONUS_WIDTH			(20.0f)		// ボーナスの幅
-#define BONUS_HEIGHT		(30.0f)		// ボーナスの高さ
-#define BONUS_SHIFT			(35.0f)		// ボーナスのずらす幅
+#define BONUS_WIDTH			(26.0f)		// ボーナスの幅
+#define BONUS_HEIGHT		(26.0f)		// ボーナスの高さ
+#define BONUS_SHIFT			(37.0f)		// ボーナスのずらす幅
 #define BONUS_ALPHA			(1.0f)		// ボーナスの透明度
 #define PLUS_WIDTH			(30.0f)		// プラスの幅
 #define PLUS_HEIGHT			(30.0f)		// プラスの高さ
