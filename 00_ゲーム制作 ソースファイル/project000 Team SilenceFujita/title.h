@@ -16,5 +16,5 @@ void UpdateTitle(void);		// タイトル画面の更新処理
 void DrawTitle(void);		// タイトル画面の描画処理
 
 TITLESTATE GetTitleState(void);	// タイトルの状態の取得処理
-bool GetTitleSound(void);		// タイトルサウンドの有無を取得
+
 #endif
