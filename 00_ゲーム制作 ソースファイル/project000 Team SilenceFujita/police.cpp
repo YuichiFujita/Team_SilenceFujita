@@ -84,6 +84,7 @@ void PoliceTrafficImprove(Police *pPolice);				// 警察の渋滞改善処理
 void PoliceGatePos(Police *pPolice);					// 警察の出現ゲート決定処理
 void PoliceSpawn(Police *pPolice);						// 警察の出現処理
 void PoliceCurveCheck(Police *pPolice);					// 警察の曲がり角チェック処理
+void PoliceWaitCheck(Police *pPolice);					// 警察の待機状態チェック処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -116,6 +117,7 @@ void InitPolice(void)
 		g_aPolice[nCntPolice].bJump		  = false;							// ジャンプしていない
 		g_aPolice[nCntPolice].nTrafficCnt = 0;								// 渋滞カウント
 		g_aPolice[nCntPolice].fAlpha	  = 1.0f;							// 透明度
+		g_aPolice[nCntPolice].nNumSpawnGate = NONE_NEAREST;					// 出てくるゲートの番号
 		g_aPolice[nCntPolice].bUse		  = false;							// 使用状況
 
 		// 曲がり角関係を初期化
@@ -282,18 +284,6 @@ void UpdatePolice(void)
 					// プレイヤーの位置の更新
 					PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
 
-					//----------------------------------------------------
-					//	影の更新
-					//----------------------------------------------------
-					// 影の位置設定
-					SetPositionShadow
-					( // 引数
-						g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
-						g_aPolice[nCntPolice].pos,			// 位置
-						g_aPolice[nCntPolice].rot,			// 向き
-						NONE_SCALE							// 拡大率
-					);
-
 					switch (g_aPolice[nCntPolice].state)
 					{//状態で判断する
 					case POLICESTATE_PATROL:		// パトロール状態
@@ -383,6 +373,13 @@ void UpdatePolice(void)
 						PoliceTrafficImprove(&g_aPolice[nCntPolice]);
 
 						break;						// 抜け出す
+
+					case POLICESTATE_WAIT:			// 待機状態
+
+						// 警察の待機状態チェック処理
+						PoliceWaitCheck(&g_aPolice[nCntPolice]);
+
+						break;						// 抜け出す
 					}
 
 				}
@@ -426,7 +423,7 @@ void UpdatePolice(void)
 						);
 					}
 
-					if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
+					if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK && g_aPolice[nCntPolice].state != POLICESTATE_WAIT)
 					{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
 
 						// 車同士の当たり判定
@@ -467,6 +464,18 @@ void UpdatePolice(void)
 					// プレイヤーの補正の更新処理
 					RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 				}
+
+				//----------------------------------------------------
+				//	影の更新
+				//----------------------------------------------------
+				// 影の位置設定
+				SetPositionShadow
+				( // 引数
+					g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
+					g_aPolice[nCntPolice].pos,			// 位置
+					g_aPolice[nCntPolice].rot,			// 向き
+					NONE_SCALE							// 拡大率
+				);
 
 				//----------------------------------------------------
 				//	アイコンの更新
@@ -666,6 +675,7 @@ void SetPolice(D3DXVECTOR3 pos)
 			g_aPolice[nCntPolice].bJump		  = false;							// ジャンプしていない
 			g_aPolice[nCntPolice].nTrafficCnt = 0;								// 渋滞カウント
 			g_aPolice[nCntPolice].fAlpha	  = 1.0f;							// 透明度
+			g_aPolice[nCntPolice].nNumSpawnGate = NONE_NEAREST;					// 出てくるゲートの番号
 			g_aPolice[nCntPolice].bMove		  = false;							// 移動していない
 			g_aPolice[nCntPolice].bUse		  = true;							// 使用状況
 
@@ -1912,6 +1922,9 @@ void PoliceGatePos(Police *pPolice)
 		// 向きの正規化
 		RotNormalize(&pPolice->rot.y);
 
+		// 出てくるゲートの番号を保存する
+		pPolice->nNumSpawnGate = nSpawnGateNum;
+
 		// ゲートの位置
 		pPolice->pos.x = pGate[nSpawnGateNum].pos.x;
 		pPolice->pos.z = pGate[nSpawnGateNum].pos.z;
@@ -1977,9 +1990,64 @@ void PoliceGatePos(Police *pPolice)
 		// 向きの正規化
 		RotNormalize(&pPolice->rot.y);
 
+		// 出てくるゲートの番号を保存する
+		pPolice->nNumSpawnGate = nSpawnGateNum;
+
 		// ゲートの位置
 		pPolice->pos.x = pGate[nSpawnGateNum].pos.x;
 		pPolice->pos.z = pGate[nSpawnGateNum].pos.z;
+	}
+
+	// 警察の待機状態チェック処理
+	PoliceWaitCheck(pPolice);
+}
+
+//======================================================================================================================
+// 警察の待機状態チェック処理
+//======================================================================================================================
+void PoliceWaitCheck(Police *pPolice)
+{
+	Police *CheckPoli = GetPoliceData();		// 確認用の警察
+	Gate *pGate = GetGateData();				// ゲートの情報
+	bool bWait = false;							// チェック完了の変数
+
+	for (int nCnt = 0; nCnt < MAX_POLICE; nCnt++, CheckPoli++)
+	{
+		if (CheckPoli->bUse == true)
+		{ // 使用していた場合
+			if (CheckPoli->nNumSpawnGate == pPolice->nNumSpawnGate
+			 && CheckPoli != pPolice)
+			{ // ゲートの位置が一緒だった場合
+				if (CheckPoli->state == POLICESTATE_POSBACK
+				 || CheckPoli->state == POLICESTATE_SPAWN)
+				{ // その警察の状態が出現状態または、最初の位置に戻る状態だった場合
+
+					// 状態を待機状態にする
+					pPolice->state = POLICESTATE_WAIT;
+
+					// 待機状態
+					bWait = true;
+
+					// ゲートの位置
+					pPolice->pos.x = pGate[pPolice->nNumSpawnGate].pos.x;
+					pPolice->pos.z = pGate[pPolice->nNumSpawnGate].pos.z;
+
+					// 抜け出す
+					break;
+				}
+			}
+		}
+	}
+
+	if (bWait == false)
+	{ // チェック完了だった場合
+
+		// 最初の座標に戻る状態にする
+		pPolice->state = POLICESTATE_POSBACK;
+
+		// ゲートの位置
+		pPolice->pos.x = pGate[pPolice->nNumSpawnGate].pos.x;
+		pPolice->pos.z = pGate[pPolice->nNumSpawnGate].pos.z;
 	}
 }
 
