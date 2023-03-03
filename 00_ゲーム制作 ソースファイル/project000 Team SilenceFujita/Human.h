@@ -23,7 +23,7 @@
 #define HUMAN_WIDTH	(10.0f)	// 人の縦幅
 #define HUMAN_DEPTH	(10.0f)	// 人の奥行
 
-#define MAX_PARTS	(14)	// パーツの最大数
+#define MAX_PARTS	(15)	// パーツの最大数
 #define MAX_MOTION	(6)		// モーションの最大数
 #define MAX_KEY		(8)		// キーの最大数
 
@@ -57,11 +57,9 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	MOTIONTYPE_NONE = 0,	// 待機状態
+	MOTIONTYPE_STOP = 0,	// 停止状態
 	MOTIONTYPE_MOVE,		// 移動状態
-	MOTIONTYPE_ATTACK,		// 攻撃状態
-	MOTIONTYPE_JUMP,		// ジャンプ状態
-	MOTIONTYPE_LANDING,		// 着地状態
+	MOTIONTYPE_SCARED,		// 怖がり状態
 	MOTIONTYPE_MAX,			// この列挙型の総数
 } MOTIONTYPE;
 
@@ -94,6 +92,7 @@ typedef struct
 	MOTIONTYPE type;					// モーションの状態
 	int        nPose;					// モーションのポーズ番号
 	int        nCounter;				// モーションのカウンター
+	int        nParts;					// パーツの総数
 }MotionInfo;
 
 //**********************************************************************************************************************
@@ -119,7 +118,6 @@ typedef struct
 	D3DXVECTOR3  posOld;				// 前回の位置
 	D3DXVECTOR3  move;					// 移動量
 	float		 fMaxMove;				// 移動量の最大数
-	float		 fLandPos;				// 着地点
 	D3DXVECTOR3  rot;					// 向き
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	MotionInfo   motion;				// モーション情報
@@ -128,7 +126,6 @@ typedef struct
 	HUMANTYPE	 type;					// 種類
 	MOVETYPE	 typeMove;				// 行動の種類
 	int			 nShadowID;				// 影のインデックス
-	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
 	bool		 bRecur;				// 復活するかどうか

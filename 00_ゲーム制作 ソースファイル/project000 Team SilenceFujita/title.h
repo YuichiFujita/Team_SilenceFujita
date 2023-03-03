@@ -15,4 +15,6 @@ void UninitTitle(void);		// タイトル画面の終了処理
 void UpdateTitle(void);		// タイトル画面の更新処理
 void DrawTitle(void);		// タイトル画面の描画処理
 
+TITLESTATE GetTitleState(void);	// タイトルの状態の取得処理
+
 #endif

@@ -552,12 +552,10 @@ void UpdateGame(void)
 
 			// 体力バーの更新
 			UpdateLife();
-
 #if 0
 			// タイマーの更新
 			UpdateTimer();
 #endif
-
 			// 能力バーの更新
 			UpdateAbility();
 
@@ -583,7 +581,7 @@ void UpdateGame(void)
 			UpdateIcon();
 
 			// 警察の追加処理
-			AddPolice();					
+			AddPolice();
 		}
 		else
 		{ // ポーズ状態の場合

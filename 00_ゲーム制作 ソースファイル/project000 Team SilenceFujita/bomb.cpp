@@ -306,6 +306,13 @@ void ShotBarrier(void)
 					// カウンターを初期化
 					pPlayer->bomb.nCounterState = 0;
 
+					//SEの再生
+					if (GetSoundType(SOUND_TYPE_SE) == true)
+					{
+						//送風機のサウンド（BGM）の再生
+						PlaySound(SOUND_LABEL_SE_ABILITY_BOMB_000);
+					}
+
 					// 使用している状態にする
 					g_aBarrier[nCntBarrier].bUse = true;
 

@@ -72,6 +72,7 @@ typedef enum
 {
 	TITLESTATE_NONE = 0,	// 何もしていない状態
 	TITLESTATE_MOVE,		// タイトル移動状態
+	TITLESTATE_FADE,		// タイトル遷移状態
 	TITLESTATE_MAX,			// この列挙型の総数
 } TITLESTATE;
 

@@ -14,6 +14,7 @@
 
 #define MAX_CONBOCOUNT		(99)		// コンボカウントの最大
 #define COMBOSTOP_CNT		(600)		// コンボの止まるカウント
+#define COMBO_CLEAR_CNT		(300)		// コンボが透明になり始めるカウント
 #define DIGIT_ONE			(1)			// 1桁の境界
 #define DIGIT_TWO			(10)		// 2桁の境界
 
@@ -69,6 +70,7 @@ void InitCombo(void)
 	g_Combo.nMagni     = 0;		// 倍率
 	g_Combo.nDigit     = 0;		// 桁数
 	g_Combo.nMoveCount = 0;		// 移動カウント
+	g_Combo.fAlpha	   = 1.0f;	// 透明度
 	g_Combo.bMoveUp    = true;	// 上に移動しているか下に移動しているか
 	g_Combo.bUse       = false;	// 使用状況
 
@@ -211,11 +213,39 @@ void UpdateCombo(void)
 		// コンボの止まるカウントを加算
 		g_nComboCount++;
 
+		if (g_nComboCount >= COMBO_CLEAR_CNT)
+		{ // カウントが一定以上になった場合
+
+			// 透明度を減らしていく
+			g_Combo.fAlpha -= (1.0f / (COMBOSTOP_CNT - COMBO_CLEAR_CNT));
+
+			if (g_Combo.fAlpha <= 0.0f)
+			{ // 透明度が0.0f以下になった場合
+
+				// 透明度を補正する
+				g_Combo.fAlpha = 0.0f;
+			}
+		}
+
 		if (g_nComboCount >= COMBOSTOP_CNT)
 		{ // カウントが一定数に達したら
 
+			// 透明度を補正する
+			g_Combo.fAlpha = 0.0f;
+
 			// コンボの倍率処理(スコア加算)
 			MagnificCombo(COMBO_INTERRUPTION);
+		}
+
+		for (int nCnt = 0; nCnt < MAX_COMBO; nCnt++)
+		{
+			//頂点カラーの設定
+			pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Combo.fAlpha);
+			pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Combo.fAlpha);
+			pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Combo.fAlpha);
+			pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Combo.fAlpha);
+
+			pVtx += 4;		// 頂点データを4つ分進める
 		}
 	}
 
@@ -280,7 +310,7 @@ void DrawCombo(void)
 			COM_COMBO_VAL_SIZE.x,	// 横幅
 			COM_COMBO_VAL_SIZE.y,	// 縦幅
 			COM_COMBO_VAL_SPACE,	// 数値間の幅
-			1.0f					// α値
+			g_Combo.fAlpha			// α値
 		);
 
 		// 数値の描画処理
@@ -295,7 +325,7 @@ void DrawCombo(void)
 			COM_SCORE_VAL_SIZE.x,	// 横幅
 			COM_SCORE_VAL_SIZE.y,	// 縦幅
 			COM_SCORE_VAL_SPACE,	// 数値間の幅
-			1.0f					// α値
+			g_Combo.fAlpha			// α値
 		);
 
 		// 数値の描画処理
@@ -316,6 +346,9 @@ void MagnificCombo(int nMagni)
 
 		// 倍率を0にする
 		g_Combo.nMagni = 0;
+
+		// コンボ倍率を使用しない
+		g_Combo.bUse = false;
 
 		// 倍率でかけるスコアを初期化
 		g_nComboScore = 0;
@@ -351,6 +384,9 @@ void MagnificCombo(int nMagni)
 
 		// コンボの止まるカウントを初期化
 		g_nComboCount = 0;
+
+		// 透明度を初期化
+		g_Combo.fAlpha = 1.0f;
 	}
 }
 

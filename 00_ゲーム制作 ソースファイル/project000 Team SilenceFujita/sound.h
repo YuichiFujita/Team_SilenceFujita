@@ -23,9 +23,10 @@ typedef enum
 	SOUND_LABEL_BGM_TITLE_000,			// タイトル内BGM_000
 	SOUND_LABEL_BGM_RESULT_000,			// リザルト内BGM_000
 	SOUND_LABEL_BGM_TUTORIAL_000,		// チュートリアル内BGM_000
-	SOUND_LABEL_BGM_ABILITY_BOOST_000,	// プレイヤーの能力（ブースト）のBGM_000
 	SOUND_LABEL_BGM_ABILITY_WIND_000,	// プレイヤーの能力（送風機）のBGM_000
+	SOUND_LABEL_BGM_ABILITY_WIND_001,	// プレイヤーの能力（送風機）のBGM_001
 	SOUND_LABEL_SE_,					// SE
+	SOUND_LABEL_SE_ABILITY_BOOST_000,	// プレイヤーの能力（ブースト）のBGM_000
 	SOUND_LABEL_SE_ABILITY_BOMB_000,	// プレイヤーの能力（ボム）のSE_000
 	SOUND_LABEL_MAX,					// この列挙型の総数
 } SOUND_LABEL;
@@ -60,6 +61,7 @@ void UninitSound(void);					// サウンドの終了処理
 HRESULT PlaySound(SOUND_LABEL label);	// サウンドの再生処理
 void StopSound(SOUND_LABEL label);
 void StopSound(void);
-bool GetSoundType(SOUND_TYPE);		// サウンドの有無の取得
+void SoundVolumeControl(SOUND_LABEL label, float fdata);	// サウンドの音量調整
+bool GetSoundType(SOUND_TYPE);								// サウンドの有無の取得
 
 #endif

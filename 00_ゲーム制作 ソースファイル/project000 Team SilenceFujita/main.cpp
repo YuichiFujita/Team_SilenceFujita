@@ -437,7 +437,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
+	g_mode = MODE_GAME;				// モードをチュートリアルに初期化
 #else
 	g_mode = MODE_LOGO;				// モードをロゴに初期化
 #endif
@@ -1372,7 +1372,7 @@ void TxtSetAI(void)
 						} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 						// 車の設定
-						SetCar(pos, rot, nWalk, type);
+						SetCar(pos, D3DXToRadian(rot), nWalk, type);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);				// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
 			}
@@ -1439,7 +1439,7 @@ void TxtSetAI(void)
 						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 						// 人間の設定
-						SetHuman(pos, rot, nWalk, bRecur, type);
+						SetHuman(pos, D3DXToRadian(rot), nWalk, bRecur, type);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}

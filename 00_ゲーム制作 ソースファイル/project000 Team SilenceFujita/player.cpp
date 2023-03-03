@@ -109,8 +109,8 @@ typedef struct
 //************************************************************
 typedef struct
 {
-	bool bBoost;	//ブーストの音
-	bool bWind;		//送風機の音
+	bool bBoost;		//ブーストの音
+	bool bWind;			//送風機の音
 }PlayerSound;
 
 //************************************************************
@@ -208,8 +208,8 @@ void InitPlayer(void)
 	g_tutoInfo.bFirst       = false;			// 一人称カメラの状況
 
 	//プレイヤーの音
-	g_playerSound.bBoost = false;	//ブースト
-	g_playerSound.bWind = false;	//ウィンド
+	g_playerSound.bBoost = false;		//ブースト
+	g_playerSound.bWind = false;		//送風機
 
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -1349,6 +1349,7 @@ void FlyAwayPlayer(void)
 			//効果音系BGMの再生
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
+				
 				//サウンドの設定
 				if (g_playerSound.bWind == false)
 				{//送風機のサウンドが流れていないとき
@@ -1371,10 +1372,13 @@ void FlyAwayPlayer(void)
 		//サウンドの設定
 		if (g_playerSound.bWind == true)
 		{//送風機のサウンドが流れているとき
-			//送風機のサウンドのオフに設定
-			g_playerSound.bWind = false;
+
 			//送風機のサウンド（BGM）の停止
 			StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+
+			//送風機のサウンドのオフに設定
+			g_playerSound.bWind = false;
+
 		}
 	}
 }
@@ -1559,7 +1563,7 @@ void UpdateSlumBoost(void)
 				g_playerSound.bBoost = false;
 
 				//送風機のサウンド（BGM）の停止
-				StopSound(SOUND_LABEL_BGM_ABILITY_BOOST_000);
+				StopSound(SOUND_LABEL_SE_ABILITY_BOOST_000);
 			}
 		}
 
@@ -1663,7 +1667,7 @@ void SetSlumBoost(void)
 				g_playerSound.bBoost = true;
 				
 				//ブーストのサウンド（BGM）の再生
-				PlaySound(SOUND_LABEL_BGM_ABILITY_BOOST_000);
+				PlaySound(SOUND_LABEL_SE_ABILITY_BOOST_000);
 			}
 		}
 	}
