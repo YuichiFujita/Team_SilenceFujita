@@ -16,7 +16,6 @@
 #include "fade.h"
 #include "value.h"
 
-#include "score.h"
 #include "title.h"
 
 #include "calculation.h"
@@ -290,8 +289,8 @@ void UpdateRanking(void)
 //=====================================
 void DrawRanking(void)
 {
-	// リザルトの描画全体処理
-	DrawResultChunk();
+	// 万能描画の全体処理
+	DrawAllAroundChunk();
 
 	if (GetTitleState() != TITLESTATE_FADE)
 	{//タイトル遷移中じゃないとき
