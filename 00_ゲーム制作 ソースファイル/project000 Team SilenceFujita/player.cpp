@@ -35,16 +35,15 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MOVE_FORWARD	(0.1f)		// プレイヤー前進時の移動量
-#define MOVE_BACKWARD	(0.2f)		// プレイヤー後退時の移動量
+#define MOVE_FORWARD	(0.18f)		// プレイヤー前進時の移動量
+#define MOVE_BACKWARD	(0.3f)		// プレイヤー後退時の移動量
 #define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
 #define REV_MOVE_ROT	(0.085f)	// 移動量による向き変更量の補正係数
 #define SUB_MOVE_VALUE	(10.0f)		// 向き変更時の減速が行われる移動量
-#define SUB_MOVE		(0.15f)		// 向き変更時の減速量
 #define REV_MOVE_BRAKE	(0.1f)		// ブレーキ時の減速係数
 #define DEL_MOVE_ABS	(1.9f)		// 移動量の削除範囲の絶対値
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
-#define MAX_BACKWARD	(-10.0f)	// 後退時の最高速度
+#define MAX_BACKWARD	(-12.0f)	// 後退時の最高速度
 #define REV_MOVE_SUB	(0.08f)		// 移動量の減速係数
 #define UNRIVALED_CNT	(10)		// 無敵時にチカチカさせるカウント
 #define STATE_MOVE		(1.5f)		// 停止・旋回時の判定範囲
@@ -56,10 +55,10 @@
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
 //------------------------------------------------------------
-#define BOOST_OK_MOVE	(15.0f)		// ブースト使用に必要なプレイヤーの最低速度
 #define BOOST_ADD_MOVE	(0.25f)		// ブーストの加速量
-#define BOOST_SUB_MOVE	(0.08f)		// ブーストの減速量
+#define BOOST_SUB_MOVE	(0.12f)		// ブーストの減速量
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
+#define BOOST_WAIT_SUB	(5)			// ブーストの待機状態の減算量
 
 #define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
 #define BOOST_Y_ADD		(40.0f)		// ブースト噴射位置の y加算量
@@ -73,6 +72,8 @@
 #define FLYAWAY_SHIFT_WIDTH		(90.0f)		// 風の出る位置をずらす幅
 #define FLYAWAY_SHIFT_HEIGHT	(50.0f)		// 風の出る位置をずらす距離
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
+#define FLYAWAY_WAIT_SUB		(5)			// 風の待機状態の減算量
+
 
 //------------------------------------------------------------
 //	無音世界 (サイレンス・ワールド) マクロ定義
@@ -137,6 +138,8 @@ void UpdateFlyAway(void);			// 送風の更新処理
 void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
 void AbiHealPlayer(void);			// 能力ゲージの回復処理
+
+void CameraChange(void);			// カメラを変えたときの処理
 
 //************************************************************
 //	グローバル変数
@@ -1140,20 +1143,6 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 				// 旋回状態にする
 				currentPlayer = PLAYMOVESTATE_ROTATE;
 			}
-
-			if (g_player.move.x >= SUB_MOVE_VALUE)
-			{ // 移動量が一定値以上の場合
-
-				// 移動量を更新
-				g_player.move.x -= SUB_MOVE;
-
-				if (g_player.move.x < SUB_MOVE_VALUE)
-				{ // 移動量が一定値より小さい場合
-
-					// 最低限の移動量を代入
-					g_player.move.x = SUB_MOVE_VALUE;
-				}
-			}
 		}
 		else if (GetKeyboardPress(DIK_D) == true || GetJoyStickPressLX(0) > 0)
 		{ // 右方向の操作が行われた場合
@@ -1167,20 +1156,6 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 
 				// 旋回状態にする
 				currentPlayer = PLAYMOVESTATE_ROTATE;
-			}
-
-			if (g_player.move.x >= SUB_MOVE_VALUE)
-			{ // 移動量が一定値以上の場合
-
-				// 移動量を更新
-				g_player.move.x -= SUB_MOVE;
-
-				if (g_player.move.x < SUB_MOVE_VALUE)
-				{ // 移動量が一定値より小さい場合
-
-					// 最低限の移動量を代入
-					g_player.move.x = SUB_MOVE_VALUE;
-				}
 			}
 		}
 	}
@@ -1455,20 +1430,17 @@ void SilenceWorldPlayer(void)
 //============================================================
 void CameraChangePlayer(void)
 {
-	if (GetKeyboardPress(DIK_J) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true)
+	if (GetKeyboardTrigger(DIK_J) == true || GetJoyKeyTrigger(JOYKEY_UP, 0) == true)
 	{ // カメラ方向の変更操作が行われた場合
 
 		// カメラの状態をバックカメラにする
-		g_player.nCameraState = PLAYCAMESTATE_BACK;
+		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYCAMESTATE_MAX;
 
 		// 前向きカメラを変更した情報を残す
 		g_tutoInfo.bForward = true;
-	}
-	else
-	{ // カメラの方向の変更操作が行われていない場合
 
-		// カメラの状態を正面カメラにする
-		g_player.nCameraState = PLAYCAMESTATE_NORMAL;
+		// カメラを変えたときの処理
+		CameraChange();
 	}
 
 	if (GetKeyboardTrigger(DIK_K) == true || GetJoyKeyTrigger(JOYKEY_DOWN, 0) == true)
@@ -1479,6 +1451,9 @@ void CameraChangePlayer(void)
 
 		// 一人称カメラを変更した情報を残す
 		g_tutoInfo.bFirst = true;
+
+		// カメラを変えたときの処理
+		CameraChange();
 	}
 }
 
@@ -1627,10 +1602,13 @@ void UpdateSlumBoost(void)
 		{ // カウンターが 0より大きい場合
 
 			// カウンターを減算
-			g_player.boost.nCounter--;
+			g_player.boost.nCounter -= BOOST_WAIT_SUB;
 		}
 		else
 		{ // カウンターが 0以下の場合
+
+			// カウンターを補正
+			g_player.boost.nCounter = 0;
 
 			// 何もしない状態にする
 			g_player.boost.state = BOOSTSTATE_NONE;
@@ -1647,7 +1625,7 @@ void UpdateSlumBoost(void)
 void SetSlumBoost(void)
 {
 	if (g_player.boost.state == BOOSTSTATE_NONE
-		&&  g_player.move.x >= BOOST_OK_MOVE)
+	&&  g_player.move.x > 0.0f)
 	{ // ブーストを行える状態の場合
 
 		// 加速状態にする
@@ -1806,7 +1784,7 @@ void UpdateFlyAway(void)
 		g_player.wind.nCount = 0;
 
 		// カウンターを減算する
-		pWindInfo->nUseCounter--;
+		pWindInfo->nUseCounter -= FLYAWAY_WAIT_SUB;
 
 		if (pWindInfo->nUseCounter <= 0)
 		{ // カウンターが0以下になった場合
@@ -1933,6 +1911,49 @@ void AbiHealPlayer(void)
 
 		// カウンターを初期化
 		g_tutoInfo.nCounterHeal = 0;
+	}
+}
+
+//============================================================
+// カメラを変えたときの処理
+//============================================================
+void CameraChange(void)
+{
+	Camera *pCamera = GetCamera(CAMERATYPE_MAIN);		// メインカメラの取得処理
+
+	if (g_player.bCameraFirst == false)
+	{ // 1人称じゃない場合
+
+		switch (g_player.nCameraState)
+		{
+		case PLAYCAMESTATE_NORMAL:			// 通常のカメラ状態
+
+			// 注視点の位置を更新
+			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+			pCamera->posR.y = g_player.pos.y + POS_R_PLUS_Y;								// プレイヤーの位置と同じ
+			pCamera->posR.z = g_player.pos.z + cosf(g_player.rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+
+			// 視点の位置を更新
+			pCamera->posV.x = pCamera->posR.x + ((pCamera->fDis * sinf(pCamera->rot.x)) * sinf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+			pCamera->posV.y = POS_V_Y;																				// 固定の高さ
+			pCamera->posV.z = pCamera->posR.z + ((pCamera->fDis * sinf(pCamera->rot.x)) * cosf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+
+			break;							// 抜け出す
+
+		case PLAYCAMESTATE_BACK:			// 後ろを見るカメラ状態
+
+			// 注視点の位置を更新
+			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * -POS_R_PLUS;	// プレイヤーの位置より少し前
+			pCamera->posR.y = g_player.pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
+			pCamera->posR.z = g_player.pos.z + cosf(g_player.rot.y + D3DX_PI) * -POS_R_PLUS;	// プレイヤーの位置より少し前
+
+			// 視点の位置を更新
+			pCamera->posV.x = pCamera->posR.x - ((pCamera->fDis * sinf(pCamera->rot.x)) * sinf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+			pCamera->posV.y = POS_V_Y;																				// 固定の高さ
+			pCamera->posV.z = pCamera->posR.z - ((pCamera->fDis * sinf(pCamera->rot.x)) * cosf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+
+			break;							//抜け出す
+		}
 	}
 }
 

@@ -869,7 +869,7 @@ void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 		pos->z = GetLimitStage().fNear - (30.0f * 2);
 
 		// 移動量を削除
-		move->x *= 0.95f;
+		CollisionSlow(&move->x);
 	}
 	if (pos->z < GetLimitStage().fFar + (30.0f * 2))
 	{ // 範囲外の場合 (奥)
@@ -878,7 +878,7 @@ void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 		pos->z = GetLimitStage().fFar + (30.0f * 2);
 
 		// 移動量を削除
-		move->x *= 0.95f;
+		CollisionSlow(&move->x);
 	}
 	if (pos->x > GetLimitStage().fRight - (30.0f * 2))
 	{ // 範囲外の場合 (右)
@@ -887,7 +887,7 @@ void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 		pos->x = GetLimitStage().fRight - (30.0f * 2);
 
 		// 移動量を削除
-		move->x *= 0.95f;
+		CollisionSlow(&move->x);
 	}
 	if (pos->x < GetLimitStage().fLeft + (30.0f * 2))
 	{ // 範囲外の場合 (左)
@@ -896,7 +896,7 @@ void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos, D3DXVECTOR3 *move)
 		pos->x = GetLimitStage().fLeft + (30.0f * 2);
 
 		// 移動量を削除
-		move->x *= 0.95f;
+		CollisionSlow(&move->x);
 	}
 }
 
