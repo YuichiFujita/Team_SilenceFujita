@@ -13,7 +13,7 @@
 //	マクロ定義 (追加で入れたやつ)
 //**********************************************************************************************************************
 #define SOUND_SWITCH_RELEASE	(SOUND_SWITCH_ON)		//リリースで使用する音
-#define SOUND_SWITCH_DEBUG		(SOUND_SWITCH_OFF)		//デバックで使用する音
+#define SOUND_SWITCH_DEBUG		(SOUND_SWITCH_ON)		//デバックで使用する音
 
 //**********************************************************************************************************************
 //	構造体定義 (SOUNDINFO)
@@ -48,10 +48,11 @@ SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 	{ "data/BGM/title_bgm000.wav", -1 },	// タイトル内BGM_000
 	{ "data/BGM/result_bgm000.wav", -1 },	// リザルト内BGM_000
 	{ "data/BGM/tutorial_bgm000.wav", -1 },	// チュートリアル内BGM_000
-	{ "data/BGM/boost000.wav", -1 },		// プレイヤー能力（ブースト）のBGM_000
 	{ "data/BGM/wind000.wav", -1 },			// プレイヤー能力（送風機）のBGM_000
+	{ "data/BGM/wind001.wav", -1 },			// プレイヤー能力（送風機）のBGM_001
 	{ "data/SE/move000.wav", 0 },			// SE
-	{ "data/BGM/bomb000.wav", 0 },			// プレイヤー能力（ボム）のSE_000
+	{ "data/SE/boost000.wav", 0 },			// プレイヤー能力（ブースト）のSE_000
+	{ "data/SE/bomb000.wav", 0 },			// プレイヤー能力（ボム）のSE_000
 };
 
 //**********************************************************************************************************************
@@ -316,6 +317,23 @@ void StopSound(void)
 			// 一時停止
 			g_apSourceVoice[nCntSound]->Stop(0);
 		}
+	}
+}
+
+//======================================================================================================================
+//	音量調整 (ラベル指定)
+//======================================================================================================================
+void SoundVolumeControl(SOUND_LABEL label,float fdata)
+{
+	XAUDIO2_VOICE_STATE xa2state;
+
+	float SourceVoiceChannelVolumes[1] = { 0.1 };
+
+	// 状態取得
+	g_apSourceVoice[label]->GetState(&xa2state);
+	if (xa2state.BuffersQueued != 0)
+	{// 再生中
+		g_apSourceVoice[label]->SetChannelVolumes(label, SourceVoiceChannelVolumes);
 	}
 }
 
