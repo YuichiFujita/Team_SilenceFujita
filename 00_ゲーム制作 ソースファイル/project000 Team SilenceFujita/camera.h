@@ -13,6 +13,10 @@
 #define CNT_ROT_FOLLOW	(50)		// 追従時の回り込みが始まるカウンターの値
 #define VIEW_ANGLE		(D3DXToRadian(65.0f))	// 視野角
 
+#define POS_R_PLUS		(25.0f)		// プレイヤーの位置と注視点の位置の距離 (x, z)
+#define POS_R_PLUS_Y	(180.0f)	// プレイヤーの位置と注視点の位置の距離 (y)
+#define POS_V_Y			(200.0f)	// 追従時の視点の位置 (y)
+
 // マップカメラ
 #define MAPCAM_POS_R	(0.0f)		// マップカメラの注視点の位置 (y)
 #define MAPCAM_POS_V	(6000.0f)	// マップカメラの視点の位置 (y)

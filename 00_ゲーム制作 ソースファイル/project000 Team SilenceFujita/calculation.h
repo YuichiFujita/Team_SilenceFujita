@@ -13,9 +13,9 @@
 #include "main.h"
 #include "game.h"
 
-//**********************************************************************************************************************
+//*****************************************************************************
 //	ぶつかったもののタイプ
-//**********************************************************************************************************************
+//*****************************************************************************
 typedef enum
 {
 	COLLOBJECTTYPE_PLAYER = 0,			// プレイヤー
@@ -34,6 +34,7 @@ void  CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D
 float LandObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pMove, bool *pbJump);																					// モデルの着地の更新処理
 
 void RotNormalize(float *rot);			// 向きの正規化
+void CollisionSlow(float *fMove);		// ぶつかりの減速
 bool UpdateAllClear(RESULTSTATE state);	// 全てのアップデートが終わっているかどうかの判断処理
 void UpdateJudge(Judge *pJudge);		// ジャッジの更新処理
 

@@ -10,7 +10,6 @@
 #include "main.h"
 #include "buildtimer.h"
 #include "object.h"
-#include "3DValue.h"
 #include "player.h"
 
 //**********************************************************************************************************************

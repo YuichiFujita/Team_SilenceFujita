@@ -82,11 +82,13 @@ LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTitle = NULL;						// 頂点バッファへのポインタ
 
 D3DXVECTOR3 g_posTitle;		// タイトルの絶対座標
 TITLESTATE  g_stateTitle;	// タイトルの状態
+
 float g_fAlphaTitle;		// 背景の透明度
 float g_fChangeTitle;		// 透明度の変更値
-int g_nTransCount;			// 遷移カウント
-int g_nTransMode = TRANSITION_TITLE_LOGO;			// 遷移するモード
-bool g_bTitleSound;			// タイトルのサウンドの有無
+bool  g_bTitleSound;		// タイトルのサウンドの有無
+
+int g_nTransCount;							// 遷移カウント
+int g_nTransMode = TRANSITION_TITLE_LOGO;	// 遷移するモード
 
 //======================================================================================================================
 //	タイトル画面の初期化処理
