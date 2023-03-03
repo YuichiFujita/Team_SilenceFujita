@@ -118,7 +118,6 @@ typedef struct
 	D3DXVECTOR3  posOld;				// 前回の位置
 	D3DXVECTOR3  move;					// 移動量
 	float		 fMaxMove;				// 移動量の最大数
-	float		 fLandPos;				// 着地点
 	D3DXVECTOR3  rot;					// 向き
 	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
 	MotionInfo   motion;				// モーション情報
@@ -127,7 +126,6 @@ typedef struct
 	HUMANTYPE	 type;					// 種類
 	MOVETYPE	 typeMove;				// 行動の種類
 	int			 nShadowID;				// 影のインデックス
-	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
 	bool		 bRecur;				// 復活するかどうか
