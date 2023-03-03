@@ -194,7 +194,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 	UpdateWindow(hWnd);				// クライアント領域を更新
 
 	// 初期化処理
-	if (FAILED(Init(hInstance, hWnd, FALSE)))
+	if (FAILED(Init(hInstance, hWnd, TRUE)))
 	{ // 初期化処理が失敗した場合
 
 		// 値を返す
@@ -439,7 +439,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 #ifdef _DEBUG	// デバッグ処理
 	g_mode = MODE_GAME;				// モードをチュートリアルに初期化
 #else
-	g_mode = MODE_TUTORIAL;				// モードをロゴに初期化
+	g_mode = MODE_LOGO;				// モードをロゴに初期化
 #endif
 
 	// ステージの移動範囲を初期化
