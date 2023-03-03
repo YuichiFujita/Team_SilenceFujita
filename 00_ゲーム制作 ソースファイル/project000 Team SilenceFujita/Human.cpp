@@ -64,10 +64,10 @@
 const char *apTextureHumanUV[] =	// 人間のUVテクスチャの相対パス
 {
 	"data\\TEXTURE\\Chara_UV.png",	// 人間1のテクスチャ相対パス
-	"data\\TEXTURE\\.png",			// 人間2のテクスチャ相対パス
-	"data\\TEXTURE\\.png",			// 人間3のテクスチャ相対パス
-	"data\\TEXTURE\\.png",			// 歩きタバコのテクスチャ相対パス
-	"data\\TEXTURE\\.png",			// 歩きスマホのテクスチャ相対パス
+	"data\\TEXTURE\\Chara_UV.png",	// 人間2のテクスチャ相対パス
+	"data\\TEXTURE\\Chara_UV.png",	// 人間3のテクスチャ相対パス
+	"data\\TEXTURE\\Chara_UV.png",	// 歩きタバコのテクスチャ相対パス
+	"data\\TEXTURE\\Chara_UV.png",	// 歩きスマホのテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
