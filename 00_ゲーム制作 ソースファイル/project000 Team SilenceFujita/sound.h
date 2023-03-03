@@ -61,7 +61,7 @@ void UninitSound(void);					// サウンドの終了処理
 HRESULT PlaySound(SOUND_LABEL label);	// サウンドの再生処理
 void StopSound(SOUND_LABEL label);
 void StopSound(void);
-//void SoundVolumeControl(SOUND_LABEL label, float fdata);	// サウンドの音量調整
-bool GetSoundType(SOUND_TYPE);		// サウンドの有無の取得
+void SoundVolumeControl(SOUND_LABEL label, float fdata);	// サウンドの音量調整
+bool GetSoundType(SOUND_TYPE);								// サウンドの有無の取得
 
 #endif
