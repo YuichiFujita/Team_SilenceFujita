@@ -136,9 +136,9 @@ void InitHuman(void)
 	}
 
 	// 人間のパーツの初期化
-	g_aSetPartsNormal[MAX_PARTS]  = {};	// 通常
-	g_aSetPartsCigaret[MAX_PARTS] = {};	// タバコ
-	g_aSetPartsPhone[MAX_PARTS]   = {};	// スマホ
+	ZeroMemory(&g_aSetPartsNormal[0],  sizeof(HumanParts) * MAX_PARTS);
+	ZeroMemory(&g_aSetPartsCigaret[0], sizeof(HumanParts) * MAX_PARTS);
+	ZeroMemory(&g_aSetPartsPhone[0],   sizeof(HumanParts) * MAX_PARTS);
 
 	// 人間のセットアップ処理
 	TxtSetHuman(HUMAN_NORMAL_SETUP_TXT,  &g_aSetPartsNormal[0],  &g_setMotionNormal);	// 通常

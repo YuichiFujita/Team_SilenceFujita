@@ -141,6 +141,8 @@ void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
 void AbiHealPlayer(void);			// 能力ゲージの回復処理
 
+void CameraChange(void);			// カメラを変えたときの処理
+
 //************************************************************
 //	グローバル変数
 //************************************************************
@@ -1461,20 +1463,17 @@ void SilenceWorldPlayer(void)
 //============================================================
 void CameraChangePlayer(void)
 {
-	if (GetKeyboardPress(DIK_J) == true || GetJoyKeyPress(JOYKEY_UP, 0) == true)
+	if (GetKeyboardTrigger(DIK_J) == true || GetJoyKeyTrigger(JOYKEY_UP, 0) == true)
 	{ // カメラ方向の変更操作が行われた場合
 
 		// カメラの状態をバックカメラにする
-		g_player.nCameraState = PLAYCAMESTATE_BACK;
+		g_player.nCameraState = (g_player.nCameraState + 1) % PLAYCAMESTATE_MAX;
 
 		// 前向きカメラを変更した情報を残す
 		g_tutoInfo.bForward = true;
-	}
-	else
-	{ // カメラの方向の変更操作が行われていない場合
 
-		// カメラの状態を正面カメラにする
-		g_player.nCameraState = PLAYCAMESTATE_NORMAL;
+		// カメラを変えたときの処理
+		CameraChange();
 	}
 
 	if (GetKeyboardTrigger(DIK_K) == true || GetJoyKeyTrigger(JOYKEY_DOWN, 0) == true)
@@ -1485,6 +1484,9 @@ void CameraChangePlayer(void)
 
 		// 一人称カメラを変更した情報を残す
 		g_tutoInfo.bFirst = true;
+
+		// カメラを変えたときの処理
+		CameraChange();
 	}
 }
 
@@ -1939,6 +1941,49 @@ void AbiHealPlayer(void)
 
 		// カウンターを初期化
 		g_tutoInfo.nCounterHeal = 0;
+	}
+}
+
+//============================================================
+// カメラを変えたときの処理
+//============================================================
+void CameraChange(void)
+{
+	Camera *pCamera = GetCamera(CAMERATYPE_MAIN);		// メインカメラの取得処理
+
+	if (g_player.bCameraFirst == false)
+	{ // 1人称じゃない場合
+
+		switch (g_player.nCameraState)
+		{
+		case PLAYCAMESTATE_NORMAL:			// 通常のカメラ状態
+
+			// 注視点の位置を更新
+			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+			pCamera->posR.y = g_player.pos.y + POS_R_PLUS_Y;								// プレイヤーの位置と同じ
+			pCamera->posR.z = g_player.pos.z + cosf(g_player.rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+
+			// 視点の位置を更新
+			pCamera->posV.x = pCamera->posR.x + ((pCamera->fDis * sinf(pCamera->rot.x)) * sinf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+			pCamera->posV.y = POS_V_Y;																				// 固定の高さ
+			pCamera->posV.z = pCamera->posR.z + ((pCamera->fDis * sinf(pCamera->rot.x)) * cosf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+
+			break;							// 抜け出す
+
+		case PLAYCAMESTATE_BACK:			// 後ろを見るカメラ状態
+
+			// 注視点の位置を更新
+			pCamera->posR.x = g_player.pos.x + sinf(g_player.rot.y + D3DX_PI) * -POS_R_PLUS;	// プレイヤーの位置より少し前
+			pCamera->posR.y = g_player.pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
+			pCamera->posR.z = g_player.pos.z + cosf(g_player.rot.y + D3DX_PI) * -POS_R_PLUS;	// プレイヤーの位置より少し前
+
+			// 視点の位置を更新
+			pCamera->posV.x = pCamera->posR.x - ((pCamera->fDis * sinf(pCamera->rot.x)) * sinf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+			pCamera->posV.y = POS_V_Y;																				// 固定の高さ
+			pCamera->posV.z = pCamera->posR.z - ((pCamera->fDis * sinf(pCamera->rot.x)) * cosf(pCamera->rot.y));	// 目標注視点から距離分離れた位置
+
+			break;							//抜け出す
+		}
 	}
 }
 
