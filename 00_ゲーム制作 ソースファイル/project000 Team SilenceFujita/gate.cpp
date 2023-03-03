@@ -512,7 +512,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// ˆÚ“®—Ê‚ðíœ
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 						else if (pPos->z    - fDepth <  collPos.z + g_aGate[nCntGate].collInfo[nCntCollGate].fDepth[nCntColl]
 						     &&  pOldPos->z - fDepth >= collPos.z + g_aGate[nCntGate].collInfo[nCntCollGate].fDepth[nCntColl])
@@ -536,7 +536,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// ˆÚ“®—Ê‚ðíœ
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 					}
 
@@ -567,7 +567,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// ˆÚ“®—Ê‚ðíœ
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 						else if (pPos->x    - fWidth <  collPos.x + g_aGate[nCntGate].collInfo[nCntCollGate].fWidth[nCntColl]
 						     &&  pOldPos->x - fWidth >= collPos.x + g_aGate[nCntGate].collInfo[nCntCollGate].fWidth[nCntColl])
@@ -591,7 +591,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// ˆÚ“®—Ê‚ðíœ
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 					}
 				}

@@ -940,14 +940,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -1009,14 +1009,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -1085,14 +1085,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -1154,14 +1154,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -1241,14 +1241,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1310,14 +1310,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1386,14 +1386,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1455,14 +1455,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)

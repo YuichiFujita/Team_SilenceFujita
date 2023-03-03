@@ -1291,10 +1291,10 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						//pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
 
 						// プレイヤーの移動量を削除
-						pPlayer->move.x *= 0.95f;
+						CollisionSlow(&pPlayer->move.x);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						if (state == TACKLESTATE_BOOST)
 						{ // タックル時
@@ -1315,7 +1315,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					pPlayer->pos.z = pPos->z + (PLAY_DEPTH + fDepth);
 
 					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+					CollisionSlow(&pPlayer->move.x);
 
 					// 移動量を削除
 					pMove->x = 0.0f;
@@ -1353,10 +1353,10 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						//pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
 
 						// プレイヤーの移動量を削除
-						pPlayer->move.x *= 0.95f;
+						CollisionSlow(&pPlayer->move.x);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						if (state == TACKLESTATE_BOOST)
 						{ // タックル時
@@ -1377,7 +1377,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					pPlayer->pos.z = pPos->z - (PLAY_DEPTH + fDepth);
 
 					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+					CollisionSlow(&pPlayer->move.x);
 
 					// 移動量を削除
 					pMove->x = 0.0f;
@@ -1420,10 +1420,10 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						//pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
 
 						// プレイヤーの移動量を削除
-						pPlayer->move.x *= 0.95f;
+						CollisionSlow(&pPlayer->move.x);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						if (state == TACKLESTATE_BOOST)
 						{ // タックル時
@@ -1444,7 +1444,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					pPlayer->pos.x = pPos->x + (PLAY_WIDTH + fWidth);
 
 					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+					CollisionSlow(&pPlayer->move.x);
 
 					// 移動量を削除
 					pMove->x = 0.0f;
@@ -1482,10 +1482,10 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						//pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
 
 						// プレイヤーの移動量を削除
-						pPlayer->move.x *= 0.95f;
+						CollisionSlow(&pPlayer->move.x);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						if (state == TACKLESTATE_BOOST)
 						{ // タックル時
@@ -1506,7 +1506,7 @@ void CarBodyStopPlayer(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 					pPlayer->pos.x = pPos->x - (PLAY_WIDTH + fWidth);
 
 					//プレイヤーの移動量を削除
-					pPlayer->move.x *= 0.95f;
+					CollisionSlow(&pPlayer->move.x);
 
 					// 移動量を削除
 					pMove->x = 0.0f;
@@ -1559,7 +1559,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.z = pPos->z + (CAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1572,7 +1572,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.z = pPos->z + (CAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1591,7 +1591,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.z = pPos->z - (CAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1604,7 +1604,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.z = pPos->z - (CAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1628,7 +1628,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.x = pPos->x + (CAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1641,7 +1641,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.x = pPos->x + (CAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1660,7 +1660,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.x = pPos->x - (CAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1673,7 +1673,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 						pCar->pos.x = pPos->x - (CAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1711,7 +1711,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.z = pPos->z + (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1724,7 +1724,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.z = pPos->z + (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1743,7 +1743,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.z = pPos->z - (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1756,7 +1756,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.z = pPos->z - (POLICAR_DEPTH + fDepth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1780,7 +1780,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.x = pPos->x + (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1793,7 +1793,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.x = pPos->x + (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1812,7 +1812,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.x = pPos->x - (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
@@ -1825,7 +1825,7 @@ void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot,
 						pPolice->pos.x = pPos->x - (POLICAR_WIDTH + fWidth);
 
 						// 移動量を削除
-						pMove->x *= 0.95f;
+						CollisionSlow(&pMove->x);
 
 						// カウントを加算する
 						*pTraCnt += 1;
