@@ -143,7 +143,7 @@ void InitHuman(void)
 	// 人間のセットアップ処理
 	TxtSetHuman(HUMAN_NORMAL_SETUP_TXT,  &g_aSetPartsNormal[0],  &g_setMotionNormal);	// 通常
 	TxtSetHuman(HUMAN_CIGARET_SETUP_TXT, &g_aSetPartsCigaret[0], &g_setMotionCigaret);	// タバコ
-	//TxtSetHuman(HUMAN_PHONE_SETUP_TXT,   &g_aSetPartsPhone[0],   &g_setMotionPhone);	// スマホ
+	TxtSetHuman(HUMAN_PHONE_SETUP_TXT,   &g_aSetPartsPhone[0],   &g_setMotionPhone);	// スマホ
 
 	// 人間の情報の初期化
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
@@ -1337,7 +1337,9 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 	//------------------------------------------------------------------------------------------------------------------
 	switch (nType)
 	{ // 種類ごとの処理
-	case HUMANTYPE_001:			// 通常
+	case HUMANTYPE_001:			// 通常1
+	case HUMANTYPE_002:			// 通常2
+	case HUMANTYPE_003:			// 通常3
 
 		// パーツの総数を設定
 		pHuman->motion.nParts = g_setMotionNormal.nParts;
@@ -1355,8 +1357,8 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 
 	case HUMANTYPE_SMARTPHONE:	// スマホ
 
-		//// パーツの総数を設定
-		//pHuman->motion.nParts = g_setMotionPhone.nParts;
+		// パーツの総数を設定
+		pHuman->motion.nParts = g_setMotionPhone.nParts;
 
 		// 処理を抜ける
 		break;
@@ -1378,7 +1380,9 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 
 		switch (nType)
 		{ // 種類ごとの処理
-		case HUMANTYPE_001:			// 通常
+		case HUMANTYPE_001:			// 通常1
+		case HUMANTYPE_002:			// 通常2
+		case HUMANTYPE_003:			// 通常3
 
 			// モーションの情報を初期化
 			pHuman->motion.aMotion[nCntMotion] = g_setMotionNormal.aMotion[nCntMotion];
@@ -1396,8 +1400,8 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 
 		case HUMANTYPE_SMARTPHONE:	// スマホ
 
-			//// モーションの情報を初期化
-			//pHuman->motion.aMotion[nCntMotion] = g_setMotionPhone.aMotion[nCntMotion];
+			// モーションの情報を初期化
+			pHuman->motion.aMotion[nCntMotion] = g_setMotionPhone.aMotion[nCntMotion];
 
 			// 処理を抜ける
 			break;
@@ -1420,7 +1424,9 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 
 		switch (nType)
 		{ // 種類ごとの処理
-		case HUMANTYPE_001:			// 通常
+		case HUMANTYPE_001:			// 通常1
+		case HUMANTYPE_002:			// 通常2
+		case HUMANTYPE_003:			// 通常3
 
 			// パーツの基本情報を初期化
 			pHuman->aParts[nCntParts] = g_aSetPartsNormal[nCntParts];
@@ -1438,8 +1444,8 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 
 		case HUMANTYPE_SMARTPHONE:	// スマホ
 
-			//// パーツの基本情報を初期化
-			//pHuman->aParts[nCntParts] = g_aSetPartsPhone[nCntParts];
+			// パーツの基本情報を初期化
+			pHuman->aParts[nCntParts] = g_aSetPartsPhone[nCntParts];
 
 			// 処理を抜ける
 			break;
@@ -1464,10 +1470,12 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 
 			switch (nType)
 			{ // 種類ごとの処理
-			case HUMANTYPE_001:			// 通常
+			case HUMANTYPE_001:			// 通常1
+			case HUMANTYPE_002:			// 通常2
+			case HUMANTYPE_003:			// 通常3
 		
-				//// 構造体の要素を初期化
-				//ZeroMemory(&pHuman->aParts[MAX_PARTS - 1].modelData, sizeof(Model));
+				// 構造体の要素を初期化
+				ZeroMemory(&pHuman->aParts[MAX_PARTS - 1].modelData, sizeof(Model));
 		
 				// 処理を抜ける
 				break;
@@ -1475,7 +1483,7 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 			case HUMANTYPE_CIGARETTE:	// タバコ
 		
 				// パーツのモデル情報をタバコに設定
-				pHuman->aParts[MAX_PARTS - 1].modelData = GetModelData(MODELTYPE_HUMAN_CIGARET);
+				pHuman->aParts[MAX_PARTS - 1].modelData = GetModelData(MODELTYPE_ITEM_CIGARET);
 		
 				// 処理を抜ける
 				break;
@@ -1483,7 +1491,7 @@ void InitMotionHuman(Human *pHuman, int nType, int nWalk)
 			case HUMANTYPE_SMARTPHONE:	// スマホ
 		
 				// パーツのモデル情報をスマホに設定
-				//pHuman->aParts[MAX_PARTS - 1].modelData = GetModelData(MODELTYPE_HUMAN_PHONE);
+				pHuman->aParts[MAX_PARTS - 1].modelData = GetModelData(MODELTYPE_ITEM_PHONE);
 		
 				// 処理を抜ける
 				break;
@@ -2079,230 +2087,6 @@ void TxtSetHuman(char *pTxt, HumanParts *pSetParts, MotionInfo *pSetMotion)
 		MessageBox(NULL, "人間のセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
 }
-
-#if 0
-//======================================================================================================================
-//	人間のパーツのセットアップ処理
-//======================================================================================================================
-void TxtSetPartsHuman(char *pTxt, HumanParts *pSetParts)
-{
-	// 変数を宣言
-	int nID  = 0;				// インデックスの代入用
-	int nEnd = 0;				// テキスト読み込み終了の確認用
-
-	// 変数配列を宣言
-	char aString[MAX_STRING];	// テキストの文字列の代入用
-
-	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
-
-	// ファイルを読み込み形式で開く
-	pFile = fopen(pTxt, "r");
-
-	if (pFile != NULL)
-	{ // ファイルが開けた場合
-
-		do
-		{ // 読み込んだ文字列が EOF ではない場合ループ
-
-			// ファイルから文字列を読み込む
-			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
-
-			if (strcmp(&aString[0], "CHARACTERSET") == 0)
-			{ // 読み込んだ文字列が CHARACTERSET の場合
-
-				do
-				{ // 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
-
-					// ファイルから文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (strcmp(&aString[0], "PARTSSET") == 0)
-					{ // 読み込んだ文字列が PARTSSET の場合
-
-						do
-						{ // 読み込んだ文字列が END_PARTSSET ではない場合ループ
-
-							// ファイルから文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
-
-							if (strcmp(&aString[0], "INDEX") == 0)
-							{ // 読み込んだ文字列が INDEX の場合
-								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-								fscanf(pFile, "%d", &nID);			// モデル (パーツ) のインデックスを読み込む
-							}
-							else if (strcmp(&aString[0], "PARENT") == 0)
-							{ // 読み込んだ文字列が PARENT の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%d", &pSetParts[nID].nParentID);	// モデル (パーツ) の親のインデックスを読み込む
-							}
-							else if (strcmp(&aString[0], "POS") == 0)
-							{ // 読み込んだ文字列が POS の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%f", &pSetParts[nID].initPos.x);	// X座標を読み込む
-								fscanf(pFile, "%f", &pSetParts[nID].initPos.y);	// Y座標を読み込む
-								fscanf(pFile, "%f", &pSetParts[nID].initPos.z);	// Z座標を読み込む
-
-								// 現在の位置に読み込んだ値を設定
-								pSetParts[nID].pos = pSetParts[nID].initPos;
-							}
-							else if (strcmp(&aString[0], "ROT") == 0)
-							{ // 読み込んだ文字列が ROT の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%f", &pSetParts[nID].initRot.x);	// X向きを読み込む
-								fscanf(pFile, "%f", &pSetParts[nID].initRot.y);	// Y向きを読み込む
-								fscanf(pFile, "%f", &pSetParts[nID].initRot.z);	// Z向きを読み込む
-
-								// 現在の向きに読み込んだ値を設定
-								pSetParts[nID].rot = pSetParts[nID].initRot;
-							}
-
-						} while (strcmp(&aString[0], "END_PARTSSET") != 0);		// 読み込んだ文字列が END_PARTSSET ではない場合ループ
-					}
-				} while (strcmp(&aString[0], "END_CHARACTERSET") != 0);			// 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
-			}
-		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
-		
-		// ファイルを閉じる
-		fclose(pFile);
-	}
-	else
-	{ // ファイルが開けなかった場合
-
-		// エラーメッセージボックス
-		MessageBox(NULL, "人間のパーツのセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
-	}
-}
-
-//======================================================================================================================
-//	人間のモーションのセットアップ処理
-//======================================================================================================================
-void TxtSetMotionHuman(char *pTxt, MotionInfo *pSetMotion)
-{
-	// 変数を宣言
-	int nNowMotion = 0;			// 現在のモーション番号
-	int nNowPose   = 0;			// 現在のポーズ番号
-	int nNowKey    = 0;			// 現在のキー番号
-	int nLoop      = 0;			// ループの ON / OFF の変換用
-	int nEnd       = 0;			// テキスト読み込み終了の確認用
-
-	// 変数配列を宣言
-	char aString[MAX_STRING];	// テキストの文字列の代入用
-
-	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
-
-	// ファイルを読み込み形式で開く
-	pFile = fopen(pTxt, "r");
-
-	if (pFile != NULL)
-	{ // ファイルが開けた場合
-
-		do
-		{ // 読み込んだ文字列が EOF ではない場合ループ
-
-			// ファイルから文字列を読み込む
-			nEnd = fscanf(pFile, "%s", &aString[0]);		// テキストを読み込みきったら EOF を返す
-
-			if (strcmp(&aString[0], "NUM_PARTS") == 0)
-			{ // 読み込んだ文字列が NUM_PARTS の場合
-				fscanf(pFile, "%s", &aString[0]);			// = を読み込む (不要)
-				fscanf(pFile, "%d", &pSetMotion->nParts);	// パーツ数を読み込む
-			}
-			else if (strcmp(&aString[0], "MOTIONSET") == 0)
-			{ // 読み込んだ文字列が MOTIONSET の場合
-
-				// 現在のポーズ番号を初期化
-				nNowPose = 0;
-
-				do
-				{ // 読み込んだ文字列が END_MOTIONSET ではない場合ループ
-
-					// ファイルから文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (strcmp(&aString[0], "LOOP") == 0)
-					{ // 読み込んだ文字列が LOOP の場合
-						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-						fscanf(pFile, "%d", &nLoop);		// ループの ON / OFF を読み込む
-
-						// 読み込んだ値が 0なら true、0以外なら falseを代入
-						pSetMotion->aMotion[nNowMotion].bLoop = (nLoop == 0) ? false : true;
-					}
-					else if (strcmp(&aString[0], "NUM_KEY") == 0)
-					{ // 読み込んだ文字列が NUM_KEY の場合
-						fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
-						fscanf(pFile, "%d", &pSetMotion->aMotion[nNowMotion].nNumKey);	// キーの総数を読み込む
-					}
-					else if (strcmp(&aString[0], "KEYSET") == 0)
-					{ // 読み込んだ文字列が KEYSET の場合
-
-						// 現在のキー番号を初期化
-						nNowKey = 0;
-
-						do
-						{ // 読み込んだ文字列が END_KEYSET ではない場合ループ
-
-							// ファイルから文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
-
-							if (strcmp(&aString[0], "FRAME") == 0)
-							{ // 読み込んだ文字列が FRAME の場合
-								fscanf(pFile, "%s", &aString[0]);												// = を読み込む (不要)
-								fscanf(pFile, "%d", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].nFrame);	// キーが切り替わるまでのフレーム数を読み込む
-							}
-							else if (strcmp(&aString[0], "KEY") == 0)
-							{ // 読み込んだ文字列が KEY の場合
-
-								do
-								{ // 読み込んだ文字列が END_KEY ではない場合ループ
-
-									// ファイルから文字列を読み込む
-									fscanf(pFile, "%s", &aString[0]);
-
-									if (strcmp(&aString[0], "POS") == 0)
-									{ // 読み込んだ文字列が POS の場合
-										fscanf(pFile, "%s", &aString[0]);														// = を読み込む (不要)
-										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].x);	// 位置 (x) を読み込む
-										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].y);	// 位置 (y) を読み込む
-										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].z);	// 位置 (z) を読み込む
-									}
-									else if (strcmp(&aString[0], "ROT") == 0)
-									{ // 読み込んだ文字列が ROT の場合
-										fscanf(pFile, "%s", &aString[0]);														// = を読み込む (不要)
-										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].x);	// 向き (x) を読み込む
-										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].y);	// 向き (y) を読み込む
-										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].z);	// 向き (z) を読み込む
-									}
-
-								} while (strcmp(&aString[0], "END_KEY") != 0);	// 読み込んだ文字列が END_KEY ではない場合ループ
-
-								// 現在のキー番号を加算
-								nNowKey++;
-							}
-						} while (strcmp(&aString[0], "END_KEYSET") != 0);		// 読み込んだ文字列が END_KEYSET ではない場合ループ
-
-						// 現在のポーズ番号を加算
-						nNowPose++;
-					}
-				} while (strcmp(&aString[0], "END_MOTIONSET") != 0);			// 読み込んだ文字列が END_MOTIONSET ではない場合ループ
-
-				// 現在のモーション番号を加算
-				nNowMotion++;
-			}
-		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
-		
-		// ファイルを閉じる
-		fclose(pFile);
-	}
-	else
-	{ // ファイルが開けなかった場合
-
-		// エラーメッセージボックス
-		MessageBox(NULL, "人間のモーションのセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
-	}
-}
-#endif
 
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================

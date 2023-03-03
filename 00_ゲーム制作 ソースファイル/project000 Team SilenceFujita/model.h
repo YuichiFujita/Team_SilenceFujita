@@ -126,7 +126,8 @@ typedef enum
 	MODELTYPE_HUMAN_SHOES_R,			// 右靴
 
 	// 小道具モデル
-	MODELTYPE_HUMAN_CIGARET,			// タバコ
+	MODELTYPE_ITEM_CIGARET,				// タバコ
+	MODELTYPE_ITEM_PHONE,				// スマホ
 
 	// ゲートモデル
 	MODELTYPE_OBJECT_GATE000,			// ゲート (建物)
