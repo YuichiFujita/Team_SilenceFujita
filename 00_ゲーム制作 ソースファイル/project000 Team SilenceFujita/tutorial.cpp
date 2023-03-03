@@ -1346,6 +1346,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 	int         nBreakType;		// 壊れ方の種類の代入用
 	int         nShadowType;	// 影の種類の代入用
 	int         nCollisionType;	// 当たり判定の種類の代入用
+	int			nJudgeType;		// 善悪の種類の代入用
 	int         nNumMat;		// マテリアル数の代入用
 	ROTSTATE    stateRot;		// 向き状態
 	int			nWalk;			// 歩きタイプの変数
@@ -1433,6 +1434,11 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
 									fscanf(pFile, "%d", &stateRot);			// 向き状態を読み込む
 								}
+								else if (strcmp(&aString[0], "JUDGE") == 0)
+								{ // 読み込んだ文字列が JUDGE の場合
+									fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+									fscanf(pFile, "%d", &nJudgeType);		// 善悪状態を読み込む
+								}
 								else if (strcmp(&aString[0], "NUMMAT") == 0)
 								{ // 読み込んだ文字列が NUMMAT の場合
 									fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
@@ -1467,7 +1473,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);		// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 							// オブジェクトの設定
-							SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY);
+							SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY, nJudgeType);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_OBJECT") != 0);			// 読み込んだ文字列が END_SETLESSON_OBJECT ではない場合ループ
 				}

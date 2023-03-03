@@ -51,6 +51,7 @@ void UpDownEditObject(void);		//オブジェクトの上下移動処理
 void RightAngleEditObject(void);	//オブジェクトの直角処理
 void CollisionRotationEdit(void);	//当たり判定の回転処理
 void PlayerPosSetEditObject(void);	//オブジェクトのプレイヤー位置移動
+void JudgeEditObject(void);			//オブジェクトの善悪処理
 
 //破壊モードの表記
 const char *c_apBreakmodename[BREAKTYPE_MAX] =
@@ -75,6 +76,13 @@ const char *c_apCollisionmodename[COLLISIONTYPE_MAX] =
 	"モデル頂点の当たり判定",
 	"作成した汎用の当たり判定",
 	//"作成したそれぞれの当たり判定",
+};
+
+//善悪状態の表記
+const char *c_apJudgemodename[2] = 
+{
+	"良い建物",
+	"悪い建物",
 };
 
 //グローバル変数
@@ -127,6 +135,9 @@ void InitEditObject(void)
 
 		//当たり判定あり
 		g_EditObject.Collisiontype.Collisiontype = COLLISIONTYPE_MODEL;
+
+		//良い建物
+		g_EditObject.Judge.Judgetype = JUDGESTATE_JUSTICE;
 	}
 
 	for (int nCntBreak = 0; nCntBreak < BREAKTYPE_MAX; nCntBreak++)
@@ -145,6 +156,12 @@ void InitEditObject(void)
 	{
 		//当たり判定のデバッグ表記を設定
 		g_EditObject.Collisiontype.pCollisionMode[nCntCollision] = (char*)c_apCollisionmodename[nCntCollision];
+	}
+
+	for (int nCntJudge = 0; nCntJudge < JUDGESTATE_MAX; nCntJudge++)
+	{
+		//善悪のデバッグ正気を設定
+		g_EditObject.Judge.pJudgeMode[nCntJudge] = (char*)c_apJudgemodename[nCntJudge];
 	}
 
 	//当たり判定の向き変数
@@ -289,6 +306,9 @@ void UpdateEditObject(void)
 
 		//オブジェクトのプレイヤー位置移動
 		PlayerPosSetEditObject();
+
+		//オブジェクトの善悪処理
+		JudgeEditObject();			
 	}
 }
 
@@ -634,7 +654,20 @@ void SetEdit(void)
 			stateRot = (g_EditObject.Collisiontype.Collisiontype == COLLISIONTYPE_CREATE) ? g_EditObject.CollInfo.stateRot : ROTSTATE_0;
 
 			//オブジェクトの設定処理
-			SetObject(g_EditObject.pos, g_EditObject.rot, g_EditObject.scale, &g_EditObject.EditMaterial[g_EditObject.nType][0], g_EditObject.nType, g_EditObject.Break.Breaktype, g_EditObject.Shadowtype.Shadowtype, g_EditObject.Collisiontype.Collisiontype, stateRot, APPEARSTATE_COMPLETE);
+			SetObject
+			(
+				g_EditObject.pos,									// 位置
+				g_EditObject.rot,									// 向き
+				g_EditObject.scale,									// 拡大率
+				&g_EditObject.EditMaterial[g_EditObject.nType][0],	// マテリアルのデータ
+				g_EditObject.nType,									// 種類
+				g_EditObject.Break.Breaktype,						// 破壊の種類
+				g_EditObject.Shadowtype.Shadowtype,					// 影の種類
+				g_EditObject.Collisiontype.Collisiontype,			// 当たり判定の種類
+				stateRot,											// 向き状態
+				APPEARSTATE_COMPLETE,								// 出現方法
+				g_EditObject.Judge.Judgetype						// 善悪の種類
+			);
 
 			//エディットオブジェクトの番号を初期化する
 			g_EditObject.nSetNumber = -1;
@@ -1249,6 +1282,19 @@ void PlayerPosSetEditObject(void)
 
 		// プレイヤーの位置に位置を移動
 		g_EditObject.pos = pPlayer->pos;
+	}
+}
+
+//=======================================
+//オブジェクトの善悪処理
+//=======================================
+void JudgeEditObject(void)
+{
+	if (GetKeyboardTrigger(DIK_RCONTROL) == true)
+	{//右コントロールキーを押した場合
+
+		//善悪の種類を切り替える
+		g_EditObject.Judge.Judgetype = (g_EditObject.Judge.Judgetype + 1) % JUDGESTATE_MAX;
 	}
 }
 

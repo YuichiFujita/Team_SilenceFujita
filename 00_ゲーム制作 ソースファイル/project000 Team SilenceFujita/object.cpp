@@ -517,7 +517,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear,int nJudge)
 {
 	// 変数を宣言
 	float AverageScale;			// 拡大率の平均値
@@ -687,21 +687,9 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
 
 			// ジャッジの情報の設定
-			g_aObject[nCntObject].judge.col = JUDGE_WHITE;			// ピカピカの色
-
-
-			if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
-			{ // 壊れるタイプの場合
-
-				g_aObject[nCntObject].judge.state = JUDGESTATE_EVIL;				// 善悪
-				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
-			}
-			else
-			{ // 上記以外
-
-				g_aObject[nCntObject].judge.state = JUDGESTATE_JUSTICE;				// 善悪
-				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
-			}
+			g_aObject[nCntObject].judge.col = JUDGE_WHITE;				// ピカピカの色
+			g_aObject[nCntObject].judge.state = (JUDGESTATE)nJudge;		// 善悪の状態
+			g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
 
 			// 処理を抜ける
 			break;
@@ -862,8 +850,12 @@ void HitObject(Object *pObject, int nDamage)
 				break;					// 抜け出す
 			}
 
-			// ボーナスの設定処理
-			SetBonus(ADDSCORE_OBJECT);
+			if (pObject->judge.state == JUDGESTATE_EVIL)
+			{ //オブジェクトが悪いものだった場合
+
+				// ボーナスの設定処理
+				SetBonus(ADDSCORE_OBJECT);
+			}
 
 			//// アイテムの設定
 			//SetItem(pObject->pos, ITEMTYPE_HEAL);
