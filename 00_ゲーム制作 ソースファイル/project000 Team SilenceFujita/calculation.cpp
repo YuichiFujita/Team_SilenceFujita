@@ -420,9 +420,6 @@ void DrawAllAroundChunk(void)
 	// 爆弾の描画
 	DrawBomb();
 
-	// エフェクトの描画
-	DrawEffect();
-
 	// パーティクルの描画
 	DrawParticle();
 

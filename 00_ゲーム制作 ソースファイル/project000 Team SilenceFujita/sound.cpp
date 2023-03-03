@@ -320,22 +320,21 @@ void StopSound(void)
 	}
 }
 
-////======================================================================================================================
-////	音量調整 (ラベル指定)
-////======================================================================================================================
-//void SoundVolumeControl(SOUND_LABEL label,float fdata)
-//{
-//	XAUDIO2_VOICE_STATE xa2state;
-//
-//	float SourceVoiceChannelVolumes[1] = { 0.1 };
-//
-//	// 状態取得
-//	g_apSourceVoice[label]->GetState(&xa2state);
-//	if (xa2state.BuffersQueued != 0)
-//	{// 再生中
-//		g_apSourceVoice[label]->SetChannelVolumes(label, SourceVoiceChannelVolumes);
-//	}
-//}
+//======================================================================================================================
+//	音量調整 (ラベル指定)
+//======================================================================================================================
+void SoundVolumeControl(SOUND_LABEL label,float fVolume)
+{
+	XAUDIO2_VOICE_STATE xa2state;
+
+	// 状態取得
+	g_apSourceVoice[label]->GetState(&xa2state);
+
+	if (xa2state.BuffersQueued != 0)
+	{// 再生中
+		g_apSourceVoice[label]->SetVolume(fVolume);
+	}
+}
 
 //======================================================================================================================
 //	チャンクのチェック
