@@ -49,6 +49,7 @@
 #define HUMAN_PASS_SHIFT		(40.0f)		// すれ違った時のずらす幅
 #define HUMAN_RADIUS			(30.0f)		// 人間の幅
 #define HUMAN_PASS_CORRECT		(0.06f)		// 人間のずらす補正倍率
+#define HUMAN_GROUND			(10.0f)		// 人間の地面
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
@@ -153,10 +154,8 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].posOld    = g_aHuman[nCntHuman].pos;		// 前回の位置
 		g_aHuman[nCntHuman].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aHuman[nCntHuman].fMaxMove  = 0.0f;							// 移動量の最大数
-		g_aHuman[nCntHuman].fLandPos  = 0.0f;							// 着地点
 		g_aHuman[nCntHuman].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aHuman[nCntHuman].nShadowID = NONE_SHADOW;					// 影のインデックス
-		g_aHuman[nCntHuman].bJump     = false;							// ジャンプしているかどうか
 		g_aHuman[nCntHuman].bMove     = false;							// 移動しているか
 		g_aHuman[nCntHuman].bRecur	  = false;							// 復活状況
 		g_aHuman[nCntHuman].bUse      = false;							// 使用状況
@@ -230,9 +229,6 @@ void UpdateHuman(void)
 			// 前回位置の更新
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;
 
-			// オブジェクトの着地の更新処理
-			g_aHuman[nCntHuman].fLandPos = LandObject(&g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].bJump);
-
 			//----------------------------------------------------
 			//	影の更新
 			//----------------------------------------------------
@@ -240,7 +236,7 @@ void UpdateHuman(void)
 			SetPositionShadow
 			( // 引数
 				g_aHuman[nCntHuman].nShadowID,		// 影のインデックス
-				D3DXVECTOR3(g_aHuman[nCntHuman].pos.x, g_aHuman[nCntHuman].fLandPos, g_aHuman[nCntHuman].pos.z),			// 位置
+				D3DXVECTOR3(g_aHuman[nCntHuman].pos.x, HUMAN_GROUND, g_aHuman[nCntHuman].pos.z),			// 位置
 				g_aHuman[nCntHuman].rot,			// 向き
 				NONE_SCALE							// 拡大率
 			);
@@ -301,7 +297,7 @@ void UpdateHuman(void)
 				g_aHuman[nCntHuman].pos.x += g_aHuman[nCntHuman].move.x;
 				g_aHuman[nCntHuman].pos.z += g_aHuman[nCntHuman].move.z;
 
-				if (g_aHuman[nCntHuman].pos.y <= g_aHuman[nCntHuman].fLandPos)
+				if (g_aHuman[nCntHuman].pos.y <= HUMAN_GROUND)
 				{ // 位置が0.0f以下になった場合
 
 					if (g_aHuman[nCntHuman].bRecur == true)
@@ -318,14 +314,14 @@ void UpdateHuman(void)
 				break;					//抜け出す
 			}
 
-			if (g_aHuman[nCntHuman].pos.y < 0.0f)
+			if (g_aHuman[nCntHuman].pos.y < HUMAN_GROUND)
 			{ // Y軸の位置が0.0fだった場合
 
 				// 縦への移動量を0.0fにする
 				g_aHuman[nCntHuman].move.y = 0.0f;
 
 				// 位置を0.0fに戻す
-				g_aHuman[nCntHuman].pos.y = 0.0f;
+				g_aHuman[nCntHuman].pos.y = HUMAN_GROUND;
 			}
 
 			//----------------------------------------------------
@@ -524,8 +520,6 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 
 			// 情報を初期化
 			g_aHuman[nCntHuman].move     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aHuman[nCntHuman].fLandPos = 0.0f;							// 着地点
-			g_aHuman[nCntHuman].bJump    = false;							// ジャンプしているかどうか
 			g_aHuman[nCntHuman].bMove    = false;							// 移動していない
 			g_aHuman[nCntHuman].state    = HUMANSTATE_WALK;					// 歩き状態
 
@@ -1712,7 +1706,6 @@ void ResurrectionHuman(Human human)
 
 			// 情報を初期化
 			g_aHuman[nCnt].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aHuman[nCnt].bJump = false;							// ジャンプしているかどうか
 			g_aHuman[nCnt].bMove = false;							// 移動していない
 			g_aHuman[nCnt].state = HUMANSTATE_WALK;					// 歩き状態
 
