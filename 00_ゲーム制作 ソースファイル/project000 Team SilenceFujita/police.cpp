@@ -209,8 +209,7 @@ void UpdatePolice(void)
 							BOOSTSTATE_NONE,					// ブーストの状態
 							&g_aPolice[nCntPolice].state,		// 警察の状態
 							&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
-							&g_aPolice[nCntPolice].tackle.tacklemove.x,	// タックル時の移動量
-							COLLOBJECTTYPE_POLICE
+							&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
 						);
 
 						// ゲートとの当たり判定
@@ -408,8 +407,7 @@ void UpdatePolice(void)
 							BOOSTSTATE_NONE,					// ブーストの状態
 							&g_aPolice[nCntPolice].state,		// 警察の状態
 							&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
-							&g_aPolice[nCntPolice].tackle.tacklemove.x,	// タックル時の移動量
-							COLLOBJECTTYPE_POLICE
+							&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
 						);
 
 						// ゲートとの当たり判定

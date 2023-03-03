@@ -2112,7 +2112,7 @@ void DrawDebugEditObject(void)
 		"\n   壊れ方　   [%s]"
 		"\n   判定　　   [%s]"
 		"\n   判定向き   [%d]"
-		"\n 　善悪の状態 [%d]",
+		"\n 　善悪の状態 [%s]",
 		EditObject->pos.x, EditObject->pos.y, EditObject->pos.z,
 		EditObject->scale.x, EditObject->scale.y, EditObject->scale.z,
 		(int)D3DXToDegree(EditObject->rot.y), EditObject->nType,
