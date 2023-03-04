@@ -46,41 +46,42 @@
 #define REV_DIS_MOUSE	(-0.15f)	// マウス操作でのカメラの距離の補正係数
 #define REV_ROT_MOUSE	(0.008f)	// マウス操作でのカメラの回転量の補正係数
 
-#define LIMIT_ROT_HIGH	(D3DX_PI - 0.1f)		// 回転量 (x) の回転制限値 (上)
-#define LIMIT_ROT_LOW	(0.1f)					// 回転量 (x) の回転制限値 (下)
+#define LIMIT_ROT_HIGH	(D3DX_PI - 0.1f)	// 回転量 (x) の回転制限値 (上)
+#define LIMIT_ROT_LOW	(0.1f)				// 回転量 (x) の回転制限値 (下)
+#define MUL_ANGLE_PLUS	(1.8f)		// ブースト時の視野角増加の乗算量
 
 // 一人称視点カメラ
-#define CAMERA_FORWARD_SHIFT	(18.5f)			// 前にカメラをずらす距離
-#define CAMERA_UP_SHIFT			(100.0f)		// 上にカメラをずらす距離
-#define CAMERA_RIGHT_SHIFT		(7.0f)			// 右にカメラをずらす距離
-#define CAMERA_BACK_SHIFT		(35.0f)			// 後ろにカメラをずらす距離
+#define CAMERA_FORWARD_SHIFT	(18.5f)		// 前にカメラをずらす距離
+#define CAMERA_UP_SHIFT			(100.0f)	// 上にカメラをずらす距離
+#define CAMERA_RIGHT_SHIFT		(7.0f)		// 右にカメラをずらす距離
+#define CAMERA_BACK_SHIFT		(35.0f)		// 後ろにカメラをずらす距離
 
 // リザルトカメラ
-#define CAMERA_RSL_ROT_MOVE		(0.003f)		// カメラの向きの移動量
-#define TITLE_DISTANCE			(13000.0f)		// タイトル時のカメラの距離
-#define TITLE_INIT_POS_Y		(4500.0f)		// タイトル時のカメラの初期位置(Y軸)
+#define CAMERA_RSL_ROT_MOVE		(0.003f)	// カメラの向きの移動量
+#define TITLE_DISTANCE			(13000.0f)	// タイトル時のカメラの距離
+#define TITLE_INIT_POS_Y		(4500.0f)	// タイトル時のカメラの初期位置(Y軸)
 	
 // ランキングカメラ
-#define CAMERA_RSL_ROT_MOVE		(0.003f)		// カメラの向きの移動量
-#define RANK_DISTANCE			(500.0f)		// ランキング時のカメラの距離
-#define RANK_POSV_Y				(200.0f)		// ランキング時のカメラの視点初期位置(Y軸)
-#define RANK_POSR_Y				(350.0f)		// ランキング時のカメラの注視点初期位置(Y軸)
+#define CAMERA_RSL_ROT_MOVE		(0.003f)	// カメラの向きの移動量
+#define RANK_DISTANCE			(500.0f)	// ランキング時のカメラの距離
+#define RANK_POSV_Y				(200.0f)	// ランキング時のカメラの視点初期位置(Y軸)
+#define RANK_POSR_Y				(350.0f)	// ランキング時のカメラの注視点初期位置(Y軸)
 
-#define RANK_POS_X_ROAD_ONE		(2500.0f)		// 一つ目の道路の視点の位置
-#define RANK_POS_Z_ROAD_ONE		(-7000.0f)		// 一つ目の道路の視点の位置
-#define RANK_POS_X_ROAD_TWO		(11000.0f)		// 二つ目の道路の視点の位置
-#define RANK_POS_Z_ROAD_TWO		(2250.0f)		// 二つ目の道路の視点の位置
-#define RANK_POS_X_ROAD_THREE	(9000.0f)		// 三つ目の道路の視点の位置
-#define RANK_POS_Z_ROAD_THREE	(11000.0f)		// 三つ目の道路の視点の位置
+#define RANK_POS_X_ROAD_ONE		(2500.0f)	// 一つ目の道路の視点の位置
+#define RANK_POS_Z_ROAD_ONE		(-7000.0f)	// 一つ目の道路の視点の位置
+#define RANK_POS_X_ROAD_TWO		(11000.0f)	// 二つ目の道路の視点の位置
+#define RANK_POS_Z_ROAD_TWO		(2250.0f)	// 二つ目の道路の視点の位置
+#define RANK_POS_X_ROAD_THREE	(9000.0f)	// 三つ目の道路の視点の位置
+#define RANK_POS_Z_ROAD_THREE	(11000.0f)	// 三つ目の道路の視点の位置
 
 #define RANK_ROT_ROAD_ONE		(0)					// 一つ目の道路の角度
 #define RANK_ROT_ROAD_TWO		(-D3DX_PI * 0.5f)	// 二つ目の道路の角度
 #define RANK_ROT_ROAD_THREE		(-D3DX_PI)			// 三つ目の道路の角度
 
-#define RANK_POS_MOVE_ROAD		(10.0f)			// 道路の移動量
-#define RANK_POS_END_ROAD_ONE	(10000.0f)		// 一つ目の道路の終着点
-#define RANK_POS_END_ROAD_TWO	(-5000.0f)		// 二つ目の道路の終着点
-#define RANK_POS_END_ROAD_THREE	(-1000.0f)		// 三つ目の道路の終着点
+#define RANK_POS_MOVE_ROAD		(10.0f)		// 道路の移動量
+#define RANK_POS_END_ROAD_ONE	(10000.0f)	// 一つ目の道路の終着点
+#define RANK_POS_END_ROAD_TWO	(-5000.0f)	// 二つ目の道路の終着点
+#define RANK_POS_END_ROAD_THREE	(-1000.0f)	// 三つ目の道路の終着点
 
 //************************************************************
 //	列挙型
@@ -361,6 +362,9 @@ void UpdateCamera(void)
 //============================================================
 void SetCamera(int nID)
 {
+	// 変数を宣言
+	float viewAngle;	// 視野角の設定用
+
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
@@ -370,11 +374,34 @@ void SetCamera(int nID)
 	// プロジェクションマトリックスの初期化
 	D3DXMatrixIdentity(&g_aCamera[nID].mtxProjection);
 
+	if (GetMode() == MODE_TUTORIAL || GetMode() == MODE_GAME)
+	{ // プレイモードの場合
+
+		if (nID == CAMERATYPE_MAIN)
+		{ // メインカメラの場合
+
+			// ブースト速度に応じて視野角を変動
+			viewAngle = VIEW_ANGLE + D3DXToRadian(GetPlayer()->boost.plusMove.x * MUL_ANGLE_PLUS);
+		}
+		else
+		{ // 非メインカメラの場合
+
+			// 通常の視野角を設定
+			viewAngle = VIEW_ANGLE;
+		}
+	}
+	else
+	{ // 非プレイモードの場合
+
+		// 通常の視野角を設定
+		viewAngle = VIEW_ANGLE;
+	}
+
 	// プロジェクションマトリックスを作成
 	D3DXMatrixPerspectiveFovLH
 	( // 引数
 		&g_aCamera[nID].mtxProjection,													// プロジェクションマトリックス
-		VIEW_ANGLE,																		// 視野角
+		viewAngle,																		// 視野角
 		(float)g_aCamera[nID].viewport.Width / (float)g_aCamera[nID].viewport.Height,	// 画面のアスペクト比
 		VIEW_NEAR,																		// Z軸の最小値
 		VIEW_FAR																		// Z軸の最大値
