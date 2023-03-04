@@ -34,6 +34,13 @@ typedef struct
 	int Collisiontype;							//当たり判定の種類
 }EDITCOLLISION;
 
+//善悪関係の構造体
+typedef struct
+{
+	char *pJudgeMode[JUDGESTATE_MAX];			//善悪の種類の表記
+	int Judgetype;								//善悪の種類
+}EDITJUDGE;
+
 //当たり判定の向き関係の構造体
 typedef struct
 {
@@ -60,6 +67,7 @@ typedef struct
 	EDITSHADOW Shadowtype;									//影の変数
 	EDITCOLLISION Collisiontype;							//当たり判定の変数
 	EDITCOLL_INFO CollInfo;									//当たり判定の向き変数
+	EDITJUDGE Judge;										//善悪の変数
 }EditObject;
 
 //プロトタイプ宣言

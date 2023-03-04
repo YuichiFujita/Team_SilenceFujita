@@ -37,7 +37,14 @@ typedef struct
 	bool		bUse;		// 使用状況
 }Build;
 
-//グローバル変数
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void CollisionReBuild(Build *pBuild);			// 再建設時の当たり判定
+
+//**********************************************************************************************************************
+//	グローバル変数
+//**********************************************************************************************************************
 Build g_aBuild[MAX_BUILDTIMER];					// 再建築タイマーの情報
 
 //==========================================
@@ -85,8 +92,8 @@ void UpdateBuildtimer(void)
 					// カウントを0にする
 					g_aBuild[nCntBill].nCount = 0;
 
-					// 消滅状態にする
-					g_aBuild[nCntBill].state = BUILDSTATE_DISAPPEAR;
+					// 再建設時の当たり判定
+					CollisionReBuild(&g_aBuild[nCntBill]);
 				}
 
 				break;					// 抜け出す
@@ -105,13 +112,21 @@ void UpdateBuildtimer(void)
 					g_aBuild[nCntBill].object.nShadowType,			// 影の種類
 					g_aBuild[nCntBill].object.nCollisionType,		// 当たり判定の種類
 					g_aBuild[nCntBill].object.collInfo.stateRot,	// 当たり判定の向きの状態
-					APPEARSTATE_SLOWLY								// 徐々に出現
+					APPEARSTATE_SLOWLY,								// 徐々に出現
+					g_aBuild[nCntBill].object.judge.state			// 善悪の状態
 				);
 
 				// 使用しない
 				g_aBuild[nCntBill].bUse = false;
 
 				break;					// 抜け出す
+
+			case BUILDSTATE_WAIT:		// 待機状態
+
+				// 再建設時の当たり判定
+				CollisionReBuild(&g_aBuild[nCntBill]);
+
+				break;
 			}
 		}
 	}
@@ -145,6 +160,33 @@ void SetBuildtimer(D3DXVECTOR3 pos, int nCount, Object object)
 
 			break;									//抜け出す
 		}
+	}
+}
+
+//======================================
+// 再建設時の当たり判定
+//======================================
+void CollisionReBuild(Build *pBuild)
+{
+	Player *pPlayer = GetPlayer();
+
+	float fLength;										// 長さの変数
+
+	// 長さを測る
+	fLength = (pBuild->object.pos.x - pPlayer->pos.x) * (pBuild->object.pos.x - pPlayer->pos.x)
+		+ (pBuild->object.pos.z - pPlayer->pos.z) * (pBuild->object.pos.z - pPlayer->pos.z);
+
+	if (fLength <= (pPlayer->modelData.fRadius * pPlayer->modelData.fRadius) + ((pBuild->object.modelData.fRadius * pBuild->object.scale.x) * (pBuild->object.modelData.fRadius * pBuild->object.scale.x)))
+	{ // 範囲内にプレイヤーがいる場合
+
+		// 待機状態にする
+		pBuild->state = BUILDSTATE_WAIT;
+	}
+	else
+	{ // 上記以外
+
+		// 再建築状態にする
+		pBuild->state = BUILDSTATE_DISAPPEAR;
 	}
 }
 

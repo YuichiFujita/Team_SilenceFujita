@@ -437,7 +437,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;				// モードをチュートリアルに初期化
+	g_mode = MODE_TITLE;			// モードをチュートリアルに初期化
 #else
 	g_mode = MODE_GAME;				// モードをロゴに初期化
 #endif
@@ -1077,6 +1077,7 @@ void TxtSetObject(void)
 	int         nBreakType;		// 壊れ方の種類の代入用
 	int         nShadowType;	// 影の種類の代入用
 	int         nCollisionType;	// 当たり判定の種類の代入用
+	int			nJudgetype;		// 善悪の種類の代入用
 	int         nNumMat;		// マテリアル数の代入用
 	int         nAnimCnt;		// 再生カウントの代入用
 	int         nAnimPat;		// 再生パターンの代入用
@@ -1165,6 +1166,11 @@ void TxtSetObject(void)
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
 								fscanf(pFile, "%d", &stateRot);			// 向き状態を読み込む
 							}
+							else if (strcmp(&aString[0], "JUDGE") == 0)
+							{ // 読み込んだ文字列が JUDGE の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nJudgetype);		// 善悪状態を読み込む
+							}
 							else if (strcmp(&aString[0], "NUMMAT") == 0)
 							{ // 読み込んだ文字列が NUMMAT の場合
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
@@ -1200,7 +1206,7 @@ void TxtSetObject(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_COMPLETE);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_COMPLETE, nJudgetype);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
@@ -2097,16 +2103,16 @@ void DrawDebugEditObject(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n　 位置　　 [%.4f, %.4f, %.4f]"
-		"\n　 拡大率　 [%.4f, %.4f, %.4f]"
-		"\n　 向き　　 [%d]"
-		"\n　 種類　　 [%d]"
-		"\n　 色　　　 [%.2f, %.2f, %.2f]"
-		"\n   影    　 [%s]"
-		"\n   壊れ方　 [%s]"
-		"\n   判定　　 [%s]"
-		"\n   判定向き [%d]"
-		"\n\n",
+		"\n　 位置　　   [%.4f, %.4f, %.4f]"
+		"\n　 拡大率　   [%.4f, %.4f, %.4f]"
+		"\n　 向き　　   [%d]"
+		"\n　 種類　　   [%d]"
+		"\n　 色　　　   [%.2f, %.2f, %.2f]"
+		"\n   影    　   [%s]"
+		"\n   壊れ方　   [%s]"
+		"\n   判定　　   [%s]"
+		"\n   判定向き   [%d]"
+		"\n 　善悪の状態 [%s]",
 		EditObject->pos.x, EditObject->pos.y, EditObject->pos.z,
 		EditObject->scale.x, EditObject->scale.y, EditObject->scale.z,
 		(int)D3DXToDegree(EditObject->rot.y), EditObject->nType,
@@ -2116,7 +2122,8 @@ void DrawDebugEditObject(void)
 		EditObject->Shadowtype.pShadowMode[EditObject->Shadowtype.Shadowtype],
 		EditObject->Break.pBreakMode[EditObject->Break.Breaktype],
 		EditObject->Collisiontype.pCollisionMode[EditObject->Collisiontype.Collisiontype],
-		(int)D3DXToDegree(EditObject->CollInfo.rot.y)
+		(int)D3DXToDegree(EditObject->CollInfo.rot.y),
+		EditObject->Judge.pJudgeMode[EditObject->Judge.Judgetype]
 	);
 
 	// テキストの描画
@@ -2259,6 +2266,7 @@ void DrawDebugControlObject(void)
 		"\nプレイヤーの位置へ移動：[ALT] 　"
 		"\n当たり判定の種類の変更：[BACKSPACE] 　"
 		"\n当たり判定の調整：[ENTER] 　"
+		"\n善悪の調整：[RCTRL]"
 		"\n--------------------------------------------- 　"
 		"\nオブジェクトの移動：[W/A/S/D] 　"
 		"\nオブジェクトの平面移動微調整：[LCTRL+W/A/S/D] 　"

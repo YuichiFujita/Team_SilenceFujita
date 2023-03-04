@@ -21,7 +21,8 @@
 typedef enum
 {
 	BUILDSTATE_COUNT,					// カウント状態
-	BUILDSTATE_DISAPPEAR,				// 消滅状態
+	BUILDSTATE_DISAPPEAR,				// 再建築状態
+	BUILDSTATE_WAIT,					// 待機状態
 	BUILDSTATE_MAX						// この列挙型の総数
 }BUILDSTATE;
 

@@ -603,8 +603,7 @@ void UpdateGameNorPlayer(void)
 		g_player.boost.state,	// ブーストの状態
 		&policeState,			// 警察の状態
 		&nTackleCnt,			// タックルカウント
-		&fTackleSpeed,			// タックル時の移動量
-		COLLOBJECTTYPE_PLAYER
+		&fTackleSpeed			// タックル時の移動量
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -792,8 +791,7 @@ void UpdateTutorialNorPlayer(void)
 		g_player.boost.state,	// ブーストの状態
 		&policeState,			// 警察の状態
 		&nTackleCnt,			// タックルカウント
-		&fTackleSpeed,			// タックル時の移動量
-		COLLOBJECTTYPE_PLAYER
+		&fTackleSpeed			// タックル時の移動量
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定
@@ -1011,8 +1009,7 @@ void UpdateOverPlayer(void)
 		g_player.boost.state,	// ブーストの状態
 		&policeState,			// 警察の状態
 		&nTackleCnt,			// タックルカウント
-		&fTackleSpeed,			// タックル時の移動量
-		COLLOBJECTTYPE_PLAYER
+		&fTackleSpeed			// タックル時の移動量
 	);
 
 	// 吹っ飛ぶオブジェクトとの当たり判定

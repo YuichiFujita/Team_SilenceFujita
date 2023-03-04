@@ -217,8 +217,7 @@ void UpdateCar(void)
 						BOOSTSTATE_NONE,				// ブースト状態
 						&policeState,					// 警察の状態
 						&nTackleCnt,					// タックルカウント
-						&fTackleMove,					// タックル時の移動量
-						COLLOBJECTTYPE_CAR
+						&fTackleMove					// タックル時の移動量
 					);
 
 					// 車の停止処理
