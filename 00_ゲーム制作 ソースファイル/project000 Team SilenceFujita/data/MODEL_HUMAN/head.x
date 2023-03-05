@@ -1748,9 +1748,6 @@ Mesh {
    5.000000;
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
-   TextureFilename {
-    "data\\TEXTURE\\Chara_UV.png";
-   }
   }
  }
  MeshNormals {

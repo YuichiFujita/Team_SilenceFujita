@@ -57,7 +57,7 @@
 #define SHAD_SETUP_TXT	"data\\TXT\\shadow.txt"		// ステージセットアップ用のテキストファイルの相対パス
 
 #ifdef _DEBUG	// デバッグ処理
-#define DEBUG_PRINT		(1280)		// デバッグ表示の文字列の最長
+#define DEBUG_PRINT		(2400)		// デバッグ表示の文字列の最長
 
 #define MAX_DEBUG		(2)			// 使用するポリゴン数
 #define DEBUG_WIDTH		(405.0f)	// デバッグ背景の横幅
