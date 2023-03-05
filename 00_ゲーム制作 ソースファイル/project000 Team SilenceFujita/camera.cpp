@@ -46,8 +46,10 @@
 #define REV_DIS_MOUSE	(-0.15f)	// マウス操作でのカメラの距離の補正係数
 #define REV_ROT_MOUSE	(0.008f)	// マウス操作でのカメラの回転量の補正係数
 
-#define LIMIT_ROT_HIGH	(D3DX_PI - 0.1f)		// 回転量 (x) の回転制限値 (上)
-#define LIMIT_ROT_LOW	(0.1f)					// 回転量 (x) の回転制限値 (下)
+#define MUL_ANGLE_PLUS	(1.8f)		// ブースト時の視野角増加の乗算量
+
+#define LIMIT_ROT_HIGH	(D3DX_PI - 0.1f)	// 回転量 (x) の回転制限値 (上)
+#define LIMIT_ROT_LOW	(0.1f)				// 回転量 (x) の回転制限値 (下)
 
 // 一人称視点カメラ
 #define CAMERA_FORWARD_SHIFT	(18.5f)			// 前にカメラをずらす距離
@@ -97,10 +99,10 @@
 #define RANK_ROT_ROAD_TWO		(-D3DX_PI * 0.5f)	// 二つ目の道路の角度
 #define RANK_ROT_ROAD_THREE		(-D3DX_PI)			// 三つ目の道路の角度
 
-#define RANK_POS_MOVE_ROAD		(10.0f)				// 道路の移動量
-#define RANK_POS_END_ROAD_ONE	(10000.0f)			// 一つ目の道路の終着点
-#define RANK_POS_END_ROAD_TWO	(-5000.0f)			// 二つ目の道路の終着点
-#define RANK_POS_END_ROAD_THREE	(-1000.0f)			// 三つ目の道路の終着点
+#define RANK_POS_MOVE_ROAD		(10.0f)		// 道路の移動量
+#define RANK_POS_END_ROAD_ONE	(10000.0f)	// 一つ目の道路の終着点
+#define RANK_POS_END_ROAD_TWO	(-5000.0f)	// 二つ目の道路の終着点
+#define RANK_POS_END_ROAD_THREE	(-1000.0f)	// 三つ目の道路の終着点
 
 //************************************************************
 //	列挙型
@@ -450,6 +452,9 @@ void UpdateCamera(void)
 //============================================================
 void SetCamera(int nID)
 {
+	// 変数を宣言
+	float viewAngle;	// 視野角の設定用
+
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
@@ -459,11 +464,34 @@ void SetCamera(int nID)
 	// プロジェクションマトリックスの初期化
 	D3DXMatrixIdentity(&g_aCamera[nID].mtxProjection);
 
+	if (GetMode() == MODE_TUTORIAL || GetMode() == MODE_GAME)
+	{ // プレイモードの場合
+
+		if (nID == CAMERATYPE_MAIN)
+		{ // メインカメラの場合
+
+			// ブースト速度に応じて視野角を変動
+			viewAngle = VIEW_ANGLE + D3DXToRadian(GetPlayer()->boost.plusMove.x * MUL_ANGLE_PLUS);
+		}
+		else
+		{ // 非メインカメラの場合
+
+			// 通常の視野角を設定
+			viewAngle = VIEW_ANGLE;
+		}
+	}
+	else
+	{ // 非プレイモードの場合
+
+		// 通常の視野角を設定
+		viewAngle = VIEW_ANGLE;
+	}
+
 	// プロジェクションマトリックスを作成
 	D3DXMatrixPerspectiveFovLH
 	( // 引数
 		&g_aCamera[nID].mtxProjection,													// プロジェクションマトリックス
-		VIEW_ANGLE,																		// 視野角
+		viewAngle,																		// 視野角
 		(float)g_aCamera[nID].viewport.Width / (float)g_aCamera[nID].viewport.Height,	// 画面のアスペクト比
 		VIEW_NEAR,																		// Z軸の最小値
 		VIEW_FAR																		// Z軸の最大値

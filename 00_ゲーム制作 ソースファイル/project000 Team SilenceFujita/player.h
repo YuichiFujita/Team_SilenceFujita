@@ -20,9 +20,11 @@
 #define PLAY_HEIGHT			(25.0f)		// プレイヤーの縦幅
 #define PLAY_DEPTH			(65.0f)		// プレイヤーの奥行 / 2
 
-#define MAX_FORWARD			(35.0f)		// 前進時の最高速度
-#define MAX_BOOST			(15.0f)		// ブーストの最大移動量
+#define MAX_FORWARD			(35.0f)						// 前進時の最高速度
+#define MAX_BOOST			(15.0f)						// ブーストの最大移動量
+#define MAX_REAL_SPEED		(MAX_FORWARD + MAX_BOOST)	// 数値上の最高速度
 
+#define PLAY_REV_ROT_MIN	(0.6f)		// プレイヤーの向き変更量の減速係数の最小値
 #define PLAY_LIFE			(100)		// プレイヤーの体力
 #define PLAY_DAMAGE			(10)		// プレイヤーのダメージ数
 #define BOOST_WAIT_CNT		(180)		// ブーストの再使用までの時間
@@ -106,8 +108,8 @@ typedef struct
 	D3DXVECTOR3 pos;				// 現在の位置
 	D3DXVECTOR3 oldPos;				// 前回の位置
 	D3DXVECTOR3 move;				// 移動量
-	D3DXVECTOR3 rot;				// 現在の向き
-	D3DXVECTOR3 destRot;			// 目標の向き
+	D3DXVECTOR3 rot;				// 向き
+	D3DXVECTOR3 moveRot;			// 向き変更量
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	ACTIONSTATE state;				// プレイヤーの状態
 	Model       modelData;			// モデル情報
