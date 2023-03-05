@@ -79,7 +79,7 @@ const char *c_apCollisionmodename[COLLISIONTYPE_MAX] =
 };
 
 //‘Pˆ«ó‘Ô‚Ì•\‹L
-const char *c_apJudgemodename[2] = 
+const char *c_apJudgemodename[JUDGESTATE_MAX] = 
 {
 	"—Ç‚¢Œš•¨",
 	"ˆ«‚¢Œš•¨",
