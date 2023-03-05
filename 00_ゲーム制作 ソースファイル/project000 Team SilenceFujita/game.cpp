@@ -25,6 +25,7 @@
 #include "camera.h"
 #include "Car.h"
 #include "Combo.h"
+#include "Countdown.h"
 #include "effect.h"
 #include "flash.h"
 #include "Human.h"
@@ -164,6 +165,9 @@ void InitGame(void)
 	// コンボの初期化
 	InitCombo();
 
+	// カウントダウンの初期化
+	InitCountDown();
+
 	// エフェクトの初期化
 	InitEffect();
 
@@ -298,6 +302,9 @@ void UninitGame(void)
 
 	// コンボの終了
 	UninitCombo();
+
+	// カウントダウンの終了
+	UninitCountDown();
 
 	// エフェクトの終了
 	UninitEffect();
@@ -543,10 +550,13 @@ void UpdateGame(void)
 
 			// 体力バーの更新
 			UpdateLife();
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif
+			// カウントダウンの更新
+			UpdateCountDown();
+
 			// 能力バーの更新
 			UpdateAbility();
 
@@ -748,6 +758,9 @@ void DrawGame(void)
 
 	// フラッシュの描画
 	DrawFlash();
+
+	// カウントダウンの描画
+	DrawCountDown();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合
