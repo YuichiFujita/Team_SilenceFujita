@@ -546,6 +546,9 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].appear.scaleAdd  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の加算数
 			g_aObject[nCntObject].appear.fAlpha	   = 1.0f;							// 透明度
 
+			// モデル情報を設定
+			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
+
 			if (g_aObject[nCntObject].appear.state == APPEARSTATE_SLOWLY)
 			{ // 徐々に出てくる状態だった場合
 
@@ -628,9 +631,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].smash.bJump = false;									// ジャンプの状態
 			g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
 			g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
-
-			// モデル情報を設定
-			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
 
 			// マテリアルデータへのポインタを取得
 			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].modelData.pBuffMat->GetBufferPointer();
