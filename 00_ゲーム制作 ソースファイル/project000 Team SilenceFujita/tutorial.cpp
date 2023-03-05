@@ -1298,12 +1298,10 @@ void ResetPlayer(void)
 	pPlayer->pos    = D3DXVECTOR3(0.0f, 0.0f, RESET_POS_Z);		// 現在の位置
 	pPlayer->oldPos = D3DXVECTOR3(0.0f, 0.0f, RESET_POS_Z);		// 前回の位置
 
-	// 向きを設定
-	pPlayer->rot     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の向き
-	pPlayer->destRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 目標の向き
-
 	// 本体情報の初期化
 	pPlayer->move          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+	pPlayer->rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
+	pPlayer->moveRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き変更量
 	pPlayer->state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
 	pPlayer->nLife         = PLAY_LIFE;							// 体力
 	pPlayer->nCounterState = 0;									// 状態管理カウンター

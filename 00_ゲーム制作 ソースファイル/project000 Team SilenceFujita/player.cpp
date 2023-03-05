@@ -74,7 +74,6 @@
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
 #define FLYAWAY_WAIT_SUB		(5)			// 風の待機状態の減算量
 
-
 //------------------------------------------------------------
 //	無音世界 (サイレンス・ワールド) マクロ定義
 //------------------------------------------------------------
@@ -125,6 +124,7 @@ void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
 PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake);		// プレイヤーの移動量の更新処理
 
 void PosPlayer(void);				// プレイヤーの位置の更新処理
+void RotPlayer(void);				// プレイヤーの向きの更新処理
 void RevPlayer(void);				// プレイヤーの補正の更新処理
 
 void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
@@ -160,8 +160,8 @@ void InitPlayer(void)
 	g_player.pos           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の位置
 	g_player.oldPos        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 前回の位置
 	g_player.move          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
-	g_player.rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の向き
-	g_player.destRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の向き
+	g_player.rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
+	g_player.moveRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き変更量
 	g_player.state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
@@ -396,8 +396,7 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	// 引数を代入
 	g_player.pos     = pos;		// 現在の位置
 	g_player.oldPos  = pos;		// 前回の位置
-	g_player.rot     = rot;		// 現在の向き
-	g_player.destRot = rot;		// 目標の向き
+	g_player.rot     = rot;		// 向き
 
 	if (g_player.bUse == false)
 	{ // プレイヤーが使用されていない場合
@@ -567,6 +566,9 @@ void UpdateGameNorPlayer(void)
 	// プレイヤーの位置の更新
 	PosPlayer();
 
+	// プレイヤーの向きの更新
+	RotPlayer();
+
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 
@@ -735,6 +737,9 @@ void UpdateTutorialNorPlayer(void)
 
 	// プレイヤーの位置の更新
 	PosPlayer();
+
+	// プレイヤーの向きの更新
+	RotPlayer();
 
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
@@ -933,6 +938,9 @@ void UpdateClearPlayer(void)
 	// プレイヤーの位置の更新
 	PosPlayer();
 
+	// プレイヤーの向きの更新
+	RotPlayer();
+
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 
@@ -990,6 +998,9 @@ void UpdateOverPlayer(void)
 
 	// プレイヤーの位置の更新
 	PosPlayer();
+
+	// プレイヤーの向きの更新
+	RotPlayer();
 
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
@@ -1131,7 +1142,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		{ // 左方向の操作が行われた場合
 
 			// 向きを更新
-			g_player.rot.y -= MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+			g_player.moveRot.y -= MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
 
 			if (g_player.move.x <= -STATE_MOVE
 			||  g_player.move.x >=  STATE_MOVE)
@@ -1145,7 +1156,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		{ // 右方向の操作が行われた場合
 
 			// 向きを更新
-			g_player.rot.y += MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
+			g_player.moveRot.y += MOVE_ROT * ((g_player.move.x + g_player.boost.plusMove.x) * REV_MOVE_ROT);
 
 			if (g_player.move.x <= -STATE_MOVE
 			||  g_player.move.x >=  STATE_MOVE)
@@ -1231,6 +1242,32 @@ void PosPlayer(void)
 		// 移動量を減速
 		g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_SUB;
 	}
+}
+
+//============================================================
+//	プレイヤーの向きの更新処理
+//============================================================
+void RotPlayer(void)
+{
+	// 変数を宣言
+	float fRevRot = (((fabsf(GetPlayer()->move.x + GetPlayer()->boost.plusMove.x) - MAX_REAL_SPEED) * -1.0f) * ((1.0f - PLAY_REV_ROT_MIN) / MAX_REAL_SPEED)) + PLAY_REV_ROT_MIN;	// 向き変更量の減速係数
+
+	//--------------------------------------------------------
+	//	向きの更新
+	//--------------------------------------------------------
+	g_player.rot.y += g_player.moveRot.y;
+
+	//--------------------------------------------------------
+	//	向きの正規化
+	//--------------------------------------------------------
+	// 向きの正規化
+	RotNormalize(&g_player.rot.y);
+
+	//--------------------------------------------------------
+	//	向き変更量の減衰
+	//--------------------------------------------------------
+	// 向き変更量を減衰
+	g_player.moveRot.y += (0.0f - g_player.moveRot.y) * fRevRot;
 }
 
 //============================================================

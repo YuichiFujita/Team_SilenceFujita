@@ -46,9 +46,10 @@
 #define REV_DIS_MOUSE	(-0.15f)	// マウス操作でのカメラの距離の補正係数
 #define REV_ROT_MOUSE	(0.008f)	// マウス操作でのカメラの回転量の補正係数
 
+#define MUL_ANGLE_PLUS	(1.8f)		// ブースト時の視野角増加の乗算量
+
 #define LIMIT_ROT_HIGH	(D3DX_PI - 0.1f)	// 回転量 (x) の回転制限値 (上)
 #define LIMIT_ROT_LOW	(0.1f)				// 回転量 (x) の回転制限値 (下)
-#define MUL_ANGLE_PLUS	(1.8f)		// ブースト時の視野角増加の乗算量
 
 // 一人称視点カメラ
 #define CAMERA_FORWARD_SHIFT	(18.5f)			// 前にカメラをずらす距離

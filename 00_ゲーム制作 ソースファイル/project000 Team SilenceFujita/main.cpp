@@ -437,9 +437,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_TITLE;			// モードをチュートリアルに初期化
+	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
 #else
-	g_mode = MODE_GAME;				// モードをロゴに初期化
+	g_mode = MODE_LOGO;				// モードをロゴに初期化
 #endif
 
 	// ステージの移動範囲を初期化
@@ -1915,6 +1915,7 @@ void DrawDebug(void)
 	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
 	int nNumWeather = GetNumWeather();				// 降っている物の総数を取得する
 	int nNumBuild = GetNumBuildTimer();				// 再建築タイマーの総数取得処理
+	float fRevPlayerRot = (((fabsf(GetPlayer()->move.x + GetPlayer()->boost.plusMove.x) - MAX_REAL_SPEED) * -1.0f) * ((1.0f - PLAY_REV_ROT_MIN) / MAX_REAL_SPEED)) + PLAY_REV_ROT_MIN;	// プレイヤーの向き変更量の減速係数
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1958,7 +1959,8 @@ void DrawDebug(void)
 		" 　再建築タイマーの数：%d\n"
 		" 　警察の状態：%d\n"
 		" 　警察のタックル状態：%d\n"
-		" 　チュートリアルのレッスン：%d\n",
+		" 　向き変更量：%.2f\n"
+		" 　向き変更量の減衰量：%.2f\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1985,7 +1987,8 @@ void DrawDebug(void)
 		nNumBuild,
 		pPolice->state,
 		pPolice->tackle.tackleState,
-		GetLessonState()
+		GetPlayer()->moveRot.y,
+		fRevPlayerRot
 	);
 
 	//--------------------------------------------------------
