@@ -1301,7 +1301,7 @@ void RevPlayer(void)
 		g_player.pos.z = GetLimitStage().fNear - (PLAY_DEPTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 	if (g_player.pos.z < GetLimitStage().fFar + (PLAY_DEPTH * 2))
 	{ // 範囲外の場合 (奥)
@@ -1310,7 +1310,7 @@ void RevPlayer(void)
 		g_player.pos.z = GetLimitStage().fFar + (PLAY_DEPTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 	if (g_player.pos.x > GetLimitStage().fRight - (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (右)
@@ -1319,7 +1319,7 @@ void RevPlayer(void)
 		g_player.pos.x = GetLimitStage().fRight - (PLAY_WIDTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 	if (g_player.pos.x < GetLimitStage().fLeft + (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (左)
@@ -1328,7 +1328,7 @@ void RevPlayer(void)
 		g_player.pos.x = GetLimitStage().fLeft + (PLAY_WIDTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 }
 

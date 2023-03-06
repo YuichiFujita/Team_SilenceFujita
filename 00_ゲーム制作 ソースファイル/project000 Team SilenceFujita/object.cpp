@@ -588,13 +588,13 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			// オブジェクトの情報を初期化
 			g_aObject[nCntObject].state = ACTIONSTATE_NORMAL;	// 状態
 			g_aObject[nCntObject].nLife = OBJ_LIFE;				// 体力
-			g_aObject[nCntObject].nCounterState = 0; 					// 状態管理カウンター
+			g_aObject[nCntObject].nCounterState = 0; 			// 状態管理カウンター
 
 			// 使用している状態にする
 			g_aObject[nCntObject].bUse = true;
 
 			// 当たり判定情報を設定
-			g_aObject[nCntObject].collInfo.stateRot = stateRot;			// 向き状態
+			g_aObject[nCntObject].collInfo.stateRot = stateRot;	// 向き状態
 
 			for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
 			{ // 当たり判定の最大数分繰り返す
