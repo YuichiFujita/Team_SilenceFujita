@@ -861,7 +861,7 @@ void HitObject(Object *pObject, int nDamage)
 			{ //オブジェクトが悪いものだった場合
 
 				// ボーナスの設定処理
-				SetBonus(ADDSCORE_OBJECT);
+				SetBonus(SCORE_OBJECT);
 
 				// アイテムが落ちるカウントを加算する
 				g_nDropItemCount++;

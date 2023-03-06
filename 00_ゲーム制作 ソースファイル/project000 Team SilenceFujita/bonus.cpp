@@ -31,7 +31,7 @@
 #define BONUS_RIGHT_SHIFT	(120)		// 右にボーナスを出す時のずらす座標(Y座標)
 #define BONUS_LEFT_Y		(200)		// 左にボーナスを出す時の座標(Y座標)
 #define BONUS_LEFT_SHIFT	(350)		// 左にボーナスを出す時のずらす座標(Y座標)
-#define BONUS_SCORE_POS		(D3DXVECTOR3(1026.0f, 576.0f, 0.0f))		// スコアの位置
+#define BONUS_SCORE_POS		(D3DXVECTOR3( 918.0f, 573.0f, 0.0f))		// スコアの位置
 
 #define BONUS_MOVE_MAGNI	(0.02f)		// プラスの移動量の倍率
 #define BONUS_STATE_CNT		(120)		// 加算状態になるまでのカウント
@@ -41,14 +41,11 @@
 #define BONUS_EFFECT_RADIUS	(40.0f)		// ボーナスのエフェクトの半径
 #define BONUS_EFFECT_SUB	(4.0f)		// ボーナスのエフェクトの減衰係数
 
-#define SCORE_HUMAN			(500)		// 人を吹き飛ばした時のスコア
-#define DIGIT_HUMAN			(3)			// 人を吹き飛ばした時の桁数
-#define SCORE_OBJECT		(1000)		// オブジェクトを壊した時のスコア
-#define DIGIT_OBJECT		(4)			// オブジェクトを壊した時の桁数
-#define SCORE_CAR			(100)		// 車を封じ込めてる時のスコア
-#define DIGIT_CAR			(3)			// 車を封じ込めてる時の桁数
-#define SCORE_ITEM			(100)		// アイテムをゲージ満杯状態で取得した時のスコア
-#define DIGIT_ITEM			(3)			// アイテムをゲージ満杯状態で取得した時の桁数
+#define BONUS_DIGIT_ONE		(9)			// 1桁の境界
+#define BONUS_DIGIT_TWO		(99)		// 2桁の境界
+#define BONUS_DIGIT_THREE	(999)		// 3桁の境界
+#define BONUS_DIGIT_FOUR	(9999)		// 4桁の境界
+#define BONUS_DIGIT_FIVE	(99999)		// 5桁の境界
 
 //**********************************************************************************************************************
 //	ボーナステクスチャ(BONUSTEX)
@@ -252,12 +249,6 @@ void UpdateBonus(void)
 					// コンボのスコアの加算処理
 					AddComboScore(g_aBonus[nCntBonus].nScore);
 
-					// 増援の得点を増やす
-					GetReinforce()->nBonus += 1;
-
-					// コンボの倍率処理
-					MagnificCombo(1);
-
 					// 2Dパーティクルの発生
 					Set2DParticle
 					( // 引数
@@ -368,7 +359,7 @@ void DrawBonus(void)
 //========================================
 //得点表示の設定処理
 //========================================
-void SetBonus(ADDSCORETYPE Reason)
+void SetBonus(int nBonus)
 {
 	VERTEX_2D * pVtx;					// 頂点情報へのポインタ
 	D3DXVECTOR3 posBonus;				// ボーナスの位置
@@ -419,47 +410,38 @@ void SetBonus(ADDSCORETYPE Reason)
 				g_aBonus[nCntBonus].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);	// 色
 				g_aBonus[nCntBonus].nStateCounter = 0;							// 状態カウンター
 
-				switch (Reason)
-				{
-				case ADDSCORE_HUMAN:	// 人間を吹き飛ばした時
+				// スコアを設定する
+				g_aBonus[nCntBonus].nScore = nBonus;
 
-										// スコアを設定する
-					g_aBonus[nCntBonus].nScore = SCORE_HUMAN;
-
-					// 桁数を設定する
-					g_aBonus[nCntBonus].nDigit = DIGIT_HUMAN;
-
-					break;				// 抜け出す
-
-				case ADDSCORE_OBJECT:	// オブジェクトを壊した場合
-
-										// スコアを設定する
-					g_aBonus[nCntBonus].nScore = SCORE_OBJECT;
+				if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_ONE)
+				{ // スコアが9以上だった場合
 
 					// 桁数を設定する
-					g_aBonus[nCntBonus].nDigit = DIGIT_OBJECT;
-
-					break;				// 抜け出す
-
-				case ADDSCORE_CAR:		//車を封じ込めた場合
-
-					// スコアを設定する
-					g_aBonus[nCntBonus].nScore = SCORE_CAR;
+					g_aBonus[nCntBonus].nDigit = 1;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_TWO)
+				{ // スコアが99以上だった場合
 
 					// 桁数を設定する
-					g_aBonus[nCntBonus].nDigit = DIGIT_CAR;
-
-					break;				// 抜け出す
-
-				case ADDSCORE_ITEM:		// アイテムをゲージ満杯状態で取った場合
-
-					// スコアを設定する
-					g_aBonus[nCntBonus].nScore = SCORE_ITEM;
+					g_aBonus[nCntBonus].nDigit = 2;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_THREE)
+				{ // スコアが999以上だった場合
 
 					// 桁数を設定する
-					g_aBonus[nCntBonus].nDigit = DIGIT_ITEM;
+					g_aBonus[nCntBonus].nDigit = 3;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_FOUR)
+				{ // スコアが9999以上だった場合
 
-					break;				// 抜け出す
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = 4;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_FIVE)
+				{ // スコアが99999以上だった場合
+
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = 5;
 				}
 
 				// 頂点座標の設定

@@ -265,7 +265,7 @@ void UpdateCar(void)
 					{ // ボムカウントが一定数になった場合
 
 						// ボーナスの設定処理
-						SetBonus(ADDSCORE_CAR);
+						SetBonus(SCORE_CAR);
 					}
 				}
 			}
