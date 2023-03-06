@@ -22,7 +22,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define ITEM_SCALE			(D3DXVECTOR3(0.5f, 0.5f, 0.5f))		// アイテムの拡大率
-#define ITEM_HEAL			(1000)		// アイテムの回復量
+#define ITEM_HEAL			(5)		// アイテムの回復量
 #define EFFECT_TIME_ITEM	(160)		// パーティクルを出す間隔
 #define MOVE_ROT_ITEM		(0.03f)		// アイテムの回転量
 
@@ -401,9 +401,7 @@ void TutorialItem(void)
 void GameItem(void)
 {
 	if (GetKeyboardTrigger(DIK_0) == true)
-	{ // 0キーを押した場合
-
-		// アイテムの設定処理
+	{
 		SetItem(D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_HEAL_BARRIER);
 	}
 
