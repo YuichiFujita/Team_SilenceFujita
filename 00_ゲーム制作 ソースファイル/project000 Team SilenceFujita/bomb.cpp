@@ -26,16 +26,13 @@
 #define MAX_BOMB		(128)		// 爆弾の範囲内表示の最大数
 #define MAX_BARINFO		(16)		// バリアのまとまりの最大数
 
-#define BOMB_VIEW_FAR	(4000.0f)			// ボム発射の視野の距離
-#define BOMB_VIEW_ANGLE	(D3DXToRadian(90))	// ボム発射の視野角
-
-#define BOMB_PULS		(1200.0f)	// プレイヤー位置からボム検知の中心位置へのずれ
-#define BOMB_RADIUS		(1000.0f)	// ボム検知範囲の半径
-#define BOMB_CAR_RADIUS	(80.0f)		// 車の検知サイズの半径
+#define BOMB_VIEW_FAR	(4000.0f)				// ボム発射の視野の距離
+#define BOMB_VIEW_ANGLE	(D3DXToRadian(90))		// ボム発射の視野角
 
 #define BOMB_FRONT_PLUS	(100.0f)				// プレイヤーの前方位置の計算用
 #define BOMB_LEFT_PLUS	(BOMB_RADIUS + 100.0f)	// 車の位置関係の設定用ベクトルの計算用
 
+#define BOMB_CAR_RADIUS	(80.0f)		// 車の検知サイズの半径
 #define BOMB_XZ_ADD		(90.0f)		// ボム発射位置の xz加算量
 #define BOMB_Y_ADD		(155.0f)	// ボム発射位置の y加算量
 
@@ -1065,8 +1062,12 @@ void UpdateBarrierInfoData(void)
 						}
 					}
 
-					// ボーナスの設定処理
-					SetBonus(ADDSCORE_CAR);
+					if (nNumEvil > 0)
+					{ // 悪い奴がいた場合
+
+						// ボーナスの設定処理
+						SetBonus(SCORE_CAR * nNumEvil);
+					}
 
 					// カウンターを初期化
 					g_aBarrierInfo[nCntBarInfo].nCounterScore = 0;
