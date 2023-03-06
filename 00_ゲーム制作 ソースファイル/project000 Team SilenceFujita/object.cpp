@@ -101,7 +101,7 @@ void InitObject(void)
 		g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
 
 		// ジャッジの情報の初期化
-		g_aObject[nCntObject].judge.col = JUDGE_WHITE;								// ピカピカの色
+		g_aObject[nCntObject].judge.col = JUDGE_ORANGE;								// ピカピカの色
 		g_aObject[nCntObject].judge.state = JUDGESTATE_JUSTICE;						// 善悪
 		g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;					// チカチカ状態
 			
@@ -688,7 +688,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
 
 			// ジャッジの情報の設定
-			g_aObject[nCntObject].judge.col = JUDGE_WHITE;				// ピカピカの色
+			g_aObject[nCntObject].judge.col = JUDGE_ORANGE;				// ピカピカの色
 			g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
 
 			// 処理を抜ける

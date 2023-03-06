@@ -162,7 +162,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].state     = HUMANSTATE_WALK;				// 状態
 
 		// ジャッジの情報の初期化
-		g_aHuman[nCntHuman].judge.col      = JUDGE_WHITE;			// ピカピカの色
+		g_aHuman[nCntHuman].judge.col      = JUDGE_ORANGE;			// ピカピカの色
 		g_aHuman[nCntHuman].judge.state    = JUDGESTATE_JUSTICE;	// 善悪
 		g_aHuman[nCntHuman].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
 
@@ -590,7 +590,7 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 			}
 
 			// ジャッジの情報の設定
-			g_aHuman[nCntHuman].judge.col = JUDGE_WHITE;			// ピカピカの色
+			g_aHuman[nCntHuman].judge.col = JUDGE_ORANGE;			// ピカピカの色
 
 			if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_EVIL)
 			{ // 悪い奴だった場合
@@ -1764,7 +1764,7 @@ void ResurrectionHuman(Human human)
 			}
 
 			// ジャッジの情報の設定
-			g_aHuman[nCnt].judge.col = JUDGE_WHITE;			// ピカピカの色
+			g_aHuman[nCnt].judge.col = JUDGE_ORANGE;			// ピカピカの色
 
 			g_aHuman[nCnt].judge.state = JUDGESTATE_EVIL;			// 善悪
 			g_aHuman[nCnt].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態

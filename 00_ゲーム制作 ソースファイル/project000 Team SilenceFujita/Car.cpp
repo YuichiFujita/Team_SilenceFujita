@@ -109,7 +109,7 @@ void InitCar(void)
 		//ジャッジの情報の初期化
 		g_aCar[nCntCar].judge.state = JUDGESTATE_JUSTICE;			// 善悪
 		g_aCar[nCntCar].judge.ticatica = CHICASTATE_BLACKOUT;		// チカチカ状態
-		g_aCar[nCntCar].judge.col = JUDGE_WHITE;					// ピカピカの色
+		g_aCar[nCntCar].judge.col = JUDGE_ORANGE;					// ピカピカの色
 
 		// モデル情報の初期化
 		g_aCar[nCntCar].modelData.dwNumMat = 0;						// マテリアルの数
@@ -489,7 +489,7 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 			}
 
 			// ジャッジの情報の設定
-			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色
+			g_aCar[nCntCar].judge.col = JUDGE_ORANGE;			// ピカピカの色
 
 			if (g_aCar[nCntCar].type == CARTYPE_ELECTIONCAR)
 			{ // 悪いやつだった場合
