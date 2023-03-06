@@ -94,6 +94,8 @@ typedef enum
 	MODELTYPE_OBJECT_SIGNSTOP,				// 標識(一時停止)
 	MODELTYPE_OBJECT_CONCRETEWALL,			// コンクリ壁
 	MODELTYPE_OBJECT_YAWARAGE,				// やわらげ斎場
+	MODELTYPE_OBJECT_TOWNWALL,				// 町壁（壁）
+	MODELTYPE_OBJECT_TOWNPILLAR,			// 町壁（柱）
 	
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
