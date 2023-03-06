@@ -537,6 +537,7 @@ void DrawPolice(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aPolice[nCntPolice].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
+#if 0
 				if (pPlayer->bomb.state == ATTACKSTATE_BOMB)
 				{ // 攻撃状態がボム攻撃状態の場合
 
@@ -633,6 +634,77 @@ void DrawPolice(void)
 						break;
 					}
 				}
+#else
+				switch (g_aPolice[nCntPolice].state)
+				{ // 状態ごとの処理
+				case POLICESTATE_PATBACK:	// パトロールに戻っている状態
+
+					// マテリアルの色を代入する
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.r = pMat[nCntMat].MatD3D.Diffuse.r;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.g = pMat[nCntMat].MatD3D.Diffuse.g;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.b = pMat[nCntMat].MatD3D.Diffuse.b;
+
+					// 透明度を下げる
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a  = g_aPolice[nCntPolice].fAlpha;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Ambient.a  = g_aPolice[nCntPolice].fAlpha;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a = g_aPolice[nCntPolice].fAlpha;
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D);
+
+					// 処理を抜ける
+					break;
+
+				case POLICESTATE_POSBACK:	// 最初の位置に戻る状態
+
+					// マテリアルの色を代入する
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.r = pMat[nCntMat].MatD3D.Diffuse.r;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.g = pMat[nCntMat].MatD3D.Diffuse.g;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.b = pMat[nCntMat].MatD3D.Diffuse.b;
+
+					// 透明度を下げる
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a  = g_aPolice[nCntPolice].fAlpha;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Ambient.a  = g_aPolice[nCntPolice].fAlpha;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive.a = g_aPolice[nCntPolice].fAlpha;
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D);
+
+					// 処理を抜ける
+					break;
+
+				case POLICESTATE_TRAFFIC:	// 渋滞時
+
+					// マテリアルデータを代入する
+					g_aPolice[nCntPolice].MatCopy[nCntMat] = pMat[nCntMat];
+
+					// 車を薄くする
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse.a = POLICAR_TRAFFIC_ALPHA;
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D);
+
+					break;					// 抜け出す
+
+				default:					// 上記以外
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+					// 処理を抜ける
+					break;
+				}
+
+				if (g_aPolice[nCntPolice].bombState == BOMBSTATE_RANGE)
+				{ // 範囲内状態の場合
+
+					// 範囲内時のマテリアルの色を設定
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse = BOMB_RANGE_COL;
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D);
+				}
+#endif
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aPolice[nCntPolice].modelData.pTexture[nCntMat]);

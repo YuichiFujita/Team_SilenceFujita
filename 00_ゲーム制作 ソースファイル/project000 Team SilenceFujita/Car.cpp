@@ -12,7 +12,6 @@
 #include "model.h"
 #include "calculation.h"
 
-#include "bonus.h"
 #include "Car.h"
 #include "Combo.h"
 #include "shadow.h"
@@ -49,8 +48,6 @@
 #define CAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 #define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
-
-#define CAR_BOMB_BONUS_CNT		(180)		// ボム状態の時ボーナスが入るカウント数
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -252,23 +249,6 @@ void UpdateCar(void)
 					TACKLESTATE_CHARGE					// 状態
 				);
 			}
-			else
-			{ // バリアセット状態の場合
-
-				if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
-				{ // 悪い奴の場合
-
-					// ボム中のカウントを加算する
-					g_aCar[nCntCar].nBombCount++;
-
-					if (g_aCar[nCntCar].nBombCount % CAR_BOMB_BONUS_CNT == 0)
-					{ // ボムカウントが一定数になった場合
-
-						// ボーナスの設定処理
-						SetBonus(SCORE_CAR);
-					}
-				}
-			}
 
 			if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
 			{ // 悪者だった場合
@@ -339,6 +319,7 @@ void DrawCar(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aCar[nCntCar].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
+#if 0
 				if (pPlayer->bomb.state == ATTACKSTATE_BOMB)
 				{ // 攻撃状態がボム攻撃状態の場合
 
@@ -406,6 +387,49 @@ void DrawCar(void)
 						pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
 					}
 				}
+#else
+				if (g_aCar[nCntCar].state == CARSTATE_TRAFFIC)
+				{ // 渋滞状態の場合
+
+					// 車を薄くする
+					g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Diffuse.a = CAR_TRAFFIC_ALPHA;
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
+				}
+				else
+				{ // 攻撃状態がそれ以外の状態の場合
+
+					// マテリアルのコピーに代入する
+					g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
+
+					if (g_aCar[nCntCar].judge.state == JUDGESTATE_JUSTICE)
+					{ // 良い奴の場合
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+					else
+					{ // 悪い奴の場合
+
+						// 自己発光を代入する
+						g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Emissive = g_aCar[nCntCar].judge.col;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
+					}
+				}
+
+				if (g_aCar[nCntCar].bombState == BOMBSTATE_RANGE)
+				{ // 範囲内状態の場合
+
+					// 範囲内時のマテリアルの色を設定
+					bombMat.MatD3D.Diffuse = BOMB_RANGE_COL;
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&bombMat.MatD3D);
+				}
+#endif
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aCar[nCntCar].modelData.pTexture[nCntMat]);
