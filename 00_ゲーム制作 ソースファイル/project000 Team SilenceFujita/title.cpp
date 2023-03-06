@@ -27,7 +27,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_TITLE			(4)			// 使用するポリゴン数
+#define MAX_TITLE			(3)			// 使用するポリゴン数
 
 #define TITLE_POS_X			(640.0f)	// タイトルの停止時の絶対座標 (x)
 #define TITLE_POS_Y			(250.0f)	// タイトルの停止時の絶対座標 (y)
@@ -40,14 +40,10 @@
 #define TITLE_SELECT_SIZE_Y			(60.0f)							//タイトル選択肢の大きさ（Y）
 #define TITLE_SELECT_INTERVAL_Y		(125.0f)						//タイトル選択肢の間隔（Y）
 
-#define TITLE_CURSOR_SIZE_X			(40.0f)							//タイトルカーソルの大きさ（X）
-#define TITLE_CURSOR_SIZE_Y			(40.0f)							//タイトルカーソルの大きさ（Y）
-#define TITLE_CURSOR_INTERVAL_X		(TITLE_SELECT_SIZE_X + 50.0f)	//タイトルカーソルの間隔（X）
-
 #define TITLE_MOVE			(2.0f)		// タイトルの移動量
 #define TIT_FIRST_ALPHA		(0.65f)		// 背景の初期の透明度
 #define TIT_CHANGE_ALPHA	(0.003f)	// 背景の透明度の変更値
-#define TIT_ALPHA_HIGH		(0.8f)		// 不透明度の最大値
+#define TIT_ALPHA_HIGH		(0.5f)		// 不透明度の最大値
 #define TIT_ALPHA_LOW		(0.5f)		// 透明度の最大値
 
 #define TRANS_CNT			(900)		// 自動遷移するまでのカウント
@@ -60,7 +56,6 @@ const char *apTextureTitle[] =			// テクスチャの相対パス
 	"data\\TEXTURE\\title000.png",				// タイトルのテクスチャ相対パス
 	"data\\TEXTURE\\title_select_start.png",	// タイトル選択（スタート）
 	"data\\TEXTURE\\title_select_tutorial.png",	// タイトル選択（チュートリアル）
-	"data\\TEXTURE\\title_select_cursor.png",	// タイトル選択（カーソル）
 };
 
 //**********************************************************************************************************************
@@ -71,7 +66,6 @@ typedef enum
 	TEXTURE_TITLE_TITLE = 0,			// タイトル
 	TEXTURE_TITLE_SELECT_START,			// タイトル選択（スタート）
 	TEXTURE_TITLE_SELECT_TUTORIAL,		// タイトル選択（チュートリアル）
-	TEXTURE_TITLE_SELECT_CURSOR,		// タイトル選択（カーソル）
 	TEXTURE_TITLE_MAX,					// この列挙型の総数
 } TEXTURE_TITLE;
 
@@ -86,7 +80,7 @@ typedef enum
 } TRANSITION_TITLE;
 
 //**********************************************************************************************************************
-//	列挙型定義 (TEXTURE_TITLE)
+//	タイトル選択の種類の列挙型定義 (TITLE_SELECT_TYPE)
 //**********************************************************************************************************************
 typedef enum
 {
@@ -109,7 +103,6 @@ typedef struct
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 pos;			//位置
 	TITLE_SELECT_TYPE type;		//モード選択の種類
 	bool bOk;					//決定の有無
 }TitleCursor;
@@ -176,7 +169,6 @@ void InitTitle(void)
 		g_aTitleSelect[nCount].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 		//タイトル選択カーソル
-		g_titleCursor.pos = D3DXVECTOR3(TITLE_SELECT_POS_X - TITLE_CURSOR_INTERVAL_X, TITLE_SELECT_POS_Y, 0.0f);
 		g_titleCursor.type = TITLE_SELECT_TYPE_START;
 		g_titleCursor.bOk = false;
 	}
@@ -253,30 +245,6 @@ void InitTitle(void)
 		pVtx[7 + (nCount * 4)].tex = D3DXVECTOR2(1.0f, 1.0f);
 	}
 
-	// 頂点座標を設定
-	pVtx[12].pos = D3DXVECTOR3(g_titleCursor.pos.x - TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y - TITLE_CURSOR_SIZE_Y, 0.0f);
-	pVtx[13].pos = D3DXVECTOR3(g_titleCursor.pos.x + TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y - TITLE_CURSOR_SIZE_Y, 0.0f);
-	pVtx[14].pos = D3DXVECTOR3(g_titleCursor.pos.x - TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y + TITLE_CURSOR_SIZE_Y, 0.0f);
-	pVtx[15].pos = D3DXVECTOR3(g_titleCursor.pos.x + TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y + TITLE_CURSOR_SIZE_Y, 0.0f);
-
-	// rhw の設定
-	pVtx[12].rhw = 1.0f;
-	pVtx[13].rhw = 1.0f;
-	pVtx[14].rhw = 1.0f;
-	pVtx[15].rhw = 1.0f;
-
-	// 頂点カラーの設定
-	pVtx[12].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[13].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[14].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[15].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	// テクスチャ座標の設定
-	pVtx[12].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[13].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[14].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[15].tex = D3DXVECTOR2(1.0f, 1.0f);
-
 	// 頂点バッファをアンロックする
 	g_pVtxBuffTitle->Unlock();
 
@@ -300,6 +268,8 @@ void InitTitle(void)
 		true,	// オブジェクト
 		true	// AI
 	);
+
+
 }
 
 //======================================================================================================================
@@ -428,15 +398,6 @@ void UpdateTitle(void)
 
 					break;
 				}
-
-				//カーソルの位置を選択してるモードの横に移動
-				g_titleCursor.pos.y = TITLE_SELECT_POS_Y + (TITLE_SELECT_INTERVAL_Y * (int)g_titleCursor.type);
-
-				// カーソルの頂点座標を設定
-				pVtx[12].pos = D3DXVECTOR3(g_titleCursor.pos.x - TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y - TITLE_CURSOR_SIZE_Y, 0.0f);
-				pVtx[13].pos = D3DXVECTOR3(g_titleCursor.pos.x + TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y - TITLE_CURSOR_SIZE_Y, 0.0f);
-				pVtx[14].pos = D3DXVECTOR3(g_titleCursor.pos.x - TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y + TITLE_CURSOR_SIZE_Y, 0.0f);
-				pVtx[15].pos = D3DXVECTOR3(g_titleCursor.pos.x + TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y + TITLE_CURSOR_SIZE_Y, 0.0f);
 				
 			}
 
@@ -464,14 +425,6 @@ void UpdateTitle(void)
 					break;
 				}
 
-				//カーソルの位置を選択してるモードの横に移動
-				g_titleCursor.pos.y = TITLE_SELECT_POS_Y + (TITLE_SELECT_INTERVAL_Y * (int)g_titleCursor.type);
-
-				// 頂点座標を設定
-				pVtx[12].pos = D3DXVECTOR3(g_titleCursor.pos.x - TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y - TITLE_CURSOR_SIZE_Y, 0.0f);
-				pVtx[13].pos = D3DXVECTOR3(g_titleCursor.pos.x + TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y - TITLE_CURSOR_SIZE_Y, 0.0f);
-				pVtx[14].pos = D3DXVECTOR3(g_titleCursor.pos.x - TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y + TITLE_CURSOR_SIZE_Y, 0.0f);
-				pVtx[15].pos = D3DXVECTOR3(g_titleCursor.pos.x + TITLE_CURSOR_SIZE_X, g_titleCursor.pos.y + TITLE_CURSOR_SIZE_Y, 0.0f);
 			}
 
 			if (GetKeyboardTrigger(DIK_RETURN) == true || GetKeyboardTrigger(DIK_SPACE) == true
@@ -520,6 +473,20 @@ void UpdateTitle(void)
 			case TITLE_SELECT_TYPE_START:
 				// 頂点カラーの更新
 
+				pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+				pVtx[8].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
+				pVtx[9].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
+				pVtx[10].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
+				pVtx[11].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
+				break;
+
+				//チュートリアル
+			case TITLE_SELECT_TYPE_TUTORIAL:
+				// 頂点カラーの更新
 				pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
 				pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
 				pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
@@ -529,20 +496,6 @@ void UpdateTitle(void)
 				pVtx[9].col = D3DXCOLOR(1.0f, 1.0f, 1.0f,  1.0f);
 				pVtx[10].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				pVtx[11].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-				break;
-
-				//チュートリアル
-			case TITLE_SELECT_TYPE_TUTORIAL:
-				// 頂点カラーの更新
-				pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-				pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-				pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-				pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-				pVtx[8].col = D3DXCOLOR(1.0f, 1.0f, 1.0f,  g_fAlphaTitle);
-				pVtx[9].col = D3DXCOLOR(1.0f, 1.0f, 1.0f,  g_fAlphaTitle);
-				pVtx[10].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
-				pVtx[11].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
 				break;
 			}
 
