@@ -58,6 +58,7 @@ typedef struct
 	int         nType;				// 種類
 	int         nCounterEffect;		// エフェクト管理カウンター
 	int         nShadowID;			// 影のインデックス
+	int			nLostCounter;		// 消失カウンター
 	bool        bUse;				// 使用状況
 }Item;
 
