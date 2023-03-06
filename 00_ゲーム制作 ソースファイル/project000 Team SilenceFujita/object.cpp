@@ -14,6 +14,7 @@
 #include "buildtimer.h"
 #include "bonus.h"
 #include "Combo.h"
+#include "item.h"
 #include "junk.h"
 #include "object.h"
 #include "particle.h"
@@ -50,12 +51,15 @@
 
 #define APPEAR_ADD_MAGNI		(0.05f)							// 出現時の加算数の倍率
 
+#define ITEM_DROP_COUNT			(3)								// アイテムが落ちるカウント数
+
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
 Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
 float     g_aShadowRadius[MODEL_OBJ_MAX];		// 影の半径の情報
+int		  g_nDropItemCount;						// アイテムが落ちるカウント
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -156,6 +160,9 @@ void InitObject(void)
 
 		g_aShadowRadius[nCntObject] = FIRST_RADIUS;
 	}
+
+	// アイテムが落ちるカウントを初期化する
+	g_nDropItemCount = 0;
 }
 
 //======================================================================================================================
@@ -855,6 +862,16 @@ void HitObject(Object *pObject, int nDamage)
 
 				// ボーナスの設定処理
 				SetBonus(ADDSCORE_OBJECT);
+
+				// アイテムが落ちるカウントを加算する
+				g_nDropItemCount++;
+
+				if (g_nDropItemCount % ITEM_DROP_COUNT == 0)
+				{ // アイテムが落ちるカウントが一定数になった場合
+
+				  // アイテムの設定処理
+					SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
+				}
 			}
 
 			//// アイテムの設定

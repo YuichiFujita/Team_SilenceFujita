@@ -199,6 +199,7 @@ void InitPlayer(void)
 	g_player.bomb.state           = ATTACKSTATE_NONE;	// 攻撃状態
 	g_player.bomb.nCounterState   = BOMB_WAIT_CNT;		// 攻撃管理カウンター
 	g_player.bomb.nCounterControl = 0;					// 操作管理カウンター
+	g_player.bomb.nHeal = 0;							// ゲージの回復量
 	g_player.bomb.bShot           = false;				// 発射待機状況
 
 	// アイコンの情報の初期化
@@ -442,6 +443,18 @@ void HealPlayer(Player *pPlayer, int nHeal)
 		// サウンドの再生
 		//PlaySound(SOUND_LABEL_SE_HEAL);		// SE (回復)
 	}
+}
+
+//============================================================
+// バリアの回復判定
+//============================================================
+void HealBarrier(Player *pPlayer, int nHeal)
+{
+	// 引数の回復分をバリアに加算する
+	pPlayer->bomb.nHeal += nHeal;
+
+	// 状態を設定する
+	pPlayer->bomb.state = ATTACKSTATE_HEAL;
 }
 
 //============================================================
@@ -1886,6 +1899,33 @@ void UpdateSilenceWorld(void)
 		}
 		else
 		{ // カウンターが一定値以上の場合
+
+			// 状態カウントを補正する
+			g_player.bomb.nCounterState = BOMB_WAIT_CNT;
+
+			// 何もしない状態にする
+			g_player.bomb.state = ATTACKSTATE_NONE;
+		}
+
+		// 処理を抜ける
+		break;
+
+	case ATTACKSTATE_HEAL:	// ゲージ回復状態
+
+		if (g_player.bomb.nCounterState < BOMB_WAIT_CNT)
+		{ // カウンターが一定値より小さい場合
+
+			// ゲージを回復
+			g_player.bomb.nCounterState += g_player.bomb.nHeal;
+		}
+		else
+		{ // カウンターが一定値以上の場合
+
+			// 状態カウントを補正する
+			g_player.bomb.nCounterState = BOMB_WAIT_CNT;
+
+			// ゲージ回復量を初期化する
+			g_player.bomb.nHeal = 0;
 
 			// 何もしない状態にする
 			g_player.bomb.state = ATTACKSTATE_NONE;

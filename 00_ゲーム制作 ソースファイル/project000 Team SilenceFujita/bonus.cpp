@@ -42,6 +42,8 @@
 #define DIGIT_OBJECT		(4)			// オブジェクトを壊した時の桁数
 #define SCORE_CAR			(100)		// 車を封じ込めてる時のスコア
 #define DIGIT_CAR			(3)			// 車を封じ込めてる時の桁数
+#define SCORE_ITEM			(100)		// アイテムをゲージ満杯状態で取得した時のスコア
+#define DIGIT_ITEM			(3)			// アイテムをゲージ満杯状態で取得した時の桁数
 
 //**********************************************************************************************************************
 // 上に出すか下に出すか(WHEREBONUS)
@@ -462,11 +464,21 @@ void SetBonus(ADDSCORETYPE Reason)
 
 				case ADDSCORE_CAR:		//車を封じ込めた場合
 
-										// スコアを設定する
+					// スコアを設定する
 					g_aBonus[nCntBonus].nScore = SCORE_CAR;
 
 					// 桁数を設定する
 					g_aBonus[nCntBonus].nDigit = DIGIT_CAR;
+
+					break;				// 抜け出す
+
+				case ADDSCORE_ITEM:		// アイテムをゲージ満杯状態で取った場合
+
+					// スコアを設定する
+					g_aBonus[nCntBonus].nScore = SCORE_ITEM;
+
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = DIGIT_ITEM;
 
 					break;				// 抜け出す
 				}

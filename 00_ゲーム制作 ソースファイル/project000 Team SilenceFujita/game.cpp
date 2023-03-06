@@ -31,6 +31,7 @@
 #include "Human.h"
 #include "gate.h"
 #include "icon.h"
+#include "item.h"
 #include "junk.h"
 #include "life.h"
 #include "light.h"
@@ -119,6 +120,9 @@ void InitGame(void)
 
 	// がれきの初期化
 	InitJunk();
+
+	// アイテムの初期化
+	InitItem();
 
 	// カメラの初期化
 	InitCamera();
@@ -257,6 +261,9 @@ void UninitGame(void)
 
 	// がれきの終了
 	UninitJunk();
+
+	// アイテムの終了
+	UninitItem();
 
 	// カメラの終了
 	UninitCamera();
@@ -521,6 +528,9 @@ void UpdateGame(void)
 			// がれきの更新
 			UpdateJunk();
 
+			// アイテムの更新
+			UpdateItem();
+
 			// 車の更新処理
 			UpdateCar();
 
@@ -660,6 +670,9 @@ void DrawGame(void)
 
 	// がれきの描画
 	DrawJunk();
+
+	// アイテムの描画
+	DrawItem();
 
 	// 警察の描画
 	DrawPolice();
