@@ -29,11 +29,12 @@
 #define BARRIER_ICON_RADIUS	(140.0f)	// バリアのアイコンの半径
 #define BARRIER_ICON_COL	(D3DXCOLOR(0.4f,1.0f,1.0f,1.0f))		// バリアのアイコンの色
 
-#define GATE_ICON_VERT_RADIUS_X	(400.0f)		// ゲート(正面・後ろ向き)アイコンの半径(X軸)
-#define GATE_ICON_VERT_RADIUS_Z	(150.0f)		// ゲート(正面・後ろ向き)アイコンの半径(Y軸)
-#define GATE_ICON_HORIZ_RADIUS_X	(150.0f)	// ゲート(左右向き)アイコンの半径(X軸)
-#define GATE_ICON_HORIZ_RADIUS_Z	(400.0f)	// ゲート(左右向き)アイコンの半径(Y軸)
+#define GATE_ICON_VERT_RADIUS	(D3DXVECTOR3(400.0f, 0.0f, 150.0f))		// ゲート(正面・後ろ向き)アイコンの半径
+#define GATE_ICON_HORIZ_RADIUS	(D3DXVECTOR3(150.0f, 0.0f, 400.0f))	// ゲート(左右向き)アイコンの半径(X軸)
 #define GATE_ICON_COL		(D3DXCOLOR(1.0f, 0.6f, 1.0f, 1.0f))		// ゲートのアイコンの色
+
+#define ITEM_ICON_RADIUS	(80.0f)	// アイテムのアイコンの半径
+#define ITEM_ICON_COL		(D3DXCOLOR(1.0f, 0.5f, 0.8f, 1.0f))		// アイテムのアイコンの色
 
 #define ICON_CORRECT_RIGHT	(4000.0f)	// アイコンの右側の補正係数
 #define ICON_CORRECT_LEFT	(4000.0f)	// アイコンの左側の補正係数
@@ -540,7 +541,7 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 			case ICONTYPE_GATE_VERT:	// 正面・後ろ向きゲート
 
 				// 半径を設定
-				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_VERT_RADIUS_X, 0.0f, GATE_ICON_VERT_RADIUS_Z);
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_VERT_RADIUS.x, 0.0f, GATE_ICON_VERT_RADIUS.x);
 
 				// 色を設定
 				g_aIcon[nCntIcon].col = GATE_ICON_COL;
@@ -550,10 +551,20 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 			case ICONTYPE_GATE_HORIZ:	// 左右向きゲート
 
 				// 半径を設定
-				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_HORIZ_RADIUS_X, 0.0f, GATE_ICON_HORIZ_RADIUS_Z);
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_HORIZ_RADIUS.x, 0.0f, GATE_ICON_HORIZ_RADIUS.x);
 
 				// 色を設定
 				g_aIcon[nCntIcon].col = GATE_ICON_COL;
+
+				break;				// 抜け出す
+
+			case ICONTYPE_ITEM:		// アイテム
+
+				// 半径を設定
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(ITEM_ICON_RADIUS, 0.0f, ITEM_ICON_RADIUS);
+
+				// 色を設定
+				g_aIcon[nCntIcon].col = ITEM_ICON_COL;
 
 				break;				// 抜け出す
 			}

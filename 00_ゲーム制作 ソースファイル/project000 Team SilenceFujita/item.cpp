@@ -65,6 +65,7 @@ void InitItem(void)
 	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
 	{ // アイテムの最大表示数分繰り返す
 
+		// 情報の初期化
 		g_aItem[nCntItem].pos            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_aItem[nCntItem].move			 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aItem[nCntItem].rot            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
@@ -78,6 +79,10 @@ void InitItem(void)
 		g_aItem[nCntItem].stateInfo.fPosDest = 0.0f;						// 目標の位置
 		g_aItem[nCntItem].stateInfo.state	 = ITEMSTATE_UP;				// 状態
 		g_aItem[nCntItem].stateInfo.nCounter = 0;							// カウンター
+
+		// アイコン関係の初期化
+		g_aItem[nCntItem].icon.nIconID = NONE_ICON;							// アイコンのインデックス
+		g_aItem[nCntItem].icon.state   = ICONSTATE_NONE;					// 状態
 
 		// モデル情報の初期化
 		g_aItem[nCntItem].modelData.dwNumMat = 0;							// マテリアルの数
@@ -236,6 +241,17 @@ void SetItem(D3DXVECTOR3 pos, int nType)
 			g_aItem[nCntItem].stateInfo.fPosDest = ITEM_POS_DEST_UP;		// 目標の位置
 			g_aItem[nCntItem].stateInfo.state	 = ITEMSTATE_UP;			// 状態
 			g_aItem[nCntItem].stateInfo.nCounter = 0;						// カウンター
+
+			// アイコンの情報を設定
+			g_aItem[nCntItem].icon.state = ICONSTATE_NONE;					// 状態
+			g_aItem[nCntItem].icon.nIconID = SetIcon						// アイコンのインデックス
+			(
+				g_aItem[nCntItem].pos,							// 位置
+				ICONTYPE_ITEM,									// 種類
+				&g_aItem[nCntItem].icon.nIconID,				// アイコンのインデックス
+				&g_aItem[nCntItem].bUse, 						// 使用状況
+				&g_aItem[nCntItem].icon.state					// 状態
+			);							
 
 			// 処理を抜ける
 			break;
@@ -571,6 +587,16 @@ void GameItem(void)
 				D3DXVECTOR3(g_aItem[nCntItem].pos.x, 0.0f, g_aItem[nCntItem].pos.z),				// 位置
 				g_aItem[nCntItem].rot,				// 向き
 				ITEM_SCALE							// 拡大率
+			);
+
+			//------------------------------------------------------------------------------------------------------
+			//	アイコンの更新
+			//------------------------------------------------------------------------------------------------------
+			// アイコンの位置設定
+			SetPositionIcon
+			(
+				g_aItem[nCntItem].icon.nIconID,
+				g_aItem[nCntItem].pos
 			);
 		}
 	}

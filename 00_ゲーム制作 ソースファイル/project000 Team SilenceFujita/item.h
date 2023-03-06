@@ -9,6 +9,7 @@
 
 #include "main.h"
 #include "model.h"
+#include "icon.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -55,6 +56,7 @@ typedef struct
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	Model		modelData;			// モデル情報
 	ItemState	stateInfo;			// 状態関係の情報
+	IconInfo	icon;				// アイコンの情報
 	int         nType;				// 種類
 	int         nCounterEffect;		// エフェクト管理カウンター
 	int         nShadowID;			// 影のインデックス
