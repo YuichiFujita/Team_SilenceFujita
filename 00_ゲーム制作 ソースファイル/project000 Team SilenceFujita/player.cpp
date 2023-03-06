@@ -38,8 +38,7 @@
 #define MOVE_FORWARD	(0.18f)		// プレイヤー前進時の移動量
 #define MOVE_BACKWARD	(0.3f)		// プレイヤー後退時の移動量
 #define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
-#define REV_MOVE_ROT	(0.085f)	// 移動量による向き変更量の補正係数
-#define SUB_MOVE_VALUE	(10.0f)		// 向き変更時の減速が行われる移動量
+#define REV_MOVE_ROT	(0.08f)		// 移動量による向き変更量の補正係数
 #define REV_MOVE_BRAKE	(0.1f)		// ブレーキ時の減速係数
 #define DEL_MOVE_ABS	(1.9f)		// 移動量の削除範囲の絶対値
 #define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
@@ -63,6 +62,7 @@
 #define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
 #define BOOST_Y_ADD		(40.0f)		// ブースト噴射位置の y加算量
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
+#define BOOST_MIN_MOVE	(1.5f)		// ブースト時に必要な最低速度
 
 //------------------------------------------------------------
 //	吹飛散風 (フライ・アウェイ) マクロ定義
@@ -1301,7 +1301,7 @@ void RevPlayer(void)
 		g_player.pos.z = GetLimitStage().fNear - (PLAY_DEPTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 	if (g_player.pos.z < GetLimitStage().fFar + (PLAY_DEPTH * 2))
 	{ // 範囲外の場合 (奥)
@@ -1310,7 +1310,7 @@ void RevPlayer(void)
 		g_player.pos.z = GetLimitStage().fFar + (PLAY_DEPTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 	if (g_player.pos.x > GetLimitStage().fRight - (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (右)
@@ -1319,7 +1319,7 @@ void RevPlayer(void)
 		g_player.pos.x = GetLimitStage().fRight - (PLAY_WIDTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 	if (g_player.pos.x < GetLimitStage().fLeft + (PLAY_WIDTH * 2))
 	{ // 範囲外の場合 (左)
@@ -1328,7 +1328,7 @@ void RevPlayer(void)
 		g_player.pos.x = GetLimitStage().fLeft + (PLAY_WIDTH * 2);
 
 		// 移動量を削除
-		g_player.move.x *= 0.99f;
+		CollisionSlow(&g_player.move.x);
 	}
 }
 
@@ -1672,7 +1672,7 @@ void UpdateSlumBoost(void)
 void SetSlumBoost(void)
 {
 	if (g_player.boost.state == BOOSTSTATE_NONE
-	&&  g_player.move.x > 0.0f)
+	&&  g_player.move.x > BOOST_MIN_MOVE)
 	{ // ブーストを行える状態の場合
 
 		// 加速状態にする

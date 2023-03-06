@@ -284,7 +284,7 @@ void CollisionPlayer(Item *pItem)
 			{ // 上記以外
 
 				// ボーナスの設定処理
-				SetBonus(ADDSCORE_ITEM);
+				SetBonus(SCORE_ITEM);
 			}
 
 			// 使用していない状態にする

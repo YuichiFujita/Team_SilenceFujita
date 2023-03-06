@@ -391,7 +391,7 @@ void CollisionWind(Human *pHuman)
 				FlyAwayHuman(pHuman, *pPlayer);
 
 				// ボーナスの設定処理
-				SetBonus(ADDSCORE_HUMAN);
+				SetBonus(SCORE_HUMAN);
 
 				// カメラの状態を変える
 				*GetCameraState() = CAMERASTATE_GOODJOB;
