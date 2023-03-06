@@ -449,6 +449,10 @@ void DrawObject(void)
 
 						if (g_aObject[nCntObject].judge.state == JUDGESTATE_JUSTICE)
 						{ // 良い奴の場合
+
+							// 透明度を設定する
+							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse.a = 1.0f;
+
 							// マテリアルの設定
 							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 						}
