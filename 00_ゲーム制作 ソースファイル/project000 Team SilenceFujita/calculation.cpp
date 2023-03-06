@@ -134,6 +134,67 @@ void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3
 }
 
 //==================================================================================
+//	扇形の当たり判定
+//==================================================================================
+//	視界内の判定などに使用
+//==================================================================================
+bool CollisionSector(D3DXVECTOR3 centerPos, D3DXVECTOR3 targetPos, float fCenterRot, float fRadius, float fAngle)
+{
+	// 変数を宣言
+	float       fLength;		// 中心位置と目標位置の距離
+	float       fHalfAngle;		// 引数の角度の半分の値の代入用
+	bool        bHit = false;	// 当たり判定の結果
+	D3DXVECTOR3 vecToPos;		// 左端と位置のベクトル
+
+	// 変数配列を宣言
+	float       fRotEdge[2];	// 扇形の縁の角度   [※] 0：左 1：右
+	D3DXVECTOR3 vecEdge[2];		// 扇形の縁ベクトル [※] 0：左 1：右
+
+	// 中心位置と目標位置の距離求める
+	fLength = (centerPos.x - targetPos.x) * (centerPos.x - targetPos.x)
+			+ (centerPos.z - targetPos.z) * (centerPos.z - targetPos.z);
+
+	if (fLength < fRadius * fRadius)
+	{ // 円の範囲内の場合
+
+		// 引数の角度の半分の値を求める
+		fHalfAngle = fAngle * 0.5f;
+
+		// 扇形の左縁の角度を求める
+		fRotEdge[0] = fCenterRot + fHalfAngle;	// 角度を左に傾ける
+		RotNormalize(&fRotEdge[0]);				// 向きを正規化
+
+		// 扇形の右縁の角度を求める
+		fRotEdge[1] = fCenterRot - fHalfAngle;	// 角度を右に傾ける
+		RotNormalize(&fRotEdge[1]);				// 向きを正規化
+
+		// 扇形の左縁のベクトルを求める
+		vecEdge[0].x = sinf(fRotEdge[0]) * 1.0f - centerPos.x;
+		vecEdge[0].y = 0.0f;
+		vecEdge[0].z = cosf(fRotEdge[0]) * 1.0f - centerPos.z;
+
+		// 扇形の右縁のベクトルを求める
+		vecEdge[1].x = sinf(fRotEdge[1]) * 1.0f - centerPos.x;
+		vecEdge[1].y = 0.0f;
+		vecEdge[1].z = cosf(fRotEdge[1]) * 1.0f - centerPos.z;
+
+		// 左端と位置のベクトルを求める
+		vecToPos = targetPos - centerPos;
+
+		if ((vecEdge[0].z * vecToPos.x) - (vecEdge[0].x * vecToPos.z) < 0
+		&&  (vecEdge[1].z * vecToPos.x) - (vecEdge[1].x * vecToPos.z) > 0)
+		{ // 扇形の両縁の範囲内の場合
+
+			// 当たっている状態にする
+			bHit = true;
+		}
+	}
+
+	// 当たり判定の結果を返す
+	return bHit;
+}
+
+//==================================================================================
 //	モデルの着地の更新処理
 //==================================================================================
 //	地面の上に立つかメッシュフィールドの上にいるかの判定に使用
