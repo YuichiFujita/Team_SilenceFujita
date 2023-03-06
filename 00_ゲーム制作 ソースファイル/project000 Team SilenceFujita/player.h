@@ -42,6 +42,7 @@ typedef enum
 	ATTACKSTATE_NONE = 0,			// 何もしない状態
 	ATTACKSTATE_BOMB,				// ボム攻撃状態
 	ATTACKSTATE_WAIT,				// 攻撃待機状態
+	ATTACKSTATE_HEAL,				// ゲージ回復状態
 	ATTACKSTATE_MAX					// この列挙型の総数
 }ATTACKSTATE;
 
@@ -97,6 +98,7 @@ typedef struct
 	ATTACKSTATE state;				// 攻撃状態
 	int         nCounterState;		// 攻撃管理カウンター
 	int         nCounterControl;	// 操作管理カウンター
+	int			nHeal;				// ゲージの回復量
 	bool        bShot;				// 発射待機状況
 }PlayerBomb;
 

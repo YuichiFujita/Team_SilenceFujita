@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 
+#include "bonus.h"
 #include "item.h"
 #include "calculation.h"
 #include "particle.h"
@@ -21,13 +22,18 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define ITEM_SCALE			(D3DXVECTOR3(0.5f, 0.5f, 0.5f))		// アイテムの拡大率
-#define ITEM_HEAL			(1000)		// アイテムの回復量
-#define EFFECT_TIME_ITEM	(160)		// パーティクルを出す間隔
-#define MOVE_ROT_ITEM		(0.03f)		// アイテムの回転量
+#define ITEM_SCALE				(D3DXVECTOR3(0.5f, 0.5f, 0.5f))		// アイテムの拡大率
+#define ITEM_HEAL				(5)		// アイテムの回復量
+#define EFFECT_TIME_ITEM		(160)	// パーティクルを出す間隔
+#define MOVE_ROT_ITEM			(0.03f)	// アイテムの回転量
+#define ITEM_LOST_COUNT			(600)	// アイテムが消えるカウント数
 
-#define ITEM_POS_DEST_UP	(100.0f)	// アイテムの目標の位置(上昇状態)
-#define ITEM_POS_DEST_DOWN	(50.0f)		// アイテムの目標の位置(下降状態)
+#define ITEM_POS_DEST_UP		(100.0f)	// アイテムの目標の位置(上昇状態)
+#define ITEM_POS_DEST_DOWN		(50.0f)		// アイテムの目標の位置(下降状態)
+
+#define ITEM_LOST_EFFECT_COL	(D3DXCOLOR(0.1f,0.1f,1.0f,1.0f))	// アイテム消失のエフェクトの色
+#define ITEM_GET_EFFECT_COL		(D3DXCOLOR(0.1f,0.1f,1.0f,1.0f))	// アイテム取得のエフェクトの色
+#define ITEM_MARK_EFFECT_COL	(D3DXCOLOR(0.1f,0.9f,1.0f,1.0f))	// アイテムの目印のエフェクトの色
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -65,6 +71,7 @@ void InitItem(void)
 		g_aItem[nCntItem].nType          = 0;								// 種類
 		g_aItem[nCntItem].nCounterEffect = 0;								// エフェクト管理カウンター
 		g_aItem[nCntItem].nShadowID      = NONE_SHADOW;						// 影のインデックス
+		g_aItem[nCntItem].nLostCounter	 = 0;								// 消失カウンター
 		g_aItem[nCntItem].bUse           = false;							// 使用状況
 
 		// 状態関係の初期化
@@ -199,6 +206,7 @@ void SetItem(D3DXVECTOR3 pos, int nType)
 			g_aItem[nCntItem].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 			g_aItem[nCntItem].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aItem[nCntItem].nCounterEffect = 0;					// エフェクト管理カウンター
+			g_aItem[nCntItem].nLostCounter = 0;						// 消失カウンター
 
 			// 使用している状態にする
 			g_aItem[nCntItem].bUse = true;
@@ -260,14 +268,24 @@ void CollisionPlayer(Item *pItem)
 			SetParticle
 			( // 引数
 				pItem->pos,							// 位置
-				D3DXCOLOR(0.6f, 0.2f, 0.55f, 1.0f),	// 色
+				ITEM_GET_EFFECT_COL,				// 色
 				PARTICLETYPE_EXPLOSION,				// 種類
 				SPAWN_PARTICLE_EXPLOSION,			// エフェクト数
 				1									// 寿命
 			);
 
-			// バリアの回復判定
-			HealBarrier(pPlayer, ITEM_HEAL);	
+			if (pPlayer->bomb.state == ATTACKSTATE_WAIT || pPlayer->bomb.state == ATTACKSTATE_HEAL)
+			{ // 待機状態の場合
+
+				// バリアの回復判定
+				HealBarrier(pPlayer, ITEM_HEAL);
+			}
+			else
+			{ // 上記以外
+
+				// ボーナスの設定処理
+				SetBonus(ADDSCORE_ITEM);
+			}
 
 			// 使用していない状態にする
 			pItem->bUse = false;
@@ -286,10 +304,10 @@ void TutorialItem(void)
 		if (g_aItem[nCntItem].bUse == true)
 		{ // アイテムが使用されている場合
 
-			//--------------------------------------------------------------------------------------------------------------
-			//	向きの更新
-			//--------------------------------------------------------------------------------------------------------------
-			// 向きの更新
+		  //--------------------------------------------------------------------------------------------------------------
+		  //	向きの更新
+		  //--------------------------------------------------------------------------------------------------------------
+		  // 向きの更新
 			g_aItem[nCntItem].rot.y += MOVE_ROT_ITEM;
 
 			// 向きの正規化
@@ -299,7 +317,7 @@ void TutorialItem(void)
 			{
 			case ITEMSTATE_UP:		// 上昇状態
 
-				// 移動量を設定する
+									// 移動量を設定する
 				g_aItem[nCntItem].move.y = 1.0f;
 
 				// 移動量を加算する
@@ -308,7 +326,7 @@ void TutorialItem(void)
 				if (g_aItem[nCntItem].pos.y >= g_aItem[nCntItem].stateInfo.fPosDest)
 				{ // 位置が目標に一定量近づいた場合
 
-					// 位置を補正する
+				  // 位置を補正する
 					g_aItem[nCntItem].pos.y = g_aItem[nCntItem].stateInfo.fPosDest;
 
 					// 目標の位置を設定する
@@ -322,7 +340,7 @@ void TutorialItem(void)
 
 			case ITEMSTATE_DOWN:	// 下降状態
 
-				// 移動量を設定する
+									// 移動量を設定する
 				g_aItem[nCntItem].move.y = -1.0f;
 
 				// 移動量を加算する
@@ -331,7 +349,7 @@ void TutorialItem(void)
 				if (g_aItem[nCntItem].pos.y <= g_aItem[nCntItem].stateInfo.fPosDest)
 				{ // 位置が目標に一定量近づいた場合
 
-					// 位置を補正する
+				  // 位置を補正する
 					g_aItem[nCntItem].pos.y = g_aItem[nCntItem].stateInfo.fPosDest;
 
 					// 目標の位置を設定する
@@ -350,35 +368,54 @@ void TutorialItem(void)
 			if (g_aItem[nCntItem].nCounterEffect < EFFECT_TIME_ITEM)
 			{ // カウンターが一定値より小さい場合
 
-				// カウンターを加算
+			  // カウンターを加算
 				g_aItem[nCntItem].nCounterEffect++;
 			}
 			else
 			{ // カウンターが一定値以上の場合
 
-				// カウンターを初期化
+			  // カウンターを初期化
 				g_aItem[nCntItem].nCounterEffect = 0;
 
 				// パーティクルの設定
 				SetParticle
 				( // 引数
 					g_aItem[nCntItem].pos,				// 位置
-					D3DXCOLOR(1.0f, 0.2f, 0.6f, 1.0f),	// 色
+					ITEM_MARK_EFFECT_COL,				// 色
 					PARTICLETYPE_DAMAGE,				// 種類
 					SPAWN_PARTICLE_DAMAGE,				// エフェクト数
 					1									// 寿命
 				);
 			}
 
-			////------------------------------------------------------------------------------------------------------
-			////	当たり判定
-			////------------------------------------------------------------------------------------------------------
-			//if (GetLessonState() >= LESSON_05)
-			//{ // レッスン5に挑戦中、またはクリアしている場合
+			// 消失カウントを加算する
+			g_aItem[nCntItem].nLostCounter++;
 
-			//	// アイテムとプレイヤーの当たり判定
-			//	CollisionPlayer(&g_aItem[nCntItem]);
-			//}
+			if (g_aItem[nCntItem].nLostCounter % ITEM_LOST_COUNT == 0)
+			{ // 消失カウントが一定数になった場合
+
+				// パーティクルの設定処理
+				SetParticle
+				(
+					g_aItem[nCntItem].pos,
+					ITEM_LOST_EFFECT_COL,
+					PARTICLETYPE_ITEM_LOST,
+					SPAWN_PARTICLE_ITEM_LOST,
+					3
+				);
+
+				// 消失カウントを初期化する
+				g_aItem[nCntItem].nLostCounter = 0;
+
+				// 使用しない
+				g_aItem[nCntItem].bUse = false;
+			}
+
+			//------------------------------------------------------------------------------------------------------
+			//	当たり判定
+			//------------------------------------------------------------------------------------------------------
+			// アイテムとプレイヤーの当たり判定
+			CollisionPlayer(&g_aItem[nCntItem]);
 
 			//------------------------------------------------------------------------------------------------------
 			//	影の更新
@@ -402,8 +439,6 @@ void GameItem(void)
 {
 	if (GetKeyboardTrigger(DIK_0) == true)
 	{ // 0キーを押した場合
-
-		// アイテムの設定処理
 		SetItem(D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_HEAL_BARRIER);
 	}
 
@@ -490,11 +525,34 @@ void GameItem(void)
 				SetParticle
 				( // 引数
 					g_aItem[nCntItem].pos,				// 位置
-					D3DXCOLOR(1.0f, 0.2f, 0.6f, 1.0f),	// 色
+					ITEM_MARK_EFFECT_COL,				// 色
 					PARTICLETYPE_DAMAGE,				// 種類
 					SPAWN_PARTICLE_DAMAGE,				// エフェクト数
 					1									// 寿命
 				);
+			}
+
+			// 消失カウントを加算する
+			g_aItem[nCntItem].nLostCounter++;
+
+			if (g_aItem[nCntItem].nLostCounter % ITEM_LOST_COUNT == 0)
+			{ // 消失カウントが一定数になった場合
+
+				// パーティクルの設定処理
+				SetParticle
+				(
+					g_aItem[nCntItem].pos,
+					ITEM_LOST_EFFECT_COL,
+					PARTICLETYPE_ITEM_LOST,
+					SPAWN_PARTICLE_ITEM_LOST,
+					3
+				);
+
+				// 消失カウントを初期化する
+				g_aItem[nCntItem].nLostCounter = 0;
+
+				// 使用しない
+				g_aItem[nCntItem].bUse = false;
 			}
 
 			//------------------------------------------------------------------------------------------------------
