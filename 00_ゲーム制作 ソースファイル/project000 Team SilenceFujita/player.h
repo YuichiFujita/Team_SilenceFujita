@@ -40,7 +40,6 @@
 typedef enum
 {
 	ATTACKSTATE_NONE = 0,			// 何もしない状態
-	ATTACKSTATE_BOMB,				// ボム攻撃状態
 	ATTACKSTATE_WAIT,				// 攻撃待機状態
 	ATTACKSTATE_HEAL,				// ゲージ回復状態
 	ATTACKSTATE_MAX					// この列挙型の総数

@@ -48,14 +48,27 @@
 #define POS_Y_CHANGE	(1.0f)		// 位置の変更量
 #define MOVEPOS_ADD		(0.2f)		// 上昇・下降時の加算量
 #define DOWN_RADIUS		(240.0f)	// 下降時の下の車の確認半径
-#define CARPOS_MUL		(0.9f)		// 車の位置の乗算量
 #define SET_CNT			(1)			// 完成時のカウント (スコアが加算し終わったら減算)
 #define ENLARGE_SCALE	(9.0f)		// 拡大率の補正値
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
 
 #define BOMB_BONUS_CNT	(180)		// ボム状態の時ボーナスが入るカウント数
-#define BOMB_BONUS_END	(5)			// ボム状態のボーナス取得の総数
+#define BOMB_BONUS_END	(8)			// ボム状態のボーナス取得の総数
+
+#define POLICE_POS_MUL	(0.9f)		// 警察の位置の乗算量
+
+//**********************************************************************************************************************
+//	コンスト定義
+//**********************************************************************************************************************
+const float aCarPosMul[] =	// 車ごとの位置の乗算量
+{
+	0.9f ,	// 自動車の位置の乗算量
+	0.75f,	// 消防車の位置の乗算量
+	0.75f,	// 石焼き芋屋の位置の乗算量
+	0.65f,	// 選挙カーの位置の乗算量
+	0.75f,	// 暴走車の位置の乗算量
+};
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -563,6 +576,9 @@ void SetBomb(D3DXVECTOR3 pos, BOMBTYPE type, void *pCarAddress)
 //======================================================================================================================
 void UpdateBarrierData(void)
 {
+	// 変数を宣言
+	float fCarPosMul;	// 車ごとの位置の乗算量
+
 	// ポインタを宣言
 	Car    *pCar;		// 車の情報
 	Police *pPolice;	// 警察の情報
@@ -572,6 +588,28 @@ void UpdateBarrierData(void)
 
 		if (g_aBarrier[nCntBarrier].bUse == true)
 		{ // バリアが使用されている場合
+
+			switch (g_aBarrier[nCntBarrier].type)
+			{ // 種類ごとの処理
+			case BOMBTYPE_CAR:		// 車
+
+				// バリア内の車のアドレスを代入
+				pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
+
+				// 車ごとの位置の乗算量を設定
+				fCarPosMul = aCarPosMul[pCar->type];
+
+				// 処理を抜ける
+				break;
+
+			case BOMBTYPE_POLICE:	// 警察
+
+				// 警察の位置の乗算量を設定
+				fCarPosMul = POLICE_POS_MUL;
+
+				// 処理を抜ける
+				break;
+			}
 
 			switch (g_aBarrier[nCntBarrier].state)
 			{ // 状態ごとの処理
@@ -690,14 +728,14 @@ void UpdateBarrierData(void)
 
 					// 位置を上昇
 					g_aBarrier[nCntBarrier].pos.y      +=  g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
-					g_aBarrier[nCntBarrier].pCarPos->y += (g_aBarrier[nCntBarrier].move.y * CARPOS_MUL) + POS_Y_CHANGE;	// 車の位置
+					g_aBarrier[nCntBarrier].pCarPos->y += (g_aBarrier[nCntBarrier].move.y * fCarPosMul) + POS_Y_CHANGE;	// 車の位置
 				}
 				else
 				{ // バリアの位置が一定座標以上の場合
 
 					// 位置を補正
 					g_aBarrier[nCntBarrier].pos.y      = REV_UP_POS;				// バリアの位置
-					g_aBarrier[nCntBarrier].pCarPos->y = REV_UP_POS * CARPOS_MUL;	// 車の位置
+					g_aBarrier[nCntBarrier].pCarPos->y = REV_UP_POS * fCarPosMul;	// 車の位置
 
 					// 移動量を初期化
 					g_aBarrier[nCntBarrier].move = D3DXVECTOR3(0.0f, 0.0f, 0.0);
@@ -742,7 +780,7 @@ void UpdateBarrierData(void)
 
 					// 位置を下降
 					g_aBarrier[nCntBarrier].pos.y      -=  g_aBarrier[nCntBarrier].move.y + POS_Y_CHANGE;				// バリアの位置
-					g_aBarrier[nCntBarrier].pCarPos->y -= (g_aBarrier[nCntBarrier].move.y * CARPOS_MUL) + POS_Y_CHANGE;	// 車の位置
+					g_aBarrier[nCntBarrier].pCarPos->y -= (g_aBarrier[nCntBarrier].move.y * fCarPosMul) + POS_Y_CHANGE;	// 車の位置
 				}
 				else
 				{ // バリアの位置が一定座標以下の場合

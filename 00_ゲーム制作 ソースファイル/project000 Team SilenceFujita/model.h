@@ -158,7 +158,7 @@ typedef enum
 #define FROM_POLI		(int(MODELTYPE_CAR_POLICE))		// 警察のモデル列挙の開始地点
 #define MODEL_POLI_MAX	(1)								// 警察のモデルの総数
 #define FROM_CAR		(int(MODELTYPE_CAR_CAR001))		// 車のモデル列挙の開始地点
-#define MODEL_CAR_MAX	(4)								// 車のモデルの総数
+#define MODEL_CAR_MAX	(5)								// 車のモデルの総数
 #define FROM_HUMAN		(int(MODELTYPE_HUMAN_BODY))		// 人間のモデル列挙の開始地点
 #define MODEL_HUMAN_MAX	(14)							// 人間のモデルの総数
 #define FROM_GATE		(int(MODELTYPE_OBJECT_GATE000))	// ゲートのモデル列挙の開始地点
