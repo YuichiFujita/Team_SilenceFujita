@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 
+#include "bonus.h"
 #include "item.h"
 #include "calculation.h"
 #include "particle.h"
@@ -273,8 +274,18 @@ void CollisionPlayer(Item *pItem)
 				1									// 寿命
 			);
 
-			// バリアの回復判定
-			HealBarrier(pPlayer, ITEM_HEAL);	
+			if (pPlayer->bomb.state == ATTACKSTATE_WAIT || pPlayer->bomb.state == ATTACKSTATE_HEAL)
+			{ // 待機状態の場合
+
+				// バリアの回復判定
+				HealBarrier(pPlayer, ITEM_HEAL);
+			}
+			else
+			{ // 上記以外
+
+				// ボーナスの設定処理
+				SetBonus(ADDSCORE_ITEM);
+			}
 
 			// 使用していない状態にする
 			pItem->bUse = false;
@@ -426,6 +437,11 @@ void TutorialItem(void)
 //======================================================================================================================
 void GameItem(void)
 {
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{ // 0キーを押した場合
+		SetItem(D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_HEAL_BARRIER);
+	}
+
 	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
 	{ // アイテムの最大表示数分繰り返す
 
