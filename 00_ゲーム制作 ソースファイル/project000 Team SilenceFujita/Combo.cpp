@@ -341,6 +341,13 @@ void MagnificCombo(int nMagni)
 	if (nMagni <= COMBO_INTERRUPTION)
 	{ // ”{—¦‚ª-1ˆÈ‰º‚¾‚Á‚½ê‡
 
+		if (g_Combo.nMagni <= 0)
+		{ // ”{—¦‚ª0ˆÈ‰º‚¾‚Á‚½ê‡
+
+			// ”{—¦‚ð1‚ÉÝ’è‚·‚é
+			g_Combo.nMagni = 1;
+		}
+
 		// ƒXƒRƒA‚Ì‰ÁŽZˆ—
 		AddScore(g_nComboScore * g_Combo.nMagni);
 
