@@ -284,7 +284,6 @@ void DrawCar(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
-	D3DXMATERIAL      bombMat;					// マテリアルデータ (ボム用)
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -423,11 +422,15 @@ void DrawCar(void)
 				if (g_aCar[nCntCar].bombState == BOMBSTATE_RANGE)
 				{ // 範囲内状態の場合
 
+					// マテリアルのコピーに代入する
+					g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
+
 					// 範囲内時のマテリアルの色を設定
-					bombMat.MatD3D.Diffuse = BOMB_RANGE_COL;
+					g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Diffuse = BOMB_RANGE_DIF;
+					g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Emissive = BOMB_RANGE_EMI;
 
 					// マテリアルの設定
-					pDevice->SetMaterial(&bombMat.MatD3D);
+					pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
 				}
 #endif
 

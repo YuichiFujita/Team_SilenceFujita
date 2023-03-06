@@ -1066,7 +1066,7 @@ void UpdateBarrierInfoData(void)
 					}
 
 					// ボーナスの設定処理
-					SetBonus(ADDSCORE_CAR);
+					SetBonus(SCORE_CAR * nNumEvil);
 
 					// カウンターを初期化
 					g_aBarrierInfo[nCntBarInfo].nCounterScore = 0;
