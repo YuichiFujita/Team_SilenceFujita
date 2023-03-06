@@ -27,13 +27,14 @@ typedef enum
 }ADDSCORETYPE;
 
 //**********************************************************************************************************************
-//	ボーナステクスチャ(BONUSTEX)
+// 右に出すか左に出すか(WHEREBONUS)
 //**********************************************************************************************************************
 typedef enum
 {
-	BONUSTEX_PLUS = 0,		// プラスのテクスチャ
-	BONUSTEX_MAX			// この列挙型の総数
-}BONUSTEX;
+	WHEREBONUS_RIGHT = 0,		// 右に出す
+	WHEREBONUS_LEFT,			// 左に出す
+	WHEREBONUS_MAX				// この列挙型の総数
+}WHEREBONUS;
 
 //**********************************************************************************************************************
 //	ボーナスの状態(BONUSSTATE)
@@ -55,6 +56,7 @@ typedef struct
 	D3DXVECTOR3 move;			// 移動量
 	BONUSSTATE  state;			// 状態
 	D3DXCOLOR	col;			// 色
+	WHEREBONUS  whereBonus;		// ボーナスの左右
 	int			nScore;			// スコアの値
 	int			nStateCounter;	// 状態カウンター
 	int			nDigit;			// 桁数
