@@ -147,8 +147,9 @@ bool CollisionSector(D3DXVECTOR3 centerPos, D3DXVECTOR3 targetPos, float fCenter
 	D3DXVECTOR3 vecToPos;		// 左端と位置のベクトル
 
 	// 変数配列を宣言
-	float       fRotEdge[2];	// 扇形の縁の角度   [※] 0：左 1：右
-	D3DXVECTOR3 vecEdge[2];		// 扇形の縁ベクトル [※] 0：左 1：右
+	float       fRotEdge[2];	// 扇形の縁の角度     [※] 0：左 1：右
+	D3DXVECTOR3 posEdge[2];		// 扇形の縁の先端位置 [※] 0：左 1：右
+	D3DXVECTOR3 vecEdge[2];		// 扇形の縁ベクトル   [※] 0：左 1：右
 
 	// 中心位置と目標位置の距離求める
 	fLength = (centerPos.x - targetPos.x) * (centerPos.x - targetPos.x)
@@ -168,15 +169,23 @@ bool CollisionSector(D3DXVECTOR3 centerPos, D3DXVECTOR3 targetPos, float fCenter
 		fRotEdge[1] = fCenterRot - fHalfAngle;	// 角度を右に傾ける
 		RotNormalize(&fRotEdge[1]);				// 向きを正規化
 
+		// 扇形の左縁の先端位置を求める
+		posEdge[0].x = centerPos.x + sinf(fRotEdge[0]) * 1.0f;
+		posEdge[0].y = 0.0f;
+		posEdge[0].z = centerPos.z + cosf(fRotEdge[0]) * 1.0f;
+
+		// 扇形の右縁の先端位置を求める
+		posEdge[1].x = centerPos.x + sinf(fRotEdge[1]) * 1.0f;
+		posEdge[1].y = 0.0f;
+		posEdge[1].z = centerPos.z + cosf(fRotEdge[1]) * 1.0f;
+
 		// 扇形の左縁のベクトルを求める
-		vecEdge[0].x = sinf(fRotEdge[0]) * 1.0f - centerPos.x;
+		vecEdge[0] = posEdge[0] - centerPos;
 		vecEdge[0].y = 0.0f;
-		vecEdge[0].z = cosf(fRotEdge[0]) * 1.0f - centerPos.z;
 
 		// 扇形の右縁のベクトルを求める
-		vecEdge[1].x = sinf(fRotEdge[1]) * 1.0f - centerPos.x;
+		vecEdge[1] = posEdge[1] - centerPos;
 		vecEdge[1].y = 0.0f;
-		vecEdge[1].z = cosf(fRotEdge[1]) * 1.0f - centerPos.z;
 
 		// 左端と位置のベクトルを求める
 		vecToPos = targetPos - centerPos;

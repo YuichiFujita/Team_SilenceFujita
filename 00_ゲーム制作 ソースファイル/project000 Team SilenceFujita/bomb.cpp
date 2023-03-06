@@ -12,15 +12,22 @@
 #include "sound.h"
 
 #include "bomb.h"
+#include "bonus.h"
 #include "calculation.h"
 #include "player.h"
 #include "car.h"
 #include "police.h"
 
+#include "particle.h"
+
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
 #define MAX_BOMB		(128)		// 爆弾の範囲内表示の最大数
+#define MAX_BARINFO		(16)		// バリアのまとまりの最大数
+
+#define BOMB_VIEW_FAR	(4000.0f)			// ボム発射の視野の距離
+#define BOMB_VIEW_ANGLE	(D3DXToRadian(90))	// ボム発射の視野角
 
 #define BOMB_PULS		(1200.0f)	// プレイヤー位置からボム検知の中心位置へのずれ
 #define BOMB_RADIUS		(1000.0f)	// ボム検知範囲の半径
@@ -45,10 +52,13 @@
 #define MOVEPOS_ADD		(0.2f)		// 上昇・下降時の加算量
 #define DOWN_RADIUS		(240.0f)	// 下降時の下の車の確認半径
 #define CARPOS_MUL		(0.9f)		// 車の位置の乗算量
-#define SET_CNT			(1800)		// 完成時のカウント
+#define SET_CNT			(1)			// 完成時のカウント (スコアが加算し終わったら減算)
 #define ENLARGE_SCALE	(9.0f)		// 拡大率の補正値
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
+
+#define BOMB_BONUS_CNT	(180)		// ボム状態の時ボーナスが入るカウント数
+#define BOMB_BONUS_END	(5)			// ボム状態のボーナス取得の総数
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -58,56 +68,41 @@ typedef struct
 	D3DXVECTOR3 pos;		// 位置
 	BOMBTYPE    type;		// 種類
 	void       *pCar;		// 車アドレス
-	float       fOrder;		// 判定距離
 	bool        bUse;		// 使用状況
 }Bomb;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void SetBomb(D3DXVECTOR3 pos, BOMBTYPE type, void *pCar);	// ボムの設定
+void UpdateBombData(void);											// 爆弾の情報の更新
+void SetBomb(D3DXVECTOR3 pos, BOMBTYPE type, void *pCarAddress);	// 爆弾の設定
 
-void UpdateBombData(void);		// ボムの情報の更新
-void UpdateBarrierData(void);	// バリアの情報の更新
-
-void ResetBomb(void);		// ボムの再設定
-void CollisionBomb(void);	// ボム検知範囲の当たり判定
-void SortBomb(void);		// ボムの配列のソート
-void ChangeAim(void);		// 狙いの変更
-void CurrentAim(void);		// 選択中の車両判定
-void SetAim(void);			// 狙い状態の設定
-
+void UpdateBarrierData(void);			// バリアの情報の更新
 void HomingBarrier(int nCntBarrier);	// バリアのホーミング
 bool DownBarrier(int nCntBarrier);		// バリアの下降
+
+void UpdateBarrierInfoData(void);		// バリアのまとまりの情報の更新
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-int     g_nCurrentMaxBomb;			// 現在狙い中の車の総数
-int     g_nID;						// 現在狙い中の車のID
-void   *g_pCurrentAim;				// 現在狙い中の車のアドレス
-Bomb    g_aBomb[MAX_BOMB];			// 爆弾の情報
-Barrier g_aBarrier[MAX_BARRIER];	// バリアの情報
+Bomb        g_aBomb[MAX_BOMB];				// 爆弾の情報
+Barrier     g_aBarrier[MAX_BARRIER];		// バリアの情報
+BarrierInfo g_aBarrierInfo[MAX_BARINFO];	// バリアのまとまりの情報
 
 //======================================================================================================================
 //	爆弾の初期化処理
 //======================================================================================================================
 void InitBomb(void)
 {
-	// グローバル変数を初期化
-	g_nCurrentMaxBomb = 0;			// 現在狙い中の車の総数
-	g_nID             = 0;			// 現在狙い中の車のID
-	g_pCurrentAim     = NULL;		// 現在狙い中の車のアドレス
-
 	// 爆弾の情報の初期化
 	for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
 	{ // 爆弾の最大表示数分繰り返す
 
-		g_aBomb[nCntBomb].pos    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aBomb[nCntBomb].type   = BOMBTYPE_CAR;					// 種類
-		g_aBomb[nCntBomb].pCar   = NULL;							// 車アドレス
-		g_aBomb[nCntBomb].fOrder = 0.0f;							// 判定距離
-		g_aBomb[nCntBomb].bUse   = false;							// 使用状況
+		g_aBomb[nCntBomb].pos  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aBomb[nCntBomb].type = BOMBTYPE_CAR;					// 種類
+		g_aBomb[nCntBomb].pCar = NULL;							// 車アドレス
+		g_aBomb[nCntBomb].bUse = false;							// 使用状況
 	}
 
 	// バリアの情報の初期化
@@ -130,6 +125,25 @@ void InitBomb(void)
 		g_aBarrier[nCntBarrier].icon.nIconID = NONE_ICON;		// アイコンのインデックス
 		g_aBarrier[nCntBarrier].icon.state   = ICONSTATE_NONE;	// アイコンの状態
 	}
+
+	// バリアのまとまりの情報の初期化
+	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++)
+	{ // バリアのまとまりの最大表示数分繰り返す
+
+		// 基本情報を初期化
+		g_aBarrierInfo[nCntBarInfo].state         = BARSCOSTATE_NONE;	// 状態
+		g_aBarrierInfo[nCntBarInfo].nNumBarrier   = 0;					// 使ったバリアの総数
+		g_aBarrierInfo[nCntBarInfo].nNumAddScore  = 0;					// スコア加算回数
+		g_aBarrierInfo[nCntBarInfo].nCounterScore = 0;					// スコア加算カウンター
+		g_aBarrierInfo[nCntBarInfo].bUse          = false;				// 使用状況
+
+		for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
+		{ // バリアの最大表示数分繰り返す
+
+			// バリアの情報を初期化
+			g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier] = NULL;
+		}
+	}
 }
 
 //======================================================================================================================
@@ -145,11 +159,14 @@ void UninitBomb(void)
 //======================================================================================================================
 void UpdateBomb(void)
 {
-	// ボムの情報の更新
+	// 爆弾の情報の更新
 	UpdateBombData();
 
 	// バリアの情報の更新
 	UpdateBarrierData();
+
+	// バリアのまとまりの情報の更新
+	UpdateBarrierInfoData();
 }
 
 //======================================================================================================================
@@ -225,16 +242,56 @@ void DrawBomb(void)
 //======================================================================================================================
 void ShotBarrier(void)
 {
+	// 変数を宣言
+	int nInfoID    = NONE_ID;		// バリアのまとまりのインデックス
+	int nBarrierID = 0;				// バリアの情報のインデックス
+
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーの情報
 	Car    *pCar;					// 車の情報
 	Police *pPolice;				// 警察の情報
 
-	if (g_pCurrentAim != NULL)
-	{ // 現在狙っている車のアドレスが NULLではない場合
+	//------------------------------------------------------------------------------------------------------------------
+	//	バリアのまとまりの設定
+	//------------------------------------------------------------------------------------------------------------------
+	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++)
+	{ // バリアのまとまりの最大表示数分繰り返す
 
-		if (g_aBomb[g_nID].bUse == true)
-		{ // 現在狙い中の車が使用されている場合
+		if (g_aBarrierInfo[nCntBarInfo].bUse == false)
+		{ // バリアのまとまりが使用されていない場合
+
+			// 基本情報を初期化
+			g_aBarrierInfo[nCntBarInfo].state         = BARSCOSTATE_NONE;	// 状態
+			g_aBarrierInfo[nCntBarInfo].nNumBarrier   = 0;					// 使ったバリアの総数
+			g_aBarrierInfo[nCntBarInfo].nNumAddScore  = 0;					// スコア加算回数
+			g_aBarrierInfo[nCntBarInfo].nCounterScore = 0;					// スコア加算カウンター
+
+			for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
+			{ // バリアの最大表示数分繰り返す
+
+				// バリアの情報を初期化
+				g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier] = NULL;
+			}
+
+			// 使用している状態にする
+			g_aBarrierInfo[nCntBarInfo].bUse = true;
+
+			// インデックスを設定
+			nInfoID = nCntBarInfo;
+
+			// 処理を抜ける
+			break;
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	バリアの設定
+	//------------------------------------------------------------------------------------------------------------------
+	for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
+	{ // 爆弾の最大表示数分繰り返す
+
+		if (g_aBomb[nCntBomb].bUse == true)
+		{ // 爆弾が使用されている場合
 
 			for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
 			{ // バリアの最大表示数分繰り返す
@@ -253,8 +310,8 @@ void ShotBarrier(void)
 					g_aBarrier[nCntBarrier].move.z = cosf(pPlayer->rot.y) * (SHOT_BAR_POS_XZ + pPlayer->move.x + pPlayer->boost.plusMove.x);	// z
 
 					// ボムの情報を代入
-					g_aBarrier[nCntBarrier].type = g_aBomb[g_nID].type;	// 種類
-					g_aBarrier[nCntBarrier].pCar = g_aBomb[g_nID].pCar;	// 車アドレス
+					g_aBarrier[nCntBarrier].type = g_aBomb[nCntBomb].type;	// 種類
+					g_aBarrier[nCntBarrier].pCar = g_aBomb[nCntBomb].pCar;	// 車アドレス
 
 					// 構造体の情報を初期化
 					g_aBarrier[nCntBarrier].scale    = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
@@ -263,12 +320,12 @@ void ShotBarrier(void)
 					// 発射状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_FLY;
 
-					switch (g_aBomb[g_nID].type)
-					{ // 現在狙い中の車の種類ごとの処理	
+					switch (g_aBarrier[nCntBarrier].type)
+					{ // 種類ごとの処理	
 					case BOMBTYPE_CAR:		// 車
 
 						// 狙っている車のアドレスを代入
-						pCar = (Car*)g_aBomb[g_nID].pCar;
+						pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
 
 						// 車の位置アドレスを設定
 						g_aBarrier[nCntBarrier].pCarPos = &pCar->pos;
@@ -285,7 +342,7 @@ void ShotBarrier(void)
 					case BOMBTYPE_POLICE:	// 警察
 
 						// 狙っている警察のアドレスを代入
-						pPolice = (Police*)g_aBomb[g_nID].pCar;
+						pPolice = (Police*)g_aBarrier[nCntBarrier].pCar;
 
 						// 警察の位置アドレスを設定
 						g_aBarrier[nCntBarrier].pCarPos = &pPolice->pos;
@@ -306,10 +363,23 @@ void ShotBarrier(void)
 					// カウンターを初期化
 					pPlayer->bomb.nCounterState = 0;
 
-					//SEの再生
+					if (nInfoID != NONE_ID)
+					{ // バリアのまとまりのインデックスが正しく設定されている場合
+
+						// バリアの情報を設定
+						g_aBarrierInfo[nInfoID].pBarrier[nBarrierID] = &g_aBarrier[nCntBarrier];
+
+						// バリアのインデックスを加算
+						nBarrierID++;
+
+						// 使ったバリアの総数を加算
+						g_aBarrierInfo[nInfoID].nNumBarrier++;
+					}
+
+					// SEの再生
 					if (GetSoundType(SOUND_TYPE_SE) == true)
 					{
-						//送風機のサウンド（BGM）の再生
+						// 大砲のサウンド（SE）の再生
 						PlaySound(SOUND_LABEL_SE_ABILITY_BOMB_000);
 					}
 
@@ -358,39 +428,136 @@ BARRIERSTATE GetBarrierState(void *pCar)
 }
 
 //======================================================================================================================
-//	ボムの情報の更新
+//	爆弾の情報の更新
 //======================================================================================================================
 void UpdateBombData(void)
 {
-	if (GetPlayer()->bomb.state == ATTACKSTATE_BOMB)
-	{ // プレイヤーの攻撃状態がボムの場合
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+	Car    *pCar    = GetCarData();		// 車の情報
+	Police *pPolice = GetPoliceData();	// 警察の情報
+	
+	// 爆弾の情報を再設定
+	for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
+	{ // 爆弾の最大表示数分繰り返す
 
-		// ボムの再設定
-		ResetBomb();
+		// 爆弾を使用していない状態にする
+		g_aBomb[nCntBomb].bUse = false;
+	}
 
-		// ボム検知範囲の当たり判定
-		CollisionBomb();
+	// 車の検知を確認
+	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
+	{ // 車の最大表示数分繰り返す
 
-		// ボムの配列のソート
-		SortBomb();
+		if (pCar->bUse == true
+		&&  pCar->bombState != BOMBSTATE_BAR_NEAR
+		&&  pCar->bombState != BOMBSTATE_BAR_IN)
+		{ // 車が使用されている且つ、バリア関連の状態ではない場合
 
-		// 狙いの変更
-		ChangeAim();
+			// 爆弾の設定
+			SetBomb(pCar->pos, BOMBTYPE_CAR, pCar);
+		}
+	}
 
-		// 選択中の車両判定
-		CurrentAim();
+	// 警察の検知を確認
+	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++, pPolice++)
+	{ // 警察の最大表示数分繰り返す
 
-		// 狙い状態の設定
-		SetAim();
+		if (pPolice->bUse == true
+		&&  pPolice->bombState != BOMBSTATE_BAR_NEAR
+		&&  pPolice->bombState != BOMBSTATE_BAR_IN)
+		{ // 警察が使用されている且つ、バリア関連の状態ではない場合
+
+			// 爆弾の設定
+			SetBomb(pPolice->pos, BOMBTYPE_POLICE, pPolice);
+		}
+	}
+}
+
+//======================================================================================================================
+//	爆弾の設定
+//======================================================================================================================
+void SetBomb(D3DXVECTOR3 pos, BOMBTYPE type, void *pCarAddress)
+{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+	Car    *pCar    = GetCarData();		// 車の情報
+	Police *pPolice = GetPoliceData();	// 警察の情報
+
+	if (CollisionSector(pPlayer->pos, pos, pPlayer->rot.y, BOMB_VIEW_FAR, BOMB_VIEW_ANGLE) == true)
+	{ // プレイヤーの視界内の場合
+
+		for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
+		{ // 爆弾の最大表示数分繰り返す
+
+			if (g_aBomb[nCntBomb].bUse == false)
+			{ // 爆弾が使用されていない場合
+
+				// 引数を設定
+				g_aBomb[nCntBomb].pos  = pos;			// 位置
+				g_aBomb[nCntBomb].type = type;			// 種類
+				g_aBomb[nCntBomb].pCar = pCarAddress;	// 車アドレス
+
+				// 使用している状態にする
+				g_aBomb[nCntBomb].bUse = true;
+
+				// 処理を抜ける
+				break;
+			}
+		}
+
+		switch (type)
+		{ // 種類ごとの処理	
+		case BOMBTYPE_CAR:		// 車
+
+			// 車のアドレスを代入
+			pCar = (Car*)pCarAddress;
+
+			// 範囲内状態にする
+			pCar->bombState = BOMBSTATE_RANGE;
+
+			// 処理を抜ける
+			break;
+
+		case BOMBTYPE_POLICE:	// 警察
+
+			// 警察のアドレスを代入
+			pPolice = (Police*)pCarAddress;
+
+			// 範囲内状態にする
+			pPolice->bombState = BOMBSTATE_RANGE;
+
+			// 処理を抜ける
+			break;
+		}
 	}
 	else
-	{ // プレイヤーの攻撃状態がそれ以外の場合
+	{ // プレイヤーの視界外の場合
 
-		// 現在狙い中の車のIDを初期化
-		g_nID = 0;
+		switch (type)
+		{ // 種類ごとの処理	
+		case BOMBTYPE_CAR:		// 車
 
-		// 現在狙い中の車を初期化
-		g_pCurrentAim = NULL;
+			// 車のアドレスを代入
+			pCar = (Car*)pCarAddress;
+
+			// 範囲外状態にする
+			pCar->bombState = BOMBSTATE_NONE;
+
+			// 処理を抜ける
+			break;
+
+		case BOMBTYPE_POLICE:	// 警察
+
+			// 警察のアドレスを代入
+			pPolice = (Police*)pCarAddress;
+
+			// 範囲外状態にする
+			pPolice->bombState = BOMBSTATE_NONE;
+
+			// 処理を抜ける
+			break;
+		}
 	}
 }
 
@@ -496,9 +663,6 @@ void UpdateBarrierData(void)
 					g_aBarrier[nCntBarrier].scale.y = ENLARGE_SCALE;
 					g_aBarrier[nCntBarrier].scale.z = ENLARGE_SCALE;
 
-					// カウンターを設定
-					g_aBarrier[nCntBarrier].nCounter = SET_CNT;
-
 					// 上昇状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_UP;
 
@@ -531,6 +695,9 @@ void UpdateBarrierData(void)
 					// 移動量を初期化
 					g_aBarrier[nCntBarrier].move = D3DXVECTOR3(0.0f, 0.0f, 0.0);
 
+					// カウンターを設定
+					g_aBarrier[nCntBarrier].nCounter = SET_CNT;
+
 					// 完成状態にする
 					g_aBarrier[nCntBarrier].state = BARRIERSTATE_SET;
 				}
@@ -540,13 +707,7 @@ void UpdateBarrierData(void)
 
 			case BARRIERSTATE_SET:		// 完成状態
 
-				if (g_aBarrier[nCntBarrier].nCounter > 0)
-				{ // カウンターが 0より大きい場合
-
-					// カウンターを減算
-					g_aBarrier[nCntBarrier].nCounter--;
-				}
-				else
+				if (g_aBarrier[nCntBarrier].nCounter <= 0)
 				{ // カウンターが 0以下の場合
 
 					if (GetMode() != MODE_TUTORIAL)
@@ -676,315 +837,6 @@ void UpdateBarrierData(void)
 }
 
 //======================================================================================================================
-//	ボムの設定
-//======================================================================================================================
-void SetBomb(D3DXVECTOR3 pos, BOMBTYPE type, void *pCar)
-{
-	// 変数を宣言
-	D3DXVECTOR3 playerPos;			// プレイヤーの位置
-	D3DXVECTOR3 frontPos;			// プレイヤーの前方位置
-
-	// ポインタを宣言
-	Player *pPlayer = GetPlayer();	// プレイヤーの情報
-
-	// プレイヤーの位置を代入
-	playerPos = D3DXVECTOR3(pPlayer->pos.x, 0.0f, pPlayer->pos.z);
-
-	// プレイヤーの前方位置を設定
-	frontPos.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * BOMB_FRONT_PLUS;
-	frontPos.y = 0.0f;
-	frontPos.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * BOMB_FRONT_PLUS;
-
-	// プレイヤーの位置、前方位置を横にずらす
-	playerPos.x += sinf(pPlayer->rot.y - (D3DX_PI * 0.5f)) * BOMB_LEFT_PLUS;
-	playerPos.z += cosf(pPlayer->rot.y - (D3DX_PI * 0.5f)) * BOMB_LEFT_PLUS;
-	frontPos.x  += sinf(pPlayer->rot.y - (D3DX_PI * 0.5f)) * BOMB_LEFT_PLUS;
-	frontPos.z  += cosf(pPlayer->rot.y - (D3DX_PI * 0.5f)) * BOMB_LEFT_PLUS;
-
-	for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
-	{ // 爆弾の最大表示数分繰り返す
-
-		if (g_aBomb[nCntBomb].bUse == false)
-		{ // 爆弾が使用されていない場合
-
-			// 引数を設定
-			g_aBomb[nCntBomb].pos  = pos;	// 位置
-			g_aBomb[nCntBomb].type = type;	// 種類
-			g_aBomb[nCntBomb].pCar = pCar;	// 車アドレス
-
-			// 判定距離を求める
-			g_aBomb[nCntBomb].fOrder = LineOuterProduct(frontPos, playerPos, pos);
-
-			// 現在狙っている車の総数を加算
-			g_nCurrentMaxBomb++;
-
-			// 使用している状態にする
-			g_aBomb[nCntBomb].bUse = true;
-
-			// 処理を抜ける
-			break;
-		}
-	}
-}
-
-//======================================================================================================================
-//	ボムの再設定
-//======================================================================================================================
-void ResetBomb(void)
-{
-	// 現在狙っている車の総数を初期化
-	g_nCurrentMaxBomb = 0;
-
-	// ボムの使用状況を初期化
-	for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
-	{ // 爆弾の最大表示数分繰り返す
-
-		// 判定距離を初期化
-		g_aBomb[nCntBomb].fOrder = 0.0f;
-
-		// 使用していない状態にする
-		g_aBomb[nCntBomb].bUse = false;
-	}
-}
-
-//======================================================================================================================
-//	ボム検知範囲の当たり判定
-//======================================================================================================================
-void CollisionBomb(void)
-{
-	// 変数を宣言
-	D3DXVECTOR3 rangePos;	// ボムの検知範囲の中心
-	float       fLength;	// 検知範囲と検知車の距離
-
-	// ポインタを宣言
-	Player *pPlayer = GetPlayer();		// プレイヤーの情報
-	Police *pPolice = GetPoliceData();	// 警察の情報
-	Car    *pCar    = GetCarData();		// 車の情報
-
-	// ボムの検知範囲の中心を設定
-	rangePos.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * BOMB_PULS;
-	rangePos.y = pPlayer->pos.y + 0.0f;
-	rangePos.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * BOMB_PULS;
-
-	// 車の検知を確認
-	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
-	{ // 車の最大表示数分繰り返す
-
-		if (pCar->bUse      == true
-		&&  pCar->bombState != BOMBSTATE_BAR_NEAR
-		&&  pCar->bombState != BOMBSTATE_BAR_IN)
-		{ // 車が使用されている且つ、バリア関連の状態ではない場合
-
-			// 検知範囲と検知車の距離を求める
-			fLength = (rangePos.x - pCar->pos.x) * (rangePos.x - pCar->pos.x)
-					+ (rangePos.z - pCar->pos.z) * (rangePos.z - pCar->pos.z);
-
-			if (fLength < ((BOMB_RADIUS + BOMB_CAR_RADIUS) * (BOMB_RADIUS + BOMB_CAR_RADIUS)))
-			{ // 検知範囲内の場合
-
-				// ボムの状態を範囲内状態にする
-				pCar->bombState = BOMBSTATE_RANGE;
-
-				// ボムの設定
-				SetBomb(pCar->pos, BOMBTYPE_CAR, pCar);
-			}
-			else
-			{ // 検知範囲外の場合
-
-				// ボムの状態を何もしない状態にする
-				pCar->bombState = BOMBSTATE_NONE;
-			}
-		}
-	}
-
-	// 警察の検知を確認
-	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++, pPolice++)
-	{ // 警察の最大表示数分繰り返す
-
-		if (pPolice->bUse      == true
-		&&  pPolice->bombState != BOMBSTATE_BAR_NEAR
-		&&  pPolice->bombState != BOMBSTATE_BAR_IN)
-		{ // 警察が使用されている且つ、バリア関連の状態ではない場合
-
-			// 検知範囲と検知車の距離を求める
-			fLength = (rangePos.x - pPolice->pos.x) * (rangePos.x - pPolice->pos.x)
-					+ (rangePos.z - pPolice->pos.z) * (rangePos.z - pPolice->pos.z);
-
-			if (fLength < ((BOMB_RADIUS + BOMB_CAR_RADIUS) * (BOMB_RADIUS + BOMB_CAR_RADIUS)))
-			{ // 検知範囲内の場合
-
-				// ボムの状態を範囲内状態にする
-				pPolice->bombState = BOMBSTATE_RANGE;
-
-				// ボムの設定
-				SetBomb(pPolice->pos, BOMBTYPE_POLICE, pPolice);
-			}
-			else
-			{ // 検知範囲外の場合
-
-				// ボムの状態を何もしない状態にする
-				pPolice->bombState = BOMBSTATE_NONE;
-			}
-		}
-	}
-}
-
-//======================================================================================================================
-//	ボムの配列のソート
-//======================================================================================================================
-void SortBomb(void)
-{
-	// 変数を宣言
-	Bomb keepBomb;		// ソート入れ替え時の代入用
-	int  nNowMaxID;		// 最大値が入っている配列の要素番号の記憶用
-
-	for (int nCntBomb = 0; nCntBomb < (g_nCurrentMaxBomb - 1); nCntBomb++)
-	{ // 現在狙い中の車の総数 -1回分繰り返す
-
-		// 現在の繰り返し数を代入 (要素1とする)
-		nNowMaxID = nCntBomb;
-
-		for (int nCntSort = nCntBomb + 1; nCntSort < g_nCurrentMaxBomb; nCntSort++)
-		{ // 現在狙い中の車の総数分繰り返す
-
-			if (g_aBomb[nNowMaxID].fOrder < g_aBomb[nCntSort].fOrder)
-			{ // 最大値に設定されている値より、現在の値のほうが大きい場合
-
-				// 現在の要素番号を最大値に設定
-				nNowMaxID = nCntSort;
-			}
-		}
-
-		if (nCntBomb != nNowMaxID)
-		{ // 最大値の要素番号に変動があった場合
-
-			// 要素の入れ替え
-			keepBomb           = g_aBomb[nCntBomb];
-			g_aBomb[nCntBomb]  = g_aBomb[nNowMaxID];
-			g_aBomb[nNowMaxID] = keepBomb;
-		}
-	}
-}
-
-//======================================================================================================================
-//	狙いの変更
-//======================================================================================================================
-void ChangeAim(void)
-{
-	if (g_nCurrentMaxBomb > 0)
-	{ // 狙える車が 0より多い場合
-
-		if (GetKeyboardTrigger(DIK_M) == true || GetJoyKeyTrigger(JOYKEY_R1, 0))
-		{ // 右の車へ変更する捜査が行われた場合
-
-			// 選択している車のインデックスを変更
-			g_nID = (g_nID + 1) % g_nCurrentMaxBomb;
-
-			// 現在狙っている車のアドレスを変更
-			g_pCurrentAim = g_aBomb[g_nID].pCar;
-		}
-		else if (GetKeyboardTrigger(DIK_N) == true || GetJoyKeyTrigger(JOYKEY_L1, 0))
-		{ // 左の車へ変更する捜査が行われた場合
-
-			// 選択している車のインデックスを変更
-			g_nID = (g_nID + (g_nCurrentMaxBomb - 1)) % g_nCurrentMaxBomb;
-
-			// 現在狙っている車のアドレスを変更
-			g_pCurrentAim = g_aBomb[g_nID].pCar;
-		}
-
-		if (g_pCurrentAim == NULL)
-		{ // 現在狙っている車のアドレスが NULLの場合
-
-			// 一番左にいる車のアドレスを設定
-			g_pCurrentAim = g_aBomb[0].pCar;
-		}
-	}
-}
-
-//======================================================================================================================
-//	選択中の車両判定
-//======================================================================================================================
-void CurrentAim(void)
-{
-	// 変数を宣言
-	int nAim = -1;
-
-	for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)
-	{ // 爆弾の最大表示数分繰り返す
-
-		if (g_aBomb[nCntBomb].bUse == true)
-		{ // 爆弾が使用されている場合
-
-			if (g_pCurrentAim == g_aBomb[nCntBomb].pCar)
-			{ // アドレスが同じ場合 (選択中の車)
-
-				// 現在狙い中の車のIDを保存
-				nAim = nCntBomb;
-
-				// 処理を抜ける
-				break;
-			}
-		}
-	}
-
-	if (nAim != -1)
-	{ // 現在狙い中の車と同じアドレスの車が存在した場合
-
-		// 現在狙い中の車のIDを再設定
-		g_nID = nAim;
-	}
-	else
-	{ // 現在狙い中の車と同じアドレスの車が存在しなかった場合
-
-		// 現在狙い中の車のIDを初期化
-		g_nID = 0;
-
-		// 現在狙い中の車を初期化
-		g_pCurrentAim = NULL;
-	}
-}
-
-//======================================================================================================================
-//	狙い状態の設定
-//======================================================================================================================
-void SetAim(void)
-{
-	// ポインタを宣言
-	Car    *pCar;		// 車の情報
-	Police *pPolice;	// 警察の情報
-
-	if (g_aBomb[g_nID].bUse == true)
-	{ // 現在狙い中の車が使用されている場合
-
-		switch (g_aBomb[g_nID].type)
-		{ // 現在狙い中の車の種類ごとの処理
-		case BOMBTYPE_CAR:		// 車
-
-			// 狙っている車のアドレスを代入
-			pCar = (Car*)g_aBomb[g_nID].pCar;
-
-			// 狙っている状態にする
-			pCar->bombState = BOMBSTATE_AIM;
-
-			// 処理を抜ける
-			break;
-
-		case BOMBTYPE_POLICE:	// 警察
-
-			// 狙っている警察のアドレスを代入
-			pPolice = (Police*)g_aBomb[g_nID].pCar;
-
-			// 狙っている状態にする
-			pPolice->bombState = BOMBSTATE_AIM;
-
-			// 処理を抜ける
-			break;
-		}
-	}
-}
-
-//======================================================================================================================
 //	バリアのホーミング
 //======================================================================================================================
 void HomingBarrier(int nCntBarrier)
@@ -1015,8 +867,8 @@ void HomingBarrier(int nCntBarrier)
 	if (g_aBarrier[nCntBarrier].pos.y <= 0.0f)
 	{ // y座標が 0.0f以下の場合 (着弾)
 
-		switch (g_aBomb[g_nID].type)
-		{ // 現在狙い中の車の種類ごとの処理	
+		switch (g_aBarrier[nCntBarrier].type)
+		{ // 種類ごとの処理
 		case BOMBTYPE_CAR:		// 車
 
 			// 狙っている車のアドレスを代入
@@ -1131,6 +983,121 @@ bool DownBarrier(int nCntBarrier)
 
 	// 車が下にない状態を返す
 	return true;
+}
+
+//======================================================================================================================
+//	バリアのまとまりの情報の更新
+//======================================================================================================================
+void UpdateBarrierInfoData(void)
+{
+	// 変数を宣言
+	int  nNumEvil   = 0;		// 悪い奴の総数
+	bool bNextState = true;		// 状態遷移用
+
+	// ポインタを宣言
+	Car *pCar = GetCarData();	// 車の情報
+
+	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++)
+	{ // バリアのまとまりの最大表示数分繰り返す
+
+		if (g_aBarrierInfo[nCntBarInfo].bUse == true)
+		{ // バリアのまとまりが使用されていない場合
+
+			switch (g_aBarrierInfo[nCntBarInfo].state)
+			{ // 状態ごとの処理
+			case BARSCOSTATE_NONE:		// 何もしない状態
+
+				for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
+				{ // バリアの最大表示数分繰り返す
+
+					if (g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier] != NULL)
+					{ // バリアの情報が設定されている場合
+
+						if (g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier]->state != BARRIERSTATE_SET)
+						{ // 完成状態ではない場合
+
+							// 状態遷移できない状態にする
+							bNextState = false;
+
+							// 処理を抜ける
+							break;
+						}
+					}
+				}
+
+				if (bNextState)
+				{ // 状態遷移が可能だった場合
+
+					// スコアの加算状態にする
+					g_aBarrierInfo[nCntBarInfo].state = BARSCOSTATE_ADDSCORE;
+				}
+
+				// 処理を抜ける
+				break;
+
+			case BARSCOSTATE_ADDSCORE:	// スコアの加算状態
+
+				// カウンターを加算
+				g_aBarrierInfo[nCntBarInfo].nCounterScore++;
+
+				if (g_aBarrierInfo[nCntBarInfo].nCounterScore >= BOMB_BONUS_CNT)
+				{ // カウンターが一定値以上の場合
+
+					for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
+					{ // バリアの最大表示数分繰り返す
+
+						if (g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier] != NULL)
+						{ // バリアの情報が設定されている場合
+
+							if (g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier]->type == BOMBTYPE_CAR)
+							{ // 通常車の場合
+
+								// 車の情報を設定
+								pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
+
+								if (pCar->judge.state == JUDGESTATE_EVIL)
+								{ // 悪い奴の場合
+
+									// 悪い奴を加算
+									nNumEvil++;
+								}
+							}
+						}
+					}
+
+					// ボーナスの設定処理
+					SetBonus(ADDSCORE_CAR);
+
+					// カウンターを初期化
+					g_aBarrierInfo[nCntBarInfo].nCounterScore = 0;
+
+					// スコア加算回数を加算
+					g_aBarrierInfo[nCntBarInfo].nNumAddScore++;
+
+					if (g_aBarrierInfo[nCntBarInfo].nNumAddScore >= BOMB_BONUS_END)
+					{ // スコアの加算を一定値以上行った場合
+
+						for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
+						{ // バリアの最大表示数分繰り返す
+
+							if (g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier] != NULL)
+							{ // バリアの情報が設定されている場合
+
+								// 状態管理カウンターを減算 (バリアの状態を下降状態に移行)
+								g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier]->nCounter--;
+							}
+						}
+
+						// 使用していない状態にする
+						g_aBarrierInfo[nCntBarInfo].bUse = false;
+					}
+				}
+
+				// 処理を抜ける
+				break;
+			}
+		}
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理
