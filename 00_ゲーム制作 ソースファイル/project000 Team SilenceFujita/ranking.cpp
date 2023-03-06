@@ -91,11 +91,8 @@
 //**********************************
 //* ランキング（下線）の2Dポリゴン関係
 //**********************************
-#define RANK_LINE_MAX		(RANK_SCORE_MAX)			//下線の数（スコアの数と同じ）
-#define RANK_LINE_POS_X		(SCREEN_WIDTH * 0.49f)		//下線の開始位置（X)
-#define RANK_LINE_POS_Y		(SCREEN_HEIGHT * 0.88f)		//下線の開始位置（Y）	
-#define RANK_LINE_WIDTH		(490.0f)					//下線の大きさ（X）
-#define RANK_LINE_HEIGHT	(95.0f)						//下線の大きさ（Y）
+#define RANK_LINE_WIDTH		(70.0f)					//下線の大きさ（X）
+#define RANK_LINE_HEIGHT	(20.0f)					//下線の大きさ（Y）
 
 //**********************************
 //* 画面遷移中のランキングスコアの数値関係
@@ -126,11 +123,11 @@ const char *apTextureRank[] =		// ランキングのテクスチャの相対パス
 {
 	"data\\TEXTURE\\ranking000.png",	// ランキング文字
 	"data\\TEXTURE\\ui001.png",			// ニュースコア背景
-	"data\\TEXTURE\\ranking001.png",	// ランキングの下線（1位）
-	"data\\TEXTURE\\ranking002.png",	// ランキングの下線（2位）
-	"data\\TEXTURE\\ranking003.png",	// ランキングの下線（3位）
-	"data\\TEXTURE\\ranking004.png",	// ランキングの下線（4位）
-	"data\\TEXTURE\\ranking005.png",	// ランキングの下線（5位）
+	"data\\TEXTURE\\rank1st000.png",	// ランキングの下線（1位）
+	"data\\TEXTURE\\rank2nd000.png",	// ランキングの下線（2位）
+	"data\\TEXTURE\\rank3rd000.png",	// ランキングの下線（3位）
+	"data\\TEXTURE\\rank4th000.png",	// ランキングの下線（4位）
+	"data\\TEXTURE\\rank5th000.png",	// ランキングの下線（5位）
 };
 
 //**********************************************************************************************************************
@@ -140,7 +137,11 @@ typedef enum
 {
 	TEXTURE_RANK_CHAR = 0,		// ランキング文字
 	TEXTURE_RANK_UI_004,		// ニュースコア背景
-	TEXTURE_RANK_LINE,			// 下線
+	TEXTURE_RANK_1ST,			// 下線（一位）
+	TEXTURE_RANK_2ND,			// 下線（二位）
+	TEXTURE_RANK_3RD,			// 下線（三位）
+	TEXTURE_RANK_4TH,			// 下線（四位）
+	TEXTURE_RANK_5TH,			// 下線（五位）
 	TEXTURE_RANK_MAX,			// この列挙型の総数
 } TEXTURE_RANKING;
 
@@ -231,15 +232,23 @@ void InitRanking(void)
 
 		//2Dポリゴン
 		{
-			//ランキング文字の2D背景
+			//ランキング文字
 			g_rank2DChar.pos = D3DXVECTOR3(RANK_CHAR_POS_X, RANK_CHAR_POS_Y, 0.0f);
 			g_rank2DChar.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			g_rank2DChar.bUse = true;
 
-			//ニュースコアの2D背景
+			//ニュースコアの背景
 			g_rank2DNewBg.pos = D3DXVECTOR3(RANK_NEW_BG_POS_X, RANK_NEW_BG_POS_Y, 0.0f);
 			g_rank2DNewBg.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			g_rank2DNewBg.bUse = true;	//TRUEに変更
+
+			//下線
+			for (nCutRank = 0; nCutRank < RANK_SCORE_MAX; nCutRank++)
+			{
+				g_rank2DLine.pos = D3DXVECTOR3(RANK_POS_X, RANK_POS_Y, 0.0f);
+				g_rank2DLine.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				g_rank2DLine.bUse = true;
+			}
 		}
 		
 		//数値
@@ -268,15 +277,24 @@ void InitRanking(void)
 	{
 		//2Dポリゴン
 		{
-			//ランキング文字の2D背景
+			//ランキング文字
 			g_rank2DChar.pos = D3DXVECTOR3(RANK_FADE_CHAR_POS_X, RANK_FADE_CHAR_POS_Y, 0.0f);
 			g_rank2DChar.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			g_rank2DChar.bUse = true;
 
-			//ニュースコアの2D背景
+			//ニュースコアの背景
 			g_rank2DNewBg.pos = D3DXVECTOR3(RANK_NEW_BG_POS_X, RANK_NEW_BG_POS_Y, 0.0f);
 			g_rank2DNewBg.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			g_rank2DNewBg.bUse = false;	//FALSEに変更
+
+			//下線
+			for (nCutRank = 0; nCutRank < RANK_SCORE_MAX; nCutRank++)
+			{
+				//ニュースコアの背景
+				g_rank2DLine.pos = D3DXVECTOR3(RANK_FADE_POS_X, RANK_FADE_POS_Y, 0.0f);
+				g_rank2DLine.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				g_rank2DLine.bUse = true;
+			}
 		}
 
 		//数値
@@ -386,6 +404,37 @@ void InitRanking(void)
 	pVtx[5].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[6].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	ランキング（下線）の初期化
+	//------------------------------------------------------------------------------------------------------------------
+	for (int nCount = 0; nCount < RANK_SCORE_MAX; nCount++)
+	{ // スコア分回す
+	  // 頂点座標を設定
+		pVtx[8  + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x - RANK_WIDTH) - ((RANK_NUM_PLACE * RANK_INTERVAL_X) + RANK_LINE_WIDTH), ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) - (RANK_HEIGHT), 0.0f);
+		pVtx[9  + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x + RANK_WIDTH),														  ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) - (RANK_HEIGHT), 0.0f);
+		pVtx[10 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x - RANK_WIDTH) - ((RANK_NUM_PLACE * RANK_INTERVAL_X) + RANK_LINE_WIDTH), ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) + (RANK_HEIGHT), 0.0f);
+		pVtx[11 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x + RANK_WIDTH),														  ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) + (RANK_HEIGHT), 0.0f);
+
+		// rhw の設定
+		pVtx[ 8 + (nCount * 4)].rhw = 1.0f;
+		pVtx[ 9 + (nCount * 4)].rhw = 1.0f;
+		pVtx[10 + (nCount * 4)].rhw = 1.0f;
+		pVtx[11 + (nCount * 4)].rhw = 1.0f;
+
+		// 頂点カラーの設定
+		pVtx[ 8 + (nCount * 4)].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[ 9 + (nCount * 4)].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[10 + (nCount * 4)].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[11 + (nCount * 4)].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// テクスチャ座標の設定
+		pVtx[ 8 + (nCount * 4)].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[ 9 + (nCount * 4)].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[10 + (nCount * 4)].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[11 + (nCount * 4)].tex = D3DXVECTOR2(1.0f, 1.0f);
+	}
+
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffRank->Unlock();
@@ -529,7 +578,7 @@ void DrawRanking(void)
 	//2Dポリゴンの描画
 	{ // 使用するポリゴン数分繰り返す
 
-	  //ランキング（文字）
+		//ランキング（文字）
 		if (g_rank2DChar.bUse == true)
 		{
 			// テクスチャの設定
@@ -547,6 +596,19 @@ void DrawRanking(void)
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+		}
+
+		//下線
+		for (int nCut = 0; nCut < RANK_SCORE_MAX; nCut++)
+		{
+			if (g_rank2DLine.bUse == true)
+			{
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureRank[2 + nCut]);
+
+				// ポリゴンの描画
+				pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8 + (4 * nCut), 2);
+			}
 		}
 	}
 
