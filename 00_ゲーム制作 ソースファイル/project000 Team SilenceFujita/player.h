@@ -24,7 +24,7 @@
 #define MAX_BOOST			(15.0f)						// ブーストの最大移動量
 #define MAX_REAL_SPEED		(MAX_FORWARD + MAX_BOOST)	// 数値上の最高速度
 
-#define PLAY_REV_ROT_MIN	(0.6f)		// プレイヤーの向き変更量の減速係数の最小値
+#define PLAY_REV_ROT_MIN	(0.75f)		// プレイヤーの向き変更量の減速係数の最小値
 #define PLAY_LIFE			(100)		// プレイヤーの体力
 #define PLAY_DAMAGE			(10)		// プレイヤーのダメージ数
 #define BOOST_WAIT_CNT		(180)		// ブーストの再使用までの時間
