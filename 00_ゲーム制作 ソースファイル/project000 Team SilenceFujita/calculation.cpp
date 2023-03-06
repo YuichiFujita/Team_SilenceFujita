@@ -645,8 +645,8 @@ void UpdateJudge(Judge *pJudge)
 
 		// ˆÃ“]‚³‚¹‚Ä‚¢‚­
 		pJudge->col.r -= JUDGE_FLASH;
-		pJudge->col.g -= 0.5f * JUDGE_FLASH;
-		pJudge->col.b -= 0.9f * JUDGE_FLASH;
+		pJudge->col.g -= JUDGE_FLASH;
+		pJudge->col.b -= JUDGE_FLASH;
 
 		if (pJudge->col.r <= JUDGE_BLACK.r)
 		{ // F‚ªˆê’è”‚ð’´‚¦‚½ê‡
@@ -663,15 +663,15 @@ void UpdateJudge(Judge *pJudge)
 	case CHICASTATE_WHITEOUT:		// –¾“]ó‘Ô
 
 		// –¾“]‚³‚¹‚Ä‚¢‚­
-		pJudge->col.r += JUDGE_ORANGE.r * JUDGE_FLASH;
-		pJudge->col.g += JUDGE_ORANGE.g * JUDGE_FLASH;
-		pJudge->col.b += JUDGE_ORANGE.b * JUDGE_FLASH;
+		pJudge->col.r += JUDGE_FLASH;
+		pJudge->col.g += JUDGE_FLASH;
+		pJudge->col.b += JUDGE_FLASH;
 
-		if (pJudge->col.r >= JUDGE_ORANGE.r)
+		if (pJudge->col.r >= JUDGE_WHITE.r)
 		{ // F‚ªˆê’è”‚ð’´‚¦‚½ê‡
 
 			// F‚ð•â³‚·‚é
-			pJudge->col = JUDGE_ORANGE;
+			pJudge->col = JUDGE_WHITE;
 
 			// ˆÃ“]ó‘Ô‚É‚·‚é
 			pJudge->ticatica = CHICASTATE_BLACKOUT;
