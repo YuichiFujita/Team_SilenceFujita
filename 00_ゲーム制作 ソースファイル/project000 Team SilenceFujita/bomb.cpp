@@ -608,6 +608,16 @@ void UpdateBarrierData(void)
 				// バリアのホーミング
 				HomingBarrier(nCntBarrier);
 
+				// パーティクルの設定
+				SetParticle
+				( // 引数
+					g_aBarrier[nCntBarrier].pos,		// 位置
+					D3DXCOLOR(0.0f, 0.4f, 0.8f, 1.0f),	// 色
+					PARTICLETYPE_DAMAGE,				// 種類
+					SPAWN_PARTICLE_DAMAGE,				// エフェクト数
+					2									// 寿命
+				);
+
 				// 処理を抜ける
 				break;
 
