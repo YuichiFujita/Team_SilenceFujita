@@ -25,7 +25,7 @@
 #define PLUS_WIDTH			(30.0f)		// プラスの幅
 #define PLUS_HEIGHT			(30.0f)		// プラスの高さ
 #define PLUS_SHIFT			(40.0f)		// プラスのずらす幅
-#define BONUS_RIGHT_X		(1000.0f)	// 右にボーナスを出す時の座標(X座標)
+#define BONUS_RIGHT_X		(1080.0f)	// 右にボーナスを出す時の座標(X座標)
 #define BONUS_LEFT_X		(40.0f)		// 左にボーナスを出す時の座標(X座標)
 #define BONUS_RIGHT_Y		(400)		// 右にボーナスを出す時の座標(Y座標)
 #define BONUS_RIGHT_SHIFT	(120)		// 右にボーナスを出す時のずらす座標(Y座標)
@@ -382,7 +382,7 @@ void SetBonus(int nBonus)
 				MagnificCombo(1);
 
 				// 右に出すか左に出すかをランダムで算出する
-				g_aBonus[nCntBonus].whereBonus = (WHEREBONUS)(rand() % WHEREBONUS_MAX);
+				g_aBonus[nCntBonus].whereBonus = (WHEREBONUS)/*(rand() % WHEREBONUS_MAX)*/0;
 
 				switch (g_aBonus[nCntBonus].whereBonus)
 				{
