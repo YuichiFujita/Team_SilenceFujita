@@ -179,6 +179,7 @@
     <ClCompile Include="Human.cpp" />
     <ClCompile Include="icon.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="junk.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="Human.h" />
     <ClInclude Include="icon.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="junk.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />

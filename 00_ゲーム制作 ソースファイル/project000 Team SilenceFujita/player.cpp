@@ -445,6 +445,29 @@ void HealPlayer(Player *pPlayer, int nHeal)
 }
 
 //============================================================
+// バリアの回復判定
+//============================================================
+void HealBarrier(Player *pPlayer, int nHeal)
+{
+	if (pPlayer->state == ACTIONSTATE_NORMAL)
+	{ // プレイヤーが通常状態の場合
+		
+		// 引数の回復分をバリアに加算する
+		pPlayer->bomb.nCounterState += nHeal;
+
+		if (pPlayer->bomb.nCounterState > BOMB_WAIT_CNT)
+		{ // 体力が最大体力より多くなった場合
+
+			// 体力を補正
+			pPlayer->nLife = BOMB_WAIT_CNT;
+
+			// 状態を設定する
+			pPlayer->bomb.state = ATTACKSTATE_NONE;
+		}
+	}
+}
+
+//============================================================
 //	プレイヤーのダメージ判定
 //============================================================
 void HitPlayer(Player *pPlayer, int nDamage)

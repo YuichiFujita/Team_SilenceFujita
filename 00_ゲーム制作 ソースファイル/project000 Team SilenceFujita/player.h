@@ -140,6 +140,7 @@ void DrawPlayer(void);				// プレイヤーの描画処理
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// プレイヤーの位置・向きの設定処理
 
 void HealPlayer(Player *pPlayer, int nHeal);	// プレイヤーの回復判定
+void HealBarrier(Player *pPlayer, int nHeal);	// バリアの回復判定
 void HitPlayer(Player *pPlayer, int nDamage);	// プレイヤーのダメージ判定
 Player *GetPlayer(void);						// プレイヤーの取得処理
 
