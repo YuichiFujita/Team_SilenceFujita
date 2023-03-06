@@ -97,6 +97,9 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\SignStop.x",			// 標識(一時停止)
 	"data\\MODEL_OBJECT\\ConcreteWall.x",		// コンクリ壁
 	"data\\MODEL_OBJECT\\yawarage.x",			// やわらげ斎場
+	"data\\MODEL_OBJECT\\wall000.x",			// 町壁（壁）
+	"data\\MODEL_OBJECT\\pillar000.x",			// 町壁（柱）
+	"data\\MODEL_OBJECT\\fence001.x",			// 町壁（フェンス）
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー

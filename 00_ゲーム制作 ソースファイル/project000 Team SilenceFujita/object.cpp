@@ -14,6 +14,7 @@
 #include "buildtimer.h"
 #include "bonus.h"
 #include "Combo.h"
+#include "item.h"
 #include "junk.h"
 #include "object.h"
 #include "particle.h"
@@ -50,12 +51,15 @@
 
 #define APPEAR_ADD_MAGNI		(0.05f)							// 出現時の加算数の倍率
 
+#define ITEM_DROP_COUNT			(3)								// アイテムが落ちるカウント数
+
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
 Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
 float     g_aShadowRadius[MODEL_OBJ_MAX];		// 影の半径の情報
+int		  g_nDropItemCount;						// アイテムが落ちるカウント
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -156,6 +160,9 @@ void InitObject(void)
 
 		g_aShadowRadius[nCntObject] = FIRST_RADIUS;
 	}
+
+	// アイテムが落ちるカウントを初期化する
+	g_nDropItemCount = 0;
 }
 
 //======================================================================================================================
@@ -532,19 +539,20 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 		{ // オブジェクトが使用されていない場合
 
 			// 引数を代入
-			g_aObject[nCntObject].pos            = pos;					// 位置
-			g_aObject[nCntObject].rot            = rot;					// 向き
-			g_aObject[nCntObject].scale          = scale;				// 拡大率
-			g_aObject[nCntObject].nType          = nType;				// オブジェクトの種類
-			g_aObject[nCntObject].nBreakType     = nBreakType;			// 壊れ方の種類
-			g_aObject[nCntObject].nShadowType    = nShadowType;			// 影の種類
+			g_aObject[nCntObject].pos = pos;					// 位置
+			g_aObject[nCntObject].rot = rot;					// 向き
+			g_aObject[nCntObject].scale = scale;				// 拡大率
+			g_aObject[nCntObject].nType = nType;				// オブジェクトの種類
+			g_aObject[nCntObject].nBreakType = nBreakType;			// 壊れ方の種類
+			g_aObject[nCntObject].nShadowType = nShadowType;			// 影の種類
 			g_aObject[nCntObject].nCollisionType = nCollisionType;		// 当たり判定の種類
+			g_aObject[nCntObject].judge.state = (JUDGESTATE)nJudge;		// 善悪の状態
 
 			// 出現関係の設定
 			g_aObject[nCntObject].appear.scaleCopy = scale;							// 拡大率のコピー
-			g_aObject[nCntObject].appear.state	   = appear;						// 出現状態
-			g_aObject[nCntObject].appear.scaleAdd  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の加算数
-			g_aObject[nCntObject].appear.fAlpha	   = 1.0f;							// 透明度
+			g_aObject[nCntObject].appear.state = appear;						// 出現状態
+			g_aObject[nCntObject].appear.scaleAdd = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の加算数
+			g_aObject[nCntObject].appear.fAlpha = 1.0f;							// 透明度
 
 			// モデル情報を設定
 			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
@@ -561,7 +569,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				g_aObject[nCntObject].appear.scaleAdd.z = scale.z * APPEAR_ADD_MAGNI;
 
 				// 透明度を設定する
-				g_aObject[nCntObject].appear.fAlpha = 0.0f;							
+				g_aObject[nCntObject].appear.fAlpha = 0.0f;
 			}
 			else
 			{ // 一瞬で出てくる状態だった場合
@@ -578,8 +586,8 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			}
 
 			// オブジェクトの情報を初期化
-			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態
-			g_aObject[nCntObject].nLife         = OBJ_LIFE;				// 体力
+			g_aObject[nCntObject].state = ACTIONSTATE_NORMAL;	// 状態
+			g_aObject[nCntObject].nLife = OBJ_LIFE;				// 体力
 			g_aObject[nCntObject].nCounterState = 0; 					// 状態管理カウンター
 
 			// 使用している状態にする
@@ -593,7 +601,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 				// 横幅と縦幅を計算
 				if (stateRot == ROTSTATE_0
-				||  stateRot == ROTSTATE_180)
+					|| stateRot == ROTSTATE_180)
 				{ // 角度が0度、または180度の場合
 					g_aObject[nCntObject].collInfo.fWidth[nCntColl] = g_aCollision[nType].fWidth[nCntColl];
 					g_aObject[nCntObject].collInfo.fDepth[nCntColl] = g_aCollision[nType].fDepth[nCntColl];
@@ -618,8 +626,8 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 					g_aObject[nCntObject].collInfo.vecPos[nCntColl] = D3DXVECTOR3
 					( // 引数
 						-g_aObject[nCntObject].collInfo.vecPos[nCntColl].z,
-						 g_aObject[nCntObject].collInfo.vecPos[nCntColl].y,
-						 g_aObject[nCntObject].collInfo.vecPos[nCntColl].x
+						g_aObject[nCntObject].collInfo.vecPos[nCntColl].y,
+						g_aObject[nCntObject].collInfo.vecPos[nCntColl].x
 					);
 				}
 			}
@@ -688,7 +696,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 			// ジャッジの情報の設定
 			g_aObject[nCntObject].judge.col = JUDGE_WHITE;				// ピカピカの色
-			g_aObject[nCntObject].judge.state = (JUDGESTATE)nJudge;		// 善悪の状態
 			g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
 
 			// 処理を抜ける
@@ -855,6 +862,16 @@ void HitObject(Object *pObject, int nDamage)
 
 				// ボーナスの設定処理
 				SetBonus(ADDSCORE_OBJECT);
+
+				// アイテムが落ちるカウントを加算する
+				g_nDropItemCount++;
+
+				if (g_nDropItemCount % ITEM_DROP_COUNT == 0)
+				{ // アイテムが落ちるカウントが一定数になった場合
+
+				  // アイテムの設定処理
+					SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
+				}
 			}
 
 			//// アイテムの設定

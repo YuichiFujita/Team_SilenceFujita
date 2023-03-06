@@ -657,7 +657,7 @@ void UpdateJudge(Judge *pJudge)
 		pJudge->col.g -= JUDGE_FLASH;
 		pJudge->col.b -= JUDGE_FLASH;
 
-		if (pJudge->col.r <= JUDGE_BLACK_LINE)
+		if (pJudge->col.r <= JUDGE_BLACK.r)
 		{ // 色が一定数を超えた場合
 
 			// 色を補正する
@@ -676,7 +676,7 @@ void UpdateJudge(Judge *pJudge)
 		pJudge->col.g += JUDGE_FLASH;
 		pJudge->col.b += JUDGE_FLASH;
 
-		if (pJudge->col.r >= JUDGE_WHITE_LINE)
+		if (pJudge->col.r >= JUDGE_WHITE.r)
 		{ // 色が一定数を超えた場合
 
 			// 色を補正する

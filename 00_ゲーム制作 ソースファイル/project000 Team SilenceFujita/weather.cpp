@@ -73,6 +73,13 @@ void InitWeather(void)
 
 	switch (g_WeatherMode)
 	{
+	case MODE_TITLE:
+
+		// 天気を晴れに設定する
+		g_Weather = WEATHERTYPE_SUNNY;
+
+		break;			// 抜け出す
+
 	case MODE_TUTORIAL:	// チュートリアル
 
 		// 天気を晴れに設定する
@@ -124,6 +131,24 @@ void InitWeather(void)
 			g_Weather = WEATHERTYPE_THUNDER;
 		}
 
+		break;
+
+	case MODE_RANKING:	// ランキング
+
+		if (resultState == RESULTSTATE_CLEAR)
+		{ // ゲームクリア状態の場合
+
+			// 天気を晴れに設定する
+			g_Weather = WEATHERTYPE_SUNNY;
+
+		}
+		else if (resultState == RESULTSTATE_TIMEOVER
+			|| resultState == RESULTSTATE_LIFEOVER)
+		{ // ゲームオーバー状態の場合
+
+		  // 天気を雷雨に設定する
+			g_Weather = WEATHERTYPE_THUNDER;
+		}
 		break;			// 抜け出す
 	}
 

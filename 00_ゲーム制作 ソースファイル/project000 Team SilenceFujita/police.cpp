@@ -438,6 +438,18 @@ void UpdatePolice(void)
 							(g_aPolice[nCntPolice].tackle.tackleState)
 						);
 					}
+
+					//----------------------------------------------------
+					//	影の更新
+					//----------------------------------------------------
+					// 影の位置設定
+					SetPositionShadow
+					( // 引数
+						g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
+						g_aPolice[nCntPolice].pos,			// 位置
+						g_aPolice[nCntPolice].rot,			// 向き
+						NONE_SCALE							// 拡大率
+					);
 				}
 
 				if (g_aPolice[nCntPolice].nTrafficCnt >= POLICAR_TRAFFIC_CNT)
@@ -462,18 +474,6 @@ void UpdatePolice(void)
 					// プレイヤーの補正の更新処理
 					RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 				}
-
-				//----------------------------------------------------
-				//	影の更新
-				//----------------------------------------------------
-				// 影の位置設定
-				SetPositionShadow
-				( // 引数
-					g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
-					g_aPolice[nCntPolice].pos,			// 位置
-					g_aPolice[nCntPolice].rot,			// 向き
-					NONE_SCALE							// 拡大率
-				);
 
 				//----------------------------------------------------
 				//	アイコンの更新
