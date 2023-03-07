@@ -633,8 +633,8 @@ void HomingPlayer(Item *pItem)
 			fAngle = atan2f(pPlayer->pos.x - pItem->pos.x, pPlayer->pos.z - pItem->pos.z);
 
 			// ˆÚ“®—Ê‚ðÝ’è‚·‚é
-			pItem->move.x = sinf(fAngle) * (fabsf(pPlayer->move.x) + ITEM_HOMING_SPEED);
-			pItem->move.z = cosf(fAngle) * (fabsf(pPlayer->move.x) + ITEM_HOMING_SPEED);
+			pItem->move.x = sinf(fAngle) * (fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x) + ITEM_HOMING_SPEED);
+			pItem->move.z = cosf(fAngle) * (fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x) + ITEM_HOMING_SPEED);
 		}
 	}
 }
