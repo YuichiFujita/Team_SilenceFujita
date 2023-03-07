@@ -2047,7 +2047,8 @@ void DrawDebug(void)
 		" 　警察の状態：%d\n"
 		" 　警察のタックル状態：%d\n"
 		" 　向き変更量：%.2f\n"
-		" 　向き変更量の減衰量：%.2f\n",
+		" 　向き変更量の減衰量：%.2f\n"
+		" 　音量：%.2f\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -2075,7 +2076,8 @@ void DrawDebug(void)
 		pPolice->state,
 		pPolice->tackle.tackleState,
 		GetPlayer()->moveRot.y,
-		fRevPlayerRot
+		fRevPlayerRot,
+		GetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000)
 	);
 
 	//--------------------------------------------------------
