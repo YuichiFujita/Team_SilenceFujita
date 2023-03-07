@@ -699,8 +699,8 @@ void DrawPolice(void)
 				{ // 範囲内状態の場合
 
 					// 範囲内時のマテリアルの色を設定
-					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse = BOMB_RANGE_DIF;
-					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive = BOMB_RANGE_EMI;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse = POLICAR_BOMB_RANGE_DIF;
+					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Emissive = POLICAR_BOMB_RANGE_EMI;
 
 					// マテリアルの設定
 					pDevice->SetMaterial(&g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D);
