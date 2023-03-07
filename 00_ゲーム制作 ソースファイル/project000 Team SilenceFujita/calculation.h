@@ -40,7 +40,7 @@ bool UpdateAllClear(RESULTSTATE state);	// ‘S‚Ä‚ÌƒAƒbƒvƒf[ƒg‚ªI‚í‚Á‚Ä‚¢‚é‚©‚Ç‚
 void UpdateJudge(Judge *pJudge);		// ƒWƒƒƒbƒW‚ÌXVˆ—
 
 // –œ”\ƒVƒŠ[ƒY
-void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI);	// ƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚é‘S‘Ìˆ—
+void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI, bool bIcon);		// ƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚é‘S‘Ìˆ—
 
 void InitAllAroundChunk(void);			// –œ”\‰Šú‰»‚Ì‘S‘Ìˆ—
 void UninitAllAroundChunk(void);		// –œ”\I—¹‚Ì‘S‘Ìˆ—

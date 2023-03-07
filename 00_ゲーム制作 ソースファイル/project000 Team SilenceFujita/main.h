@@ -166,6 +166,7 @@ void TxtSetObject(void);				// オブジェクトのセットアップ処理
 void TxtSetAI(void);					// AI系のセットアップ処理
 void TxtSetCollision(void);				// 当たり判定のセットアップ処理
 void TxtSetShadow(void);				// 影の半径のセットアップ処理
+void TxtSetIcon(void);					// アイコンのセットアップ処理
 
 void InitCurveInfo(void);				// カーブの情報の初期化処理
 void LoadCurveTxt(void);				// カーブテキストのロード処理

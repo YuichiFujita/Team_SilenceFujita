@@ -164,6 +164,7 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed);				// ‚Á”ò‚
 Object *GetObjectData(void);	// ƒIƒuƒWƒFƒNƒg‚Ìæ“¾ˆ—
 Collision *GetCollision(void);	// “–‚½‚è”»’è‚Ìæ“¾ˆ—
 float *GetShadowRadius(void);	// ‰e‚Ì”¼Œa‚Ìæ“¾ˆ—
+bool *GetIconSet(void);			// ƒAƒCƒRƒ“ƒZƒbƒg‚Ìæ“¾ˆ—
 
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾ (ƒfƒoƒbƒO—p)

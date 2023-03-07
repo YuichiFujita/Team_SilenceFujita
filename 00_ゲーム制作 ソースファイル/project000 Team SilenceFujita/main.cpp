@@ -55,6 +55,7 @@
 #define AI_SETUP_TXT	"data\\TXT\\Ai.txt"			// AI系セットアップ用のテキストファイルの相対パス
 #define OBJ_SETUP_TXT	"data\\TXT\\object.txt"		// オブジェクトセットアップ用のテキストファイルの相対パス
 #define SHAD_SETUP_TXT	"data\\TXT\\shadow.txt"		// ステージセットアップ用のテキストファイルの相対パス
+#define ICON_SETUP_TXT	"data\\TXT\\Icon.txt"		// アイコンセットアップ用のテキストファイルの相対パス
 
 #ifdef _DEBUG	// デバッグ処理
 #define DEBUG_PRINT		(2400)		// デバッグ表示の文字列の最長
@@ -1742,6 +1743,92 @@ void TxtSetShadow(void)
 	}
 }
 
+//======================================================================================================================
+//	アイコンのセットアップ処理
+//======================================================================================================================
+void TxtSetIcon(void)
+{
+	// 変数を宣言
+	int nEnd;		// テキスト読み込み終了の確認用
+	int nType;		// 種類の代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE  *pFile;							// ファイルポインタ
+	bool *pIconSet = GetIconSet();			// アイコンの設定情報
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(ICON_SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+		  // ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
+
+			if (strcmp(&aString[0], "SETICON_OBJECT") == 0)
+			{ // 読み込んだ文字列が SETICON_OBJECT の場合
+
+				do
+				{ // 読み込んだ文字列が END_SETICON_OBJECT ではない場合ループ
+
+				  // ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "SET_ICON") == 0)
+					{ // 読み込んだ文字列が SET_ICON の場合
+
+						do
+						{ // 読み込んだ文字列が END_SET_ICON ではない場合ループ
+
+						  // ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);					// 種類を読み込む
+							}
+							else if (strcmp(&aString[0], "SET") == 0)
+							{ // 読み込んだ文字列が RADIUS の場合
+								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+								fscanf(pFile, "%s", &aString[0]);				// アイコンのセットを読み込む
+
+								if (strcmp(&aString[0], "TRUE") == 0)
+								{ // 読み込んだ文字列が TRUE の場合
+
+									// アイコンセットをtrueにする
+									pIconSet[nType] = true;
+								}
+								else if (strcmp(&aString[0], "FALSE") == 0)
+								{ // 読み込んだ文字列が FALSE の場合
+
+									// アイコンセットをfalseにする
+									pIconSet[nType] = false;
+								}
+							}
+						} while (strcmp(&aString[0], "END_SET_ICON") != 0);		// 読み込んだ文字列が END_SET_ICON ではない場合ループ
+					}
+				} while (strcmp(&aString[0], "END_SETICON_OBJECT") != 0);		// 読み込んだ文字列が END_SETICON_OBJECT ではない場合ループ
+			}
+		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
+
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "アイコンファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
+
 //============================================================
 // ゲートの数の取得処理
 //============================================================
@@ -1960,7 +2047,8 @@ void DrawDebug(void)
 		" 　警察の状態：%d\n"
 		" 　警察のタックル状態：%d\n"
 		" 　向き変更量：%.2f\n"
-		" 　向き変更量の減衰量：%.2f\n",
+		" 　向き変更量の減衰量：%.2f\n"
+		" 　音量：%.2f\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1988,7 +2076,8 @@ void DrawDebug(void)
 		pPolice->state,
 		pPolice->tackle.tackleState,
 		GetPlayer()->moveRot.y,
-		fRevPlayerRot
+		fRevPlayerRot,
+		GetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000)
 	);
 
 	//--------------------------------------------------------
