@@ -43,13 +43,13 @@
 
 #define BARRIER_GRAVITY	(0.5f)		// 発射されたバリアにかかる重力
 #define LAND_CNT		(5)			// 着弾時のカウント
-#define REV_UP_POS		(450.0f)	// 上昇時の補正値
+#define REV_UP_POS		(550.0f)	// 上昇時の補正値
 #define REV_DOWN_POS	(0.0f)		// 下降時の補正値
 #define POS_Y_CHANGE	(1.0f)		// 位置の変更量
 #define MOVEPOS_ADD		(0.2f)		// 上昇・下降時の加算量
 #define DOWN_RADIUS		(240.0f)	// 下降時の下の車の確認半径
 #define SET_CNT			(1)			// 完成時のカウント (スコアが加算し終わったら減算)
-#define ENLARGE_SCALE	(9.0f)		// 拡大率の補正値
+#define ENLARGE_SCALE	(9.5f)		// 拡大率の補正値
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
 
@@ -67,7 +67,7 @@ const float aCarPosMul[] =	// 車ごとの位置の乗算量
 	0.75f,	// 消防車の位置の乗算量
 	0.75f,	// 石焼き芋屋の位置の乗算量
 	0.65f,	// 選挙カーの位置の乗算量
-	0.75f,	// 暴走車の位置の乗算量
+	0.7f,	// 暴走車の位置の乗算量
 };
 
 //**********************************************************************************************************************

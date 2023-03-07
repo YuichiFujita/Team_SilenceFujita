@@ -77,9 +77,9 @@ const char *apTextureHumanUV[] =	// 人間のUVテクスチャの相対パス
 //**********************************************************************************************************************
 typedef struct
 {
-	Human	humanDate;			// 人間の情報
-	int		nResurCount;		// 復活のカウント
-	bool	bUse;				// 使用状況
+	Human	humanDate;		// 人間の情報
+	int		nResurCount;	// 復活のカウント
+	bool	bUse;			// 使用状況
 }Resurrect;
 
 //**********************************************************************************************************************
@@ -548,9 +548,11 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 		if (g_aHuman[nCntHuman].bUse == false)
 		{ // オブジェクトが使用されていない場合
 
-			// 引数の位置を代入
-			g_aHuman[nCntHuman].pos				= pos;					// 現在の位置
-			g_aHuman[nCntHuman].posOld			= pos;					// 前回の位置
+			// 位置を設定
+			g_aHuman[nCntHuman].pos				= D3DXVECTOR3(pos.x, HUMAN_GROUND, pos.z);	// 現在の位置
+			g_aHuman[nCntHuman].posOld			= D3DXVECTOR3(pos.x, HUMAN_GROUND, pos.z);	// 前回の位置
+
+			// 引数を代入
 			g_aHuman[nCntHuman].typeMove		= (MOVETYPE)(walk);		// 移動の種類
 			g_aHuman[nCntHuman].bRecur			= bRecur;				// 復活状況
 			g_aHuman[nCntHuman].type			= (HUMANTYPE)(type);	// 種類
