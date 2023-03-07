@@ -27,10 +27,8 @@
 #include "Car.h"
 #include "Combo.h"
 #include "effect.h"
-#include "flash.h"
 #include "gate.h"
 #include "icon.h"
-#include "item.h"
 #include "junk.h"
 #include "life.h"
 #include "light.h"
@@ -175,7 +173,7 @@ typedef struct
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void UpdateTutorialUi(void);			// チュートリアルのUIの更新処理
-void DrawTutorialUi(void);				// チュートリアルのUIの描画処理
+void DrawTutorialUi(bool bBefore);		// チュートリアルのUIの描画処理
 
 bool CheckNextSlumBoost(void);			// 破滅疾走のレッスン終了の確認処理
 bool CheckNextFlyAway(void);			// 吹飛散風のレッスン終了の確認処理
@@ -508,9 +506,6 @@ void InitTutorial(void)
 	// がれきの初期化
 	InitJunk();
 
-	// アイテムの初期化
-	InitItem();
-
 	// カメラの初期化
 	InitCamera();
 
@@ -573,9 +568,6 @@ void InitTutorial(void)
 
 	// スコアの初期化
 	InitScore();
-
-	// フラッシュの初期化
-	InitFlash();
 
 	// ファイルをロードする全体処理
 	LoadFileChunk
@@ -645,9 +637,6 @@ void UninitTutorial(void)
 
 	// 影の終了
 	UninitShadow();
-
-	// アイコンの終了
-	UninitIcon();
 
 	// アイコンの終了
 	UninitIcon();
@@ -735,9 +724,6 @@ void UninitTutorial(void)
 
 	// スコアの終了
 	UninitScore();
-
-	// フラッシュの終了
-	UninitFlash();
 
 	// サウンドの停止
 	StopSound();
@@ -848,9 +834,6 @@ void UpdateTutorial(void)
 		// ライトの更新
 		UpdateLight();
 
-		// フラッシュの更新処理
-		UpdateFlash();
-
 		// メッシュドームの更新
 		UpdateMeshDome();
 
@@ -886,9 +869,6 @@ void UpdateTutorial(void)
 
 		// がれきの更新
 		UpdateJunk();
-
-		// アイテムの更新
-		UpdateItem();
 
 		// 車の更新処理
 		UpdateCar();
@@ -987,9 +967,6 @@ void DrawTutorial(void)
 	// がれきの描画
 	DrawJunk();
 
-	// アイテムの描画
-	DrawItem();
-
 	// 警察の描画
 	DrawPolice();
 
@@ -1039,7 +1016,7 @@ void DrawTutorial(void)
 	DrawScore();
 
 	// チュートリアルのUIの描画
-	DrawTutorialUi();
+	DrawTutorialUi(false);
 
 	// ボーナスの描画
 	DrawBonus();
@@ -1050,8 +1027,8 @@ void DrawTutorial(void)
 	// 2Dパーティクルの描画
 	Draw2DParticle();
 
-	// フラッシュの描画
-	DrawFlash();
+	// チュートリアルのUIの描画
+	DrawTutorialUi(true);
 }
 
 //======================================================================================================================
@@ -1393,7 +1370,7 @@ void UpdateTutorialUi(void)
 //======================================================================================================================
 //	チュートリアルのUIの描画処理
 //======================================================================================================================
-void DrawTutorialUi(void)
+void DrawTutorialUi(bool bBefore)
 {
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -1404,101 +1381,108 @@ void DrawTutorialUi(void)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	//------------------------------------------------------------------------------------------------------------------
-	//	レッスンの背景の描画
-	//------------------------------------------------------------------------------------------------------------------
-	// テクスチャの設定
-	pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_BG]);
-
-	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	レッスンの描画
-	//------------------------------------------------------------------------------------------------------------------
-	// テクスチャの設定
-	pDevice->SetTexture(0, g_apTextureLesson[g_nLessonState]);
-
-	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
-
-	if (g_nLessonState >= LESSON_04)
-	{ // 現在のレッスンがレッスン4 (破滅疾走) 以降の場合
+	if (bBefore == false)
+	{ // 後の描画の場合
 
 		//--------------------------------------------------------------------------------------------------------------
-		//	備考の背景の描画
+		//	レッスンの背景の描画
 		//--------------------------------------------------------------------------------------------------------------
 		// テクスチャの設定
-		pDevice->SetTexture(0, NULL);
+		pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_BG]);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 
 		//--------------------------------------------------------------------------------------------------------------
-		//	備考の描画
+		//	レッスンの描画
 		//--------------------------------------------------------------------------------------------------------------
-		switch (g_nLessonState)
-		{ // レッスンごとの処理
-		case LESSON_04:	// レッスン4 (破滅疾走)
+		// テクスチャの設定
+		pDevice->SetTexture(0, g_apTextureLesson[g_nLessonState]);
 
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+
+		if (g_nLessonState >= LESSON_04)
+		{ // 現在のレッスンがレッスン4 (破滅疾走) 以降の場合
+
+			//----------------------------------------------------------------------------------------------------------
+			//	備考の背景の描画
+			//----------------------------------------------------------------------------------------------------------
 			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
+			pDevice->SetTexture(0, NULL);
 
-			// 処理を抜ける
-			break;
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
 
-		case LESSON_05:	// レッスン5 (吹飛散風)
+			//----------------------------------------------------------------------------------------------------------
+			//	備考の描画
+			//----------------------------------------------------------------------------------------------------------
+			switch (g_nLessonState)
+			{ // レッスンごとの処理
+			case LESSON_04:	// レッスン4 (破滅疾走)
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_FLY]);
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
 
-			// 処理を抜ける
-			break;
+				// 処理を抜ける
+				break;
 
-		case LESSON_06:	// レッスン6 (無音世界)
+			case LESSON_05:	// レッスン5 (吹飛散風)
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SILENCE]);
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_FLY]);
 
-			// 処理を抜ける
-			break;
+				// 処理を抜ける
+				break;
 
-		case LESSON_07:	// レッスン7 (脱出)
+			case LESSON_06:	// レッスン6 (無音世界)
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_EXIT]);
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SILENCE]);
 
-			// 処理を抜ける
-			break;
+				// 処理を抜ける
+				break;
+
+			case LESSON_07:	// レッスン7 (脱出)
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_EXIT]);
+
+				// 処理を抜ける
+				break;
+			}
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
 		}
-
-		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
 	}
+	else
+	{ // 前の描画の場合
 
-	//------------------------------------------------------------------------------------------------------------------
-	//	演出の描画
-	//------------------------------------------------------------------------------------------------------------------
-	if (g_tutorial.state != TUTOSTAGSTATE_NONE)
-	{ // 何もしない状態ではない場合
+		//--------------------------------------------------------------------------------------------------------------
+		//	演出の描画
+		//--------------------------------------------------------------------------------------------------------------
+		if (g_tutorial.state != TUTOSTAGSTATE_NONE)
+		{ // 何もしない状態ではない場合
 
-		// テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_LETTER]);
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_LETTER]);
 
-		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 20, 2);
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 20, 2);
 
-		// テクスチャの設定
-		pDevice->SetTexture(0, NULL);
+			// テクスチャの設定
+			pDevice->SetTexture(0, NULL);
 
-		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 24, 2);
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 24, 2);
 
-		// テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_PAPER]);
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_PAPER]);
 
-		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 28, 2);
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 28, 2);
+		}
 	}
 }
 
@@ -1664,8 +1648,9 @@ void AllFalseFlyAway(void)
 void AllFalseSilenceWorld(void)
 {
 	// ポインタを宣言
-	Car     *pCar     = GetCarData();		// 車の情報
-	Barrier *pBarrier = GetBarrierData();	// バリアの情報
+	Car         *pCar     = GetCarData();			// 車の情報
+	Barrier     *pBarrier = GetBarrierData();		// バリアの情報
+	BarrierInfo *pBarInfo = GetBarrierInfoData();	// バリアのまとまりの情報
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
 	{ // 車の最大表示数分繰り返す
@@ -1679,6 +1664,13 @@ void AllFalseSilenceWorld(void)
 
 		// バリアを使用していない状態にする
 		pBarrier->bUse = false;
+	}
+
+	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++, pBarInfo++)
+	{ // バリアのまとまりの最大表示数分繰り返す
+
+		// バリアのまとまりを使用していない状態にする
+		pBarInfo->bUse = false;
 	}
 
 	// 影の更新
