@@ -541,7 +541,7 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 			case ICONTYPE_GATE_VERT:	// 正面・後ろ向きゲート
 
 				// 半径を設定
-				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_VERT_RADIUS.x, 0.0f, GATE_ICON_VERT_RADIUS.x);
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_VERT_RADIUS.x, 0.0f, GATE_ICON_VERT_RADIUS.z);
 
 				// 色を設定
 				g_aIcon[nCntIcon].col = GATE_ICON_COL;
@@ -551,7 +551,7 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 			case ICONTYPE_GATE_HORIZ:	// 左右向きゲート
 
 				// 半径を設定
-				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_HORIZ_RADIUS.x, 0.0f, GATE_ICON_HORIZ_RADIUS.x);
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_HORIZ_RADIUS.x, 0.0f, GATE_ICON_HORIZ_RADIUS.z);
 
 				// 色を設定
 				g_aIcon[nCntIcon].col = GATE_ICON_COL;
