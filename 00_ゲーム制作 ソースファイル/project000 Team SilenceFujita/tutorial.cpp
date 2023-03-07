@@ -52,7 +52,7 @@
 //**********************************************************************************************************************
 #define LESSON_SETUP_TXT	"data\\TXT\\lesson.txt"	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌƒŒƒbƒXƒ“ƒZƒbƒgƒAƒbƒv—p‚ÌƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚Ì‘Š‘ÎƒpƒX
 
-#define MAX_TUTO		(4)			// Žg—p‚·‚éƒ|ƒŠƒSƒ“”
+#define MAX_TUTO		(8)			// Žg—p‚·‚éƒ|ƒŠƒSƒ“”
 #define END_TUTO_TIME	(120)		// ƒ`ƒ…[ƒgƒŠƒAƒ‹I—¹‚Ü‚Å‚Ì—]‰CƒtƒŒ[ƒ€
 
 #define TUTO_BG_POS_X	(970.0f)	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ì”wŒi‚Ìâ‘ÎÀ•W (x)
@@ -71,6 +71,13 @@
 #define TIPS_HEIGHT		(100.0f)	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ì”õl‚Ì• / 2 (‚‚³)
 
 #define RESET_POS_Z		(-2000.0f)	// ƒvƒŒƒCƒ„[ÄÝ’èŽž‚Ì zÀ•W
+
+#define TUTO_EXIT_POS	(D3DXVECTOR3(100.0f, 100.0f, 0.0f))							// ‘Þo‚Ìâ‘ÎÀ•W
+#define TUTO_EXIT_SIZE	(D3DXVECTOR3(250.0f, 50.0f, 0.0f))							// ‘Þo‚Ì‘å‚«‚³
+#define TUTO_LET_POS	(D3DXVECTOR3(SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2, 0.0f))	// ŽèŽ†‚Ìâ‘ÎÀ•W
+#define TUTO_LET_SIZE	(D3DXVECTOR3(300.0f, 300.0f, 0.0f))							// ŽèŽ†‚Ì‘å‚«‚³
+#define TUTO_PAP_SIZE	(D3DXVECTOR3(300.0f, 300.0f, 0.0f))							// •Öâ³‚Ì‘å‚«‚³
+#define TUTO_FADE_STOP	(0.6f)		// ƒtƒF[ƒh‚ÌÅ‘åƒ¿’l
 
 //**********************************************************************************************************************
 //	—ñ‹“Œ^’è‹` (TEXTURE_TUTORIAL)
@@ -95,6 +102,15 @@ typedef enum
 	LESSON_SETUP_SILENCEWORLD,		// ƒŒƒbƒXƒ“6 (–³‰¹¢ŠE) ‚Ì“Ç‚Ýž‚Ý
 	LESSON_SETUP_MAX				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 } LESSON_SETUP;
+
+//**********************************************************************************************************************
+//	—ñ‹“Œ^’è‹` (TUTOSTAGSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	TUTOSTAGSTATE_NONE = 0,			// 
+	TUTOSTAGSTATE_MAX				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
+} TUTOSTAGSTATE;
 
 //**********************************************************************************************************************
 //	ƒRƒ“ƒXƒg’è‹`
@@ -133,6 +149,18 @@ const char *apTextureLesson[] =		// ƒŒƒbƒXƒ“ƒeƒNƒXƒ`ƒƒ‚Ì‘Š‘ÎƒpƒX
 };
 
 //**********************************************************************************************************************
+//	\‘¢‘Ì’è‹` (Tutorial)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3   pos;			// •Öâ³‚ÌˆÊ’u
+	TUTOSTAGSTATE state;		// ‰‰o‚Ìó‘Ô
+	float         fMove;		// •Öâ³‚ÌˆÚ“®—Ê
+	float         fAlphaLetter;	// ŽèŽ†‚Ìƒ¿’l
+	float         fAlphaFade;	// ƒtƒF[ƒh‚Ìƒ¿’l
+}Tutorial;
+
+//**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾
 //**********************************************************************************************************************
 void UpdateTutorialUi(void);			// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌUI‚ÌXVˆ—
@@ -157,6 +185,7 @@ LPDIRECT3DTEXTURE9      g_apTextureTutorial[TEXTURE_TUTORIAL_MAX] = {};	// ƒ`ƒ…
 LPDIRECT3DTEXTURE9      g_apTextureLesson[LESSON_MAX] = {};				// ƒŒƒbƒXƒ“ƒeƒNƒXƒ`ƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTutorial = NULL;						// ’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
+Tutorial      g_tutorial;				// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìî•ñ
 TUTORIALSTATE g_tutorialState;			// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìó‘Ô
 int           g_nLessonState;			// ƒŒƒbƒXƒ“‚Ìó‘Ô
 int           g_nCounterTutorialState;	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìó‘ÔŠÇ—ƒJƒEƒ“ƒ^[
@@ -208,6 +237,13 @@ void InitTutorial(void)
 	g_nCounterTutorialState = 0;						// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìó‘ÔŠÇ—ƒJƒEƒ“ƒ^[
 	g_nCounterLessonState   = 0;						// ƒŒƒbƒXƒ“‚Ìó‘ÔŠÇ—ƒJƒEƒ“ƒ^[
 	g_bTutorialEnd          = false;					// ƒ‚[ƒh‚Ì‘JˆÚó‹µ
+
+	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìî•ñ‚ð‰Šú‰»
+	g_tutorial.pos   = D3DXVECTOR3(SCREEN_WIDTH * 2, SCREEN_HEIGHT, 0.0f);	// •Öâ³‚ÌˆÊ’u
+	g_tutorial.state = TUTOSTAGSTATE_NONE;									// ‰‰o‚Ìó‘Ô
+	g_tutorial.fMove = 0.0f;												// •Öâ³‚ÌˆÚ“®—Ê
+	g_tutorial.fAlphaLetter = 0.0f;											// ŽèŽ†‚Ìƒ¿’l
+	g_tutorial.fAlphaFade   = 0.0f;											// ƒtƒF[ƒh‚Ìƒ¿’l
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	’¸“_î•ñ‚Ì‰Šú‰»
@@ -322,6 +358,108 @@ void InitTutorial(void)
 	pVtx[13].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[14].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[15].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	‘Þo‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[16].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[17].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[18].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[19].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[16].rhw = 1.0f;
+	pVtx[17].rhw = 1.0f;
+	pVtx[18].rhw = 1.0f;
+	pVtx[19].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[16].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[17].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[18].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[19].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌÝ’è
+	pVtx[16].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[17].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[18].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[19].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	ŽèŽ†‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[20].pos = D3DXVECTOR3(TUTO_LET_POS.x - TUTO_LET_SIZE.x, TUTO_LET_POS.y - TUTO_LET_SIZE.y, 0.0f);
+	pVtx[21].pos = D3DXVECTOR3(TUTO_LET_POS.x + TUTO_LET_SIZE.x, TUTO_LET_POS.y - TUTO_LET_SIZE.y, 0.0f);
+	pVtx[22].pos = D3DXVECTOR3(TUTO_LET_POS.x - TUTO_LET_SIZE.x, TUTO_LET_POS.y + TUTO_LET_SIZE.y, 0.0f);
+	pVtx[23].pos = D3DXVECTOR3(TUTO_LET_POS.x + TUTO_LET_SIZE.x, TUTO_LET_POS.y + TUTO_LET_SIZE.y, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[20].rhw = 1.0f;
+	pVtx[21].rhw = 1.0f;
+	pVtx[22].rhw = 1.0f;
+	pVtx[23].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[20].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[21].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[22].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[23].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌÝ’è
+	pVtx[20].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[21].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[22].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[23].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	ƒtƒF[ƒh‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[24].pos = D3DXVECTOR3(0.0f,         0.0f,          0.0f);
+	pVtx[25].pos = D3DXVECTOR3(SCREEN_WIDTH, 0.0f,          0.0f);
+	pVtx[26].pos = D3DXVECTOR3(0.0f,         SCREEN_HEIGHT, 0.0f);
+	pVtx[27].pos = D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[24].rhw = 1.0f;
+	pVtx[25].rhw = 1.0f;
+	pVtx[26].rhw = 1.0f;
+	pVtx[27].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[24].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[25].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[26].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[27].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	•Öâ³‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[28].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[29].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[30].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[31].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[28].rhw = 1.0f;
+	pVtx[29].rhw = 1.0f;
+	pVtx[30].rhw = 1.0f;
+	pVtx[31].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[28].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[29].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[30].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[31].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌÝ’è
+	pVtx[28].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[29].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[30].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[31].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	// ’¸“_ƒoƒbƒtƒ@‚ðƒAƒ“ƒƒbƒN‚·‚é
 	g_pVtxBuffTutorial->Unlock();
@@ -1022,7 +1160,116 @@ TUTORIALSTATE GetTutorialState(void)
 //======================================================================================================================
 void UpdateTutorialUi(void)
 {
+	// ƒ|ƒCƒ“ƒ^‚ðéŒ¾
+	VERTEX_2D *pVtx;	// ’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
+	// ’¸“_ƒoƒbƒtƒ@‚ðƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ðŽæ“¾
+	g_pVtxBuffTutorial->Lock(0, 0, (void**)&pVtx, 0);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	‘Þo‚ÌXV
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[16].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[17].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[18].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[19].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[16].rhw = 1.0f;
+	pVtx[17].rhw = 1.0f;
+	pVtx[18].rhw = 1.0f;
+	pVtx[19].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[16].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[17].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[18].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[19].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌÝ’è
+	pVtx[16].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[17].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[18].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[19].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	ŽèŽ†‚ÌXV
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[20].pos = D3DXVECTOR3(TUTO_LET_POS.x - TUTO_LET_SIZE.x, TUTO_LET_POS.y - TUTO_LET_SIZE.y, 0.0f);
+	pVtx[21].pos = D3DXVECTOR3(TUTO_LET_POS.x + TUTO_LET_SIZE.x, TUTO_LET_POS.y - TUTO_LET_SIZE.y, 0.0f);
+	pVtx[22].pos = D3DXVECTOR3(TUTO_LET_POS.x - TUTO_LET_SIZE.x, TUTO_LET_POS.y + TUTO_LET_SIZE.y, 0.0f);
+	pVtx[23].pos = D3DXVECTOR3(TUTO_LET_POS.x + TUTO_LET_SIZE.x, TUTO_LET_POS.y + TUTO_LET_SIZE.y, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[20].rhw = 1.0f;
+	pVtx[21].rhw = 1.0f;
+	pVtx[22].rhw = 1.0f;
+	pVtx[23].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[20].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[21].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[22].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[23].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌÝ’è
+	pVtx[20].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[21].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[22].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[23].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	ƒtƒF[ƒh‚ÌXV
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[24].pos = D3DXVECTOR3(0.0f,         0.0f,          0.0f);
+	pVtx[25].pos = D3DXVECTOR3(SCREEN_WIDTH, 0.0f,          0.0f);
+	pVtx[26].pos = D3DXVECTOR3(0.0f,         SCREEN_HEIGHT, 0.0f);
+	pVtx[27].pos = D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[24].rhw = 1.0f;
+	pVtx[25].rhw = 1.0f;
+	pVtx[26].rhw = 1.0f;
+	pVtx[27].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[24].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[25].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[26].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[27].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	•Öâ³‚ÌXV
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ðÝ’è
+	pVtx[28].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[29].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[30].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[31].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+
+	// rhw ‚ÌÝ’è
+	pVtx[28].rhw = 1.0f;
+	pVtx[29].rhw = 1.0f;
+	pVtx[30].rhw = 1.0f;
+	pVtx[31].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚ÌÝ’è
+	pVtx[28].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[29].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[30].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[31].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌÝ’è
+	pVtx[28].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[29].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[30].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[31].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	// ’¸“_ƒoƒbƒtƒ@‚ðƒAƒ“ƒƒbƒN‚·‚é
+	g_pVtxBuffTutorial->Unlock();
 }
 
 //======================================================================================================================
