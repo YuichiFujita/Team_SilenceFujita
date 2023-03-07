@@ -23,8 +23,10 @@ typedef enum
 	SOUND_LABEL_BGM_TITLE_000,			// タイトル内BGM_000
 	SOUND_LABEL_BGM_RESULT_000,			// リザルト内BGM_000
 	SOUND_LABEL_BGM_TUTORIAL_000,		// チュートリアル内BGM_000
-	SOUND_LABEL_BGM_ABILITY_WIND_000,	// プレイヤーの能力（送風機）のBGM_000
-	SOUND_LABEL_BGM_ABILITY_WIND_001,	// プレイヤーの能力（送風機）のBGM_001
+	SOUND_LABEL_BGM_FIRECAR_000,		// 消防車の効果音BGM_000
+	SOUND_LABEL_BGM_YAKIIMO_000,		// 石焼き芋の効果音BGM_000
+	SOUND_LABEL_BGM_BOUSOUCAR_000,		// 暴走車の効果音BGM_000
+	SOUND_LABEL_BGM_ABILITY_WIND_000,	// プレイヤーの能力（送風機）の効果音BGM_000
 	SOUND_LABEL_SE_,					// SE
 	SOUND_LABEL_SE_ABILITY_BOOST_000,	// プレイヤーの能力（ブースト）のBGM_000
 	SOUND_LABEL_SE_ABILITY_BOMB_000,	// プレイヤーの能力（ボム）のSE_000
@@ -61,7 +63,8 @@ void UninitSound(void);					// サウンドの終了処理
 HRESULT PlaySound(SOUND_LABEL label);	// サウンドの再生処理
 void StopSound(SOUND_LABEL label);
 void StopSound(void);
-void SoundVolumeControl(SOUND_LABEL label, float fdata);	// サウンドの音量調整
-bool GetSoundType(SOUND_TYPE);								// サウンドの有無の取得
+void SetSoundVolume(SOUND_LABEL label, float fdata);	// サウンドの音量調整
+float GetSoundVolume(SOUND_LABEL label);				// サウンドの音量の取得
+bool GetSoundType(SOUND_TYPE);							// サウンドの有無の取得
 
 #endif

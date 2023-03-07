@@ -11,6 +11,7 @@
 #include "input.h"
 #include "model.h"
 #include "calculation.h"
+#include "sound.h"
 
 #include "Car.h"
 #include "Combo.h"
@@ -48,6 +49,9 @@
 #define CAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 #define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
+
+#define CAR_SOUND_VOLUME_MAX	(1.0f)		// 最大値の音量
+#define CAR_SOUND_RADIUS		(3000.0f)	// 半径を検知を開始する判定
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -141,6 +145,15 @@ void UpdateCar(void)
 	float fTackleMove = 0.0f;	// 引数設定用
 	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
+	//効果音BGMの音量調整
+	if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+	{
+		//車の効果音サウンドの音量を0に変更
+		SetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
+	}
+
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aCar[nCntCar].bUse == true)
@@ -186,6 +199,9 @@ void UpdateCar(void)
 					//位置を0.0fに戻す
 					g_aCar[nCntCar].pos.y = 0.0f;
 				}
+
+				//車との距離で音量を調整
+				CarSoundVolume(&g_aCar[nCntCar].pos, &g_aCar[nCntCar].type);
 			}
 
 			if (GetBarrierState(&g_aCar[nCntCar]) == BARRIERSTATE_NONE	 ||
@@ -629,7 +645,7 @@ void PosCar(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove)
 	//	重力の更新
 	//--------------------------------------------------------
 	move->y -= CAR_GRAVITY;
-
+	
 	//--------------------------------------------------------
 	//	移動量の補正
 	//--------------------------------------------------------
@@ -1874,11 +1890,85 @@ void CarTrafficImprove(Car *pCar)
 
 	if (pCar->nTrafficCnt >= CAR_TRAFFIC_IMPROVE_CNT)
 	{ // 渋滞カウントが解除状態に入った場合
-		// カウントを0にする
+	  // カウントを0にする
 		pCar->nTrafficCnt = 0;
 
 		// 通常状態にする
 		pCar->state = CARSTATE_NORMAL;
+	}
+}
+
+//============================================================
+// 車との距離で音量を調整
+//============================================================
+void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type)
+{
+	Player *pPlayer = GetPlayer();				// プレイヤーの情報を取得する
+
+	if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+	{//効果音BGMが使用状態のとき
+		if (pPlayer->bUse == true)
+		{//プレイヤーが使用状態のとき
+
+			//距離を測る変数
+			float fLength = ((pPlayer->pos.x - pPos->x) * (pPlayer->pos.x - pPos->x)
+						  +	 (pPlayer->pos.z - pPos->z) * (pPlayer->pos.z - pPos->z));
+
+			//効果音BGMの再生
+			if (fLength < (CAR_SOUND_RADIUS * CAR_SOUND_RADIUS))
+			{//一定範囲内の場合
+
+				//音量設定用の変数
+				float fVolume = CAR_SOUND_VOLUME_MAX - (fLength / (CAR_SOUND_RADIUS * CAR_SOUND_RADIUS));
+
+				switch (*type)
+				{//車の種類ごとに設定
+
+					//普通の車
+				case CARTYPE_CAR001:
+
+					break;
+
+					//消防車
+				case CARTYPE_FIRECAR:
+					if (fVolume >= GetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000))
+					{//現在の音量より大きい場合
+
+						//音量を調整（消防車）
+						SetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000, fVolume);
+					}
+
+					break;
+
+					//焼き芋屋
+				case CARTYPE_YAKIIMOCAR:
+					if (fVolume >= GetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000))
+					{//現在の音量より大きい場合
+
+						//音量を調整（焼き芋屋）
+						SetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000, fVolume);
+					}
+					break;
+
+					//選挙カー
+				case CARTYPE_ELECTIONCAR:
+
+					break;
+
+					//暴走車
+				case CARTYPE_BOUSOUCAR:
+					if (fVolume >= GetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000))
+					{//現在の音量より大きい場合
+
+						//音量を調整（暴走車）
+						SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, fVolume);
+					}
+					break;
+
+				}
+
+			}
+		}
 	}
 }
 
