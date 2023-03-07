@@ -131,6 +131,10 @@ void InitObject(void)
 		g_aObject[nCntObject].appear.scaleAdd = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率の加算数
 		g_aObject[nCntObject].appear.fAlpha = 0.0f;									// 透明度
 
+		// アイコンの情報の初期化
+		g_aObject[nCntObject].icon.state   = ICONSTATE_NONE;						// アイコンの状態
+		g_aObject[nCntObject].icon.nIconID = NONE_ICON;								// アイコンのインデックス
+
 #ifdef _DEBUG	// デバッグ処理
 		// エディット時の状態
 		g_aObject[nCntObject].editState = OBJECTSTATE_NONE;
@@ -178,6 +182,8 @@ void UninitObject(void)
 //======================================================================================================================
 void UpdateObject(void)
 {
+	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
+
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -358,6 +364,26 @@ void UpdateObject(void)
 
 				break;					// 抜け出す(出現完了)
 			}
+
+			// 原点からずれている位置を算出する
+			Pos = D3DXVECTOR3
+			(
+				(g_aObject[nCntObject].modelData.vtxMax.x + g_aObject[nCntObject].modelData.vtxMin.x) * 0.5f,
+				0.0f,
+				(g_aObject[nCntObject].modelData.vtxMax.z + g_aObject[nCntObject].modelData.vtxMin.z) * 0.5f
+			);
+
+			// アイコンの位置設定処理
+			SetPositionIcon
+			(
+				g_aObject[nCntObject].icon.nIconID,			// アイコンのインデックス
+				D3DXVECTOR3									// 位置
+				(
+					g_aObject[nCntObject].pos.x + Pos.x,
+					0.0f,
+					g_aObject[nCntObject].pos.z + Pos.z
+				)
+			);
 		}
 	}
 }
@@ -532,6 +558,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 {
 	// 変数を宣言
 	float AverageScale;			// 拡大率の平均値
+	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
 
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;	// マテリアルデータへのポインタ
@@ -644,6 +671,10 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
 			g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
 
+			// アイコンの情報の初期化
+			g_aObject[nCntObject].icon.state   = ICONSTATE_NONE;						// アイコンの状態
+			g_aObject[nCntObject].icon.nIconID = NONE_ICON;								// アイコンのインデックス
+
 			// マテリアルデータへのポインタを取得
 			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].modelData.pBuffMat->GetBufferPointer();
 
@@ -693,6 +724,123 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = NONE_SHADOW;	// 影を設定しない
+			}
+
+			// 原点からずれている位置を算出する
+			Pos = D3DXVECTOR3
+			(
+				(g_aObject[nCntObject].modelData.vtxMax.x + g_aObject[nCntObject].modelData.vtxMin.x) * 0.5f,
+				0.0f,
+				(g_aObject[nCntObject].modelData.vtxMax.z + g_aObject[nCntObject].modelData.vtxMin.z) * 0.5f
+			);
+
+			if (g_aObject[nCntObject].judge.state == JUDGESTATE_EVIL)
+			{ // 悪い建物の場合
+
+				if (g_aObject[nCntObject].appear.state == APPEARSTATE_SLOWLY)
+				{ // 徐々に出現する場合
+
+					// アイコンの設定処理
+					g_aObject[nCntObject].icon.nIconID = SetIconObject
+					(
+						D3DXVECTOR3										// 半径
+						(
+							(g_aObject[nCntObject].modelData.size.x * g_aObject[nCntObject].appear.scaleCopy.x) * 0.5f,
+							0.0f,
+							(g_aObject[nCntObject].modelData.size.z * g_aObject[nCntObject].appear.scaleCopy.z) * 0.5f
+						),
+						D3DXVECTOR3										// 位置
+						(
+							g_aObject[nCntObject].pos.x + Pos.x,
+							0.0f,
+							g_aObject[nCntObject].pos.z + Pos.z
+						),
+						ICONTYPE_EVIL_OBJECT,							// アイコンの種類
+						&g_aObject[nCntObject].icon.nIconID,			// アイコンのインデックス
+						&g_aObject[nCntObject].bUse,					// 使用状況
+						&g_aObject[nCntObject].icon.state,				// アイコンの状態
+						g_aObject[nCntObject].collInfo.stateRot			// 向きの状態
+					);
+				}
+				else
+				{ // 出現する場合
+
+					// アイコンの設定処理
+					g_aObject[nCntObject].icon.nIconID = SetIconObject
+					(
+						D3DXVECTOR3										// 半径
+						(
+							(g_aObject[nCntObject].modelData.size.x * g_aObject[nCntObject].scale.x) * 0.5f,
+							0.0f,
+							(g_aObject[nCntObject].modelData.size.z * g_aObject[nCntObject].scale.z) * 0.5f
+						),
+						D3DXVECTOR3										// 位置
+						(
+							g_aObject[nCntObject].pos.x + Pos.x,
+							0.0f,
+							g_aObject[nCntObject].pos.z + Pos.z
+						),
+						ICONTYPE_EVIL_OBJECT,							// アイコンの種類
+						&g_aObject[nCntObject].icon.nIconID,			// アイコンのインデックス
+						&g_aObject[nCntObject].bUse,					// 使用状況
+						&g_aObject[nCntObject].icon.state,				// アイコンの状態
+						g_aObject[nCntObject].collInfo.stateRot			// 向きの状態
+					);
+				}
+			}
+			else
+			{ // 良い建物の場合
+
+				if (g_aObject[nCntObject].appear.state == APPEARSTATE_SLOWLY)
+				{ // 徐々に出現する場合
+
+					// アイコンの設定処理
+					g_aObject[nCntObject].icon.nIconID = SetIconObject
+					(
+						D3DXVECTOR3										// 半径
+						(
+							(g_aObject[nCntObject].modelData.size.x * g_aObject[nCntObject].appear.scaleCopy.x) * 0.5f,
+							0.0f,
+							(g_aObject[nCntObject].modelData.size.z * g_aObject[nCntObject].appear.scaleCopy.z) * 0.5f
+						),
+						D3DXVECTOR3										// 位置
+						(
+							g_aObject[nCntObject].pos.x + Pos.x,
+							0.0f,
+							g_aObject[nCntObject].pos.z + Pos.z
+						),
+						ICONTYPE_OBJECT,								// アイコンの種類
+						&g_aObject[nCntObject].icon.nIconID,			// アイコンのインデックス
+						&g_aObject[nCntObject].bUse,					// 使用状況
+						&g_aObject[nCntObject].icon.state,				// アイコンの状態
+						g_aObject[nCntObject].collInfo.stateRot			// 向きの状態
+					);
+				}
+				else
+				{ // 出現する場合
+
+					// アイコンの設定処理
+					g_aObject[nCntObject].icon.nIconID = SetIconObject
+					(
+						D3DXVECTOR3										// 半径
+						(
+							(g_aObject[nCntObject].modelData.size.x * g_aObject[nCntObject].scale.x) * 0.5f,
+							0.0f,
+							(g_aObject[nCntObject].modelData.size.z * g_aObject[nCntObject].scale.z) * 0.5f
+						),
+						D3DXVECTOR3										// 位置
+						(
+							g_aObject[nCntObject].pos.x + Pos.x,
+							0.0f,
+							g_aObject[nCntObject].pos.z + Pos.z
+						),
+						ICONTYPE_OBJECT,								// アイコンの種類
+						&g_aObject[nCntObject].icon.nIconID,			// アイコンのインデックス
+						&g_aObject[nCntObject].bUse,					// 使用状況
+						&g_aObject[nCntObject].icon.state,				// アイコンの状態
+						g_aObject[nCntObject].collInfo.stateRot			// 向きの状態
+					);
+				}
 			}
 
 			// 影の位置設定
