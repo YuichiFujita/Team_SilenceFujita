@@ -14,27 +14,29 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MAX_ICON			(1024)		// 使用するポリゴン数 (アイコンの最大数)
+#define MAX_ICON			(1500)		// 使用するポリゴン数 (アイコンの最大数)
 
-#define PLAY_ICON_RADIUS	(130.0f)	// プレイヤーのアイコンの半径
+#define PLAY_ICON_RADIUS	(250.0f)								// プレイヤーのアイコンの半径
 #define PLAY_ICON_COL		(D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f))		// プレイヤーのアイコンの色
 
-#define EVIL_ICON_RADIUS	(100.0f)	// 悪い奴のアイコンの半径
+#define EVIL_ICON_RADIUS	(250.0f)								// 悪い奴のアイコンの半径
 #define EVIL_ICON_COL		(D3DXCOLOR(0.2f, 1.0f, 0.2f, 1.0f))		// 悪い奴のアイコンの色
 
-#define POLICE_ICON_RADIUS	(100.0f)	// 警察のアイコンの半径
+#define POLICE_ICON_RADIUS	(250.0f)								// 警察のアイコンの半径
 #define POLICE_ICON_COL		(D3DXCOLOR(0.2f, 0.2f, 1.0f, 1.0f))		// 警察のアイコンの色
 
-#define BARRIER_ICON_SET_RADIUS		(0.0f)	// アイコンの設定時の半径
-#define BARRIER_ICON_RADIUS	(140.0f)	// バリアのアイコンの半径
+#define BARRIER_ICON_SET_RADIUS		(0.0f)							// アイコンの設定時の半径
+#define BARRIER_ICON_RADIUS	(140.0f)								// バリアのアイコンの半径
 #define BARRIER_ICON_COL	(D3DXCOLOR(0.4f,1.0f,1.0f,1.0f))		// バリアのアイコンの色
 
-#define GATE_ICON_VERT_RADIUS	(D3DXVECTOR3(400.0f, 0.0f, 150.0f))		// ゲート(正面・後ろ向き)アイコンの半径
+#define GATE_ICON_VERT_RADIUS	(D3DXVECTOR3(400.0f, 0.0f, 150.0f))	// ゲート(正面・後ろ向き)アイコンの半径
 #define GATE_ICON_HORIZ_RADIUS	(D3DXVECTOR3(150.0f, 0.0f, 400.0f))	// ゲート(左右向き)アイコンの半径(X軸)
 #define GATE_ICON_COL		(D3DXCOLOR(1.0f, 0.6f, 1.0f, 1.0f))		// ゲートのアイコンの色
 
-#define ITEM_ICON_RADIUS	(80.0f)	// アイテムのアイコンの半径
-#define ITEM_ICON_COL		(D3DXCOLOR(1.0f, 0.5f, 0.8f, 1.0f))		// アイテムのアイコンの色
+#define ITEM_ICON_RADIUS	(80.0f)									// アイテムのアイコンの半径
+#define ITEM_ICON_COL		(D3DXCOLOR(0.4f, 1.0f, 1.0f, 1.0f))		// アイテムのアイコンの色
+
+#define OBJECT_ICON_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// オブジェクトのアイコンの色
 
 #define ICON_CORRECT_RIGHT	(4000.0f)	// アイコンの右側の補正係数
 #define ICON_CORRECT_LEFT	(4000.0f)	// アイコンの左側の補正係数
@@ -50,10 +52,25 @@
 //************************************************************
 //	グローバル変数
 //************************************************************
-LPDIRECT3DTEXTURE9      g_pTextureIcon = NULL;	// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9      g_pTextureIcon[ICONTYPE_MAX] = {};	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffIcon = NULL;	// 頂点バッファへのポインタ
 
 Icon g_aIcon[MAX_ICON];		// アイコンの情報
+
+// テクスチャファイル名
+const char *c_apTextureFileIcon[ICONTYPE_MAX] =
+{
+	"data\\TEXTURE\\icon001.png",
+	"data\\TEXTURE\\icon000.png",
+	"data\\TEXTURE\\icon002.png",
+	"data\\TEXTURE\\icon004.png",
+	"data\\TEXTURE\\icon005.png",
+	"data\\TEXTURE\\icon006.png",
+	"data\\TEXTURE\\icon007.png",
+	"data\\TEXTURE\\icon008.png",
+	"data\\TEXTURE\\icon009.png",
+	"data\\TEXTURE\\icon003.png",
+};
 
 //=======================================================================================================
 //	アイコンの初期化処理
@@ -64,8 +81,11 @@ void InitIcon(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	VERTEX_3D *pVtx;							// 頂点情報へのポインタ
 	
-	// テクスチャを読み込む
-	D3DXCreateTextureFromFile(pDevice, "data\\TEXTURE\\aaa.jpg", &g_pTextureIcon);
+	for (int nCntTex = 0; nCntTex < ICONTYPE_MAX; nCntTex++)
+	{
+		// テクスチャを読み込む
+		D3DXCreateTextureFromFile(pDevice, c_apTextureFileIcon[nCntTex], &g_pTextureIcon[nCntTex]);
+	}
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
@@ -140,11 +160,14 @@ void InitIcon(void)
 //=======================================================================================================
 void UninitIcon(void)
 {
-	if (g_pTextureIcon != NULL)
-	{ // 変数 (g_pTextureIcon) がNULLではない場合
+	for (int nCntTex = 0; nCntTex < ICONTYPE_MAX; nCntTex++)
+	{
+		if (g_pTextureIcon[nCntTex] != NULL)
+		{ // 変数 (g_pTextureIcon) がNULLではない場合
 
-		g_pTextureIcon->Release();
-		g_pTextureIcon = NULL;
+			g_pTextureIcon[nCntTex]->Release();
+			g_pTextureIcon[nCntTex] = NULL;
+		}
 	}
 
 	// 頂点バッファの破棄
@@ -355,8 +378,8 @@ void UpdateIcon(void)
 					break;					// 抜け出す
 				}
 
-				if (g_aIcon[nCntIcon].type != ICONTYPE_BARRIER)
-				{ // バリアのアイコン以外の場合
+				if (g_aIcon[nCntIcon].type != ICONTYPE_BARRIER && g_aIcon[nCntIcon].type != ICONTYPE_EVIL_OBJECT && g_aIcon[nCntIcon].type != ICONTYPE_OBJECT)
+				{ // バリア・建物系のアイコン以外の場合
 
 					if (cameraPos.x + ICON_CORRECT_RIGHT <= g_aIcon[nCntIcon].pos.x + g_aIcon[nCntIcon].radius.x)
 					{ // 右側よりも外側にアイコンがある場合
@@ -423,33 +446,36 @@ void DrawIcon(void)
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);					//Zテストの設定
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);						//Zテストの有効/無効設定
 
-	for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
-	{ // アイコンの最大表示数分繰り返す
+	for (int nCntType = 0; nCntType < ICONTYPE_MAX; nCntType++)
+	{
+		for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
+		{ // アイコンの最大表示数分繰り返す
 
-		if (g_aIcon[nCntIcon].bUse == true)
-		{ // アイコンが使用されている場合
+			if (g_aIcon[nCntIcon].bUse == true && g_aIcon[nCntIcon].type == nCntType)
+			{ // アイコンが使用されているかつ、タイプが一致していた場合
 
-			// ワールドマトリックスの初期化
-			D3DXMatrixIdentity(&g_aIcon[nCntIcon].mtxWorld);
+				// ワールドマトリックスの初期化
+				D3DXMatrixIdentity(&g_aIcon[nCntIcon].mtxWorld);
 
-			// 位置を反映
-			D3DXMatrixTranslation(&mtxTrans, g_aIcon[nCntIcon].pos.x, g_aIcon[nCntIcon].pos.y, g_aIcon[nCntIcon].pos.z);
-			D3DXMatrixMultiply(&g_aIcon[nCntIcon].mtxWorld, &g_aIcon[nCntIcon].mtxWorld, &mtxTrans);
+				// 位置を反映
+				D3DXMatrixTranslation(&mtxTrans, g_aIcon[nCntIcon].pos.x, g_aIcon[nCntIcon].pos.y, g_aIcon[nCntIcon].pos.z);
+				D3DXMatrixMultiply(&g_aIcon[nCntIcon].mtxWorld, &g_aIcon[nCntIcon].mtxWorld, &mtxTrans);
 
-			// ワールドマトリックスの設定
-			pDevice->SetTransform(D3DTS_WORLD, &g_aIcon[nCntIcon].mtxWorld);
+				// ワールドマトリックスの設定
+				pDevice->SetTransform(D3DTS_WORLD, &g_aIcon[nCntIcon].mtxWorld);
 
-			// 頂点バッファをデータストリームに設定
-			pDevice->SetStreamSource(0, g_pVtxBuffIcon, 0, sizeof(VERTEX_3D));
+				// 頂点バッファをデータストリームに設定
+				pDevice->SetStreamSource(0, g_pVtxBuffIcon, 0, sizeof(VERTEX_3D));
 
-			// 頂点フォーマットの設定
-			pDevice->SetFVF(FVF_VERTEX_3D);
+				// 頂点フォーマットの設定
+				pDevice->SetFVF(FVF_VERTEX_3D);
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_pTextureIcon);
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_pTextureIcon[g_aIcon[nCntIcon].type]);
 
-			// ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntIcon * 4, 2);
+				// ポリゴンの描画
+				pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntIcon * 4, 2);
+			}
 		}
 	}
 
@@ -508,7 +534,17 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 
 				break;				// 抜け出す
 
-			case ICONTYPE_EVIL:		// 悪い奴
+			case ICONTYPE_EVIL_HUMAN:		// 悪い人
+
+				// 半径を設定
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(EVIL_ICON_RADIUS, 0.0f, EVIL_ICON_RADIUS);
+
+				// 色を設定
+				g_aIcon[nCntIcon].col = EVIL_ICON_COL;
+
+				break;				// 抜け出す
+
+			case ICONTYPE_EVIL_CAR:		// 悪い車
 
 				// 半径を設定
 				g_aIcon[nCntIcon].radius = D3DXVECTOR3(EVIL_ICON_RADIUS, 0.0f, EVIL_ICON_RADIUS);
@@ -567,6 +603,105 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 				g_aIcon[nCntIcon].col = ITEM_ICON_COL;
 
 				break;				// 抜け出す
+			}
+
+			// 色のコピーを設定する
+			g_aIcon[nCntIcon].colCopy = g_aIcon[nCntIcon].col;
+
+			//頂点座標の設定
+			pVtx[0].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].radius.x, +0.0f, +g_aIcon[nCntIcon].radius.z);
+			pVtx[1].pos = D3DXVECTOR3(+g_aIcon[nCntIcon].radius.x, +0.0f, +g_aIcon[nCntIcon].radius.z);
+			pVtx[2].pos = D3DXVECTOR3(-g_aIcon[nCntIcon].radius.x, +0.0f, -g_aIcon[nCntIcon].radius.z);
+			pVtx[3].pos = D3DXVECTOR3(+g_aIcon[nCntIcon].radius.x, +0.0f, -g_aIcon[nCntIcon].radius.z);
+
+			// 頂点カラーの設定
+			pVtx[0].col = g_aIcon[nCntIcon].col;
+			pVtx[1].col = g_aIcon[nCntIcon].col;
+			pVtx[2].col = g_aIcon[nCntIcon].col;
+			pVtx[3].col = g_aIcon[nCntIcon].col;
+
+			//使用する
+			g_aIcon[nCntIcon].bUse = true;
+
+			//アイコンの番号をコピーする
+			nIdxIcon = nCntIcon;
+
+			break;				//抜け出す
+		}
+		pVtx += 4;				//頂点データを4つ分進める
+	}
+
+	//頂点バッファをアンロックする
+	g_pVtxBuffIcon->Unlock();
+
+	//アイコンの番号を返す
+	return nIdxIcon;
+}
+
+//=======================================================================================================
+// オブジェクトのアイコンの設定処理
+//=======================================================================================================
+int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE *pState, ROTSTATE rot)
+{
+	//アイコンの番号を初期化する
+	int nIdxIcon = NONE_ICON;
+
+	D3DXVECTOR3 playerPos = GetPlayer()->pos;		// プレイヤーの位置を取得
+
+	//頂点情報へのポインタ
+	VERTEX_3D *pVtx;
+
+	//頂点バッファをロック
+	g_pVtxBuffIcon->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
+	{
+		if (g_aIcon[nCntIcon].bUse == false)
+		{//使用していなかった場合
+
+			// 情報の設定
+			g_aIcon[nCntIcon].pos.x = pos.x;			// 位置(X軸)
+			g_aIcon[nCntIcon].pos.z = pos.z;			// 位置(Z軸)
+			g_aIcon[nCntIcon].type = type;				// 種類
+			g_aIcon[nCntIcon].pIconIDParent = pIconID;	// アイコンのインデックス
+			g_aIcon[nCntIcon].pUseParent = pUse;		// 親の使用状況
+			g_aIcon[nCntIcon].pState = pState;			// 状態
+
+			g_aIcon[nCntIcon].nCounter = 0;				// カウンター
+			g_aIcon[nCntIcon].alpha = ICONALPHA_NONE;	// 透明度の状態
+
+			// 横幅と縦幅を計算
+			if (rot == ROTSTATE_0
+				|| rot == ROTSTATE_180)
+			{ // 角度が0度、または180度の場合
+
+				//半径を設定する
+				g_aIcon[nCntIcon].radius.x = radius.x;
+				g_aIcon[nCntIcon].radius.z = radius.z;
+			}
+			else
+			{ // 角度90度、または270度の場合
+
+				//半径を設定する
+				g_aIcon[nCntIcon].radius.x = radius.z;
+				g_aIcon[nCntIcon].radius.z = radius.x;
+			}
+
+			switch (g_aIcon[nCntIcon].type)
+			{
+			case ICONTYPE_OBJECT:		// オブジェクトの場合
+
+				// アイコンの色を設定
+				g_aIcon[nCntIcon].col = OBJECT_ICON_COL;
+
+				break;
+
+			case ICONTYPE_EVIL_OBJECT:	// 悪いオブジェクトの場合
+
+				// アイコンの色を設定
+				g_aIcon[nCntIcon].col = EVIL_ICON_COL;
+
+				break;
 			}
 
 			// 色のコピーを設定する

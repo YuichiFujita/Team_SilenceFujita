@@ -156,12 +156,12 @@ void InitVelocity(void)
 	// í∏ì_ç¿ïWÇê›íË
 	pVtx[8].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y - VELO_HEIGHT, 0.0f);
 
-	pVtx[9].pos.x = VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL);
-	pVtx[9].pos.y = (VELO_POS_Y - VELO_HEIGHT) - VELO_PULS_Y;
+	pVtx[9].pos.x = VELO_POS_X;
+	pVtx[9].pos.y = VELO_POS_Y - VELO_HEIGHT;
 	pVtx[9].pos.z = 0.0f;
 
-	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X,                                     VELO_POS_Y + VELO_HEIGHT, 0.0f);
-	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X + (MAX_REAL_SPEED * VELO_WIDTH_MUL), VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[10].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y + VELO_HEIGHT, 0.0f);
+	pVtx[11].pos = D3DXVECTOR3(VELO_POS_X, VELO_POS_Y + VELO_HEIGHT, 0.0f);
 
 	// rhw ÇÃê›íË
 	pVtx[8].rhw  = 1.0f;

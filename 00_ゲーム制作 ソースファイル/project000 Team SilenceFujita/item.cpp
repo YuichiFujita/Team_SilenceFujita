@@ -27,6 +27,8 @@
 #define EFFECT_TIME_ITEM		(160)	// パーティクルを出す間隔
 #define MOVE_ROT_ITEM			(0.03f)	// アイテムの回転量
 #define ITEM_LOST_COUNT			(600)	// アイテムが消えるカウント数
+#define ITEM_HOMING_DIST		(700000.0f)		// ホーミング判定に入る距離
+#define ITEM_HOMING_SPEED		(10.0f)			// ホーミング時の速度
 
 #define ITEM_POS_DEST_UP		(100.0f)	// アイテムの目標の位置(上昇状態)
 #define ITEM_POS_DEST_DOWN		(50.0f)		// アイテムの目標の位置(下降状態)
@@ -36,19 +38,12 @@
 #define ITEM_MARK_EFFECT_COL	(D3DXCOLOR(0.1f,0.9f,1.0f,1.0f))	// アイテムの目印のエフェクトの色
 
 //**********************************************************************************************************************
-//	コンスト定義
-//**********************************************************************************************************************
-const char *apModelItem[] =			// モデルの相対パス
-{
-	"data\\MODEL_ITEM\\heal000.x",	// 回復アイテムのモデル相対パス
-};
-
-//**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void TutorialItem(void);			// チュートリアルのアイテムの更新処理
 void GameItem(void);				// ゲームのアイテムの更新処理
 
+void HomingPlayer(Item *pItem);		// アイテムのホーミング判定
 void CollisionPlayer(Item *pItem);	// アイテムとプレイヤーの当たり判定
 
 //**********************************************************************************************************************
@@ -265,7 +260,7 @@ void SetItem(D3DXVECTOR3 pos, int nType)
 void CollisionPlayer(Item *pItem)
 {
 	// 変数を宣言
-	float fLength = 0.0f;				// アイテムとプレイヤーとの間の距離
+	float fLength = 0.0f;			// アイテムとプレイヤーとの間の距離
 
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーの情報
@@ -274,8 +269,8 @@ void CollisionPlayer(Item *pItem)
 	{ // プレイヤーが使用されている場合
 
 		// アイテムとプレイヤーとの間の距離を求める
-		fLength = (pItem->pos.x - pPlayer->pos.x) * (pItem->pos.x - pPlayer->pos.x)
-				+ (pItem->pos.z - pPlayer->pos.z) * (pItem->pos.z - pPlayer->pos.z);
+		fLength = (pPlayer->pos.x - pItem->pos.x) * (pPlayer->pos.x - pItem->pos.x)
+				+ (pPlayer->pos.z - pItem->pos.z) * (pPlayer->pos.z - pItem->pos.z);
 
 		if (fLength < ((pItem->modelData.fRadius + PLAY_WIDTH) * (pItem->modelData.fRadius + PLAY_WIDTH)))
 		{ // アイテムがプレイヤーに当たっている場合
@@ -333,11 +328,11 @@ void TutorialItem(void)
 			{
 			case ITEMSTATE_UP:		// 上昇状態
 
-									// 移動量を設定する
+				// 移動量を設定する
 				g_aItem[nCntItem].move.y = 1.0f;
 
 				// 移動量を加算する
-				g_aItem[nCntItem].pos.y += g_aItem[nCntItem].move.y;
+				g_aItem[nCntItem].pos += g_aItem[nCntItem].move;
 
 				if (g_aItem[nCntItem].pos.y >= g_aItem[nCntItem].stateInfo.fPosDest)
 				{ // 位置が目標に一定量近づいた場合
@@ -356,11 +351,11 @@ void TutorialItem(void)
 
 			case ITEMSTATE_DOWN:	// 下降状態
 
-									// 移動量を設定する
+				// 移動量を設定する
 				g_aItem[nCntItem].move.y = -1.0f;
 
 				// 移動量を加算する
-				g_aItem[nCntItem].pos.y += g_aItem[nCntItem].move.y;
+				g_aItem[nCntItem].pos += g_aItem[nCntItem].move;
 
 				if (g_aItem[nCntItem].pos.y <= g_aItem[nCntItem].stateInfo.fPosDest)
 				{ // 位置が目標に一定量近づいた場合
@@ -428,6 +423,11 @@ void TutorialItem(void)
 			}
 
 			//------------------------------------------------------------------------------------------------------
+			// アイテムのホーミング判定
+			//------------------------------------------------------------------------------------------------------
+			HomingPlayer(&g_aItem[nCntItem]);
+
+			//------------------------------------------------------------------------------------------------------
 			//	当たり判定
 			//------------------------------------------------------------------------------------------------------
 			// アイテムとプレイヤーの当たり判定
@@ -481,7 +481,7 @@ void GameItem(void)
 				g_aItem[nCntItem].move.y = 1.0f;
 
 				// 移動量を加算する
-				g_aItem[nCntItem].pos.y += g_aItem[nCntItem].move.y;
+				g_aItem[nCntItem].pos += g_aItem[nCntItem].move;
 
 				if (g_aItem[nCntItem].pos.y >= g_aItem[nCntItem].stateInfo.fPosDest)
 				{ // 位置が目標に一定量近づいた場合
@@ -504,7 +504,7 @@ void GameItem(void)
 				g_aItem[nCntItem].move.y = -1.0f;
 
 				// 移動量を加算する
-				g_aItem[nCntItem].pos.y += g_aItem[nCntItem].move.y;
+				g_aItem[nCntItem].pos += g_aItem[nCntItem].move;
 
 				if (g_aItem[nCntItem].pos.y <= g_aItem[nCntItem].stateInfo.fPosDest)
 				{ // 位置が目標に一定量近づいた場合
@@ -572,6 +572,11 @@ void GameItem(void)
 			}
 
 			//------------------------------------------------------------------------------------------------------
+			// アイテムのホーミング判定
+			//------------------------------------------------------------------------------------------------------
+			HomingPlayer(&g_aItem[nCntItem]);
+
+			//------------------------------------------------------------------------------------------------------
 			//	当たり判定
 			//------------------------------------------------------------------------------------------------------
 			// アイテムとプレイヤーの当たり判定
@@ -598,6 +603,38 @@ void GameItem(void)
 				g_aItem[nCntItem].icon.nIconID,
 				g_aItem[nCntItem].pos
 			);
+		}
+	}
+}
+
+//======================================================================================================================
+// アイテムのホーミング判定
+//======================================================================================================================
+void HomingPlayer(Item *pItem)
+{
+	// 変数を宣言
+	float fLength = 0.0f;			// アイテムとプレイヤーとの間の距離
+	float fAngle = 0.0f;			// アイテムからプレイヤーへの角度
+
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();	// プレイヤーの情報
+
+	if (pPlayer->bUse == true)
+	{ // プレイヤーが使用されている場合
+
+		// アイテムとプレイヤーとの間の距離を求める
+		fLength = (pPlayer->pos.x - pItem->pos.x) * (pPlayer->pos.x - pItem->pos.x)
+				+ (pPlayer->pos.z - pItem->pos.z) * (pPlayer->pos.z - pItem->pos.z);
+
+		if (fLength < ITEM_HOMING_DIST)
+		{ // プレイヤーがアイテムに近づいている場合
+
+			// プレイヤーへの角度を求める
+			fAngle = atan2f(pPlayer->pos.x - pItem->pos.x, pPlayer->pos.z - pItem->pos.z);
+
+			// 移動量を設定する
+			pItem->move.x = sinf(fAngle) * (fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x) + ITEM_HOMING_SPEED);
+			pItem->move.z = cosf(fAngle) * (fabsf(pPlayer->move.x + pPlayer->boost.plusMove.x) + ITEM_HOMING_SPEED);
 		}
 	}
 }

@@ -402,11 +402,15 @@ void CollisionWind(Human *pHuman)
 				// アイテムが落ちるカウントを初期化する
 				g_nHumanItemCount++;
 
-				if (g_nHumanItemCount % ITEM_WIND_COUNT == 0)
-				{ // 一定数以上になったら
+				if (GetMode() == MODE_GAME)
+				{ // ゲーム状態の場合
 
-					// アイテムの設定処理
-					SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
+					if (g_nHumanItemCount % ITEM_WIND_COUNT == 0)
+					{ // 一定数以上になったら
+
+						// アイテムの設定処理
+						SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
+					}
 				}
 
 				// ボーナスの設定処理

@@ -11,6 +11,7 @@
 #include "input.h"
 #include "sound.h"
 #include "fade.h"
+#include "input.h"
 #include "calculation.h"
 
 #include "tutorial.h"
@@ -26,7 +27,6 @@
 #include "Car.h"
 #include "Combo.h"
 #include "effect.h"
-#include "flash.h"
 #include "gate.h"
 #include "icon.h"
 #include "junk.h"
@@ -52,7 +52,7 @@
 //**********************************************************************************************************************
 #define LESSON_SETUP_TXT	"data\\TXT\\lesson.txt"	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌƒŒƒbƒXƒ“ƒZƒbƒgƒAƒbƒv—p‚ÌƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚Ì‘Š‘ÎƒpƒX
 
-#define MAX_TUTO		(4)			// g—p‚·‚éƒ|ƒŠƒSƒ“”
+#define MAX_TUTO		(8)			// g—p‚·‚éƒ|ƒŠƒSƒ“”
 #define END_TUTO_TIME	(120)		// ƒ`ƒ…[ƒgƒŠƒAƒ‹I—¹‚Ü‚Å‚Ì—]‰CƒtƒŒ[ƒ€
 
 #define TUTO_BG_POS_X	(970.0f)	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ì”wŒi‚Ìâ‘ÎÀ•W (x)
@@ -72,12 +72,21 @@
 
 #define RESET_POS_Z		(-2000.0f)	// ƒvƒŒƒCƒ„[Äİ’è‚Ì zÀ•W
 
+#define TUTO_EXIT_POS	(D3DXVECTOR3(100.0f, 100.0f, 0.0f))								// ‘Şo‚Ìâ‘ÎÀ•W
+#define TUTO_EXIT_SIZE	(D3DXVECTOR3(250.0f, 50.0f, 0.0f))								// ‘Şo‚Ì‘å‚«‚³
+#define TUTO_LET_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))	// è†‚Ìâ‘ÎÀ•W
+#define TUTO_LET_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// è†‚Ì‘å‚«‚³
+#define TUTO_PAP_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 1020.0f, 0.0f))				// •Öâ³‚Ì‰ŠúÀ•W
+#define TUTO_PAP_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// •Öâ³‚Ì‘å‚«‚³
+
 //**********************************************************************************************************************
 //	—ñ‹“Œ^’è‹` (TEXTURE_TUTORIAL)
 //**********************************************************************************************************************
 typedef enum
 {
 	TEXTURE_TUTORIAL_BG = 0,		// ”wŒi
+	TEXTURE_TUTORIAL_LETTER,		// è†
+	TEXTURE_TUTORIAL_PAPER,			// •Öâ³
 	TEXTURE_TUTORIAL_SLUM,			// ƒŒƒbƒXƒ“4 (”j–Å¾‘–) ‚Ì”õl
 	TEXTURE_TUTORIAL_FLY,			// ƒŒƒbƒXƒ“5 (”òU•—) ‚Ì”õl
 	TEXTURE_TUTORIAL_SILENCE,		// ƒŒƒbƒXƒ“6 (–³‰¹¢ŠE) ‚Ì”õl
@@ -97,15 +106,31 @@ typedef enum
 } LESSON_SETUP;
 
 //**********************************************************************************************************************
+//	—ñ‹“Œ^’è‹` (TUTOSTAGSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	TUTOSTAGSTATE_NONE = 0,			// ‰½‚à‚µ‚È‚¢ó‘Ô
+	TUTOSTAGSTATE_LET_ALPHA,		// è†‚Ì•\¦ó‘Ô
+	TUTOSTAGSTATE_FADE_ALPHA,		// ƒtƒF[ƒh‚Ì•\¦ó‘Ô
+	TUTOSTAGSTATE_PAP_TAKE,			// •Öâ³‚Ìæ‚èo‚µó‘Ô
+	TUTOSTAGSTATE_WAIT,				// ‘Ò‹@ó‘Ô
+	TUTOSTAGSTATE_PAP_RETURN,		// •Öâ³‚Ì‚µ‚Ü‚¢ó‘Ô
+	TUTOSTAGSTATE_MAX				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
+} TUTOSTAGSTATE;
+
+//**********************************************************************************************************************
 //	ƒRƒ“ƒXƒg’è‹`
 //**********************************************************************************************************************
-const char *apTextureTutorial[] =	// ƒ`ƒ…[ƒgƒŠƒAƒ‹ƒeƒNƒXƒ`ƒƒ‚Ì‘Š‘ÎƒpƒX
+const char *apTextureTutorial[] =		// ƒ`ƒ…[ƒgƒŠƒAƒ‹ƒeƒNƒXƒ`ƒƒ‚Ì‘Š‘ÎƒpƒX
 {
-	"data\\TEXTURE\\ui005.png",		// ƒ`ƒ…[ƒgƒŠƒAƒ‹”wŒi‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
-	"data\\TEXTURE\\tips000.png",	// ƒŒƒbƒXƒ“4 (”j–Å¾‘–) ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
-	"data\\TEXTURE\\tips001.png",	// ƒŒƒbƒXƒ“5 (”òU•—) ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
-	"data\\TEXTURE\\tips002.png",	// ƒŒƒbƒXƒ“6 (–³‰¹¢ŠE) ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
-	"data\\TEXTURE\\tips003.png",	// ƒŒƒbƒXƒ“7 (’Eo)     ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
+	"data\\TEXTURE\\ui005.png",			// ƒ`ƒ…[ƒgƒŠƒAƒ‹”wŒi‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
+	"data\\TEXTURE\\tutorial000.png",	// è†‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
+	"data\\TEXTURE\\tutorial001.png",	// •Öâ³‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
+	"data\\TEXTURE\\tips000.png",		// ƒŒƒbƒXƒ“4 (”j–Å¾‘–) ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
+	"data\\TEXTURE\\tips001.png",		// ƒŒƒbƒXƒ“5 (”òU•—) ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
+	"data\\TEXTURE\\tips002.png",		// ƒŒƒbƒXƒ“6 (–³‰¹¢ŠE) ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
+	"data\\TEXTURE\\tips003.png",		// ƒŒƒbƒXƒ“7 (’Eo)     ‚Ì”õl‚ÌƒeƒNƒXƒ`ƒƒ‘Š‘ÎƒpƒX
 };
 
 const int aNextLesson[] =	// ƒŒƒbƒXƒ“‚ÌƒJƒEƒ“ƒ^[
@@ -133,10 +158,22 @@ const char *apTextureLesson[] =		// ƒŒƒbƒXƒ“ƒeƒNƒXƒ`ƒƒ‚Ì‘Š‘ÎƒpƒX
 };
 
 //**********************************************************************************************************************
+//	\‘¢‘Ì’è‹` (Tutorial)
+//**********************************************************************************************************************
+typedef struct
+{
+	D3DXVECTOR3   pos;			// •Öâ³‚ÌˆÊ’u
+	TUTOSTAGSTATE state;		// ‰‰o‚Ìó‘Ô
+	float         fMove;		// •Öâ³‚ÌˆÚ“®—Ê
+	float         fAlphaLetter;	// è†‚Ìƒ¿’l
+	float         fAlphaFade;	// ƒtƒF[ƒh‚Ìƒ¿’l
+}Tutorial;
+
+//**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾
 //**********************************************************************************************************************
 void UpdateTutorialUi(void);			// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌUI‚ÌXVˆ—
-void DrawTutorialUi(void);				// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌUI‚Ì•`‰æˆ—
+void DrawTutorialUi(bool bBefore);		// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌUI‚Ì•`‰æˆ—
 
 bool CheckNextSlumBoost(void);			// ”j–Å¾‘–‚ÌƒŒƒbƒXƒ“I—¹‚ÌŠm”Fˆ—
 bool CheckNextFlyAway(void);			// ”òU•—‚ÌƒŒƒbƒXƒ“I—¹‚ÌŠm”Fˆ—
@@ -157,6 +194,7 @@ LPDIRECT3DTEXTURE9      g_apTextureTutorial[TEXTURE_TUTORIAL_MAX] = {};	// ƒ`ƒ…
 LPDIRECT3DTEXTURE9      g_apTextureLesson[LESSON_MAX] = {};				// ƒŒƒbƒXƒ“ƒeƒNƒXƒ`ƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTutorial = NULL;						// ’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
+Tutorial      g_tutorial;				// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìî•ñ
 TUTORIALSTATE g_tutorialState;			// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìó‘Ô
 int           g_nLessonState;			// ƒŒƒbƒXƒ“‚Ìó‘Ô
 int           g_nCounterTutorialState;	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìó‘ÔŠÇ—ƒJƒEƒ“ƒ^[
@@ -208,6 +246,13 @@ void InitTutorial(void)
 	g_nCounterTutorialState = 0;						// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìó‘ÔŠÇ—ƒJƒEƒ“ƒ^[
 	g_nCounterLessonState   = 0;						// ƒŒƒbƒXƒ“‚Ìó‘ÔŠÇ—ƒJƒEƒ“ƒ^[
 	g_bTutorialEnd          = false;					// ƒ‚[ƒh‚Ì‘JˆÚó‹µ
+
+	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìî•ñ‚ğ‰Šú‰»
+	g_tutorial.pos          = TUTO_PAP_POS;				// •Öâ³‚ÌˆÊ’u
+	g_tutorial.state        = TUTOSTAGSTATE_LET_ALPHA;	// ‰‰o‚Ìó‘Ô
+	g_tutorial.fMove        = 0.0f;						// •Öâ³‚ÌˆÚ“®—Ê
+	g_tutorial.fAlphaLetter = 0.0f;						// è†‚Ìƒ¿’l
+	g_tutorial.fAlphaFade   = 0.0f;						// ƒtƒF[ƒh‚Ìƒ¿’l
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	’¸“_î•ñ‚Ì‰Šú‰»
@@ -323,6 +368,108 @@ void InitTutorial(void)
 	pVtx[14].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[15].tex = D3DXVECTOR2(1.0f, 1.0f);
 
+	//------------------------------------------------------------------------------------------------------------------
+	//	‘Şo‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ğİ’è
+	pVtx[16].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[17].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[18].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[19].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
+
+	// rhw ‚Ìİ’è
+	pVtx[16].rhw = 1.0f;
+	pVtx[17].rhw = 1.0f;
+	pVtx[18].rhw = 1.0f;
+	pVtx[19].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	pVtx[16].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[17].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[18].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[19].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	pVtx[16].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[17].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[18].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[19].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	è†‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ğİ’è
+	pVtx[20].pos = D3DXVECTOR3(TUTO_LET_POS.x - TUTO_LET_SIZE.x, TUTO_LET_POS.y - TUTO_LET_SIZE.y, 0.0f);
+	pVtx[21].pos = D3DXVECTOR3(TUTO_LET_POS.x + TUTO_LET_SIZE.x, TUTO_LET_POS.y - TUTO_LET_SIZE.y, 0.0f);
+	pVtx[22].pos = D3DXVECTOR3(TUTO_LET_POS.x - TUTO_LET_SIZE.x, TUTO_LET_POS.y + TUTO_LET_SIZE.y, 0.0f);
+	pVtx[23].pos = D3DXVECTOR3(TUTO_LET_POS.x + TUTO_LET_SIZE.x, TUTO_LET_POS.y + TUTO_LET_SIZE.y, 0.0f);
+
+	// rhw ‚Ìİ’è
+	pVtx[20].rhw = 1.0f;
+	pVtx[21].rhw = 1.0f;
+	pVtx[22].rhw = 1.0f;
+	pVtx[23].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	pVtx[20].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[21].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[22].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[23].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	pVtx[20].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[21].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[22].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[23].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	ƒtƒF[ƒh‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ğİ’è
+	pVtx[24].pos = D3DXVECTOR3(0.0f,         0.0f,          0.0f);
+	pVtx[25].pos = D3DXVECTOR3(SCREEN_WIDTH, 0.0f,          0.0f);
+	pVtx[26].pos = D3DXVECTOR3(0.0f,         SCREEN_HEIGHT, 0.0f);
+	pVtx[27].pos = D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+
+	// rhw ‚Ìİ’è
+	pVtx[24].rhw = 1.0f;
+	pVtx[25].rhw = 1.0f;
+	pVtx[26].rhw = 1.0f;
+	pVtx[27].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	pVtx[24].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[25].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[26].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+	pVtx[27].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	•Öâ³‚Ì‰Šú‰»
+	//------------------------------------------------------------------------------------------------------------------
+	// ’¸“_À•W‚ğİ’è
+	pVtx[28].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[29].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[30].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+	pVtx[31].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+
+	// rhw ‚Ìİ’è
+	pVtx[28].rhw = 1.0f;
+	pVtx[29].rhw = 1.0f;
+	pVtx[30].rhw = 1.0f;
+	pVtx[31].rhw = 1.0f;
+
+	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	pVtx[28].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[29].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[30].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[31].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	pVtx[28].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[29].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[30].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[31].tex = D3DXVECTOR2(1.0f, 1.0f);
+
 	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
 	g_pVtxBuffTutorial->Unlock();
 
@@ -421,9 +568,6 @@ void InitTutorial(void)
 
 	// ƒXƒRƒA‚Ì‰Šú‰»
 	InitScore();
-
-	// ƒtƒ‰ƒbƒVƒ…‚Ì‰Šú‰»
-	InitFlash();
 
 	// ƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚é‘S‘Ìˆ—
 	LoadFileChunk
@@ -581,9 +725,6 @@ void UninitTutorial(void)
 	// ƒXƒRƒA‚ÌI—¹
 	UninitScore();
 
-	// ƒtƒ‰ƒbƒVƒ…‚ÌI—¹
-	UninitFlash();
-
 	// ƒTƒEƒ“ƒh‚Ì’â~
 	StopSound();
 }
@@ -687,95 +828,102 @@ void UpdateTutorial(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	g—p‚·‚éƒ\[ƒXƒtƒ@ƒCƒ‹‚ÌXV
 	//------------------------------------------------------------------------------------------------------------------
-	// ƒ‰ƒCƒg‚ÌXV
-	UpdateLight();
+	if (g_tutorial.state == TUTOSTAGSTATE_NONE)
+	{ // ‰½‚à‚µ‚È‚¢ó‘Ô‚Ìê‡
 
-	// ƒtƒ‰ƒbƒVƒ…‚ÌXVˆ—
-	UpdateFlash();
+		// ƒ‰ƒCƒg‚ÌXV
+		UpdateLight();
 
-	// ƒƒbƒVƒ…ƒh[ƒ€‚ÌXV
-	UpdateMeshDome();
+		// ƒƒbƒVƒ…ƒh[ƒ€‚ÌXV
+		UpdateMeshDome();
 
-	// ƒƒbƒVƒ…ƒVƒŠƒ“ƒ_[‚ÌXV
-	UpdateMeshCylinder();
+		// ƒƒbƒVƒ…ƒVƒŠƒ“ƒ_[‚ÌXV
+		UpdateMeshCylinder();
 
-	// ƒƒbƒVƒ…ƒtƒB[ƒ‹ƒh‚ÌXV
-	UpdateMeshField();
+		// ƒƒbƒVƒ…ƒtƒB[ƒ‹ƒh‚ÌXV
+		UpdateMeshField();
 
-	// ƒƒbƒVƒ…ƒEƒH[ƒ‹‚ÌXV
-	UpdateMeshWall();
+		// ƒƒbƒVƒ…ƒEƒH[ƒ‹‚ÌXV
+		UpdateMeshWall();
 
-	// ‘—•—‹@‚ÌXV
-	UpdateWind();
+		// ‘—•—‹@‚ÌXV
+		UpdateWind();
 
-	// ”š’e‚ÌXV
-	UpdateBomb();
+		// ”š’e‚ÌXV
+		UpdateBomb();
 
-	// ƒvƒŒƒCƒ„[‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹XV
-	UpdateTutorialPlayer();
+		// ƒvƒŒƒCƒ„[‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹XV
+		UpdateTutorialPlayer();
 
-	// ƒJƒƒ‰‚ÌXV
-	UpdateCamera();
+		// ƒJƒƒ‰‚ÌXV
+		UpdateCamera();
 
-	// ƒ^ƒCƒ„­‚ÌXV
-	UpdateTireMark();
+		// ƒ^ƒCƒ„­‚ÌXV
+		UpdateTireMark();
 
-	// Œx@‚ÌXV
-	UpdatePolice();
+		// Œx@‚ÌXV
+		UpdatePolice();
 
-	// ƒIƒuƒWƒFƒNƒg‚ÌXV
-	UpdateObject();
+		// ƒIƒuƒWƒFƒNƒg‚ÌXV
+		UpdateObject();
 
-	// ‚ª‚ê‚«‚ÌXV
-	UpdateJunk();
+		// ‚ª‚ê‚«‚ÌXV
+		UpdateJunk();
 
-	// Ô‚ÌXVˆ—
-	UpdateCar();
+		// Ô‚ÌXVˆ—
+		UpdateCar();
 
-	// lŠÔ‚ÌXV
-	UpdateHuman();
+		// lŠÔ‚ÌXV
+		UpdateHuman();
 
-	// ƒQ[ƒg‚ÌXV
-	UpdateGate();
+		// ƒQ[ƒg‚ÌXV
+		UpdateGate();
 
-	// ƒGƒtƒFƒNƒg‚ÌXV
-	UpdateEffect();
+		// ƒGƒtƒFƒNƒg‚ÌXV
+		UpdateEffect();
 
-	// ƒp[ƒeƒBƒNƒ‹‚ÌXV
-	UpdateParticle();
+		// ƒp[ƒeƒBƒNƒ‹‚ÌXV
+		UpdateParticle();
 
-	// 2DƒGƒtƒFƒNƒg‚ÌXV
-	Update2DEffect();
+		// 2DƒGƒtƒFƒNƒg‚ÌXV
+		Update2DEffect();
 
-	// 2Dƒp[ƒeƒBƒNƒ‹‚ÌXV
-	Update2DParticle();
+		// 2Dƒp[ƒeƒBƒNƒ‹‚ÌXV
+		Update2DParticle();
 
-	// ƒrƒ‹ƒ{[ƒh‚ÌXV
-	UpdateBillboard();
+		// ƒrƒ‹ƒ{[ƒh‚ÌXV
+		UpdateBillboard();
 
-	// ÄŒš’zƒ^ƒCƒ}[‚ÌXV
-	UpdateBuildtimer();
+		// ÄŒš’zƒ^ƒCƒ}[‚ÌXV
+		UpdateBuildtimer();
 
-	// ‘Ì—Íƒo[‚ÌXV
-	UpdateLife();
+		// ‘Ì—Íƒo[‚ÌXV
+		UpdateLife();
 
-	// ”\—Íƒo[‚ÌXV
-	UpdateAbility();
+		// ”\—Íƒo[‚ÌXV
+		UpdateAbility();
 
-	// ‘¬“xƒo[‚ÌXV
-	UpdateVelocity();
+		// ‘¬“xƒo[‚ÌXV
+		UpdateVelocity();
 
-	// ƒXƒRƒA‚ÌXV
-	UpdateScore();
+		// ƒXƒRƒA‚ÌXV
+		UpdateScore();
 
-	// ƒRƒ“ƒ{‚ÌXV
-	UpdateCombo();
+		// ƒRƒ“ƒ{‚ÌXV
+		UpdateCombo();
 
-	// ƒ{[ƒiƒX‚ÌXVˆ—
-	UpdateBonus();
+		// ƒ{[ƒiƒX‚ÌXVˆ—
+		UpdateBonus();
 
-	// ‰e‚ÌXV
-	UpdateShadow();
+		// ‰e‚ÌXV
+		UpdateShadow();
+	}
+	else
+	{ // ‰½‚à‚µ‚È‚¢ó‘Ô‚Å‚Í‚È‚¢ê‡
+
+		// ƒJƒƒ‰‚ÌXV
+		UpdateCamera();
+	}
 }
 
 //======================================================================================================================
@@ -868,7 +1016,7 @@ void DrawTutorial(void)
 	DrawScore();
 
 	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌUI‚Ì•`‰æ
-	DrawTutorialUi();
+	DrawTutorialUi(false);
 
 	// ƒ{[ƒiƒX‚Ì•`‰æ
 	DrawBonus();
@@ -879,8 +1027,8 @@ void DrawTutorial(void)
 	// 2Dƒp[ƒeƒBƒNƒ‹‚Ì•`‰æ
 	Draw2DParticle();
 
-	// ƒtƒ‰ƒbƒVƒ…‚Ì•`‰æ
-	DrawFlash();
+	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌUI‚Ì•`‰æ
+	DrawTutorialUi(true);
 }
 
 //======================================================================================================================
@@ -975,11 +1123,11 @@ void AddLessonState(void)
 				break;
 			}
 
-			// ƒtƒ‰ƒbƒVƒ…‚Ìİ’è
-			SetFlash(REV_TUTORIAL_ALPHA);
-
 			// ƒvƒŒƒCƒ„[‚ÌÄİ’è
 			ResetPlayer();
+
+			// ‰‰o‚Ìó‘Ô‚ğè†‚Ì•\¦ó‘Ô‚É•ÏX
+			g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
 
 			//// ƒTƒEƒ“ƒh‚ÌÄ¶
 			//PlaySound(SOUND_LABEL_SE_DEC_00);	// SE (Œˆ’è00)
@@ -1022,13 +1170,207 @@ TUTORIALSTATE GetTutorialState(void)
 //======================================================================================================================
 void UpdateTutorialUi(void)
 {
+#define TUTO_LET_CHANGE		(0.04f)		// è†‚Ìƒ¿’l•ÏX—Ê
+#define TUTO_LET_STOP		(1.0f)		// è†‚ÌÅ‘åƒ¿’l
+#define TUTO_FADE_CHANGE	(0.02f)		// ƒtƒF[ƒh‚Ìƒ¿’l•ÏX—Ê
+#define TUTO_FADE_STOP		(0.6f)		// ƒtƒF[ƒh‚ÌÅ‘åƒ¿’l
 
+#define TUTO_PAP_MOVE		(0.5f)					// •Öâ³‚ÌˆÊ’u‚ÌXV—Ê
+#define TUTO_PAP_STOP		(SCREEN_HEIGHT * 0.5f)	// •Öâ³‚Ì’â~ˆÊ’u (y)
+
+	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
+	VERTEX_2D *pVtx;	// ’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
+	g_pVtxBuffTutorial->Lock(0, 0, (void**)&pVtx, 0);
+
+	switch (g_tutorial.state)
+	{ // ó‘Ô‚²‚Æ‚Ìˆ—
+	case TUTOSTAGSTATE_NONE:		// ‰½‚à‚µ‚È‚¢ó‘Ô
+
+		if (GetKeyboardTrigger(DIK_P) == true
+		||  GetJoyKeyTrigger(JOYKEY_START, 0) == true)
+		{ // •Öâ³‚ğæ‚èo‚·‘€ì‚ªs‚í‚ê‚½ê‡
+
+			// è†‚Ì•\¦ó‘Ô‚É‚·‚é
+			g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
+		}
+
+		// ˆ—‚ğ”²‚¯‚é
+		break;
+
+	case TUTOSTAGSTATE_LET_ALPHA:	// è†‚Ì•\¦ó‘Ô
+
+		// è†‚Ìƒ¿’l‚ğ‰ÁZ
+		g_tutorial.fAlphaLetter += TUTO_LET_CHANGE;
+
+		if (g_tutorial.fAlphaLetter >= TUTO_LET_STOP)
+		{ // è†‚Ìƒ¿’l‚ªˆê’è’lˆÈã‚Ìê‡
+
+			// è†‚Ìƒ¿’l‚ğ•â³
+			g_tutorial.fAlphaLetter = TUTO_LET_STOP;
+
+			// ƒtƒF[ƒh‚Ì•\¦ó‘Ô‚É‚·‚é
+			g_tutorial.state = TUTOSTAGSTATE_FADE_ALPHA;
+		}
+
+		// ’¸“_ƒJƒ‰[‚Ìİ’è
+		pVtx[20].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+		pVtx[21].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+		pVtx[22].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+		pVtx[23].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+
+		// ˆ—‚ğ”²‚¯‚é
+		break;
+
+	case TUTOSTAGSTATE_FADE_ALPHA:	// ƒtƒF[ƒh‚Ì•\¦ó‘Ô
+
+		// ƒtƒF[ƒh‚Ìƒ¿’l‚ğ‰ÁZ
+		g_tutorial.fAlphaFade += TUTO_FADE_CHANGE;
+		
+		if (g_tutorial.fAlphaFade >= TUTO_FADE_STOP)
+		{ // ƒtƒF[ƒh‚Ìƒ¿’l‚ªˆê’è’lˆÈã‚Ìê‡
+
+			// ƒtƒF[ƒh‚Ìƒ¿’l‚ğ•â³
+			g_tutorial.fAlphaFade = TUTO_FADE_STOP;
+
+			// •Öâ³‚Ìæ‚èo‚µó‘Ô‚É‚·‚é
+			g_tutorial.state = TUTOSTAGSTATE_PAP_TAKE;
+		}
+
+		// ’¸“_ƒJƒ‰[‚Ìİ’è
+		pVtx[24].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+		pVtx[25].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+		pVtx[26].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+		pVtx[27].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+
+		// ˆ—‚ğ”²‚¯‚é
+		break;
+
+	case TUTOSTAGSTATE_PAP_TAKE:	// •Öâ³‚Ìæ‚èo‚µó‘Ô
+
+		// •Öâ³‚ÌˆÊ’uŒ¸Z—Ê‚ğİ’è
+		g_tutorial.fMove += TUTO_PAP_MOVE;
+
+		// •Öâ³‚ÌˆÊ’u‚ğŒ¸Z
+		g_tutorial.pos.y -= g_tutorial.fMove;
+
+		if (g_tutorial.pos.y <= TUTO_PAP_STOP)
+		{ // •Öâ³‚ÌˆÊ’u‚ªˆê’è’lˆÈ‰º‚Ìê‡
+
+			// •Öâ³‚ÌˆÊ’u‚ğ•â³
+			g_tutorial.pos.y = TUTO_PAP_STOP;
+
+			// •Öâ³‚ÌˆÊ’uŒ¸Z—Ê‚ğ‰Šú‰»
+			g_tutorial.fMove = 0;
+
+			// ‘Ò‹@ó‘Ô‚É‚·‚é
+			g_tutorial.state = TUTOSTAGSTATE_WAIT;
+		}
+
+		// ’¸“_À•W‚ğİ’è
+		pVtx[28].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+		pVtx[29].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+		pVtx[30].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+		pVtx[31].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+
+		// ˆ—‚ğ”²‚¯‚é
+		break;
+
+	case TUTOSTAGSTATE_WAIT:		// ‘Ò‹@ó‘Ô
+
+		if (GetKeyboardTrigger(DIK_O) == true
+		||  GetJoyKeyTrigger(JOYKEY_BACK, 0) == true)
+		{ // •Öâ³‚ğ‚µ‚Ü‚¤‘€ì‚ªs‚í‚ê‚½ê‡
+
+			// •Öâ³‚Ì‚µ‚Ü‚¢ó‘Ô‚É‚·‚é
+			g_tutorial.state = TUTOSTAGSTATE_PAP_RETURN;
+		}
+
+		// ˆ—‚ğ”²‚¯‚é
+		break;
+
+	case TUTOSTAGSTATE_PAP_RETURN:	// •Öâ³‚Ì‚µ‚Ü‚¢ó‘Ô
+
+		// è†‚Ì“§–¾‰»
+		if (g_tutorial.fAlphaLetter > 0.0f)
+		{ // è†‚Ìƒ¿’l‚ªˆê’è’l‚æ‚è‘å‚«‚¢ê‡
+
+			// è†‚Ìƒ¿’l‚ğŒ¸Z
+			g_tutorial.fAlphaLetter -= TUTO_LET_CHANGE;
+
+			if (g_tutorial.fAlphaLetter <= 0.0f)
+			{ // è†‚Ìƒ¿’l‚ªˆê’è’lˆÈ‰º‚Ìê‡
+
+				// è†‚Ìƒ¿’l‚ğ•â³
+				g_tutorial.fAlphaLetter = 0.0f;
+			}
+
+			// ’¸“_ƒJƒ‰[‚Ìİ’è
+			pVtx[20].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+			pVtx[21].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+			pVtx[22].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+			pVtx[23].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+		}
+
+		// ƒtƒF[ƒh‚Ì“§–¾‰»
+		if (g_tutorial.fAlphaFade > 0.0f)
+		{ // ƒtƒF[ƒh‚Ìƒ¿’l‚ªˆê’è’l‚æ‚è‘å‚«‚¢ê‡
+
+			// ƒtƒF[ƒh‚Ìƒ¿’l‚ğŒ¸Z
+			g_tutorial.fAlphaFade -= TUTO_FADE_CHANGE;
+
+			if (g_tutorial.fAlphaFade <= 0.0f)
+			{ // ƒtƒF[ƒh‚Ìƒ¿’l‚ªˆê’è’lˆÈ‰º‚Ìê‡
+
+				// ƒtƒF[ƒh‚Ìƒ¿’l‚ğ•â³
+				g_tutorial.fAlphaFade = 0.0f;
+			}
+
+			// ’¸“_ƒJƒ‰[‚Ìİ’è
+			pVtx[24].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+			pVtx[25].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+			pVtx[26].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+			pVtx[27].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
+		}
+
+		// •Öâ³‚ÌˆÊ’u‰ÁZ—Ê‚ğİ’è
+		g_tutorial.fMove += TUTO_PAP_MOVE;
+
+		// •Öâ³‚ÌˆÊ’u‚ğ‰ÁZ
+		g_tutorial.pos.y += g_tutorial.fMove;
+
+		if (g_tutorial.pos.y >= TUTO_PAP_POS.y)
+		{ // •Öâ³‚ÌˆÊ’u‚ªˆê’è’lˆÈã‚Ìê‡
+
+			// •Öâ³‚ÌˆÊ’u‚ğ•â³
+			g_tutorial.pos.y = TUTO_PAP_POS.y;
+
+			// •Öâ³‚ÌˆÊ’uŒ¸Z—Ê‚ğ‰Šú‰»
+			g_tutorial.fMove = 0;
+
+			// ‰½‚à‚µ‚È‚¢ó‘Ô‚É‚·‚é
+			g_tutorial.state = TUTOSTAGSTATE_NONE;
+		}
+
+		// ’¸“_À•W‚ğİ’è
+		pVtx[28].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+		pVtx[29].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y - TUTO_PAP_SIZE.y, 0.0f);
+		pVtx[30].pos = D3DXVECTOR3(g_tutorial.pos.x - TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+		pVtx[31].pos = D3DXVECTOR3(g_tutorial.pos.x + TUTO_PAP_SIZE.x, g_tutorial.pos.y + TUTO_PAP_SIZE.y, 0.0f);
+
+		// ˆ—‚ğ”²‚¯‚é
+		break;
+	}
+
+	// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN‚·‚é
+	g_pVtxBuffTutorial->Unlock();
 }
 
 //======================================================================================================================
 //	ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌUI‚Ì•`‰æˆ—
 //======================================================================================================================
-void DrawTutorialUi(void)
+void DrawTutorialUi(bool bBefore)
 {
 	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
@@ -1039,76 +1381,108 @@ void DrawTutorialUi(void)
 	// ’¸“_ƒtƒH[ƒ}ƒbƒg‚Ìİ’è
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	//------------------------------------------------------------------------------------------------------------------
-	//	ƒŒƒbƒXƒ“‚Ì”wŒi‚Ì•`‰æ
-	//------------------------------------------------------------------------------------------------------------------
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-	pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_BG]);
-
-	// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-
-	//------------------------------------------------------------------------------------------------------------------
-	//	ƒŒƒbƒXƒ“‚Ì•`‰æ
-	//------------------------------------------------------------------------------------------------------------------
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-	pDevice->SetTexture(0, g_apTextureLesson[g_nLessonState]);
-
-	// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
-
-	if (g_nLessonState >= LESSON_04)
-	{ // Œ»İ‚ÌƒŒƒbƒXƒ“‚ªƒŒƒbƒXƒ“4 (”j–Å¾‘–) ˆÈ~‚Ìê‡
+	if (bBefore == false)
+	{ // Œã‚Ì•`‰æ‚Ìê‡
 
 		//--------------------------------------------------------------------------------------------------------------
-		//	”õl‚Ì”wŒi‚Ì•`‰æ
+		//	ƒŒƒbƒXƒ“‚Ì”wŒi‚Ì•`‰æ
 		//--------------------------------------------------------------------------------------------------------------
 		// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-		pDevice->SetTexture(0, NULL);
+		pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_BG]);
 
 		// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 
 		//--------------------------------------------------------------------------------------------------------------
-		//	”õl‚Ì•`‰æ
+		//	ƒŒƒbƒXƒ“‚Ì•`‰æ
 		//--------------------------------------------------------------------------------------------------------------
-		switch (g_nLessonState)
-		{ // ƒŒƒbƒXƒ“‚²‚Æ‚Ìˆ—
-		case LESSON_04:	// ƒŒƒbƒXƒ“4 (”j–Å¾‘–)
+		// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+		pDevice->SetTexture(0, g_apTextureLesson[g_nLessonState]);
 
+		// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+
+		if (g_nLessonState >= LESSON_04)
+		{ // Œ»İ‚ÌƒŒƒbƒXƒ“‚ªƒŒƒbƒXƒ“4 (”j–Å¾‘–) ˆÈ~‚Ìê‡
+
+			//----------------------------------------------------------------------------------------------------------
+			//	”õl‚Ì”wŒi‚Ì•`‰æ
+			//----------------------------------------------------------------------------------------------------------
 			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
+			pDevice->SetTexture(0, NULL);
 
-			// ˆ—‚ğ”²‚¯‚é
-			break;
+			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
 
-		case LESSON_05:	// ƒŒƒbƒXƒ“5 (”òU•—)
+			//----------------------------------------------------------------------------------------------------------
+			//	”õl‚Ì•`‰æ
+			//----------------------------------------------------------------------------------------------------------
+			switch (g_nLessonState)
+			{ // ƒŒƒbƒXƒ“‚²‚Æ‚Ìˆ—
+			case LESSON_04:	// ƒŒƒbƒXƒ“4 (”j–Å¾‘–)
 
-			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_FLY]);
+				// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
 
-			// ˆ—‚ğ”²‚¯‚é
-			break;
+				// ˆ—‚ğ”²‚¯‚é
+				break;
 
-		case LESSON_06:	// ƒŒƒbƒXƒ“6 (–³‰¹¢ŠE)
+			case LESSON_05:	// ƒŒƒbƒXƒ“5 (”òU•—)
 
-			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SILENCE]);
+				// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_FLY]);
 
-			// ˆ—‚ğ”²‚¯‚é
-			break;
+				// ˆ—‚ğ”²‚¯‚é
+				break;
 
-		case LESSON_07:	// ƒŒƒbƒXƒ“7 (’Eo)
+			case LESSON_06:	// ƒŒƒbƒXƒ“6 (–³‰¹¢ŠE)
 
-			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_EXIT]);
+				// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SILENCE]);
 
-			// ˆ—‚ğ”²‚¯‚é
-			break;
+				// ˆ—‚ğ”²‚¯‚é
+				break;
+
+			case LESSON_07:	// ƒŒƒbƒXƒ“7 (’Eo)
+
+				// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_EXIT]);
+
+				// ˆ—‚ğ”²‚¯‚é
+				break;
+			}
+
+			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
 		}
+	}
+	else
+	{ // ‘O‚Ì•`‰æ‚Ìê‡
 
-		// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
+		//--------------------------------------------------------------------------------------------------------------
+		//	‰‰o‚Ì•`‰æ
+		//--------------------------------------------------------------------------------------------------------------
+		if (g_tutorial.state != TUTOSTAGSTATE_NONE)
+		{ // ‰½‚à‚µ‚È‚¢ó‘Ô‚Å‚Í‚È‚¢ê‡
+
+			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_LETTER]);
+
+			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 20, 2);
+
+			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+			pDevice->SetTexture(0, NULL);
+
+			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 24, 2);
+
+			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_PAPER]);
+
+			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 28, 2);
+		}
 	}
 }
 
@@ -1244,6 +1618,9 @@ void AllFalseSlumBoost(void)
 		// ƒIƒuƒWƒFƒNƒg‚ğg—p‚µ‚Ä‚¢‚È‚¢ó‘Ô‚É‚·‚é
 		pObject->bUse = false;
 	}
+
+	// ‰e‚ÌXV
+	UpdateShadow();		// ‰e‚Ìíœ—p
 }
 
 //======================================================================================================================
@@ -1260,6 +1637,9 @@ void AllFalseFlyAway(void)
 		// lŠÔ‚ğg—p‚µ‚Ä‚¢‚È‚¢ó‘Ô‚É‚·‚é
 		pHuman->bUse = false;
 	}
+
+	// ‰e‚ÌXV
+	UpdateShadow();		// ‰e‚Ìíœ—p
 }
 
 //======================================================================================================================
@@ -1268,8 +1648,9 @@ void AllFalseFlyAway(void)
 void AllFalseSilenceWorld(void)
 {
 	// ƒ|ƒCƒ“ƒ^‚ğéŒ¾
-	Car     *pCar     = GetCarData();		// Ô‚Ìî•ñ
-	Barrier *pBarrier = GetBarrierData();	// ƒoƒŠƒA‚Ìî•ñ
+	Car         *pCar     = GetCarData();			// Ô‚Ìî•ñ
+	Barrier     *pBarrier = GetBarrierData();		// ƒoƒŠƒA‚Ìî•ñ
+	BarrierInfo *pBarInfo = GetBarrierInfoData();	// ƒoƒŠƒA‚Ì‚Ü‚Æ‚Ü‚è‚Ìî•ñ
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++, pCar++)
 	{ // Ô‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
@@ -1284,6 +1665,16 @@ void AllFalseSilenceWorld(void)
 		// ƒoƒŠƒA‚ğg—p‚µ‚Ä‚¢‚È‚¢ó‘Ô‚É‚·‚é
 		pBarrier->bUse = false;
 	}
+
+	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++, pBarInfo++)
+	{ // ƒoƒŠƒA‚Ì‚Ü‚Æ‚Ü‚è‚ÌÅ‘å•\¦”•ªŒJ‚è•Ô‚·
+
+		// ƒoƒŠƒA‚Ì‚Ü‚Æ‚Ü‚è‚ğg—p‚µ‚Ä‚¢‚È‚¢ó‘Ô‚É‚·‚é
+		pBarInfo->bUse = false;
+	}
+
+	// ‰e‚ÌXV
+	UpdateShadow();		// ‰e‚Ìíœ—p
 }
 
 //======================================================================================================================
@@ -1326,6 +1717,9 @@ void ResetPlayer(void)
 	pPlayer->bomb.nCounterState   = BOMB_WAIT_CNT;				// UŒ‚ŠÇ—ƒJƒEƒ“ƒ^[
 	pPlayer->bomb.nCounterControl = 0;							// ‘€ìŠÇ—ƒJƒEƒ“ƒ^[
 	pPlayer->bomb.bShot           = false;						// ”­Ë‘Ò‹@ó‹µ
+
+	// ‰e‚ÌˆÊ’uİ’è
+	SetPositionShadow(pPlayer->nShadowID, pPlayer->pos, pPlayer->rot, NONE_SCALE);
 }
 
 //======================================================================================================================

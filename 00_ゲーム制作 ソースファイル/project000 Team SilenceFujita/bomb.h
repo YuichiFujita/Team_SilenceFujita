@@ -16,8 +16,14 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define MAX_BARRIER		(64)	// バリアの最大数
-#define BOMB_RANGE_EMI	(D3DXCOLOR(0.7f, 0.7f, 0.7f, 0.7f))		// 範囲内時のマテリアルの色(Emissive)
-#define BOMB_RANGE_DIF	(D3DXCOLOR(0.0f, 0.2f, 1.0f, 0.6f))		// 範囲内時のマテリアルの色(Diffuse)
+#define MAX_BARINFO		(16)	// バリアのまとまりの最大数
+
+#define CAR_BOMB_RANGE_EMI		(D3DXCOLOR(0.7f, 0.7f, 0.7f, 0.7f))		// 車の範囲内時のマテリアルの色(Emissive)
+#define CAR_BOMB_RANGE_DIF		(D3DXCOLOR(0.0f, 0.2f, 1.0f, 0.6f))		// 車の範囲内時のマテリアルの色(Diffuse)
+#define EVILCAR_BOMB_RANGE_EMI	(D3DXCOLOR(0.3f, 0.8f, 0.3f, 0.7f))		// 悪い車の範囲内時のマテリアルの色(Emissive)
+#define EVILCAR_BOMB_RANGE_DIF	(D3DXCOLOR(0.0f, 1.0f, 0.2f, 0.6f))		// 悪い車の範囲内時のマテリアルの色(Diffuse)
+#define POLICAR_BOMB_RANGE_EMI	(D3DXCOLOR(1.0f, 0.3f, 0.3f, 0.7f))		// 警察の範囲内時のマテリアルの色(Emissive)
+#define POLICAR_BOMB_RANGE_DIF	(D3DXCOLOR(1.0f, 0.2f, 0.4f, 0.6f))		// 警察の範囲内時のマテリアルの色(Diffuse)
 
 //**********************************************************************************************************************
 //	列挙型定義 (BOMBTYPE)
@@ -112,6 +118,7 @@ void ShotBarrier(void);		// バリアの発射処理
 
 Barrier *GetBarrierData(void);				// バリアの取得処理
 BARRIERSTATE GetBarrierState(void *pCar);	// バリアの状態の取得処理
+BarrierInfo *GetBarrierInfoData(void);		// バリアのまとまりの取得処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
