@@ -425,9 +425,20 @@ void DrawCar(void)
 					// マテリアルのコピーに代入する
 					g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
 
-					// 範囲内時のマテリアルの色を設定
-					g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Diffuse = BOMB_RANGE_DIF;
-					g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Emissive = BOMB_RANGE_EMI;
+					if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+					{ // 悪い車の場合
+
+						// 範囲内時のマテリアルの色を設定
+						g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Diffuse = EVILCAR_BOMB_RANGE_DIF;
+						g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Emissive = EVILCAR_BOMB_RANGE_EMI;
+					}
+					else
+					{ // 良い車の場合
+
+						// 範囲内時のマテリアルの色を設定
+						g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Diffuse = CAR_BOMB_RANGE_DIF;
+						g_aCar[nCntCar].MatCopy[nCntMat].MatD3D.Emissive = CAR_BOMB_RANGE_EMI;
+					}
 
 					// マテリアルの設定
 					pDevice->SetMaterial(&g_aCar[nCntCar].MatCopy[nCntMat].MatD3D);
@@ -538,7 +549,7 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 				g_aCar[nCntCar].icon.nIconID = SetIcon
 				( // 引数
 					g_aCar[nCntCar].pos,
-					ICONTYPE_EVIL,
+					ICONTYPE_EVIL_CAR,
 					&g_aCar[nCntCar].icon.nIconID,
 					&g_aCar[nCntCar].bUse,
 					&g_aCar[nCntCar].icon.state

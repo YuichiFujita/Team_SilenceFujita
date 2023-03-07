@@ -16,25 +16,25 @@
 //************************************************************
 #define MAX_ICON			(1024)		// 使用するポリゴン数 (アイコンの最大数)
 
-#define PLAY_ICON_RADIUS	(130.0f)	// プレイヤーのアイコンの半径
+#define PLAY_ICON_RADIUS	(130.0f)								// プレイヤーのアイコンの半径
 #define PLAY_ICON_COL		(D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f))		// プレイヤーのアイコンの色
 
-#define EVIL_ICON_RADIUS	(100.0f)	// 悪い奴のアイコンの半径
+#define EVIL_ICON_RADIUS	(250.0f)								// 悪い奴のアイコンの半径
 #define EVIL_ICON_COL		(D3DXCOLOR(0.2f, 1.0f, 0.2f, 1.0f))		// 悪い奴のアイコンの色
 
-#define POLICE_ICON_RADIUS	(100.0f)	// 警察のアイコンの半径
+#define POLICE_ICON_RADIUS	(250.0f)								// 警察のアイコンの半径
 #define POLICE_ICON_COL		(D3DXCOLOR(0.2f, 0.2f, 1.0f, 1.0f))		// 警察のアイコンの色
 
-#define BARRIER_ICON_SET_RADIUS		(0.0f)	// アイコンの設定時の半径
-#define BARRIER_ICON_RADIUS	(140.0f)	// バリアのアイコンの半径
+#define BARRIER_ICON_SET_RADIUS		(0.0f)							// アイコンの設定時の半径
+#define BARRIER_ICON_RADIUS	(140.0f)								// バリアのアイコンの半径
 #define BARRIER_ICON_COL	(D3DXCOLOR(0.4f,1.0f,1.0f,1.0f))		// バリアのアイコンの色
 
-#define GATE_ICON_VERT_RADIUS	(D3DXVECTOR3(400.0f, 0.0f, 150.0f))		// ゲート(正面・後ろ向き)アイコンの半径
+#define GATE_ICON_VERT_RADIUS	(D3DXVECTOR3(400.0f, 0.0f, 150.0f))	// ゲート(正面・後ろ向き)アイコンの半径
 #define GATE_ICON_HORIZ_RADIUS	(D3DXVECTOR3(150.0f, 0.0f, 400.0f))	// ゲート(左右向き)アイコンの半径(X軸)
 #define GATE_ICON_COL		(D3DXCOLOR(1.0f, 0.6f, 1.0f, 1.0f))		// ゲートのアイコンの色
 
-#define ITEM_ICON_RADIUS	(80.0f)	// アイテムのアイコンの半径
-#define ITEM_ICON_COL		(D3DXCOLOR(1.0f, 0.5f, 0.8f, 1.0f))		// アイテムのアイコンの色
+#define ITEM_ICON_RADIUS	(80.0f)									// アイテムのアイコンの半径
+#define ITEM_ICON_COL		(D3DXCOLOR(0.4f, 1.0f, 1.0f, 1.0f))		// アイテムのアイコンの色
 
 #define ICON_CORRECT_RIGHT	(4000.0f)	// アイコンの右側の補正係数
 #define ICON_CORRECT_LEFT	(4000.0f)	// アイコンの左側の補正係数
@@ -50,10 +50,23 @@
 //************************************************************
 //	グローバル変数
 //************************************************************
-LPDIRECT3DTEXTURE9      g_pTextureIcon = NULL;	// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9      g_pTextureIcon[ICONTYPE_MAX] = {};	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffIcon = NULL;	// 頂点バッファへのポインタ
 
 Icon g_aIcon[MAX_ICON];		// アイコンの情報
+
+// テクスチャファイル名
+const char *c_apTextureFileIcon[ICONTYPE_MAX] =
+{
+	"data\\TEXTURE\\icon003.png",
+	"data\\TEXTURE\\icon001.png",
+	"data\\TEXTURE\\icon000.png",
+	"data\\TEXTURE\\icon002.png",
+	"data\\TEXTURE\\icon004.png",
+	"data\\TEXTURE\\icon005.png",
+	"data\\TEXTURE\\icon006.png",
+	"data\\TEXTURE\\icon007.png",
+};
 
 //=======================================================================================================
 //	アイコンの初期化処理
@@ -64,8 +77,11 @@ void InitIcon(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	VERTEX_3D *pVtx;							// 頂点情報へのポインタ
 	
-	// テクスチャを読み込む
-	D3DXCreateTextureFromFile(pDevice, "data\\TEXTURE\\aaa.jpg", &g_pTextureIcon);
+	for (int nCntTex = 0; nCntTex < ICONTYPE_MAX; nCntTex++)
+	{
+		// テクスチャを読み込む
+		D3DXCreateTextureFromFile(pDevice, c_apTextureFileIcon[nCntTex], &g_pTextureIcon[nCntTex]);
+	}
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
@@ -140,11 +156,14 @@ void InitIcon(void)
 //=======================================================================================================
 void UninitIcon(void)
 {
-	if (g_pTextureIcon != NULL)
-	{ // 変数 (g_pTextureIcon) がNULLではない場合
+	for (int nCntTex = 0; nCntTex < ICONTYPE_MAX; nCntTex++)
+	{
+		if (g_pTextureIcon[nCntTex] != NULL)
+		{ // 変数 (g_pTextureIcon) がNULLではない場合
 
-		g_pTextureIcon->Release();
-		g_pTextureIcon = NULL;
+			g_pTextureIcon[nCntTex]->Release();
+			g_pTextureIcon[nCntTex] = NULL;
+		}
 	}
 
 	// 頂点バッファの破棄
@@ -446,7 +465,7 @@ void DrawIcon(void)
 			pDevice->SetFVF(FVF_VERTEX_3D);
 
 			// テクスチャの設定
-			pDevice->SetTexture(0, g_pTextureIcon);
+			pDevice->SetTexture(0, g_pTextureIcon[g_aIcon[nCntIcon].type]);
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntIcon * 4, 2);
@@ -508,7 +527,17 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 
 				break;				// 抜け出す
 
-			case ICONTYPE_EVIL:		// 悪い奴
+			case ICONTYPE_EVIL_HUMAN:		// 悪い人
+
+				// 半径を設定
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(EVIL_ICON_RADIUS, 0.0f, EVIL_ICON_RADIUS);
+
+				// 色を設定
+				g_aIcon[nCntIcon].col = EVIL_ICON_COL;
+
+				break;				// 抜け出す
+
+			case ICONTYPE_EVIL_CAR:		// 悪い車
 
 				// 半径を設定
 				g_aIcon[nCntIcon].radius = D3DXVECTOR3(EVIL_ICON_RADIUS, 0.0f, EVIL_ICON_RADIUS);

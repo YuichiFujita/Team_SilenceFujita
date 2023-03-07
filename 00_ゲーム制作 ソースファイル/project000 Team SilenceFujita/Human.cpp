@@ -640,7 +640,7 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 				g_aHuman[nCntHuman].icon.nIconID = SetIcon
 				( // à¯êî
 					g_aHuman[nCntHuman].pos,
-					ICONTYPE_EVIL,
+					ICONTYPE_EVIL_HUMAN,
 					&g_aHuman[nCntHuman].icon.nIconID,
 					&g_aHuman[nCntHuman].bUse,
 					&g_aHuman[nCntHuman].icon.state
@@ -1819,7 +1819,7 @@ void ResurrectionHuman(Human human)
 			g_aHuman[nCnt].icon.nIconID = SetIcon
 			( // à¯êî
 				g_aHuman[nCnt].pos,
-				ICONTYPE_EVIL,
+				ICONTYPE_EVIL_HUMAN,
 				&g_aHuman[nCnt].icon.nIconID,
 				&g_aHuman[nCnt].bUse,
 				&g_aHuman[nCnt].icon.state
