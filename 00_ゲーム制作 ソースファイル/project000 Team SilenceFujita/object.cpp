@@ -1018,11 +1018,15 @@ void HitObject(Object *pObject, int nDamage)
 				// アイテムが落ちるカウントを加算する
 				g_nObjectItemCount++;
 
-				if (g_nObjectItemCount % ITEM_OBJECT_COUNT == 0)
-				{ // アイテムが落ちるカウントが一定数になった場合
+				if (GetMode() == MODE_GAME)
+				{ // ゲーム状態の場合
 
-					// アイテムの設定処理
-					SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
+					if (g_nObjectItemCount % ITEM_OBJECT_COUNT == 0)
+					{ // アイテムが落ちるカウントが一定数になった場合
+
+						// アイテムの設定処理
+						SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
+					}
 				}
 			}
 
