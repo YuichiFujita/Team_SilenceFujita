@@ -50,6 +50,8 @@
 #define HUMAN_RADIUS			(30.0f)		// 人間の幅
 #define HUMAN_PASS_CORRECT		(0.06f)		// 人間のずらす補正倍率
 #define HUMAN_GROUND			(10.0f)		// 人間の地面
+#define HUMAN_OVERLAP_COUNT		(180)		// 人間の加速カウント
+#define HUMAN_OVERLAP_ADD_MOVE	(1.0f)		// 重なり防止で加算する移動量
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
@@ -86,16 +88,17 @@ typedef struct
 void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove, float fMaxMove);	// 人間の位置の更新処理
 void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);													// 人間の補正の更新処理
 
-void CurveHuman(Human *pHuman);			// 人間のカーブ処理
-void StopHuman(Human *pHuman);			// 人間の停止処理
-void ReactionHuman(Human *pHuman);		// 人間のリアクション処理
-void CollisionCarHuman(Human *pHuman);	// 人間と車の当たり判定
-void CurveRotHuman(Human *pHuman);		// 人間の角度更新処理
-void WalkHuman(Human *pHuman);			// 人間の歩く処理
-void PassingHuman(Human *pHuman);		// 人間のすれ違い処理
-void SetResurrection(Human human);		// 復活情報の設定処理
-void ResurrectionHuman(Human human);	// 人間の復活処理
-void CorrectCurveHuman(Human *human);	// 人間の初期位置の設定処理
+void CurveHuman(Human *pHuman);				// 人間のカーブ処理
+void StopHuman(Human *pHuman);				// 人間の停止処理
+void ReactionHuman(Human *pHuman);			// 人間のリアクション処理
+void CollisionCarHuman(Human *pHuman);		// 人間と車の当たり判定
+void CurveRotHuman(Human *pHuman);			// 人間の角度更新処理
+void WalkHuman(Human *pHuman);				// 人間の歩く処理
+void PassingHuman(Human *pHuman);			// 人間のすれ違い処理
+void SetResurrection(Human human);			// 復活情報の設定処理
+void ResurrectionHuman(Human human);		// 人間の復活処理
+void CorrectCurveHuman(Human *human);		// 人間の初期位置の設定処理
+bool OverlapHuman(Human *pHuman);			// 人間の重なり防止処理
 
 void InitMotionHuman(Human *pHuman, int nType, int nWalk);	// 人間モーションの初期化処理
 void UpdateMotionHuman(Human *pHuman);						// 人間モーションの更新処理
@@ -150,16 +153,17 @@ void InitHuman(void)
 	{ // 人間の最大表示数分繰り返す
 
 		// 基本情報の初期化
-		g_aHuman[nCntHuman].pos       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aHuman[nCntHuman].posOld    = g_aHuman[nCntHuman].pos;		// 前回の位置
-		g_aHuman[nCntHuman].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aHuman[nCntHuman].fMaxMove  = 0.0f;							// 移動量の最大数
-		g_aHuman[nCntHuman].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aHuman[nCntHuman].nShadowID = NONE_SHADOW;					// 影のインデックス
-		g_aHuman[nCntHuman].bMove     = false;							// 移動しているか
-		g_aHuman[nCntHuman].bRecur	  = false;							// 復活状況
-		g_aHuman[nCntHuman].bUse      = false;							// 使用状況
-		g_aHuman[nCntHuman].state     = HUMANSTATE_WALK;				// 状態
+		g_aHuman[nCntHuman].pos				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aHuman[nCntHuman].posOld			= g_aHuman[nCntHuman].pos;			// 前回の位置
+		g_aHuman[nCntHuman].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aHuman[nCntHuman].fMaxMove		= 0.0f;								// 移動量の最大数
+		g_aHuman[nCntHuman].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;						// 影のインデックス
+		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
+		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
+		g_aHuman[nCntHuman].bRecur			= false;							// 復活状況
+		g_aHuman[nCntHuman].bUse			= false;							// 使用状況
+		g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 状態
 
 		// ジャッジの情報の初期化
 		g_aHuman[nCntHuman].judge.col      = JUDGE_WHITE;			// ピカピカの色
@@ -366,6 +370,17 @@ void UpdateHuman(void)
 			}
 		}
 	}
+
+	for (int nCntOverlap = 0; nCntOverlap < MAX_HUMAN; nCntOverlap++)
+	{ // 人間の重なり防止処理
+
+		if (OverlapHuman(&g_aHuman[nCntOverlap]) == false)
+		{ // 重なった場合
+
+			// 重なり防止カウンターを初期化する
+			g_aHuman[nCntOverlap].nOverlapCounter = 0;
+		}
+	}
 }
 
 //======================================================================================================================
@@ -510,17 +525,18 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 		{ // オブジェクトが使用されていない場合
 
 			// 引数の位置を代入
-			g_aHuman[nCntHuman].pos      = pos;		// 現在の位置
-			g_aHuman[nCntHuman].posOld   = pos;		// 前回の位置
-			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(walk);	// 移動の種類
-			g_aHuman[nCntHuman].bRecur	 = bRecur;	// 復活状況
-			g_aHuman[nCntHuman].type	 = (HUMANTYPE)(type);		// 種類
-			g_aHuman[nCntHuman].rot		 = rot;		// 向き
+			g_aHuman[nCntHuman].pos				= pos;					// 現在の位置
+			g_aHuman[nCntHuman].posOld			= pos;					// 前回の位置
+			g_aHuman[nCntHuman].typeMove		= (MOVETYPE)(walk);		// 移動の種類
+			g_aHuman[nCntHuman].bRecur			= bRecur;				// 復活状況
+			g_aHuman[nCntHuman].type			= (HUMANTYPE)(type);	// 種類
+			g_aHuman[nCntHuman].rot				= rot;					// 向き
 
 			// 情報を初期化
-			g_aHuman[nCntHuman].move     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aHuman[nCntHuman].bMove    = false;							// 移動していない
-			g_aHuman[nCntHuman].state    = HUMANSTATE_WALK;					// 歩き状態
+			g_aHuman[nCntHuman].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aHuman[nCntHuman].bMove			= false;							// 移動していない
+			g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
+			g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 歩き状態
 
 			// 移動量の最大値を設定
 			g_aHuman[nCntHuman].fMaxMove = (float)(rand() % HUMAN_RANDAM_MOVE + HUMAN_MOVE_LEAST);
@@ -1786,6 +1802,9 @@ void ResurrectionHuman(Human human)
 			// 人間モーションの初期化処理
 			InitMotionHuman(&g_aHuman[nCnt], g_aHuman[nCnt].type, g_aHuman[nCnt].typeMove);
 
+			// 人間の重なり防止処理
+			OverlapHuman(&g_aHuman[nCnt]);
+
 			// 処理を抜ける
 			break;
 		}
@@ -2085,6 +2104,41 @@ void TxtSetHuman(char *pTxt, HumanParts *pSetParts, MotionInfo *pSetMotion)
 		// エラーメッセージボックス
 		MessageBox(NULL, "人間のセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
+}
+
+//======================================================================================================================
+// 人間の重なり防止処理
+//======================================================================================================================
+bool OverlapHuman(Human *pHuman)
+{
+	bool bOverlap = false;			// 重なったかどうか
+
+	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
+	{
+		if (g_aHuman[nCnt].bUse == true && &g_aHuman[nCnt] != pHuman)
+		{ // 人間が使われていた場合
+
+			if (g_aHuman[nCnt].pos == pHuman->pos && g_aHuman[nCnt].fMaxMove == g_aHuman[nCnt].fMaxMove)
+			{ // 位置が一致かつ、移動量の最大数が一致していた場合
+
+				// 人間の重なり防止カウンターを加算する
+				pHuman->nOverlapCounter++;
+
+				// 重なり防止判定を通った
+				bOverlap = true;
+
+				if (pHuman->nOverlapCounter >= HUMAN_OVERLAP_COUNT)
+				{ // 重なり防止のカウンターが一定数を超えた場合
+
+					// 移動量の最大数を増やす
+					pHuman->fMaxMove += HUMAN_OVERLAP_ADD_MOVE;
+				}
+			}
+		}
+	}
+
+	// 重なったかどうかを返す
+	return bOverlap;
 }
 
 #ifdef _DEBUG	// デバッグ処理

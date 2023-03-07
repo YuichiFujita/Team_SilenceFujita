@@ -126,6 +126,7 @@ typedef struct
 	HUMANTYPE	 type;					// 種類
 	MOVETYPE	 typeMove;				// 行動の種類
 	int			 nShadowID;				// 影のインデックス
+	int			 nOverlapCounter;		// 重なりカウント
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
 	bool		 bRecur;				// 復活するかどうか
