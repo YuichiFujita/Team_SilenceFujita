@@ -84,15 +84,16 @@
 //* ランキング（ニュースコア背景）の2Dポリゴン関係
 //**********************************
 #define RANK_NEW_BG_POS_X	(SCREEN_WIDTH * 0.49f)		//ニュースコア背景の開始位置（X)
-#define RANK_NEW_BG_POS_Y	(SCREEN_HEIGHT * 0.88f)		//ニュースコア背景の開始位置（Y）	
-#define RANK_NEW_BG_WIDTH	(490.0f)					//ニュースコア背景の大きさ（X）
-#define RANK_NEW_BG_HEIGHT	(95.0f)						//ニュースコア背景の大きさ（Y）
+#define RANK_NEW_BG_POS_Y	(SCREEN_HEIGHT * 0.9f)		//ニュースコア背景の開始位置（Y）	
+#define RANK_NEW_BG_WIDTH	(400.0f)					//ニュースコア背景の大きさ（X）
+#define RANK_NEW_BG_HEIGHT	(60.0f)						//ニュースコア背景の大きさ（Y）
 
 //**********************************
 //* ランキング（下線）の2Dポリゴン関係
 //**********************************
 #define RANK_LINE_WIDTH		(70.0f)					//下線の大きさ（X）
 #define RANK_LINE_HEIGHT	(20.0f)					//下線の大きさ（Y）
+#define RANK_LINE_OVER_X	(140.0f)				//下線を伸ばす距離（X）
 
 //**********************************
 //* 画面遷移中のランキングスコアの数値関係
@@ -412,9 +413,9 @@ void InitRanking(void)
 	{ // スコア分回す
 	  // 頂点座標を設定
 		pVtx[8  + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x - RANK_WIDTH) - ((RANK_NUM_PLACE * RANK_INTERVAL_X) + RANK_LINE_WIDTH), ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) - (RANK_HEIGHT), 0.0f);
-		pVtx[9  + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x + RANK_WIDTH),														  ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) - (RANK_HEIGHT), 0.0f);
+		pVtx[9  + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x + RANK_WIDTH + RANK_LINE_OVER_X),										 ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) - (RANK_HEIGHT), 0.0f);
 		pVtx[10 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x - RANK_WIDTH) - ((RANK_NUM_PLACE * RANK_INTERVAL_X) + RANK_LINE_WIDTH), ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) + (RANK_HEIGHT), 0.0f);
-		pVtx[11 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x + RANK_WIDTH),														  ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) + (RANK_HEIGHT), 0.0f);
+		pVtx[11 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine.pos.x + RANK_WIDTH + RANK_LINE_OVER_X),										 ((g_rank2DLine.pos.y + (nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT)) + (RANK_HEIGHT), 0.0f);
 
 		// rhw の設定
 		pVtx[ 8 + (nCount * 4)].rhw = 1.0f;
