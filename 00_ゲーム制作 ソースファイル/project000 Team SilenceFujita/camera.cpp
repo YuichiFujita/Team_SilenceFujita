@@ -467,14 +467,14 @@ void SetCamera(int nID)
 	if (GetMode() == MODE_TUTORIAL || GetMode() == MODE_GAME)
 	{ // プレイモードの場合
 
-		if (nID == CAMERATYPE_MAIN)
-		{ // メインカメラの場合
+		if (nID == CAMERATYPE_MAIN && GetPlayer()->bCameraFirst == false)
+		{ // メインカメラ且つ、一人称ではない場合
 
 			// ブースト速度に応じて視野角を変動
 			viewAngle = VIEW_ANGLE + D3DXToRadian(GetPlayer()->boost.plusMove.x * MUL_ANGLE_PLUS);
 		}
 		else
-		{ // 非メインカメラの場合
+		{ // 非メインカメラ、もしくは一人称の場合
 
 			// 通常の視野角を設定
 			viewAngle = VIEW_ANGLE;

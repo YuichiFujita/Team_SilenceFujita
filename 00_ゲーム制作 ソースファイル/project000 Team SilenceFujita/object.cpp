@@ -51,7 +51,7 @@
 
 #define APPEAR_ADD_MAGNI		(0.05f)							// 出現時の加算数の倍率
 
-#define ITEM_DROP_COUNT			(3)								// アイテムが落ちるカウント数
+#define ITEM_OBJECT_COUNT		(3)								// アイテムが落ちるカウント数
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -59,7 +59,7 @@
 Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
 float     g_aShadowRadius[MODEL_OBJ_MAX];		// 影の半径の情報
-int		  g_nDropItemCount;						// アイテムが落ちるカウント
+int		  g_nObjectItemCount;					// アイテムが落ちるカウント
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -162,7 +162,7 @@ void InitObject(void)
 	}
 
 	// アイテムが落ちるカウントを初期化する
-	g_nDropItemCount = 0;
+	g_nObjectItemCount = 0;
 }
 
 //======================================================================================================================
@@ -449,6 +449,10 @@ void DrawObject(void)
 
 						if (g_aObject[nCntObject].judge.state == JUDGESTATE_JUSTICE)
 						{ // 良い奴の場合
+
+							// 透明度を設定する
+							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse.a = 1.0f;
+
 							// マテリアルの設定
 							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 						}
@@ -864,12 +868,12 @@ void HitObject(Object *pObject, int nDamage)
 				SetBonus(SCORE_OBJECT);
 
 				// アイテムが落ちるカウントを加算する
-				g_nDropItemCount++;
+				g_nObjectItemCount++;
 
-				if (g_nDropItemCount % ITEM_DROP_COUNT == 0)
+				if (g_nObjectItemCount % ITEM_OBJECT_COUNT == 0)
 				{ // アイテムが落ちるカウントが一定数になった場合
 
-				  // アイテムの設定処理
+					// アイテムの設定処理
 					SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
 				}
 			}

@@ -29,6 +29,7 @@ typedef enum
 	ICONTYPE_BARRIER,			// バリアのアイコン
 	ICONTYPE_GATE_VERT,			// ゲートの奥手前のアイコン
 	ICONTYPE_GATE_HORIZ,		// ゲートの左右のアイコン
+	ICONTYPE_ITEM,				// アイテム
 	ICONTYPE_MAX				// この列挙型の総数
 }ICONTYPE;
 

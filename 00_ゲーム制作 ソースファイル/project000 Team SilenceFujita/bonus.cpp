@@ -382,7 +382,7 @@ void SetBonus(int nBonus)
 				MagnificCombo(1);
 
 				// 右に出すか左に出すかをランダムで算出する
-				g_aBonus[nCntBonus].whereBonus = (WHEREBONUS)/*(rand() % WHEREBONUS_MAX)*/0;
+				g_aBonus[nCntBonus].whereBonus = (WHEREBONUS)(rand() % WHEREBONUS_MAX);
 
 				switch (g_aBonus[nCntBonus].whereBonus)
 				{

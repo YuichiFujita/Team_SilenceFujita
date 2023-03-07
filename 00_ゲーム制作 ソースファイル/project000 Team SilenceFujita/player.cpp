@@ -1410,64 +1410,14 @@ void FlyAwayPlayer(void)
 //============================================================
 void SilenceWorldPlayer(void)
 {
-	if (g_player.bomb.state == ATTACKSTATE_BOMB)
-	{ // 攻撃状態がボム攻撃状態の場合
+	if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
+	{ // 攻撃モードの変更の操作が行われた場合
 
-		if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
-		{ // 攻撃モードの変更の操作が行われた場合
+		if (g_player.bomb.state == ATTACKSTATE_NONE)
+		{ // 何もしない状態の場合
 
-			if (g_player.bomb.bShot == true)
-			{ // 発射待機状態の場合
-
-				// 発射待機状態を取り消す
-				g_player.bomb.bShot = false;
-
-				// 操作管理カウンターを初期化
-				g_player.bomb.nCounterControl = 0;
-
-				// 攻撃待機状態にする
-				g_player.bomb.state = ATTACKSTATE_WAIT;
-			}
-			else
-			{ // 発射待機状態ではない場合
-
-				// 発射待機状態にする
-				g_player.bomb.bShot = true;
-
-				// 操作管理カウンターを初期化
-				g_player.bomb.nCounterControl = 0;
-			}
-		}
-
-		if (g_player.bomb.bShot == true)
-		{ // 発射待機状態の場合
-
-			// カウンターを加算
-			g_player.bomb.nCounterControl++;
-
-			if (g_player.bomb.nCounterControl >= BOMB_CANCEL_CNT)
-			{ // カウンターが一定値以上の場合
-
-				// バリアの発射
-				ShotBarrier();
-
-				// 発射待機状態を取り消す
-				g_player.bomb.bShot = false;
-			}
-		}
-	}
-	else
-	{ // 攻撃状態がボム攻撃状態ではない場合
-
-		if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
-		{ // 攻撃モードの変更の操作が行われた場合
-
-			if (g_player.bomb.state != ATTACKSTATE_WAIT)
-			{ // 攻撃状態が攻撃待機状態ではない場合
-
-				// 攻撃モードを変更
-				g_player.bomb.state = (ATTACKSTATE)((g_player.bomb.state + 1) % ATTACKSTATE_MAX);
-			}
+			// バリアの発射
+			ShotBarrier();
 		}
 	}
 }
@@ -1857,34 +1807,6 @@ void UpdateSilenceWorld(void)
 	case ATTACKSTATE_NONE:	// 何もしない状態
 
 		// 無し
-
-		// 処理を抜ける
-		break;
-
-	case ATTACKSTATE_BOMB:	// ボム攻撃状態
-
-		if (g_player.bomb.nCounterState > 0)
-		{ // カウンターが 0より大きい場合
-
-			// カウンターを減算
-			g_player.bomb.nCounterState -= SUB_BOMB_CNT;
-
-			if (g_player.bomb.nCounterState < 0)
-			{ // カウンターが 0を下回った場合
-
-				// カウンターを補正
-				g_player.bomb.nCounterState = 0;
-			}
-		}
-		else
-		{ // カウンターが 0以下の場合
-
-			// バリアの発射
-			ShotBarrier();
-
-			// 攻撃待機状態にする
-			g_player.bomb.state = ATTACKSTATE_WAIT;
-		}
 
 		// 処理を抜ける
 		break;
