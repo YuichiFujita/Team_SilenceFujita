@@ -585,11 +585,11 @@ void UpdateGame(void)
 			// ボーナスの更新処理
 			UpdateBonus();
 
-			// 影の更新
-			UpdateShadow();
-
 			// アイコンの更新
 			UpdateIcon();
+
+			// 影の更新
+			UpdateShadow();
 
 			// 警察の追加処理
 			AddPolice();
