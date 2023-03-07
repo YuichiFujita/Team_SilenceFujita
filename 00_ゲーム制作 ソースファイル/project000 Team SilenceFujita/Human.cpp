@@ -50,8 +50,8 @@
 #define HUMAN_RADIUS			(30.0f)		// 人間の幅
 #define HUMAN_PASS_CORRECT		(0.06f)		// 人間のずらす補正倍率
 #define HUMAN_GROUND			(10.0f)		// 人間の地面
-#define HUMAN_OVERLAP_COUNT		(180)		// 人間の加速カウント
-#define HUMAN_OVERLAP_ADD_MOVE	(1.0f)		// 重なり防止で加算する移動量
+#define HUMAN_OVERLAP_COUNT		(180)		// 人間の重なりカウント
+#define HUMAN_STOP_COUNT		(240)		// 人間の立ち止まりカウント
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
@@ -160,6 +160,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;						// 影のインデックス
 		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
+		g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
 		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
 		g_aHuman[nCntHuman].bRecur			= false;							// 復活状況
 		g_aHuman[nCntHuman].bUse			= false;							// 使用状況
@@ -229,6 +230,29 @@ void UpdateHuman(void)
 	{ // オブジェクトの最大表示数分繰り返す
 		if (g_aHuman[nCntHuman].bUse == true)
 		{ // オブジェクトが使用されている場合
+
+			if (g_aHuman[nCntHuman].nStopCount == 0)
+			{ // 停止カウントが0の場合
+
+				// 移動する
+				g_aHuman[nCntHuman].bMove = true;
+			}
+			else
+			{ // 上記以外
+
+				// 移動しない
+				g_aHuman[nCntHuman].bMove = false;
+
+				// 停止カウントを加算する
+				g_aHuman[nCntHuman].nStopCount++;
+
+				if (g_aHuman[nCntHuman].nStopCount >= HUMAN_STOP_COUNT)
+				{ // 停止カウントが一定数になった場合
+
+					// 停止カウントを初期化する
+					g_aHuman[nCntHuman].nStopCount = 0;
+				}
+			}
 
 			// 前回位置の更新
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;
@@ -535,6 +559,7 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 			// 情報を初期化
 			g_aHuman[nCntHuman].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aHuman[nCntHuman].bMove			= false;							// 移動していない
+			g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
 			g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
 			g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 歩き状態
 
@@ -739,7 +764,7 @@ void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove,
 	if (bMove == false)
 	{ // 移動していない状態の場合
 
-	  // 移動量を減速
+		// 移動量を減速
 		move->x += (0.0f - move->x) * 0.04f;
 	}
 }
@@ -789,11 +814,12 @@ void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 //============================================================
 void CurveHuman(Human *pHuman)
 {
-	// 移動量を更新
-	pHuman->move.x += HUMAN_MOVE_FORWARD;
+	if (pHuman->bMove == true)
+	{ // 移動する場合
 
-	// 移動している状態にする
-	pHuman->bMove = true;
+		// 移動量を更新
+		pHuman->move.x += HUMAN_MOVE_FORWARD;
+	}
 
 	switch (pHuman->curveInfo.actionState)
 	{
@@ -2118,7 +2144,7 @@ bool OverlapHuman(Human *pHuman)
 		if (g_aHuman[nCnt].bUse == true && &g_aHuman[nCnt] != pHuman)
 		{ // 人間が使われていた場合
 
-			if (g_aHuman[nCnt].pos == pHuman->pos && g_aHuman[nCnt].fMaxMove == g_aHuman[nCnt].fMaxMove)
+			if (g_aHuman[nCnt].pos == pHuman->pos && g_aHuman[nCnt].fMaxMove == g_aHuman[nCnt].fMaxMove && g_aHuman[nCnt].bMove == true)
 			{ // 位置が一致かつ、移動量の最大数が一致していた場合
 
 				// 人間の重なり防止カウンターを加算する
@@ -2130,8 +2156,14 @@ bool OverlapHuman(Human *pHuman)
 				if (pHuman->nOverlapCounter >= HUMAN_OVERLAP_COUNT)
 				{ // 重なり防止のカウンターが一定数を超えた場合
 
-					// 移動量の最大数を増やす
-					pHuman->fMaxMove += HUMAN_OVERLAP_ADD_MOVE;
+					// 移動量を0,0fにする
+					pHuman->move.x = 0.0f;
+
+					// 移動をしない
+					pHuman->bMove = false;
+
+					// 停止カウントを加算する
+					pHuman->nStopCount++;
 				}
 			}
 		}

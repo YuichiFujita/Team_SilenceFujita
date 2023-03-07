@@ -127,6 +127,7 @@ typedef struct
 	MOVETYPE	 typeMove;				// 行動の種類
 	int			 nShadowID;				// 影のインデックス
 	int			 nOverlapCounter;		// 重なりカウント
+	int			 nStopCount;			// 停止カウント
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
 	bool		 bRecur;				// 復活するかどうか
