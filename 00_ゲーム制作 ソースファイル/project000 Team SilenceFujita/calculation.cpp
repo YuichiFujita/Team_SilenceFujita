@@ -31,6 +31,12 @@
 #include "bonus.h"
 #include "game.h"
 
+//**********************************************************************************
+//	マクロ定義
+//**********************************************************************************
+#define COLL_SLOW_MOVE	(12.5f)	// ぶつかった際減速する移動量
+#define COLL_SLOW		(0.95f)	// ぶつかった際の減速倍率
+
 //==================================================================================
 //	四頂点の位置の計算処理
 //==================================================================================
@@ -128,6 +134,76 @@ void CollisionOuterProduct(D3DXVECTOR3 *Targetpos, D3DXVECTOR3 *TargetposOld, D3
 }
 
 //==================================================================================
+//	扇形の当たり判定
+//==================================================================================
+//	視界内の判定などに使用
+//==================================================================================
+bool CollisionSector(D3DXVECTOR3 centerPos, D3DXVECTOR3 targetPos, float fCenterRot, float fRadius, float fAngle)
+{
+	// 変数を宣言
+	float       fLength;		// 中心位置と目標位置の距離
+	float       fHalfAngle;		// 引数の角度の半分の値の代入用
+	bool        bHit = false;	// 当たり判定の結果
+	D3DXVECTOR3 vecToPos;		// 左端と位置のベクトル
+
+	// 変数配列を宣言
+	float       fRotEdge[2];	// 扇形の縁の角度     [※] 0：左 1：右
+	D3DXVECTOR3 posEdge[2];		// 扇形の縁の先端位置 [※] 0：左 1：右
+	D3DXVECTOR3 vecEdge[2];		// 扇形の縁ベクトル   [※] 0：左 1：右
+
+	// 中心位置と目標位置の距離求める
+	fLength = (centerPos.x - targetPos.x) * (centerPos.x - targetPos.x)
+			+ (centerPos.z - targetPos.z) * (centerPos.z - targetPos.z);
+
+	if (fLength < fRadius * fRadius)
+	{ // 円の範囲内の場合
+
+		// 引数の角度の半分の値を求める
+		fHalfAngle = fAngle * 0.5f;
+
+		// 扇形の左縁の角度を求める
+		fRotEdge[0] = fCenterRot + fHalfAngle;	// 角度を左に傾ける
+		RotNormalize(&fRotEdge[0]);				// 向きを正規化
+
+		// 扇形の右縁の角度を求める
+		fRotEdge[1] = fCenterRot - fHalfAngle;	// 角度を右に傾ける
+		RotNormalize(&fRotEdge[1]);				// 向きを正規化
+
+		// 扇形の左縁の先端位置を求める
+		posEdge[0].x = centerPos.x + sinf(fRotEdge[0]) * 1.0f;
+		posEdge[0].y = 0.0f;
+		posEdge[0].z = centerPos.z + cosf(fRotEdge[0]) * 1.0f;
+
+		// 扇形の右縁の先端位置を求める
+		posEdge[1].x = centerPos.x + sinf(fRotEdge[1]) * 1.0f;
+		posEdge[1].y = 0.0f;
+		posEdge[1].z = centerPos.z + cosf(fRotEdge[1]) * 1.0f;
+
+		// 扇形の左縁のベクトルを求める
+		vecEdge[0] = posEdge[0] - centerPos;
+		vecEdge[0].y = 0.0f;
+
+		// 扇形の右縁のベクトルを求める
+		vecEdge[1] = posEdge[1] - centerPos;
+		vecEdge[1].y = 0.0f;
+
+		// 左端と位置のベクトルを求める
+		vecToPos = targetPos - centerPos;
+
+		if ((vecEdge[0].z * vecToPos.x) - (vecEdge[0].x * vecToPos.z) < 0
+		&&  (vecEdge[1].z * vecToPos.x) - (vecEdge[1].x * vecToPos.z) > 0)
+		{ // 扇形の両縁の範囲内の場合
+
+			// 当たっている状態にする
+			bHit = true;
+		}
+	}
+
+	// 当たり判定の結果を返す
+	return bHit;
+}
+
+//==================================================================================
 //	モデルの着地の更新処理
 //==================================================================================
 //	地面の上に立つかメッシュフィールドの上にいるかの判定に使用
@@ -169,6 +245,28 @@ void RotNormalize(float *rot)
 {
 	if      (*rot >  D3DX_PI) { *rot -= D3DX_PI * 2; }
 	else if (*rot < -D3DX_PI) { *rot += D3DX_PI * 2; }
+}
+
+//==================================================================================
+//	ぶつかりの減速
+//==================================================================================
+//	ぶつかったときの減速に使用
+//==================================================================================
+void CollisionSlow(float *fMove)
+{
+	if (*fMove >= COLL_SLOW_MOVE)
+	{ // 移動量が一定値以上の場合
+
+		// 移動量を減速
+		*fMove *= COLL_SLOW;
+
+		if (*fMove < COLL_SLOW_MOVE)
+		{ // 移動量が一定値より小さい場合
+
+			// 移動量を補正
+			*fMove = COLL_SLOW_MOVE;
+		}
+	}
 }
 
 //==================================================================================
@@ -392,9 +490,6 @@ void DrawAllAroundChunk(void)
 	// 爆弾の描画
 	DrawBomb();
 
-	// エフェクトの描画
-	DrawEffect();
-
 	// パーティクルの描画
 	DrawParticle();
 
@@ -562,7 +657,7 @@ void UpdateJudge(Judge *pJudge)
 		pJudge->col.g -= JUDGE_FLASH;
 		pJudge->col.b -= JUDGE_FLASH;
 
-		if (pJudge->col.r <= JUDGE_BLACK_LINE)
+		if (pJudge->col.r <= JUDGE_BLACK.r)
 		{ // 色が一定数を超えた場合
 
 			// 色を補正する
@@ -581,7 +676,7 @@ void UpdateJudge(Judge *pJudge)
 		pJudge->col.g += JUDGE_FLASH;
 		pJudge->col.b += JUDGE_FLASH;
 
-		if (pJudge->col.r >= JUDGE_WHITE_LINE)
+		if (pJudge->col.r >= JUDGE_WHITE.r)
 		{ // 色が一定数を超えた場合
 
 			// 色を補正する

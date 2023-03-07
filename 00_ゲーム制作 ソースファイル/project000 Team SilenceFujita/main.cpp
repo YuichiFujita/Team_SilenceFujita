@@ -57,7 +57,7 @@
 #define SHAD_SETUP_TXT	"data\\TXT\\shadow.txt"		// ステージセットアップ用のテキストファイルの相対パス
 
 #ifdef _DEBUG	// デバッグ処理
-#define DEBUG_PRINT		(1280)		// デバッグ表示の文字列の最長
+#define DEBUG_PRINT		(2400)		// デバッグ表示の文字列の最長
 
 #define MAX_DEBUG		(2)			// 使用するポリゴン数
 #define DEBUG_WIDTH		(405.0f)	// デバッグ背景の横幅
@@ -1077,6 +1077,7 @@ void TxtSetObject(void)
 	int         nBreakType;		// 壊れ方の種類の代入用
 	int         nShadowType;	// 影の種類の代入用
 	int         nCollisionType;	// 当たり判定の種類の代入用
+	int			nJudgetype;		// 善悪の種類の代入用
 	int         nNumMat;		// マテリアル数の代入用
 	int         nAnimCnt;		// 再生カウントの代入用
 	int         nAnimPat;		// 再生パターンの代入用
@@ -1165,6 +1166,11 @@ void TxtSetObject(void)
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
 								fscanf(pFile, "%d", &stateRot);			// 向き状態を読み込む
 							}
+							else if (strcmp(&aString[0], "JUDGE") == 0)
+							{ // 読み込んだ文字列が JUDGE の場合
+								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+								fscanf(pFile, "%d", &nJudgetype);		// 善悪状態を読み込む
+							}
 							else if (strcmp(&aString[0], "NUMMAT") == 0)
 							{ // 読み込んだ文字列が NUMMAT の場合
 								fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
@@ -1200,7 +1206,7 @@ void TxtSetObject(void)
 						} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);	// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 						// オブジェクトの設定
-						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_COMPLETE);
+						SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_COMPLETE, nJudgetype);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_OBJECT") != 0);		// 読み込んだ文字列が END_SETSTAGE_OBJECT ではない場合ループ
 			}
@@ -1372,7 +1378,7 @@ void TxtSetAI(void)
 						} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 						// 車の設定
-						SetCar(pos, rot, nWalk, type);
+						SetCar(pos, D3DXToRadian(rot), nWalk, type);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_CAR") != 0);				// 読み込んだ文字列が END_SETSTAGE_CAR ではない場合ループ
 			}
@@ -1439,7 +1445,7 @@ void TxtSetAI(void)
 						} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 						// 人間の設定
-						SetHuman(pos, rot, nWalk, bRecur, type);
+						SetHuman(pos, D3DXToRadian(rot), nWalk, bRecur, type);
 					}
 				} while (strcmp(&aString[0], "END_SETSTAGE_HUMAN") != 0);			// 読み込んだ文字列が END_SETSTAGE_HUMAN ではない場合ループ
 			}
@@ -1909,6 +1915,7 @@ void DrawDebug(void)
 	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
 	int nNumWeather = GetNumWeather();				// 降っている物の総数を取得する
 	int nNumBuild = GetNumBuildTimer();				// 再建築タイマーの総数取得処理
+	float fRevPlayerRot = (((fabsf(GetPlayer()->move.x + GetPlayer()->boost.plusMove.x) - MAX_REAL_SPEED) * -1.0f) * ((1.0f - PLAY_REV_ROT_MIN) / MAX_REAL_SPEED)) + PLAY_REV_ROT_MIN;	// プレイヤーの向き変更量の減速係数
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -1952,7 +1959,8 @@ void DrawDebug(void)
 		" 　再建築タイマーの数：%d\n"
 		" 　警察の状態：%d\n"
 		" 　警察のタックル状態：%d\n"
-		" 　チュートリアルのレッスン：%d\n",
+		" 　向き変更量：%.2f\n"
+		" 　向き変更量の減衰量：%.2f\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -1979,7 +1987,8 @@ void DrawDebug(void)
 		nNumBuild,
 		pPolice->state,
 		pPolice->tackle.tackleState,
-		GetLessonState()
+		GetPlayer()->moveRot.y,
+		fRevPlayerRot
 	);
 
 	//--------------------------------------------------------
@@ -2097,16 +2106,16 @@ void DrawDebugEditObject(void)
 	sprintf
 	( // 引数
 		&aDeb[0],
-		"\n　 位置　　 [%.4f, %.4f, %.4f]"
-		"\n　 拡大率　 [%.4f, %.4f, %.4f]"
-		"\n　 向き　　 [%d]"
-		"\n　 種類　　 [%d]"
-		"\n　 色　　　 [%.2f, %.2f, %.2f]"
-		"\n   影    　 [%s]"
-		"\n   壊れ方　 [%s]"
-		"\n   判定　　 [%s]"
-		"\n   判定向き [%d]"
-		"\n\n",
+		"\n　 位置　　   [%.4f, %.4f, %.4f]"
+		"\n　 拡大率　   [%.4f, %.4f, %.4f]"
+		"\n　 向き　　   [%d]"
+		"\n　 種類　　   [%d]"
+		"\n　 色　　　   [%.2f, %.2f, %.2f]"
+		"\n   影    　   [%s]"
+		"\n   壊れ方　   [%s]"
+		"\n   判定　　   [%s]"
+		"\n   判定向き   [%d]"
+		"\n 　善悪の状態 [%s]",
 		EditObject->pos.x, EditObject->pos.y, EditObject->pos.z,
 		EditObject->scale.x, EditObject->scale.y, EditObject->scale.z,
 		(int)D3DXToDegree(EditObject->rot.y), EditObject->nType,
@@ -2116,7 +2125,8 @@ void DrawDebugEditObject(void)
 		EditObject->Shadowtype.pShadowMode[EditObject->Shadowtype.Shadowtype],
 		EditObject->Break.pBreakMode[EditObject->Break.Breaktype],
 		EditObject->Collisiontype.pCollisionMode[EditObject->Collisiontype.Collisiontype],
-		(int)D3DXToDegree(EditObject->CollInfo.rot.y)
+		(int)D3DXToDegree(EditObject->CollInfo.rot.y),
+		EditObject->Judge.pJudgeMode[EditObject->Judge.Judgetype]
 	);
 
 	// テキストの描画
@@ -2259,6 +2269,7 @@ void DrawDebugControlObject(void)
 		"\nプレイヤーの位置へ移動：[ALT] 　"
 		"\n当たり判定の種類の変更：[BACKSPACE] 　"
 		"\n当たり判定の調整：[ENTER] 　"
+		"\n善悪の調整：[RCTRL]"
 		"\n--------------------------------------------- 　"
 		"\nオブジェクトの移動：[W/A/S/D] 　"
 		"\nオブジェクトの平面移動微調整：[LCTRL+W/A/S/D] 　"

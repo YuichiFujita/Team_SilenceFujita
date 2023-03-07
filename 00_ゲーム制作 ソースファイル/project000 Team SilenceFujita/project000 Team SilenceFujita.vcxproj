@@ -156,7 +156,6 @@
   <ItemGroup>
     <ClCompile Include="2Deffect.cpp" />
     <ClCompile Include="2Dparticle.cpp" />
-    <ClCompile Include="3DValue.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
@@ -166,6 +165,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="Combo.cpp" />
+    <ClCompile Include="Countdown.cpp" />
     <ClCompile Include="curve.cpp" />
     <ClCompile Include="EditBillboard.cpp" />
     <ClCompile Include="EditCollision.cpp" />
@@ -179,6 +179,7 @@
     <ClCompile Include="Human.cpp" />
     <ClCompile Include="icon.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="junk.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
@@ -212,7 +213,6 @@
   <ItemGroup>
     <ClInclude Include="2Deffect.h" />
     <ClInclude Include="2Dparticle.h" />
-    <ClInclude Include="3DValue.h" />
     <ClInclude Include="ability.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />
@@ -222,6 +222,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="Combo.h" />
+    <ClInclude Include="Countdown.h" />
     <ClInclude Include="curve.h" />
     <ClInclude Include="EditBillboard.h" />
     <ClInclude Include="EditCollision.h" />
@@ -235,6 +236,7 @@
     <ClInclude Include="Human.h" />
     <ClInclude Include="icon.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="junk.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />

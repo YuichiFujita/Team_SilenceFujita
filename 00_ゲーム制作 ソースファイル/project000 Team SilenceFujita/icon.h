@@ -24,11 +24,13 @@
 typedef enum
 {
 	ICONTYPE_PLAY = 0,			// プレイヤーのアイコン
-	ICONTYPE_EVIL,				// 悪い奴のアイコン
+	ICONTYPE_EVIL_HUMAN,		// 悪い人間のアイコン
+	ICONTYPE_EVIL_CAR,			// 悪い車のアイコン
 	ICONTYPE_POLICE,			// 警察のアイコン
 	ICONTYPE_BARRIER,			// バリアのアイコン
 	ICONTYPE_GATE_VERT,			// ゲートの奥手前のアイコン
 	ICONTYPE_GATE_HORIZ,		// ゲートの左右のアイコン
+	ICONTYPE_ITEM,				// アイテム
 	ICONTYPE_MAX				// この列挙型の総数
 }ICONTYPE;
 

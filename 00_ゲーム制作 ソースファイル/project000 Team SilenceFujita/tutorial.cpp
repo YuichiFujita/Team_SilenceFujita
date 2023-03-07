@@ -17,7 +17,6 @@
 
 #include "2Deffect.h"
 #include "2Dparticle.h"
-#include "3DValue.h"
 #include "ability.h"
 #include "billboard.h"
 #include "bomb.h"
@@ -117,7 +116,7 @@ const int aNextLesson[] =	// レッスンのカウンター
 	60,		// レッスン3 (視点変更) のレッスンカウンター
 	30,		// レッスン4 (破滅疾走) のレッスンカウンター
 	60,		// レッスン5 (吹飛散風) のレッスンカウンター
-	120,	// レッスン6 (無音世界) のレッスンカウンター
+	160,	// レッスン6 (無音世界) のレッスンカウンター
 	0,		// レッスン7 (脱出)     のレッスンカウンター
 };
 
@@ -387,9 +386,6 @@ void InitTutorial(void)
 	// 再建築タイマーの初期化
 	InitBuildtimer();
 
-	// 3Dの数値の初期化
-	Init3DValue();
-
 	// 2Dエフェクトの初期化
 	Init2DEffect();
 
@@ -441,8 +437,12 @@ void InitTutorial(void)
 		false	// AI
 	);
 
-	//// サウンドの再生※AnarchyCarsBGM
-	//PlaySound(SOUND_LABEL_BGM_TUTORIAL_000);	// BGM (チュートリアル画面)
+	//メインBGMの再生
+	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+	{
+		// サウンドの再生（チュートリアルBGM）
+		PlaySound(SOUND_LABEL_BGM_TUTORIAL_000);
+	}
 }
 
 //======================================================================================================================
@@ -544,9 +544,6 @@ void UninitTutorial(void)
 
 	// 再建築タイマーの終了
 	UninitBuildtimer();
-
-	// 3Dの数値の終了
-	Uninit3DValue();
 
 	// 2Dエフェクトの終了
 	Uninit2DEffect();
@@ -758,9 +755,6 @@ void UpdateTutorial(void)
 
 	// 再建築タイマーの更新
 	UpdateBuildtimer();
-
-	// 3Dの数値の更新
-	Update3DValue();
 
 	// 体力バーの更新
 	UpdateLife();
@@ -1304,12 +1298,10 @@ void ResetPlayer(void)
 	pPlayer->pos    = D3DXVECTOR3(0.0f, 0.0f, RESET_POS_Z);		// 現在の位置
 	pPlayer->oldPos = D3DXVECTOR3(0.0f, 0.0f, RESET_POS_Z);		// 前回の位置
 
-	// 向きを設定
-	pPlayer->rot     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在の向き
-	pPlayer->destRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 目標の向き
-
 	// 本体情報の初期化
 	pPlayer->move          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+	pPlayer->rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
+	pPlayer->moveRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き変更量
 	pPlayer->state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
 	pPlayer->nLife         = PLAY_LIFE;							// 体力
 	pPlayer->nCounterState = 0;									// 状態管理カウンター
@@ -1352,6 +1344,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 	int         nBreakType;		// 壊れ方の種類の代入用
 	int         nShadowType;	// 影の種類の代入用
 	int         nCollisionType;	// 当たり判定の種類の代入用
+	int			nJudgeType;		// 善悪の種類の代入用
 	int         nNumMat;		// マテリアル数の代入用
 	ROTSTATE    stateRot;		// 向き状態
 	int			nWalk;			// 歩きタイプの変数
@@ -1439,6 +1432,11 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
 									fscanf(pFile, "%d", &stateRot);			// 向き状態を読み込む
 								}
+								else if (strcmp(&aString[0], "JUDGE") == 0)
+								{ // 読み込んだ文字列が JUDGE の場合
+									fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+									fscanf(pFile, "%d", &nJudgeType);		// 善悪状態を読み込む
+								}
 								else if (strcmp(&aString[0], "NUMMAT") == 0)
 								{ // 読み込んだ文字列が NUMMAT の場合
 									fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
@@ -1473,7 +1471,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);		// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 							// オブジェクトの設定
-							SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY);
+							SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY, nJudgeType);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_OBJECT") != 0);			// 読み込んだ文字列が END_SETLESSON_OBJECT ではない場合ループ
 				}

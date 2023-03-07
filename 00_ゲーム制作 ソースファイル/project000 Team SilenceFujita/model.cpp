@@ -86,6 +86,20 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\funsui.x",				// 公園（噴水）
 	"data\\MODEL_OBJECT\\TriCorn.x",			// 三角コーン
 	"data\\MODEL_OBJECT\\TriCorn001.x",			// 三角コーン（二つ）
+	"data\\MODEL_OBJECT\\syoukasen001.x",		// 消火栓
+	"data\\MODEL_OBJECT\\post001.x",			// ポスト
+	"data\\MODEL_OBJECT\\cardboard001.x",		// 段ボール（開いてる）
+	"data\\MODEL_OBJECT\\cardboard002.x",		// 段ボール（閉じてる）
+	"data\\MODEL_OBJECT\\sunabako.x",			// 砂箱
+	"data\\MODEL_OBJECT\\gomistation.x",		// ゴミステーション
+	"data\\MODEL_OBJECT\\SignPole.x",			// 交通標識のポール
+	"data\\MODEL_OBJECT\\SignVehicleUnEnter.x",	// 標識(車両侵入禁止)
+	"data\\MODEL_OBJECT\\SignStop.x",			// 標識(一時停止)
+	"data\\MODEL_OBJECT\\ConcreteWall.x",		// コンクリ壁
+	"data\\MODEL_OBJECT\\yawarage.x",			// やわらげ斎場
+	"data\\MODEL_OBJECT\\wall000.x",			// 町壁（壁）
+	"data\\MODEL_OBJECT\\pillar000.x",			// 町壁（柱）
+	"data\\MODEL_OBJECT\\fence001.x",			// 町壁（フェンス）
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
@@ -116,6 +130,10 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_HUMAN\\leg_r.x",			// 右腿
 	"data\\MODEL_HUMAN\\shoes_l.x",			// 左靴
 	"data\\MODEL_HUMAN\\shoes_r.x",			// 右靴
+
+	// 小道具モデル
+	"data\\MODEL_ITEM\\cigaret.x",			// タバコ
+	"data\\MODEL_ITEM\\phone.x",			// スマホ
 
 	// ゲートモデル
 	"data\\MODEL_GATE\\gate000.x",			// ゲート (建物)

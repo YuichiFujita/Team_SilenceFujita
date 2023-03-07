@@ -29,7 +29,9 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define HUMAN_SETUP_TXT			"data\\TXT\\player.txt"		// 人間のセットアップ用のテキストファイルの相対パス
+#define HUMAN_NORMAL_SETUP_TXT	"data\\MOTION\\humanNormal.txt"		// 人間のモーションのセットアップ用のテキストファイルの相対パス (通常)
+#define HUMAN_CIGARET_SETUP_TXT	"data\\MOTION\\humanCigaret.txt"	// 人間のモーションのセットアップ用のテキストファイルの相対パス (タバコ)
+#define HUMAN_PHONE_SETUP_TXT	"data\\MOTION\\humanPhone.txt"		// 人間のモーションのセットアップ用のテキストファイルの相対パス (スマホ)
 
 #define HUMAN_LIFE				(50)		// 人の体力
 #define HUMAN_GRAVITY			(1.0f)		// 人にかかる重力
@@ -47,13 +49,28 @@
 #define HUMAN_PASS_SHIFT		(40.0f)		// すれ違った時のずらす幅
 #define HUMAN_RADIUS			(30.0f)		// 人間の幅
 #define HUMAN_PASS_CORRECT		(0.06f)		// 人間のずらす補正倍率
+#define HUMAN_GROUND			(10.0f)		// 人間の地面
+#define HUMAN_OVERLAP_COUNT		(180)		// 人間の重なりカウント
+#define HUMAN_STOP_COUNT		(240)		// 人間の立ち止まりカウント
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
 
-#define SHADOW_HUMAN_RADIUS		(35.0f)		// 人間の影の半径
+#define SHADOW_HUMAN_RADIUS		(45.0f)		// 人間の影の半径
 
 #define RESURRECT_CNT			(300)		// 復活までのカウント
+
+//**********************************************************************************************************************
+//	コンスト定義
+//**********************************************************************************************************************
+const char *apTextureHumanUV[] =	// 人間のUVテクスチャの相対パス
+{
+	"data\\TEXTURE\\human000.png",	// 人間1のテクスチャ相対パス
+	"data\\TEXTURE\\human001.png",	// 人間2のテクスチャ相対パス
+	"data\\TEXTURE\\human002.png",	// 人間3のテクスチャ相対パス
+	"data\\TEXTURE\\human003.png",	// 歩きタバコのテクスチャ相対パス
+	"data\\TEXTURE\\human004.png",	// 歩きスマホのテクスチャ相対パス
+};
 
 //**********************************************************************************************************************
 //	構造体定義(Resurrect)
@@ -68,89 +85,86 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove, float fMaxMove);		// 人間の位置の更新処理
+void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove, float fMaxMove);	// 人間の位置の更新処理
+void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);													// 人間の補正の更新処理
 
-void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos);	// 人間の補正の更新処理
-void CurveHuman(Human *pHuman);						// 人間のカーブ処理
-void StopHuman(Human *pHuman);						// 人間の停止処理
-void ReactionHuman(Human *pHuman);					// 人間のリアクション処理
-void CollisionCarHuman(Human *pHuman);				// 人間と車の当たり判定
-void CurveRotHuman(Human *pHuman);					// 人間の角度更新処理
-void WalkHuman(Human *pHuman);						// 人間の歩く処理
-void PassingHuman(Human *pHuman);					// 人間のすれ違い処理
-void SetResurrection(Human human);					// 復活情報の設定処理
-void ResurrectionHuman(Human human);				// 人間の復活処理
-void CorrectCurveHuman(Human *human);				// 人間の初期位置の設定処理
+void CurveHuman(Human *pHuman);				// 人間のカーブ処理
+void StopHuman(Human *pHuman);				// 人間の停止処理
+void ReactionHuman(Human *pHuman);			// 人間のリアクション処理
+void CollisionCarHuman(Human *pHuman);		// 人間と車の当たり判定
+void CurveRotHuman(Human *pHuman);			// 人間の角度更新処理
+void WalkHuman(Human *pHuman);				// 人間の歩く処理
+void PassingHuman(Human *pHuman);			// 人間のすれ違い処理
+void SetResurrection(Human human);			// 復活情報の設定処理
+void ResurrectionHuman(Human human);		// 人間の復活処理
+void CorrectCurveHuman(Human *human);		// 人間の初期位置の設定処理
+bool OverlapHuman(Human *pHuman);			// 人間の重なり防止処理
 
+void InitMotionHuman(Human *pHuman, int nType, int nWalk);	// 人間モーションの初期化処理
 void UpdateMotionHuman(Human *pHuman);						// 人間モーションの更新処理
 void SetMotionHuman(Human *pHuman, MOTIONTYPE type);		// 人間モーションの設定処理
-void TxtSetHuman(HumanParts *setParts, KeyInfo *setmotion);	// 人間のセットアップ処理
+
+void TxtSetHuman(char *pTxt, HumanParts *pSetParts, MotionInfo *pSetMotion);	// 人間のセットアップ処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Human g_aHuman[MAX_HUMAN];	// 人間の情報
-Resurrect g_aResurrect[MAX_HUMAN];		// 人間の復活情報
+LPDIRECT3DTEXTURE9 g_apTextureHumanUV[HUMANTYPE_MAX] = {};	// 人間のUVテクスチャのポインタ
+
+Human     g_aHuman[MAX_HUMAN];		// 人間の情報
+Resurrect g_aResurrect[MAX_HUMAN];	// 人間の復活情報
+
+HumanParts g_aSetPartsNormal[MAX_PARTS];	// 通常パーツのセットアップ用
+HumanParts g_aSetPartsCigaret[MAX_PARTS];	// タバコパーツのセットアップ用
+HumanParts g_aSetPartsPhone[MAX_PARTS];		// スマホパーツのセットアップ用
+
+MotionInfo g_setMotionNormal;	// 通常モーションのセットアップ用
+MotionInfo g_setMotionCigaret;	// タバコモーションのセットアップ用
+MotionInfo g_setMotionPhone;	// スマホモーションのセットアップ用
 
 //======================================================================================================================
 //	人間の初期化処理
 //======================================================================================================================
 void InitHuman(void)
 {
-	// 変数配列を宣言
-	HumanParts setParts[MAX_PARTS];				// パーツのセットアップ用
-	KeyInfo    setMotion[MAX_MOTION];			// モーションのセットアップ用
-
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
-	// 人間のセットアップ
-	TxtSetHuman(&setParts[0], &setMotion[0]);
+	// 人間のUVテクスチャの読み込み
+	for (int nCntHuman = 0; nCntHuman < HUMANTYPE_MAX; nCntHuman++)
+	{ // 人間の種類の総数分繰り返す
+
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice, apTextureHumanUV[nCntHuman], &g_apTextureHumanUV[nCntHuman]);
+	}
+
+	// 人間のパーツの初期化
+	ZeroMemory(&g_aSetPartsNormal[0],  sizeof(HumanParts) * MAX_PARTS);
+	ZeroMemory(&g_aSetPartsCigaret[0], sizeof(HumanParts) * MAX_PARTS);
+	ZeroMemory(&g_aSetPartsPhone[0],   sizeof(HumanParts) * MAX_PARTS);
+
+	// 人間のセットアップ処理
+	TxtSetHuman(HUMAN_NORMAL_SETUP_TXT,  &g_aSetPartsNormal[0],  &g_setMotionNormal);	// 通常
+	TxtSetHuman(HUMAN_CIGARET_SETUP_TXT, &g_aSetPartsCigaret[0], &g_setMotionCigaret);	// タバコ
+	TxtSetHuman(HUMAN_PHONE_SETUP_TXT,   &g_aSetPartsPhone[0],   &g_setMotionPhone);	// スマホ
 
 	// 人間の情報の初期化
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // 人間の最大表示数分繰り返す
 
 		// 基本情報の初期化
-		g_aHuman[nCntHuman].pos       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aHuman[nCntHuman].posOld    = g_aHuman[nCntHuman].pos;		// 前回の位置
-		g_aHuman[nCntHuman].move      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aHuman[nCntHuman].fMaxMove  = 0.0f;							// 移動量の最大数
-		g_aHuman[nCntHuman].fLandPos  = 0.0f;							// 着地点
-		g_aHuman[nCntHuman].rot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aHuman[nCntHuman].nShadowID = NONE_SHADOW;					// 影のインデックス
-		g_aHuman[nCntHuman].bJump     = false;							// ジャンプしているかどうか
-		g_aHuman[nCntHuman].bMove     = false;							// 移動しているか
-		g_aHuman[nCntHuman].bRecur	  = false;							// 復活状況
-		g_aHuman[nCntHuman].bUse      = false;							// 使用状況
-		g_aHuman[nCntHuman].state     = HUMANSTATE_WALK;				// 状態
-
-		// モーションの基本情報の初期化
-		g_aHuman[nCntHuman].motion.type     = MOTIONTYPE_NONE;	// モーションの種類
-		g_aHuman[nCntHuman].motion.nPose    = 0;				// モーションのポーズ番号
-		g_aHuman[nCntHuman].motion.nCounter = 0;				// モーションのカウンター
-
-		// モーションの情報を初期化
-		for (int nCntMotion = 0; nCntMotion < MAX_MOTION; nCntMotion++)
-		{ // モーションの最大数分繰り返す
-
-			// モーションの情報を初期化
-			g_aHuman[nCntHuman].motion.aMotion[nCntMotion] = setMotion[nCntMotion];
-		}
-
-		// パーツ情報の初期化
-		for (int nCntParts = 0; nCntParts < MAX_PARTS; nCntParts++)
-		{ // パーツの最大数分繰り返す
-
-			// パーツの基本情報を初期化
-			g_aHuman[nCntHuman].aParts[nCntParts] = setParts[nCntParts];
-
-			// パーツのモデル情報を初期化
-			g_aHuman[nCntHuman].aParts[nCntParts].modelData = GetModelData(nCntParts + FROM_HUMAN);
-		}
-
-		// モーションの設定
-		SetMotionHuman(&g_aHuman[nCntHuman], MOTIONTYPE_MOVE);
+		g_aHuman[nCntHuman].pos				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aHuman[nCntHuman].posOld			= g_aHuman[nCntHuman].pos;			// 前回の位置
+		g_aHuman[nCntHuman].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aHuman[nCntHuman].fMaxMove		= 0.0f;								// 移動量の最大数
+		g_aHuman[nCntHuman].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;						// 影のインデックス
+		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
+		g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
+		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
+		g_aHuman[nCntHuman].bRecur			= false;							// 復活状況
+		g_aHuman[nCntHuman].bUse			= false;							// 使用状況
+		g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 状態
 
 		// ジャッジの情報の初期化
 		g_aHuman[nCntHuman].judge.col      = JUDGE_WHITE;			// ピカピカの色
@@ -189,7 +203,17 @@ void InitHuman(void)
 //======================================================================================================================
 void UninitHuman(void)
 {
+	// 人間のUVテクスチャの読み込み
+	for (int nCntHuman = 0; nCntHuman < HUMANTYPE_MAX; nCntHuman++)
+	{ // 人間の種類の総数分繰り返す
 
+		if (g_apTextureHumanUV[nCntHuman] != NULL)
+		{ // 変数 (g_apTextureHumanUV) がNULLではない場合
+
+			g_apTextureHumanUV[nCntHuman]->Release();
+			g_apTextureHumanUV[nCntHuman] = NULL;
+		}
+	}
 }
 
 //======================================================================================================================
@@ -207,11 +231,31 @@ void UpdateHuman(void)
 		if (g_aHuman[nCntHuman].bUse == true)
 		{ // オブジェクトが使用されている場合
 
+			if (g_aHuman[nCntHuman].nStopCount == 0)
+			{ // 停止カウントが0の場合
+
+				// 移動する
+				g_aHuman[nCntHuman].bMove = true;
+			}
+			else
+			{ // 上記以外
+
+				// 移動しない
+				g_aHuman[nCntHuman].bMove = false;
+
+				// 停止カウントを加算する
+				g_aHuman[nCntHuman].nStopCount++;
+
+				if (g_aHuman[nCntHuman].nStopCount >= HUMAN_STOP_COUNT)
+				{ // 停止カウントが一定数になった場合
+
+					// 停止カウントを初期化する
+					g_aHuman[nCntHuman].nStopCount = 0;
+				}
+			}
+
 			// 前回位置の更新
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;
-
-			// オブジェクトの着地の更新処理
-			g_aHuman[nCntHuman].fLandPos = LandObject(&g_aHuman[nCntHuman].pos, &g_aHuman[nCntHuman].move, &g_aHuman[nCntHuman].bJump);
 
 			//----------------------------------------------------
 			//	影の更新
@@ -220,7 +264,7 @@ void UpdateHuman(void)
 			SetPositionShadow
 			( // 引数
 				g_aHuman[nCntHuman].nShadowID,		// 影のインデックス
-				D3DXVECTOR3(g_aHuman[nCntHuman].pos.x, g_aHuman[nCntHuman].fLandPos, g_aHuman[nCntHuman].pos.z),			// 位置
+				D3DXVECTOR3(g_aHuman[nCntHuman].pos.x, HUMAN_GROUND, g_aHuman[nCntHuman].pos.z),			// 位置
 				g_aHuman[nCntHuman].rot,			// 向き
 				NONE_SCALE							// 拡大率
 			);
@@ -281,7 +325,7 @@ void UpdateHuman(void)
 				g_aHuman[nCntHuman].pos.x += g_aHuman[nCntHuman].move.x;
 				g_aHuman[nCntHuman].pos.z += g_aHuman[nCntHuman].move.z;
 
-				if (g_aHuman[nCntHuman].pos.y <= g_aHuman[nCntHuman].fLandPos)
+				if (g_aHuman[nCntHuman].pos.y <= HUMAN_GROUND)
 				{ // 位置が0.0f以下になった場合
 
 					if (g_aHuman[nCntHuman].bRecur == true)
@@ -298,14 +342,14 @@ void UpdateHuman(void)
 				break;					//抜け出す
 			}
 
-			if (g_aHuman[nCntHuman].pos.y < 0.0f)
+			if (g_aHuman[nCntHuman].pos.y < HUMAN_GROUND)
 			{ // Y軸の位置が0.0fだった場合
 
 				// 縦への移動量を0.0fにする
 				g_aHuman[nCntHuman].move.y = 0.0f;
 
 				// 位置を0.0fに戻す
-				g_aHuman[nCntHuman].pos.y = 0.0f;
+				g_aHuman[nCntHuman].pos.y = HUMAN_GROUND;
 			}
 
 			//----------------------------------------------------
@@ -323,8 +367,7 @@ void UpdateHuman(void)
 				BOOSTSTATE_NONE,				// ブースト状態
 				&policeState,					// 警察の状態
 				&nTackleCnt,					// タックルカウント
-				&fMove,							// タックル時の移動量
-				COLLOBJECTTYPE_HUMAN
+				&fMove							// タックル時の移動量
 			);
 
 			// プレイヤーの補正の更新処理
@@ -351,6 +394,17 @@ void UpdateHuman(void)
 			}
 		}
 	}
+
+	for (int nCntOverlap = 0; nCntOverlap < MAX_HUMAN; nCntOverlap++)
+	{ // 人間の重なり防止処理
+
+		if (OverlapHuman(&g_aHuman[nCntOverlap]) == false)
+		{ // 重なった場合
+
+			// 重なり防止カウンターを初期化する
+			g_aHuman[nCntOverlap].nOverlapCounter = 0;
+		}
+	}
 }
 
 //======================================================================================================================
@@ -368,7 +422,6 @@ void DrawHuman(void)
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
-	D3DXMATERIAL	  blueMat;					// 青ざめマテリアルポインタ
 	D3DXMATERIAL	  evilMat;					// 悪い奴のマテリアルデータ
 
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
@@ -398,8 +451,8 @@ void DrawHuman(void)
 			// 現在のマテリアルを取得
 			pDevice->GetMaterial(&matDef);
 
-			for (int nCntParts = 0; nCntParts < MAX_PARTS; nCntParts++)
-			{ // パーツの最大数分繰り返す
+			for (int nCntParts = 0; nCntParts < g_aHuman[nCntHuman].motion.nParts; nCntParts++)
+			{ // パーツの総数分繰り返す
 
 				// パーツのワールドマトリックスの初期化
 				D3DXMatrixIdentity(&g_aHuman[nCntHuman].aParts[nCntParts].mtxWorld);
@@ -438,54 +491,40 @@ void DrawHuman(void)
 				for (int nCntMat = 0; nCntMat < (int)g_aHuman[nCntHuman].aParts[nCntParts].modelData.dwNumMat; nCntMat++)
 				{ // マテリアルの数分繰り返す
 
-					switch (g_aHuman[nCntHuman].state)
-					{
-					case HUMANSTATE_STOP:	// 停止状態
+					// 構造体の要素をクリア
+					ZeroMemory(&evilMat, sizeof(D3DXMATERIAL));
 
-						// 構造体の要素をクリア
-						ZeroMemory(&blueMat, sizeof(D3DXMATERIAL));
+					// マテリアルのコピーに代入する
+					evilMat = pMat[nCntMat];
 
-						// 拡散光・環境光・自己発光を赤にする
-						blueMat.MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
-						blueMat.MatD3D.Ambient = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
-						blueMat.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+					if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_JUSTICE)
+					{ // 良い奴の場合
 
 						// マテリアルの設定
-						pDevice->SetMaterial(&blueMat.MatD3D);	// 青
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+					else
+					{ // 悪い奴の場合
 
-						// 処理を抜ける
-						break;
+						// 自己発光を代入する
+						evilMat.MatD3D.Emissive = g_aHuman[nCntHuman].judge.col;
 
-					default:				// 上記以外
-
-						// 構造体の要素をクリア
-						ZeroMemory(&evilMat, sizeof(D3DXMATERIAL));
-
-						// マテリアルのコピーに代入する
-						evilMat = pMat[nCntMat];
-
-						if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_JUSTICE)
-						{ // 良い奴の場合
-
-							// マテリアルの設定
-							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
-						}
-						else
-						{ // 悪い奴の場合
-
-							// 自己発光を代入する
-							evilMat.MatD3D.Emissive = g_aHuman[nCntHuman].judge.col;
-
-							// マテリアルの設定
-							pDevice->SetMaterial(&evilMat.MatD3D);
-						}
-
-						// 処理を抜ける
-						break;
+						// マテリアルの設定
+						pDevice->SetMaterial(&evilMat.MatD3D);
 					}
 
-					// テクスチャの設定
-					pDevice->SetTexture(0, g_aHuman[nCntHuman].aParts[nCntParts].modelData.pTexture[nCntMat]);
+					if (nCntParts < MAX_PARTS - 1)
+					{ // 体パーツモデルの場合
+
+						// テクスチャの設定
+						pDevice->SetTexture(0, g_apTextureHumanUV[g_aHuman[nCntHuman].type]);
+					}
+					else
+					{ // 小道具モデルの場合
+
+						// テクスチャの設定
+						pDevice->SetTexture(0, g_aHuman[nCntHuman].aParts[nCntParts].modelData.pTexture[nCntMat]);
+					}
 
 					// モデルの描画
 					g_aHuman[nCntHuman].aParts[nCntParts].modelData.pMesh->DrawSubset(nCntMat);
@@ -510,19 +549,19 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 		{ // オブジェクトが使用されていない場合
 
 			// 引数の位置を代入
-			g_aHuman[nCntHuman].pos      = pos;		// 現在の位置
-			g_aHuman[nCntHuman].posOld   = pos;		// 前回の位置
-			g_aHuman[nCntHuman].typeMove = (MOVETYPE)(walk);	// 移動の種類
-			g_aHuman[nCntHuman].bRecur	 = bRecur;	// 復活状況
-			g_aHuman[nCntHuman].type	 = (HUMANTYPE)(type);		// 種類
-			g_aHuman[nCntHuman].rot		 = rot;		// 向き
+			g_aHuman[nCntHuman].pos				= pos;					// 現在の位置
+			g_aHuman[nCntHuman].posOld			= pos;					// 前回の位置
+			g_aHuman[nCntHuman].typeMove		= (MOVETYPE)(walk);		// 移動の種類
+			g_aHuman[nCntHuman].bRecur			= bRecur;				// 復活状況
+			g_aHuman[nCntHuman].type			= (HUMANTYPE)(type);	// 種類
+			g_aHuman[nCntHuman].rot				= rot;					// 向き
 
 			// 情報を初期化
-			g_aHuman[nCntHuman].move     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aHuman[nCntHuman].fLandPos = 0.0f;							// 着地点
-			g_aHuman[nCntHuman].bJump    = false;							// ジャンプしているかどうか
-			g_aHuman[nCntHuman].bMove    = false;							// 移動していない
-			g_aHuman[nCntHuman].state    = HUMANSTATE_WALK;					// 歩き状態
+			g_aHuman[nCntHuman].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aHuman[nCntHuman].bMove			= false;							// 移動していない
+			g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
+			g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
+			g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 歩き状態
 
 			// 移動量の最大値を設定
 			g_aHuman[nCntHuman].fMaxMove = (float)(rand() % HUMAN_RANDAM_MOVE + HUMAN_MOVE_LEAST);
@@ -601,12 +640,15 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 				g_aHuman[nCntHuman].icon.nIconID = SetIcon
 				( // 引数
 					g_aHuman[nCntHuman].pos,
-					ICONTYPE_EVIL,
+					ICONTYPE_EVIL_HUMAN,
 					&g_aHuman[nCntHuman].icon.nIconID,
 					&g_aHuman[nCntHuman].bUse,
 					&g_aHuman[nCntHuman].icon.state
 				);
 			}
+
+			// 人間モーションの初期化処理
+			InitMotionHuman(&g_aHuman[nCntHuman], type, walk);
 
 			// 処理を抜ける
 			break;
@@ -722,7 +764,7 @@ void PosHuman(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove,
 	if (bMove == false)
 	{ // 移動していない状態の場合
 
-	  // 移動量を減速
+		// 移動量を減速
 		move->x += (0.0f - move->x) * 0.04f;
 	}
 }
@@ -772,11 +814,12 @@ void RevHuman(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos)
 //============================================================
 void CurveHuman(Human *pHuman)
 {
-	// 移動量を更新
-	pHuman->move.x += HUMAN_MOVE_FORWARD;
+	if (pHuman->bMove == true)
+	{ // 移動する場合
 
-	// 移動している状態にする
-	pHuman->bMove = true;
+		// 移動量を更新
+		pHuman->move.x += HUMAN_MOVE_FORWARD;
+	}
 
 	switch (pHuman->curveInfo.actionState)
 	{
@@ -911,14 +954,38 @@ void ReactionHuman(Human *pHuman)
 			if (fLength <= (pPlayer->modelData.fRadius + REACTION_CAR_RANGE) * REACTION_HUMAN_RANGE)
 			{ // プレイヤーが近くに来た場合
 
-				//停止処理に移行
-				pHuman->state = HUMANSTATE_STOP;
+				if (pHuman->state != HUMANSTATE_STOP)
+				{ // ストップ状態ではない場合
+
+					// ストップ状態にする
+					pHuman->state = HUMANSTATE_STOP;
+
+					// 怖がりモーションに設定
+					SetMotionHuman(pHuman, MOTIONTYPE_SCARED);
+				}
 			}
 			else
 			{ // プレイヤーに近くにいない場合
 
-				//停止処理に移行
-				pHuman->state = HUMANSTATE_WALK;
+				if (pHuman->state != HUMANSTATE_WALK)
+				{ // 歩き状態ではない場合
+
+					// 歩き状態にする
+					pHuman->state = HUMANSTATE_WALK;
+
+					if (pHuman->typeMove == MOVETYPE_MOVE)
+					{ // 移動する人間の場合
+
+						// 移動モーションに設定
+						SetMotionHuman(pHuman, MOTIONTYPE_MOVE);
+					}
+					else
+					{ // 停止する人間の場合
+
+						// 停止モーションに設定
+						SetMotionHuman(pHuman, MOTIONTYPE_STOP);
+					}
+				}
 			}
 		}
 	}
@@ -1302,6 +1369,217 @@ void PassingHuman(Human *pHuman)
 }
 
 //======================================================================================================================
+//	人間モーションの初期化処理
+//======================================================================================================================
+void InitMotionHuman(Human *pHuman, int nType, int nWalk)
+{
+	//------------------------------------------------------------------------------------------------------------------
+	//	パーツ数の設定
+	//------------------------------------------------------------------------------------------------------------------
+	switch (nType)
+	{ // 種類ごとの処理
+	case HUMANTYPE_001:			// 通常1
+	case HUMANTYPE_002:			// 通常2
+	case HUMANTYPE_003:			// 通常3
+
+		// パーツの総数を設定
+		pHuman->motion.nParts = g_setMotionNormal.nParts;
+
+		// 処理を抜ける
+		break;
+
+	case HUMANTYPE_CIGARETTE:	// タバコ
+
+		// パーツの総数を設定
+		pHuman->motion.nParts = g_setMotionCigaret.nParts;
+
+		// 処理を抜ける
+		break;
+
+	case HUMANTYPE_SMARTPHONE:	// スマホ
+
+		// パーツの総数を設定
+		pHuman->motion.nParts = g_setMotionPhone.nParts;
+
+		// 処理を抜ける
+		break;
+
+	default:	// 上記以外
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "人間のパーツ数ミスってるぞ！", "警告！", MB_ICONWARNING);
+
+		// 処理を抜ける
+		break;
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	モーション情報の設定
+	//------------------------------------------------------------------------------------------------------------------
+	for (int nCntMotion = 0; nCntMotion < MAX_MOTION; nCntMotion++)
+	{ // モーションの最大数分繰り返す
+
+		switch (nType)
+		{ // 種類ごとの処理
+		case HUMANTYPE_001:			// 通常1
+		case HUMANTYPE_002:			// 通常2
+		case HUMANTYPE_003:			// 通常3
+
+			// モーションの情報を初期化
+			pHuman->motion.aMotion[nCntMotion] = g_setMotionNormal.aMotion[nCntMotion];
+
+			// 処理を抜ける
+			break;
+
+		case HUMANTYPE_CIGARETTE:	// タバコ
+
+			// モーションの情報を初期化
+			pHuman->motion.aMotion[nCntMotion] = g_setMotionCigaret.aMotion[nCntMotion];
+
+			// 処理を抜ける
+			break;
+
+		case HUMANTYPE_SMARTPHONE:	// スマホ
+
+			// モーションの情報を初期化
+			pHuman->motion.aMotion[nCntMotion] = g_setMotionPhone.aMotion[nCntMotion];
+
+			// 処理を抜ける
+			break;
+
+		default:	// 上記以外
+
+			// エラーメッセージボックス
+			MessageBox(NULL, "人間の種類ミスってるぞ！", "警告！", MB_ICONWARNING);
+
+			// 処理を抜ける
+			break;
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	パーツ情報の設定
+	//------------------------------------------------------------------------------------------------------------------
+	for (int nCntParts = 0; nCntParts < MAX_PARTS; nCntParts++)
+	{ // パーツの総数分繰り返す
+
+		switch (nType)
+		{ // 種類ごとの処理
+		case HUMANTYPE_001:			// 通常1
+		case HUMANTYPE_002:			// 通常2
+		case HUMANTYPE_003:			// 通常3
+
+			// パーツの基本情報を初期化
+			pHuman->aParts[nCntParts] = g_aSetPartsNormal[nCntParts];
+
+			// 処理を抜ける
+			break;
+
+		case HUMANTYPE_CIGARETTE:	// タバコ
+
+			// パーツの基本情報を初期化
+			pHuman->aParts[nCntParts] = g_aSetPartsCigaret[nCntParts];
+
+			// 処理を抜ける
+			break;
+
+		case HUMANTYPE_SMARTPHONE:	// スマホ
+
+			// パーツの基本情報を初期化
+			pHuman->aParts[nCntParts] = g_aSetPartsPhone[nCntParts];
+
+			// 処理を抜ける
+			break;
+
+		default:	// 上記以外
+
+			// エラーメッセージボックス
+			MessageBox(NULL, "人間のパーツ数ミスってるぞ！", "警告！", MB_ICONWARNING);
+
+			// 処理を抜ける
+			break;
+		}
+
+		if (nCntParts < MAX_PARTS - 1)
+		{ // 体パーツモデルの場合
+
+			// パーツのモデル情報を初期化
+			pHuman->aParts[nCntParts].modelData = GetModelData(nCntParts + FROM_HUMAN);
+		}
+		else
+		{ // 小道具モデルの場合
+
+			switch (nType)
+			{ // 種類ごとの処理
+			case HUMANTYPE_001:			// 通常1
+			case HUMANTYPE_002:			// 通常2
+			case HUMANTYPE_003:			// 通常3
+		
+				// 構造体の要素を初期化
+				ZeroMemory(&pHuman->aParts[MAX_PARTS - 1].modelData, sizeof(Model));
+		
+				// 処理を抜ける
+				break;
+		
+			case HUMANTYPE_CIGARETTE:	// タバコ
+		
+				// パーツのモデル情報をタバコに設定
+				pHuman->aParts[MAX_PARTS - 1].modelData = GetModelData(MODELTYPE_ITEM_CIGARET);
+		
+				// 処理を抜ける
+				break;
+		
+			case HUMANTYPE_SMARTPHONE:	// スマホ
+		
+				// パーツのモデル情報をスマホに設定
+				pHuman->aParts[MAX_PARTS - 1].modelData = GetModelData(MODELTYPE_ITEM_PHONE);
+		
+				// 処理を抜ける
+				break;
+		
+			default:	// 上記以外
+		
+				// エラーメッセージボックス
+				MessageBox(NULL, "人間のモデル情報ミスってるぞ！", "警告！", MB_ICONWARNING);
+		
+				// 処理を抜ける
+				break;
+			}
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	//	モーションの設定
+	//------------------------------------------------------------------------------------------------------------------
+	switch (nWalk)
+	{ // 種類ごとの処理
+	case MOVETYPE_STOP:	// 停止
+
+		// モーションの設定
+		SetMotionHuman(pHuman, MOTIONTYPE_STOP);
+
+		// 処理を抜ける
+		break;
+
+	case MOVETYPE_MOVE:	// 移動
+
+		// モーションの設定
+		SetMotionHuman(pHuman, MOTIONTYPE_MOVE);
+
+		// 処理を抜ける
+		break;
+
+	default:	// 上記以外
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "人間のモーション情報ミスってるぞ！", "警告！", MB_ICONWARNING);
+
+		// 処理を抜ける
+		break;
+	}
+}
+
+//======================================================================================================================
 //	モーションの更新処理
 //======================================================================================================================
 void UpdateMotionHuman(Human *pHuman)
@@ -1316,14 +1594,14 @@ void UpdateMotionHuman(Human *pHuman)
 	int         nPose = pHuman->motion.nPose;	// モーションのポーズ番号
 
 	// パーツの位置を更新
-	for (int nCntKey = 0; nCntKey < MAX_PARTS; nCntKey++)
-	{ // プレイヤーのパーツの最大数分繰り返す
+	for (int nCntParts = 0; nCntParts < pHuman->motion.nParts; nCntParts++)
+	{ // パーツの総数分繰り返す
 
 		// 位置の差分を求める
-		diffPos = pHuman->motion.aMotion[type].aKey[(nPose + 1) % pHuman->motion.aMotion[type].nNumKey].aPos[nCntKey] - pHuman->motion.aMotion[type].aKey[nPose].aPos[nCntKey];
+		diffPos = pHuman->motion.aMotion[type].aKey[(nPose + 1) % pHuman->motion.aMotion[type].nNumKey].aPos[nCntParts] - pHuman->motion.aMotion[type].aKey[nPose].aPos[nCntParts];
 
 		// 向きの差分を求める
-		diffRot = pHuman->motion.aMotion[type].aKey[(nPose + 1) % pHuman->motion.aMotion[type].nNumKey].aRot[nCntKey] - pHuman->motion.aMotion[type].aKey[nPose].aRot[nCntKey];
+		diffRot = pHuman->motion.aMotion[type].aKey[(nPose + 1) % pHuman->motion.aMotion[type].nNumKey].aRot[nCntParts] - pHuman->motion.aMotion[type].aKey[nPose].aRot[nCntParts];
 
 		// 差分向きの正規化
 		RotNormalize(&diffRot.x);
@@ -1331,10 +1609,10 @@ void UpdateMotionHuman(Human *pHuman)
 		RotNormalize(&diffRot.z);
 
 		// 現在のフレームの位置を設定
-		currentPos = pHuman->motion.aMotion[type].aKey[nPose].aPos[nCntKey] + diffPos * ((float)pHuman->motion.nCounter / (float)pHuman->motion.aMotion[type].aKey[nPose].nFrame);
+		currentPos = pHuman->motion.aMotion[type].aKey[nPose].aPos[nCntParts] + diffPos * ((float)pHuman->motion.nCounter / (float)pHuman->motion.aMotion[type].aKey[nPose].nFrame);
 
 		// 現在のフレームの向きを設定
-		currentRot = pHuman->motion.aMotion[type].aKey[nPose].aRot[nCntKey] + diffRot * ((float)pHuman->motion.nCounter / (float)pHuman->motion.aMotion[type].aKey[nPose].nFrame);
+		currentRot = pHuman->motion.aMotion[type].aKey[nPose].aRot[nCntParts] + diffRot * ((float)pHuman->motion.nCounter / (float)pHuman->motion.aMotion[type].aKey[nPose].nFrame);
 
 		// 差分向きの正規化
 		RotNormalize(&currentRot.x);
@@ -1342,15 +1620,15 @@ void UpdateMotionHuman(Human *pHuman)
 		RotNormalize(&currentRot.z);
 
 		// 現在のパーツの位置を更新
-		pHuman->aParts[nCntKey].pos = pHuman->aParts[nCntKey].initPos + currentPos;
+		pHuman->aParts[nCntParts].pos = pHuman->aParts[nCntParts].initPos + currentPos;
 
 		// 現在のパーツの向きを更新
-		pHuman->aParts[nCntKey].rot = pHuman->aParts[nCntKey].initRot + currentRot;
+		pHuman->aParts[nCntParts].rot = pHuman->aParts[nCntParts].initRot + currentRot;
 
 		// 向きの正規化
-		RotNormalize(&pHuman->aParts[nCntKey].rot.x);
-		RotNormalize(&pHuman->aParts[nCntKey].rot.y);
-		RotNormalize(&pHuman->aParts[nCntKey].rot.z);
+		RotNormalize(&pHuman->aParts[nCntParts].rot.x);
+		RotNormalize(&pHuman->aParts[nCntParts].rot.y);
+		RotNormalize(&pHuman->aParts[nCntParts].rot.z);
 	}
 
 	// モーションの遷移の更新
@@ -1369,7 +1647,6 @@ void UpdateMotionHuman(Human *pHuman)
 		}
 		else
 		{ // モーションがループしない設定の場合
-
 #if 0
 			if (pHuman->motion.nPose < pHuman->motion.aMotion[type].nNumKey - SUB_MOTION_STOP)
 			{ // 現在のポーズが最終のポーズではない場合
@@ -1409,7 +1686,6 @@ void UpdateMotionHuman(Human *pHuman)
 				}
 			}
 #endif
-
 		}
 	}
 	else
@@ -1431,191 +1707,6 @@ void SetMotionHuman(Human *pHuman, MOTIONTYPE type)
 	// モーション情報を初期化
 	pHuman->motion.nPose    = 0;	// モーションのポーズ番号
 	pHuman->motion.nCounter = 0;	// モーションのカウンター
-}
-
-//======================================================================================================================
-//	人間のセットアップ処理
-//======================================================================================================================
-void TxtSetHuman(HumanParts *setParts, KeyInfo *setMotion)
-{
-	// 変数を宣言
-	int nID        = 0;			// インデックスの代入用
-	int nNowMotion = 0;			// 現在のモーション番号
-	int nNowPose   = 0;			// 現在のポーズ番号
-	int nNowKey    = 0;			// 現在のキー番号
-	int nLoop      = 0;			// ループの ON / OFF の変換用
-	int nEnd       = 0;			// テキスト読み込み終了の確認用
-
-	// 変数配列を宣言
-	char aString[MAX_STRING];	// テキストの文字列の代入用
-
-	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
-
-	// ファイルを読み込み形式で開く
-	pFile = fopen(HUMAN_SETUP_TXT, "r");
-
-	if (pFile != NULL)
-	{ // ファイルが開けた場合
-
-		do
-		{ // 読み込んだ文字列が EOF ではない場合ループ
-
-			// ファイルから文字列を読み込む
-			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
-
-			//----------------------------------------------------------------------------------------------------------
-			//	キャラクターの設定
-			//----------------------------------------------------------------------------------------------------------
-			if (strcmp(&aString[0], "CHARACTERSET") == 0)
-			{ // 読み込んだ文字列が CHARACTERSET の場合
-
-				do
-				{ // 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
-
-					// ファイルから文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (strcmp(&aString[0], "PARTSSET") == 0)
-					{ // 読み込んだ文字列が PARTSSET の場合
-
-						do
-						{ // 読み込んだ文字列が END_PARTSSET ではない場合ループ
-
-							// ファイルから文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
-
-							if (strcmp(&aString[0], "INDEX") == 0)
-							{ // 読み込んだ文字列が INDEX の場合
-								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-								fscanf(pFile, "%d", &nID);			// モデル (パーツ) のインデックスを読み込む
-							}
-							else if (strcmp(&aString[0], "PARENT") == 0)
-							{ // 読み込んだ文字列が PARENT の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%d", &setParts[nID].nParentID);	// モデル (パーツ) の親のインデックスを読み込む
-							}
-							else if (strcmp(&aString[0], "POS") == 0)
-							{ // 読み込んだ文字列が POS の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%f", &setParts[nID].initPos.x);	// X座標を読み込む
-								fscanf(pFile, "%f", &setParts[nID].initPos.y);	// Y座標を読み込む
-								fscanf(pFile, "%f", &setParts[nID].initPos.z);	// Z座標を読み込む
-
-								// 現在の位置に読み込んだ値を設定
-								setParts[nID].pos = setParts[nID].initPos;
-							}
-							else if (strcmp(&aString[0], "ROT") == 0)
-							{ // 読み込んだ文字列が ROT の場合
-								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
-								fscanf(pFile, "%f", &setParts[nID].initRot.x);	// X向きを読み込む
-								fscanf(pFile, "%f", &setParts[nID].initRot.y);	// Y向きを読み込む
-								fscanf(pFile, "%f", &setParts[nID].initRot.z);	// Z向きを読み込む
-
-								// 現在の向きに読み込んだ値を設定
-								setParts[nID].rot = setParts[nID].initRot;
-							}
-
-						} while (strcmp(&aString[0], "END_PARTSSET") != 0);		// 読み込んだ文字列が END_PARTSSET ではない場合ループ
-					}
-				} while (strcmp(&aString[0], "END_CHARACTERSET") != 0);			// 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
-			}
-
-			//----------------------------------------------------------------------------------------------------------
-			//	モーションの設定
-			//----------------------------------------------------------------------------------------------------------
-			else if (strcmp(&aString[0], "MOTIONSET") == 0)
-			{ // 読み込んだ文字列が MOTIONSET の場合
-
-				// 現在のポーズ番号を初期化
-				nNowPose = 0;
-
-				do
-				{ // 読み込んだ文字列が END_MOTIONSET ではない場合ループ
-
-					// ファイルから文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (strcmp(&aString[0], "LOOP") == 0)
-					{ // 読み込んだ文字列が LOOP の場合
-						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
-						fscanf(pFile, "%d", &nLoop);		// ループの ON / OFF を読み込む
-
-						// 読み込んだ値が 0なら true、0以外なら falseを代入
-						setMotion[nNowMotion].bLoop = (nLoop == 0) ? false : true;
-					}
-					else if (strcmp(&aString[0], "NUM_KEY") == 0)
-					{ // 読み込んだ文字列が NUM_KEY の場合
-						fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
-						fscanf(pFile, "%d", &setMotion[nNowMotion].nNumKey);	// キーの総数を読み込む
-					}
-					else if (strcmp(&aString[0], "KEYSET") == 0)
-					{ // 読み込んだ文字列が KEYSET の場合
-
-						// 現在のキー番号を初期化
-						nNowKey = 0;
-
-						do
-						{ // 読み込んだ文字列が END_KEYSET ではない場合ループ
-
-							// ファイルから文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
-
-							if (strcmp(&aString[0], "FRAME") == 0)
-							{ // 読み込んだ文字列が FRAME の場合
-								fscanf(pFile, "%s", &aString[0]);									// = を読み込む (不要)
-								fscanf(pFile, "%d", &setMotion[nNowMotion].aKey[nNowPose].nFrame);	// キーが切り替わるまでのフレーム数を読み込む
-							}
-							else if (strcmp(&aString[0], "KEY") == 0)
-							{ // 読み込んだ文字列が KEY の場合
-
-								do
-								{ // 読み込んだ文字列が END_KEY ではない場合ループ
-
-									// ファイルから文字列を読み込む
-									fscanf(pFile, "%s", &aString[0]);
-
-									if (strcmp(&aString[0], "POS") == 0)
-									{ // 読み込んだ文字列が POS の場合
-										fscanf(pFile, "%s", &aString[0]);											// = を読み込む (不要)
-										fscanf(pFile, "%f", &setMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].x);	// 位置 (x) を読み込む
-										fscanf(pFile, "%f", &setMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].y);	// 位置 (y) を読み込む
-										fscanf(pFile, "%f", &setMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].z);	// 位置 (z) を読み込む
-									}
-									else if (strcmp(&aString[0], "ROT") == 0)
-									{ // 読み込んだ文字列が ROT の場合
-										fscanf(pFile, "%s", &aString[0]);											// = を読み込む (不要)
-										fscanf(pFile, "%f", &setMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].x);	// 向き (x) を読み込む
-										fscanf(pFile, "%f", &setMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].y);	// 向き (y) を読み込む
-										fscanf(pFile, "%f", &setMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].z);	// 向き (z) を読み込む
-									}
-
-								} while (strcmp(&aString[0], "END_KEY") != 0);	// 読み込んだ文字列が END_KEY ではない場合ループ
-
-								// 現在のキー番号を加算
-								nNowKey++;
-							}
-						} while (strcmp(&aString[0], "END_KEYSET") != 0);		// 読み込んだ文字列が END_KEYSET ではない場合ループ
-
-						// 現在のポーズ番号を加算
-						nNowPose++;
-					}
-				} while (strcmp(&aString[0], "END_MOTIONSET") != 0);			// 読み込んだ文字列が END_MOTIONSET ではない場合ループ
-
-				// 現在のモーション番号を加算
-				nNowMotion++;
-			}
-		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
-		
-		// ファイルを閉じる
-		fclose(pFile);
-	}
-	else
-	{ // ファイルが開けなかった場合
-
-		// エラーメッセージボックス
-		MessageBox(NULL, "人間のセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
-	}
 }
 
 //======================================================================================================================
@@ -1656,7 +1747,6 @@ void ResurrectionHuman(Human human)
 
 			// 情報を初期化
 			g_aHuman[nCnt].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aHuman[nCnt].bJump = false;							// ジャンプしているかどうか
 			g_aHuman[nCnt].bMove = false;							// 移動していない
 			g_aHuman[nCnt].state = HUMANSTATE_WALK;					// 歩き状態
 
@@ -1729,11 +1819,17 @@ void ResurrectionHuman(Human human)
 			g_aHuman[nCnt].icon.nIconID = SetIcon
 			( // 引数
 				g_aHuman[nCnt].pos,
-				ICONTYPE_EVIL,
+				ICONTYPE_EVIL_HUMAN,
 				&g_aHuman[nCnt].icon.nIconID,
 				&g_aHuman[nCnt].bUse,
 				&g_aHuman[nCnt].icon.state
 			);
+
+			// 人間モーションの初期化処理
+			InitMotionHuman(&g_aHuman[nCnt], g_aHuman[nCnt].type, g_aHuman[nCnt].typeMove);
+
+			// 人間の重なり防止処理
+			OverlapHuman(&g_aHuman[nCnt]);
 
 			// 処理を抜ける
 			break;
@@ -1848,6 +1944,233 @@ void CorrectCurveHuman(Human *human)
 
 		break;			// 抜け出す
 	}
+}
+
+//======================================================================================================================
+//	人間のセットアップ処理
+//======================================================================================================================
+void TxtSetHuman(char *pTxt, HumanParts *pSetParts, MotionInfo *pSetMotion)
+{
+	// 変数を宣言
+	int nID        = 0;			// インデックスの代入用
+	int nNowMotion = 0;			// 現在のモーション番号
+	int nNowPose   = 0;			// 現在のポーズ番号
+	int nNowKey    = 0;			// 現在のキー番号
+	int nLoop      = 0;			// ループの ON / OFF の変換用
+	int nEnd       = 0;			// テキスト読み込み終了の確認用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE *pFile;				// ファイルポインタ
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(pTxt, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
+
+			//----------------------------------------------------------------------------------------------------------
+			//	キャラクターの設定
+			//----------------------------------------------------------------------------------------------------------
+			if (strcmp(&aString[0], "CHARACTERSET") == 0)
+			{ // 読み込んだ文字列が CHARACTERSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "NUM_PARTS") == 0)
+					{ // 読み込んだ文字列が NUM_PARTS の場合
+						fscanf(pFile, "%s", &aString[0]);			// = を読み込む (不要)
+						fscanf(pFile, "%d", &pSetMotion->nParts);	// パーツ数を読み込む
+					}
+					else if (strcmp(&aString[0], "PARTSSET") == 0)
+					{ // 読み込んだ文字列が PARTSSET の場合
+
+						do
+						{ // 読み込んだ文字列が END_PARTSSET ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "INDEX") == 0)
+							{ // 読み込んだ文字列が INDEX の場合
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nID);			// モデル (パーツ) のインデックスを読み込む
+							}
+							else if (strcmp(&aString[0], "PARENT") == 0)
+							{ // 読み込んだ文字列が PARENT の場合
+								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+								fscanf(pFile, "%d", &pSetParts[nID].nParentID);	// モデル (パーツ) の親のインデックスを読み込む
+							}
+							else if (strcmp(&aString[0], "POS") == 0)
+							{ // 読み込んだ文字列が POS の場合
+								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+								fscanf(pFile, "%f", &pSetParts[nID].initPos.x);	// X座標を読み込む
+								fscanf(pFile, "%f", &pSetParts[nID].initPos.y);	// Y座標を読み込む
+								fscanf(pFile, "%f", &pSetParts[nID].initPos.z);	// Z座標を読み込む
+
+								// 現在の位置に読み込んだ値を設定
+								pSetParts[nID].pos = pSetParts[nID].initPos;
+							}
+							else if (strcmp(&aString[0], "ROT") == 0)
+							{ // 読み込んだ文字列が ROT の場合
+								fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+								fscanf(pFile, "%f", &pSetParts[nID].initRot.x);	// X向きを読み込む
+								fscanf(pFile, "%f", &pSetParts[nID].initRot.y);	// Y向きを読み込む
+								fscanf(pFile, "%f", &pSetParts[nID].initRot.z);	// Z向きを読み込む
+
+								// 現在の向きに読み込んだ値を設定
+								pSetParts[nID].rot = pSetParts[nID].initRot;
+							}
+						} while (strcmp(&aString[0], "END_PARTSSET") != 0);		// 読み込んだ文字列が END_PARTSSET ではない場合ループ
+					}
+				} while (strcmp(&aString[0], "END_CHARACTERSET") != 0);			// 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
+			}
+			//----------------------------------------------------------------------------------------------------------
+			//	モーションの設定
+			//----------------------------------------------------------------------------------------------------------
+			else if (strcmp(&aString[0], "MOTIONSET") == 0)
+			{ // 読み込んだ文字列が MOTIONSET の場合
+
+				// 現在のポーズ番号を初期化
+				nNowPose = 0;
+
+				do
+				{ // 読み込んだ文字列が END_MOTIONSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "LOOP") == 0)
+					{ // 読み込んだ文字列が LOOP の場合
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%d", &nLoop);		// ループの ON / OFF を読み込む
+
+						// 読み込んだ値が 0なら true、0以外なら falseを代入
+						pSetMotion->aMotion[nNowMotion].bLoop = (nLoop == 0) ? false : true;
+					}
+					else if (strcmp(&aString[0], "NUM_KEY") == 0)
+					{ // 読み込んだ文字列が NUM_KEY の場合
+						fscanf(pFile, "%s", &aString[0]);								// = を読み込む (不要)
+						fscanf(pFile, "%d", &pSetMotion->aMotion[nNowMotion].nNumKey);	// キーの総数を読み込む
+					}
+					else if (strcmp(&aString[0], "KEYSET") == 0)
+					{ // 読み込んだ文字列が KEYSET の場合
+
+						// 現在のキー番号を初期化
+						nNowKey = 0;
+
+						do
+						{ // 読み込んだ文字列が END_KEYSET ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "FRAME") == 0)
+							{ // 読み込んだ文字列が FRAME の場合
+								fscanf(pFile, "%s", &aString[0]);												// = を読み込む (不要)
+								fscanf(pFile, "%d", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].nFrame);	// キーが切り替わるまでのフレーム数を読み込む
+							}
+							else if (strcmp(&aString[0], "KEY") == 0)
+							{ // 読み込んだ文字列が KEY の場合
+
+								do
+								{ // 読み込んだ文字列が END_KEY ではない場合ループ
+
+									// ファイルから文字列を読み込む
+									fscanf(pFile, "%s", &aString[0]);
+									if (strcmp(&aString[0], "POS") == 0)
+									{ // 読み込んだ文字列が POS の場合
+										fscanf(pFile, "%s", &aString[0]);														// = を読み込む (不要)
+										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].x);	// 位置 (x) を読み込む
+										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].y);	// 位置 (y) を読み込む
+										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aPos[nNowKey].z);	// 位置 (z) を読み込む
+									}
+									else if (strcmp(&aString[0], "ROT") == 0)
+									{ // 読み込んだ文字列が ROT の場合
+										fscanf(pFile, "%s", &aString[0]);														// = を読み込む (不要)
+										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].x);	// 向き (x) を読み込む
+										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].y);	// 向き (y) を読み込む
+										fscanf(pFile, "%f", &pSetMotion->aMotion[nNowMotion].aKey[nNowPose].aRot[nNowKey].z);	// 向き (z) を読み込む
+									}
+								} while (strcmp(&aString[0], "END_KEY") != 0);	// 読み込んだ文字列が END_KEY ではない場合ループ
+
+								// 現在のキー番号を加算
+								nNowKey++;
+							}
+						} while (strcmp(&aString[0], "END_KEYSET") != 0);		// 読み込んだ文字列が END_KEYSET ではない場合ループ
+
+						// 現在のポーズ番号を加算
+						nNowPose++;
+					}
+				} while (strcmp(&aString[0], "END_MOTIONSET") != 0);			// 読み込んだ文字列が END_MOTIONSET ではない場合ループ
+
+				// 現在のモーション番号を加算
+				nNowMotion++;
+			}
+		} while (nEnd != EOF);													// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "人間のセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
+}
+
+//======================================================================================================================
+// 人間の重なり防止処理
+//======================================================================================================================
+bool OverlapHuman(Human *pHuman)
+{
+	bool bOverlap = false;			// 重なったかどうか
+
+	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
+	{
+		if (g_aHuman[nCnt].bUse == true && &g_aHuman[nCnt] != pHuman)
+		{ // 人間が使われていた場合
+
+			if (g_aHuman[nCnt].pos == pHuman->pos && g_aHuman[nCnt].fMaxMove == g_aHuman[nCnt].fMaxMove && g_aHuman[nCnt].bMove == true)
+			{ // 位置が一致かつ、移動量の最大数が一致していた場合
+
+				// 人間の重なり防止カウンターを加算する
+				pHuman->nOverlapCounter++;
+
+				// 重なり防止判定を通った
+				bOverlap = true;
+
+				if (pHuman->nOverlapCounter >= HUMAN_OVERLAP_COUNT)
+				{ // 重なり防止のカウンターが一定数を超えた場合
+
+					// 移動量を0,0fにする
+					pHuman->move.x = 0.0f;
+
+					// 移動をしない
+					pHuman->bMove = false;
+
+					// 停止カウントを加算する
+					pHuman->nStopCount++;
+				}
+			}
+		}
+	}
+
+	// 重なったかどうかを返す
+	return bOverlap;
 }
 
 #ifdef _DEBUG	// デバッグ処理

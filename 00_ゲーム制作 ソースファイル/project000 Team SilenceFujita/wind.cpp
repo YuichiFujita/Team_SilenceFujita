@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "Combo.h"
 #include "input.h"
+#include "item.h"
 #include "particle.h"
 #include "object.h"
 #include "Human.h"
@@ -31,6 +32,8 @@
 #define FLYAWAY_WIDTH		(100.0f)		// 吹き飛ぶ幅
 #define FLYAWAY_HEIGHT		(25.0f)			// 吹き飛ぶ高さ
 #define FLYAWAY_DEPTH		(100.0f)		// 吹き飛ぶ高さ
+
+#define ITEM_WIND_COUNT		(5)								// アイテムが落ちるカウント数
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -60,6 +63,8 @@ LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWind = NULL;		// 頂点バッファへのポインタ
 Wind g_aWind[MAX_WIND];								// 風の構造体
 WindInfo g_WindInfo;								// 風の情報の構造体
 
+int		  g_nHumanItemCount;					// アイテムが落ちるカウント
+
 //======================================================================================================================
 //	送風機の初期化処理
 //======================================================================================================================
@@ -84,6 +89,9 @@ void InitWind(void)
 	g_WindInfo.nUseCounter = 0;										// 風のカウンターを初期化する
 	g_WindInfo.nOverHeatCounter = 0;								// オーバーヒートカウンターを初期化する
 	g_WindInfo.state = WIND_USABLE;									// 使用可能状態
+
+	// アイテムが落ちるカウントを初期化する
+	g_nHumanItemCount = 0;
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,
@@ -308,6 +316,7 @@ void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	{
 		if (g_aWind[nCntWind].bUse == false)
 		{ // 風を使用していない場合
+
 			// 位置を設置する
 			g_aWind[nCntWind].pos = pos;
 
@@ -390,8 +399,18 @@ void CollisionWind(Human *pHuman)
 				// 人間が吹き飛ばされる処理
 				FlyAwayHuman(pHuman, *pPlayer);
 
+				// アイテムが落ちるカウントを初期化する
+				g_nHumanItemCount++;
+
+				if (g_nHumanItemCount % ITEM_WIND_COUNT == 0)
+				{ // 一定数以上になったら
+
+					// アイテムの設定処理
+					SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
+				}
+
 				// ボーナスの設定処理
-				SetBonus(ADDSCORE_HUMAN);
+				SetBonus(SCORE_HUMAN);
 
 				// カメラの状態を変える
 				*GetCameraState() = CAMERASTATE_GOODJOB;

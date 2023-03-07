@@ -18,15 +18,20 @@
 // マクロ定義
 //**********************************************************************************************************************
 #define BONUS_MAX_VALUE		(9999)		// ボーナスの最大値
-#define BONUS_WIDTH			(20.0f)		// ボーナスの幅
-#define BONUS_HEIGHT		(30.0f)		// ボーナスの高さ
-#define BONUS_SHIFT			(35.0f)		// ボーナスのずらす幅
+#define BONUS_WIDTH			(26.0f)		// ボーナスの幅
+#define BONUS_HEIGHT		(26.0f)		// ボーナスの高さ
+#define BONUS_SHIFT			(37.0f)		// ボーナスのずらす幅
 #define BONUS_ALPHA			(1.0f)		// ボーナスの透明度
 #define PLUS_WIDTH			(30.0f)		// プラスの幅
 #define PLUS_HEIGHT			(30.0f)		// プラスの高さ
 #define PLUS_SHIFT			(40.0f)		// プラスのずらす幅
-#define BONUS_RIGHT			(1000.0f)	// 右にボーナスを出す時の座標(X座標)
-#define BONUS_LEFT			(40.0f)		// 左にボーナスを出す時の座標(X座標)
+#define BONUS_RIGHT_X		(1080.0f)	// 右にボーナスを出す時の座標(X座標)
+#define BONUS_LEFT_X		(40.0f)		// 左にボーナスを出す時の座標(X座標)
+#define BONUS_RIGHT_Y		(400)		// 右にボーナスを出す時の座標(Y座標)
+#define BONUS_RIGHT_SHIFT	(120)		// 右にボーナスを出す時のずらす座標(Y座標)
+#define BONUS_LEFT_Y		(200)		// 左にボーナスを出す時の座標(Y座標)
+#define BONUS_LEFT_SHIFT	(350)		// 左にボーナスを出す時のずらす座標(Y座標)
+#define BONUS_SCORE_POS		(D3DXVECTOR3( 918.0f, 573.0f, 0.0f))		// スコアの位置
 
 #define BONUS_MOVE_MAGNI	(0.02f)		// プラスの移動量の倍率
 #define BONUS_STATE_CNT		(120)		// 加算状態になるまでのカウント
@@ -36,22 +41,20 @@
 #define BONUS_EFFECT_RADIUS	(40.0f)		// ボーナスのエフェクトの半径
 #define BONUS_EFFECT_SUB	(4.0f)		// ボーナスのエフェクトの減衰係数
 
-#define SCORE_HUMAN			(500)		// 人を吹き飛ばした時のスコア
-#define DIGIT_HUMAN			(3)			// 人を吹き飛ばした時の桁数
-#define SCORE_OBJECT		(1000)		// オブジェクトを壊した時のスコア
-#define DIGIT_OBJECT		(4)			// オブジェクトを壊した時の桁数
-#define SCORE_CAR			(100)		// 車を封じ込めてる時のスコア
-#define DIGIT_CAR			(3)			// 車を封じ込めてる時の桁数
+#define BONUS_DIGIT_ONE		(9)			// 1桁の境界
+#define BONUS_DIGIT_TWO		(99)		// 2桁の境界
+#define BONUS_DIGIT_THREE	(999)		// 3桁の境界
+#define BONUS_DIGIT_FOUR	(9999)		// 4桁の境界
+#define BONUS_DIGIT_FIVE	(99999)		// 5桁の境界
 
 //**********************************************************************************************************************
-// 上に出すか下に出すか(WHEREBONUS)
+//	ボーナステクスチャ(BONUSTEX)
 //**********************************************************************************************************************
 typedef enum
 {
-	WHEREBONUS_RIGHT = 0,		// 右に出す
-	WHEREBONUS_LEFT,			// 左に出す
-	WHEREBONUS_MAX				// この列挙型の総数
-}WHEREBONUS;
+	BONUSTEX_PLUS = 0,		// プラスのテクスチャ
+	BONUSTEX_MAX			// この列挙型の総数
+}BONUSTEX;
 
 //**********************************************************************************************************************
 //グローバル変数
@@ -95,6 +98,7 @@ void InitBonus(void)
 		g_aBonus[nCntBonus].state = BONUSSTATE_FADE;					// 状態
 		g_aBonus[nCntBonus].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);	// 色
 		g_aBonus[nCntBonus].nScore = 0;									// 得点
+		g_aBonus[nCntBonus].whereBonus = WHEREBONUS_RIGHT;				// ボーナスの左右
 		g_aBonus[nCntBonus].nStateCounter = 0;							// 状態カウンター
 		g_aBonus[nCntBonus].nDigit = 0;									// 桁数
 		g_aBonus[nCntBonus].bUse = false;								// 使用していない状態にする
@@ -176,7 +180,7 @@ void UpdateBonus(void)
 {
 	int nCntBonus;					//回数の変数を宣言する
 
-	D3DXVECTOR3 ScorePos = D3DXVECTOR3(900.0f, 400.0f, 0.0f);		// スコアの位置を取得
+	D3DXVECTOR3 ScorePos = BONUS_SCORE_POS;		// スコアの位置を取得
 
 	VERTEX_2D *pVtx;				//頂点情報へのポインタ
 
@@ -242,48 +246,8 @@ void UpdateBonus(void)
 					// 使用しない
 					g_aBonus[nCntBonus].bUse = false;
 
-					//// スコアを加算する
-					//AddScore(g_aBonus[nCntBonus].nScore);
-
 					// コンボのスコアの加算処理
 					AddComboScore(g_aBonus[nCntBonus].nScore);
-
-					// 増援の得点を増やす
-					GetReinforce()->nBonus += 1;
-
-					// コンボの倍率処理
-					MagnificCombo(1);
-
-					// 2Dパーティクルの発生
-					Set2DParticle
-					( // 引数
-						g_aBonus[nCntBonus].pos,			// 位置
-						D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
-						PARTICLE2DTYPE_SCORE_FIRE,			// 花火
-						20,									// 発生数
-						1									// 寿命
-					);
-				}
-				else if(g_aBonus[nCntBonus].pos.y >= ScorePos.y)
-				{ // スコアの位置を過ぎた場合
-
-					// 位置を補正する
-					g_aBonus[nCntBonus].pos = ScorePos;
-
-					// 使用しない
-					g_aBonus[nCntBonus].bUse = false;
-
-					//// スコアを加算する
-					//AddScore(g_aBonus[nCntBonus].nScore);
-
-					// コンボのスコアの加算処理
-					AddComboScore(g_aBonus[nCntBonus].nScore);
-
-					// 増援の得点を増やす
-					GetReinforce()->nBonus += 1;
-
-					// コンボの倍率処理
-					MagnificCombo(1);
 
 					// 2Dパーティクルの発生
 					Set2DParticle
@@ -395,10 +359,9 @@ void DrawBonus(void)
 //========================================
 //得点表示の設定処理
 //========================================
-void SetBonus(ADDSCORETYPE Reason)
+void SetBonus(int nBonus)
 {
 	VERTEX_2D * pVtx;					// 頂点情報へのポインタ
-	int nTopBotRand;					// 上に出すか下に出すか
 	D3DXVECTOR3 posBonus;				// ボーナスの位置
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
@@ -412,24 +375,30 @@ void SetBonus(ADDSCORETYPE Reason)
 			if (g_aBonus[nCntBonus].bUse == false)
 			{ // 得点表示が使用されていない場合
 
-			  // 右に出すか左に出すかをランダムで算出する
-				nTopBotRand = rand() % WHEREBONUS_MAX;
+				// 増援の得点を増やす
+				GetReinforce()->nBonus += 1;
 
-				switch (nTopBotRand)
+				// コンボの倍率処理
+				MagnificCombo(1);
+
+				// 右に出すか左に出すかをランダムで算出する
+				g_aBonus[nCntBonus].whereBonus = (WHEREBONUS)(rand() % WHEREBONUS_MAX);
+
+				switch (g_aBonus[nCntBonus].whereBonus)
 				{
 				case WHEREBONUS_RIGHT:	// 右に出す
 
-										// ボーナスの位置を設定する
-					posBonus.x = BONUS_RIGHT;
-					posBonus.y = (float)(rand() % 100) + 320.0f;
+					// ボーナスの位置を設定する
+					posBonus.x = BONUS_RIGHT_X;
+					posBonus.y = (float)(rand() % BONUS_RIGHT_SHIFT) + BONUS_RIGHT_Y;
 
 					break;				// 抜け出す
 
 				case WHEREBONUS_LEFT:	// 左に出す
 
-										// ボーナスの位置を設定する
-					posBonus.x = BONUS_LEFT;
-					posBonus.y = (float)(rand() % 100) + 220.0f;
+					// ボーナスの位置を設定する
+					posBonus.x = BONUS_LEFT_X;
+					posBonus.y = (float)(rand() % BONUS_LEFT_SHIFT) + BONUS_LEFT_Y;
 
 					break;				// 抜け出す
 				}
@@ -441,37 +410,38 @@ void SetBonus(ADDSCORETYPE Reason)
 				g_aBonus[nCntBonus].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);	// 色
 				g_aBonus[nCntBonus].nStateCounter = 0;							// 状態カウンター
 
-				switch (Reason)
-				{
-				case ADDSCORE_HUMAN:	// 人間を吹き飛ばした時
+				// スコアを設定する
+				g_aBonus[nCntBonus].nScore = nBonus;
 
-										// スコアを設定する
-					g_aBonus[nCntBonus].nScore = SCORE_HUMAN;
-
-					// 桁数を設定する
-					g_aBonus[nCntBonus].nDigit = DIGIT_HUMAN;
-
-					break;				// 抜け出す
-
-				case ADDSCORE_OBJECT:	// オブジェクトを壊した場合
-
-										// スコアを設定する
-					g_aBonus[nCntBonus].nScore = SCORE_OBJECT;
+				if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_ONE)
+				{ // スコアが9以上だった場合
 
 					// 桁数を設定する
-					g_aBonus[nCntBonus].nDigit = DIGIT_OBJECT;
-
-					break;				// 抜け出す
-
-				case ADDSCORE_CAR:		//車を封じ込めた場合
-
-										// スコアを設定する
-					g_aBonus[nCntBonus].nScore = SCORE_CAR;
+					g_aBonus[nCntBonus].nDigit = 1;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_TWO)
+				{ // スコアが99以上だった場合
 
 					// 桁数を設定する
-					g_aBonus[nCntBonus].nDigit = DIGIT_CAR;
+					g_aBonus[nCntBonus].nDigit = 2;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_THREE)
+				{ // スコアが999以上だった場合
 
-					break;				// 抜け出す
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = 3;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_FOUR)
+				{ // スコアが9999以上だった場合
+
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = 4;
+				}
+				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_FIVE)
+				{ // スコアが99999以上だった場合
+
+					// 桁数を設定する
+					g_aBonus[nCntBonus].nDigit = 5;
 				}
 
 				// 頂点座標の設定

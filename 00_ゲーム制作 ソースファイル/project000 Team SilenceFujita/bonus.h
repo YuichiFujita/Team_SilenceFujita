@@ -14,25 +14,20 @@
 //**********************************************************************************************************************
 #define MAX_BONUS		(128)		// ボーナスの最大数
 
-//**********************************************************************************************************************
-//	ボーナス理由(ADDSCORETYPE)
-//**********************************************************************************************************************
-typedef enum
-{
-	ADDSCORE_HUMAN = 0,		// 人を吹き飛ばした時
-	ADDSCORE_CAR,			// 車をバリアで閉じ込めたとき
-	ADDSCORE_OBJECT,		// オブジェクトを破壊したとき
-	ADDSCORE_MAX			// この列挙型の総数
-}ADDSCORETYPE;
+#define SCORE_HUMAN		(500)		// 人を吹き飛ばした時のスコア
+#define SCORE_OBJECT	(1000)		// オブジェクトを壊した時のスコア
+#define SCORE_CAR		(100)		// 車を封じ込めてる時のスコア
+#define SCORE_ITEM		(100)		// アイテムをゲージ満杯状態で取得した時のスコア
 
 //**********************************************************************************************************************
-//	ボーナステクスチャ(BONUSTEX)
+// 右に出すか左に出すか(WHEREBONUS)
 //**********************************************************************************************************************
 typedef enum
 {
-	BONUSTEX_PLUS = 0,		// プラスのテクスチャ
-	BONUSTEX_MAX			// この列挙型の総数
-}BONUSTEX;
+	WHEREBONUS_RIGHT = 0,		// 右に出す
+	WHEREBONUS_LEFT,			// 左に出す
+	WHEREBONUS_MAX				// この列挙型の総数
+}WHEREBONUS;
 
 //**********************************************************************************************************************
 //	ボーナスの状態(BONUSSTATE)
@@ -54,6 +49,7 @@ typedef struct
 	D3DXVECTOR3 move;			// 移動量
 	BONUSSTATE  state;			// 状態
 	D3DXCOLOR	col;			// 色
+	WHEREBONUS  whereBonus;		// ボーナスの左右
 	int			nScore;			// スコアの値
 	int			nStateCounter;	// 状態カウンター
 	int			nDigit;			// 桁数
@@ -67,7 +63,7 @@ void InitBonus(void);		// ボーナスの初期化処理
 void UninitBonus(void);		// ボーナスの終了処理
 void UpdateBonus(void);		// ボーナスの更新処理
 void DrawBonus(void);		// ボーナスの描画処理
-void SetBonus(ADDSCORETYPE Reason);	// ボーナスの設定処理
+void SetBonus(int nBonus);	// ボーナスの設定処理
 Bonus *GetBonus(void);		// ボーナスの取得処理
 
 #endif

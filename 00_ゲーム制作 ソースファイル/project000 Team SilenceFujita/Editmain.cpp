@@ -211,6 +211,10 @@ void TxtSaveStage(void)
 		fprintf(pFile, "#	  COLLTYPE：0  当たらない\n");
 		fprintf(pFile, "#	          ：1  当たる\n");
 		fprintf(pFile, "#-----------------------------------------------------------\n");
+		fprintf(pFile, "#-----------------------------------------------------------\n");
+		fprintf(pFile, "#	     JUDGE：0  良い建物\n");
+		fprintf(pFile, "#	          ：1  悪い建物\n");
+		fprintf(pFile, "#-----------------------------------------------------------\n");
 
 		// オブジェクトの設定の開始地点をテキストに書き出し
 		fprintf(pFile, "SETSTAGE_OBJECT\n\n");
@@ -238,14 +242,17 @@ void TxtSaveStage(void)
 				{ // 当たり判定の種類が作成の場合
 
 					// 向き状態を書き出し
-					fprintf(pFile, "		COLLROT    = %d\n\n", pObject->collInfo.stateRot);
+					fprintf(pFile, "		COLLROT    = %d\n", pObject->collInfo.stateRot);
 				}
 				else
 				{ // それ以外の種類の場合
 
 					// 0を書き出し
-					fprintf(pFile, "		COLLROT    = 0\n\n");
+					fprintf(pFile, "		COLLROT    = 0\n");
 				}
+
+				// 善悪状態の書き出し
+				fprintf(pFile, "		JUDGE	   = %d\n\n", pObject->judge.state);		// 善悪
 
 				// マテリアル数の書き出し
 				fprintf(pFile, "		NUMMAT     = %d\n", pObject->modelData.dwNumMat);

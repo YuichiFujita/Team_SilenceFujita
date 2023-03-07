@@ -17,7 +17,6 @@
 
 #include "2Deffect.h"
 #include "2Dparticle.h"
-#include "3DValue.h"
 #include "ability.h"
 #include "billboard.h"
 #include "bomb.h"
@@ -26,10 +25,13 @@
 #include "camera.h"
 #include "Car.h"
 #include "Combo.h"
+#include "Countdown.h"
 #include "effect.h"
 #include "flash.h"
+#include "Human.h"
 #include "gate.h"
 #include "icon.h"
+#include "item.h"
 #include "junk.h"
 #include "life.h"
 #include "light.h"
@@ -119,6 +121,9 @@ void InitGame(void)
 	// がれきの初期化
 	InitJunk();
 
+	// アイテムの初期化
+	InitItem();
+
 	// カメラの初期化
 	InitCamera();
 
@@ -146,9 +151,6 @@ void InitGame(void)
 	// 再建築タイマーの初期化
 	InitBuildtimer();
 
-	// 3Dの数値の初期化
-	Init3DValue();
-
 	// 2Dエフェクトの初期化
 	Init2DEffect();
 
@@ -166,6 +168,9 @@ void InitGame(void)
 
 	// コンボの初期化
 	InitCombo();
+
+	// カウントダウンの初期化
+	InitCountDown();
 
 	// エフェクトの初期化
 	InitEffect();
@@ -209,8 +214,12 @@ void InitGame(void)
 		true	// AI
 	);
 
-	//// サウンドの再生※AnarchyCarsBGM
-	//PlaySound(SOUND_LABEL_BGM_GAME_000);	// BGM (ゲーム画面)
+	//メインBGMの再生
+	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+	{
+		// サウンドの再生
+		PlaySound(SOUND_LABEL_BGM_GAME_000);	// BGM (ゲーム画面)
+	}
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
@@ -253,6 +262,9 @@ void UninitGame(void)
 	// がれきの終了
 	UninitJunk();
 
+	// アイテムの終了
+	UninitItem();
+
 	// カメラの終了
 	UninitCamera();
 
@@ -280,9 +292,6 @@ void UninitGame(void)
 	// 再建築タイマーの終了
 	UninitBuildtimer();
 
-	// 3Dの数値の終了
-	Uninit3DValue();
-
 	// 2Dエフェクトの終了
 	Uninit2DEffect();
 
@@ -300,6 +309,9 @@ void UninitGame(void)
 
 	// コンボの終了
 	UninitCombo();
+
+	// カウントダウンの終了
+	UninitCountDown();
 
 	// エフェクトの終了
 	UninitEffect();
@@ -516,6 +528,9 @@ void UpdateGame(void)
 			// がれきの更新
 			UpdateJunk();
 
+			// アイテムの更新
+			UpdateItem();
+
 			// 車の更新処理
 			UpdateCar();
 
@@ -543,16 +558,14 @@ void UpdateGame(void)
 			// 再建築タイマーの更新
 			UpdateBuildtimer();
 
-			// 3Dの数値の更新
-			Update3DValue();
-
 			// 体力バーの更新
 			UpdateLife();
-
 #if 0
 			// タイマーの更新
 			UpdateTimer();
 #endif
+			// カウントダウンの更新
+			UpdateCountDown();
 
 			// 能力バーの更新
 			UpdateAbility();
@@ -579,7 +592,7 @@ void UpdateGame(void)
 			UpdateIcon();
 
 			// 警察の追加処理
-			AddPolice();					
+			AddPolice();
 		}
 		else
 		{ // ポーズ状態の場合
@@ -657,6 +670,9 @@ void DrawGame(void)
 
 	// がれきの描画
 	DrawJunk();
+
+	// アイテムの描画
+	DrawItem();
 
 	// 警察の描画
 	DrawPolice();
@@ -755,6 +771,9 @@ void DrawGame(void)
 
 	// フラッシュの描画
 	DrawFlash();
+
+	// カウントダウンの描画
+	DrawCountDown();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合

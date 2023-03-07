@@ -20,9 +20,11 @@
 #define PLAY_HEIGHT			(25.0f)		// プレイヤーの縦幅
 #define PLAY_DEPTH			(65.0f)		// プレイヤーの奥行 / 2
 
-#define MAX_FORWARD			(35.0f)		// 前進時の最高速度
-#define MAX_BOOST			(15.0f)		// ブーストの最大移動量
+#define MAX_FORWARD			(35.0f)						// 前進時の最高速度
+#define MAX_BOOST			(15.0f)						// ブーストの最大移動量
+#define MAX_REAL_SPEED		(MAX_FORWARD + MAX_BOOST)	// 数値上の最高速度
 
+#define PLAY_REV_ROT_MIN	(0.75f)		// プレイヤーの向き変更量の減速係数の最小値
 #define PLAY_LIFE			(100)		// プレイヤーの体力
 #define PLAY_DAMAGE			(10)		// プレイヤーのダメージ数
 #define BOOST_WAIT_CNT		(180)		// ブーストの再使用までの時間
@@ -38,8 +40,8 @@
 typedef enum
 {
 	ATTACKSTATE_NONE = 0,			// 何もしない状態
-	ATTACKSTATE_BOMB,				// ボム攻撃状態
 	ATTACKSTATE_WAIT,				// 攻撃待機状態
+	ATTACKSTATE_HEAL,				// ゲージ回復状態
 	ATTACKSTATE_MAX					// この列挙型の総数
 }ATTACKSTATE;
 
@@ -95,6 +97,7 @@ typedef struct
 	ATTACKSTATE state;				// 攻撃状態
 	int         nCounterState;		// 攻撃管理カウンター
 	int         nCounterControl;	// 操作管理カウンター
+	int			nHeal;				// ゲージの回復量
 	bool        bShot;				// 発射待機状況
 }PlayerBomb;
 
@@ -106,8 +109,8 @@ typedef struct
 	D3DXVECTOR3 pos;				// 現在の位置
 	D3DXVECTOR3 oldPos;				// 前回の位置
 	D3DXVECTOR3 move;				// 移動量
-	D3DXVECTOR3 rot;				// 現在の向き
-	D3DXVECTOR3 destRot;			// 目標の向き
+	D3DXVECTOR3 rot;				// 向き
+	D3DXVECTOR3 moveRot;			// 向き変更量
 	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	ACTIONSTATE state;				// プレイヤーの状態
 	Model       modelData;			// モデル情報
@@ -138,6 +141,7 @@ void DrawPlayer(void);				// プレイヤーの描画処理
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// プレイヤーの位置・向きの設定処理
 
 void HealPlayer(Player *pPlayer, int nHeal);	// プレイヤーの回復判定
+void HealBarrier(Player *pPlayer, int nHeal);	// バリアの回復判定
 void HitPlayer(Player *pPlayer, int nDamage);	// プレイヤーのダメージ判定
 Player *GetPlayer(void);						// プレイヤーの取得処理
 

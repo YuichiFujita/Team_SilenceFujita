@@ -376,7 +376,7 @@ void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot, bool bOpen)
 			g_aGate[nCntGate].bUse = true;
 
 			if (stateRot == ROTSTATE_0
-			 || stateRot == ROTSTATE_180)
+			||  stateRot == ROTSTATE_180)
 			{ // 角度が0度、または180度の場合
 
 				// アイコンの設定処理
@@ -512,7 +512,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 						else if (pPos->z    - fDepth <  collPos.z + g_aGate[nCntGate].collInfo[nCntCollGate].fDepth[nCntColl]
 						     &&  pOldPos->z - fDepth >= collPos.z + g_aGate[nCntGate].collInfo[nCntCollGate].fDepth[nCntColl])
@@ -536,7 +536,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 					}
 
@@ -567,7 +567,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 						else if (pPos->x    - fWidth <  collPos.x + g_aGate[nCntGate].collInfo[nCntCollGate].fWidth[nCntColl]
 						     &&  pOldPos->x - fWidth >= collPos.x + g_aGate[nCntGate].collInfo[nCntCollGate].fWidth[nCntColl])
@@ -591,7 +591,7 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 							}
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 					}
 				}

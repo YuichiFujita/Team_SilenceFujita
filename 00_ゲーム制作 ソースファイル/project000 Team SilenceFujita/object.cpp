@@ -14,6 +14,7 @@
 #include "buildtimer.h"
 #include "bonus.h"
 #include "Combo.h"
+#include "item.h"
 #include "junk.h"
 #include "object.h"
 #include "particle.h"
@@ -50,12 +51,15 @@
 
 #define APPEAR_ADD_MAGNI		(0.05f)							// 出現時の加算数の倍率
 
+#define ITEM_OBJECT_COUNT		(3)								// アイテムが落ちるカウント数
+
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
 Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
 float     g_aShadowRadius[MODEL_OBJ_MAX];		// 影の半径の情報
+int		  g_nObjectItemCount;					// アイテムが落ちるカウント
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -156,6 +160,9 @@ void InitObject(void)
 
 		g_aShadowRadius[nCntObject] = FIRST_RADIUS;
 	}
+
+	// アイテムが落ちるカウントを初期化する
+	g_nObjectItemCount = 0;
 }
 
 //======================================================================================================================
@@ -442,6 +449,10 @@ void DrawObject(void)
 
 						if (g_aObject[nCntObject].judge.state == JUDGESTATE_JUSTICE)
 						{ // 良い奴の場合
+
+							// 透明度を設定する
+							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse.a = 1.0f;
+
 							// マテリアルの設定
 							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 						}
@@ -449,6 +460,7 @@ void DrawObject(void)
 						{ // 悪い奴の場合
 
 							// 自己発光を代入する
+							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Diffuse.a = 1.0f;
 							g_aObject[nCntObject].matCopy[nCntMat].MatD3D.Emissive = g_aObject[nCntObject].judge.col;
 
 							// マテリアルの設定
@@ -516,7 +528,7 @@ void DrawObject(void)
 //======================================================================================================================
 //	オブジェクトの設定処理
 //======================================================================================================================
-void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear)
+void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear,int nJudge)
 {
 	// 変数を宣言
 	float AverageScale;			// 拡大率の平均値
@@ -531,19 +543,23 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 		{ // オブジェクトが使用されていない場合
 
 			// 引数を代入
-			g_aObject[nCntObject].pos            = pos;					// 位置
-			g_aObject[nCntObject].rot            = rot;					// 向き
-			g_aObject[nCntObject].scale          = scale;				// 拡大率
-			g_aObject[nCntObject].nType          = nType;				// オブジェクトの種類
-			g_aObject[nCntObject].nBreakType     = nBreakType;			// 壊れ方の種類
-			g_aObject[nCntObject].nShadowType    = nShadowType;			// 影の種類
+			g_aObject[nCntObject].pos = pos;					// 位置
+			g_aObject[nCntObject].rot = rot;					// 向き
+			g_aObject[nCntObject].scale = scale;				// 拡大率
+			g_aObject[nCntObject].nType = nType;				// オブジェクトの種類
+			g_aObject[nCntObject].nBreakType = nBreakType;			// 壊れ方の種類
+			g_aObject[nCntObject].nShadowType = nShadowType;			// 影の種類
 			g_aObject[nCntObject].nCollisionType = nCollisionType;		// 当たり判定の種類
+			g_aObject[nCntObject].judge.state = (JUDGESTATE)nJudge;		// 善悪の状態
 
 			// 出現関係の設定
 			g_aObject[nCntObject].appear.scaleCopy = scale;							// 拡大率のコピー
-			g_aObject[nCntObject].appear.state	   = appear;						// 出現状態
-			g_aObject[nCntObject].appear.scaleAdd  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の加算数
-			g_aObject[nCntObject].appear.fAlpha	   = 1.0f;							// 透明度
+			g_aObject[nCntObject].appear.state = appear;						// 出現状態
+			g_aObject[nCntObject].appear.scaleAdd = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の加算数
+			g_aObject[nCntObject].appear.fAlpha = 1.0f;							// 透明度
+
+			// モデル情報を設定
+			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
 
 			if (g_aObject[nCntObject].appear.state == APPEARSTATE_SLOWLY)
 			{ // 徐々に出てくる状態だった場合
@@ -557,7 +573,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				g_aObject[nCntObject].appear.scaleAdd.z = scale.z * APPEAR_ADD_MAGNI;
 
 				// 透明度を設定する
-				g_aObject[nCntObject].appear.fAlpha = 0.0f;							
+				g_aObject[nCntObject].appear.fAlpha = 0.0f;
 			}
 			else
 			{ // 一瞬で出てくる状態だった場合
@@ -574,22 +590,22 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			}
 
 			// オブジェクトの情報を初期化
-			g_aObject[nCntObject].state         = ACTIONSTATE_NORMAL;	// 状態
-			g_aObject[nCntObject].nLife         = OBJ_LIFE;				// 体力
-			g_aObject[nCntObject].nCounterState = 0; 					// 状態管理カウンター
+			g_aObject[nCntObject].state = ACTIONSTATE_NORMAL;	// 状態
+			g_aObject[nCntObject].nLife = OBJ_LIFE;				// 体力
+			g_aObject[nCntObject].nCounterState = 0; 			// 状態管理カウンター
 
 			// 使用している状態にする
 			g_aObject[nCntObject].bUse = true;
 
 			// 当たり判定情報を設定
-			g_aObject[nCntObject].collInfo.stateRot = stateRot;			// 向き状態
+			g_aObject[nCntObject].collInfo.stateRot = stateRot;	// 向き状態
 
 			for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
 			{ // 当たり判定の最大数分繰り返す
 
 				// 横幅と縦幅を計算
 				if (stateRot == ROTSTATE_0
-				||  stateRot == ROTSTATE_180)
+					|| stateRot == ROTSTATE_180)
 				{ // 角度が0度、または180度の場合
 					g_aObject[nCntObject].collInfo.fWidth[nCntColl] = g_aCollision[nType].fWidth[nCntColl];
 					g_aObject[nCntObject].collInfo.fDepth[nCntColl] = g_aCollision[nType].fDepth[nCntColl];
@@ -614,8 +630,8 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 					g_aObject[nCntObject].collInfo.vecPos[nCntColl] = D3DXVECTOR3
 					( // 引数
 						-g_aObject[nCntObject].collInfo.vecPos[nCntColl].z,
-						 g_aObject[nCntObject].collInfo.vecPos[nCntColl].y,
-						 g_aObject[nCntObject].collInfo.vecPos[nCntColl].x
+						g_aObject[nCntObject].collInfo.vecPos[nCntColl].y,
+						g_aObject[nCntObject].collInfo.vecPos[nCntColl].x
 					);
 				}
 			}
@@ -627,9 +643,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].smash.bJump = false;									// ジャンプの状態
 			g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
 			g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
-
-			// モデル情報を設定
-			g_aObject[nCntObject].modelData = GetModelData(nType + FROM_OBJECT);	// モデル情報
 
 			// マテリアルデータへのポインタを取得
 			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].modelData.pBuffMat->GetBufferPointer();
@@ -686,21 +699,8 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
 
 			// ジャッジの情報の設定
-			g_aObject[nCntObject].judge.col = JUDGE_WHITE;			// ピカピカの色
-
-
-			if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
-			{ // 壊れるタイプの場合
-
-				g_aObject[nCntObject].judge.state = JUDGESTATE_EVIL;				// 善悪
-				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
-			}
-			else
-			{ // 上記以外
-
-				g_aObject[nCntObject].judge.state = JUDGESTATE_JUSTICE;				// 善悪
-				g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;			// チカチカ状態
-			}
+			g_aObject[nCntObject].judge.col = JUDGE_WHITE;				// ピカピカの色
+			g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
 
 			// 処理を抜ける
 			break;
@@ -861,8 +861,22 @@ void HitObject(Object *pObject, int nDamage)
 				break;					// 抜け出す
 			}
 
-			// ボーナスの設定処理
-			SetBonus(ADDSCORE_OBJECT);
+			if (pObject->judge.state == JUDGESTATE_EVIL)
+			{ //オブジェクトが悪いものだった場合
+
+				// ボーナスの設定処理
+				SetBonus(SCORE_OBJECT);
+
+				// アイテムが落ちるカウントを加算する
+				g_nObjectItemCount++;
+
+				if (g_nObjectItemCount % ITEM_OBJECT_COUNT == 0)
+				{ // アイテムが落ちるカウントが一定数になった場合
+
+					// アイテムの設定処理
+					SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
+				}
+			}
 
 			//// アイテムの設定
 			//SetItem(pObject->pos, ITEMTYPE_HEAL);
@@ -877,7 +891,7 @@ void HitObject(Object *pObject, int nDamage)
 //======================================================================================================================
 //	オブジェクトとの当たり判定
 //======================================================================================================================
-void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice,int *pTackleCnt,float *pTackleMove,COLLOBJECTTYPE collType)
+void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, float fWidth, float fDepth, int *pTraCnt, BOOSTSTATE state, POLICESTATE *pPolice,int *pTackleCnt,float *pTackleMove)
 {
 	// 変数を宣言
 	D3DXVECTOR3 collPos;	// 当たり判定の中心座標
@@ -923,16 +937,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								2													// 寿命
 							);
 						}
-						else
-						{ // 移動量が一定未満の場合
-
-							if (collType == COLLOBJECTTYPE_PLAYER)
-							{ // 当たり判定のタイプ
-
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
-							}
-						}
 
 						if (state == BOOSTSTATE_UP)
 						{ // ブースト中の場合
@@ -947,14 +951,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -992,16 +996,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								2													// 寿命
 							);
 						}
-						else
-						{ // 移動量が一定未満の場合
-
-							if (collType == COLLOBJECTTYPE_PLAYER)
-							{ // 当たり判定のタイプ
-
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
-							}
-						}
 
 						if (state == BOOSTSTATE_UP)
 						{ // ブースト中の場合
@@ -1016,14 +1010,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -1068,16 +1062,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								2													// 寿命
 							);
 						}
-						else
-						{ // 移動量が一定未満の場合
-
-							if (collType == COLLOBJECTTYPE_PLAYER)
-							{ // 当たり判定のタイプ
-
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
-							}
-						}
 
 						if (state == BOOSTSTATE_UP)
 						{ // ブースト中の場合
@@ -1092,14 +1076,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -1137,16 +1121,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								2													// 寿命
 							);
 						}
-						else
-						{ // 移動量が一定未満の場合
-
-							if (collType == COLLOBJECTTYPE_PLAYER)
-							{ // 当たり判定のタイプ
-
-								// コンボの倍率処理
-								MagnificCombo(COMBO_INTERRUPTION);
-							}
-						}
 
 						if (state == BOOSTSTATE_UP)
 						{ // ブースト中の場合
@@ -1161,14 +1135,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 						}
 						else
 						{ // 上記以外の場合
 
 							// 移動量を削除
-							pMove->x *= 0.95f;
+							CollisionSlow(&pMove->x);
 						}
 
 						if (*pPolice == POLICESTATE_TACKLE)
@@ -1224,16 +1198,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									2													// 寿命
 								);
 							}
-							else
-							{ // 移動量が一定未満の場合
-
-								if (collType == COLLOBJECTTYPE_PLAYER)
-								{ // 当たり判定のタイプ
-
-									// コンボの倍率処理
-									MagnificCombo(COMBO_INTERRUPTION);
-								}
-							}
 
 							if (state == BOOSTSTATE_UP)
 							{ // ブースト中の場合
@@ -1248,14 +1212,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1293,16 +1257,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									2													// 寿命
 								);
 							}
-							else
-							{ // 移動量が一定未満の場合
-
-								if (collType == COLLOBJECTTYPE_PLAYER)
-								{ // 当たり判定のタイプ
-
-									// コンボの倍率処理
-									MagnificCombo(COMBO_INTERRUPTION);
-								}
-							}
 
 							if (state == BOOSTSTATE_UP)
 							{ // ブースト中の場合
@@ -1317,14 +1271,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1369,16 +1323,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									2													// 寿命
 								);
 							}
-							else
-							{ // 移動量が一定未満の場合
-
-								if (collType == COLLOBJECTTYPE_PLAYER)
-								{ // 当たり判定のタイプ
-
-									// コンボの倍率処理
-									MagnificCombo(COMBO_INTERRUPTION);
-								}
-							}
 
 							if (state == BOOSTSTATE_UP)
 							{ // ブースト中の場合
@@ -1393,14 +1337,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1438,16 +1382,6 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 									2													// 寿命
 								);
 							}
-							else
-							{ // 移動量が一定未満の場合
-
-								if (collType == COLLOBJECTTYPE_PLAYER)
-								{ // 当たり判定のタイプ
-
-									// コンボの倍率処理
-									MagnificCombo(COMBO_INTERRUPTION);
-								}
-							}
 
 							if (state == BOOSTSTATE_UP)
 							{ // ブースト中の場合
@@ -1462,14 +1396,14 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								{ // 上記以外の場合
 
 									// 移動量を削除
-									pMove->x *= 0.95f;
+									CollisionSlow(&pMove->x);
 								}
 							}
 							else
 							{ // 上記以外の場合
 
 								// 移動量を削除
-								pMove->x *= 0.95f;
+								CollisionSlow(&pMove->x);
 							}
 
 							if (*pPolice == POLICESTATE_TACKLE)
@@ -1521,7 +1455,7 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed)
 			fLength = (g_aObject[nCntObject].pos.x - pos.x) * (g_aObject[nCntObject].pos.x - pos.x)
 				+ (g_aObject[nCntObject].pos.z - pos.z) * (g_aObject[nCntObject].pos.z - pos.z);
 			
-			if (fLength <= ((g_aObject[nCntObject].modelData.fRadius + fRadius) * (g_aObject[nCntObject].modelData.fRadius + fRadius)))
+			if (fLength <= (((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius) * ((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius)))
 			{ // オブジェクトが当たっている
 				// 吹っ飛ばし状態にする
 				g_aObject[nCntObject].smash.State = SMASHSTATE_ON;
