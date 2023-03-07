@@ -268,7 +268,8 @@ void InitResult(void)
 			false,	// 当たり判定
 			true,	// 影
 			true,	// オブジェクト
-			true	// AI
+			true,	// AI
+			false	// アイコン
 		);
 	}
 	else if (g_ResultState == RESULTSTATE_TIMEOVER
@@ -284,7 +285,8 @@ void InitResult(void)
 			false,	// 当たり判定
 			true,	// 影
 			true,	// オブジェクト
-			false	// AI
+			false,	// AI
+			false	// アイコン
 		);
 	}
 

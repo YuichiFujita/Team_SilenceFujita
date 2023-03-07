@@ -11,6 +11,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "game.h"
 #include "model.h"
 
 //************************************************************
@@ -98,7 +99,7 @@ void UninitIcon(void);		// アイコンの終了処理
 void UpdateIcon(void);		// アイコンの更新処理
 void DrawIcon(void);		// アイコンの描画処理
 int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE *pState);			// アイコンの設定処理
-int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE *pState, ROTSTATE rot);	// オブジェクトのアイコンの設定処理
+int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, JUDGESTATE type, int *pIconID, bool *pUse, ICONSTATE *pState, ROTSTATE rot);	// オブジェクトのアイコンの設定処理
 
 void SetPositionIcon(int nIconID, D3DXVECTOR3 pos);			// アイコンの位置の設定処理
 

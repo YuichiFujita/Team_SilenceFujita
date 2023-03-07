@@ -274,7 +274,7 @@ void CollisionSlow(float *fMove)
 //==================================================================================
 //	ファイルをロードする際に使用。引数で読み込むものをコントロールすることも可
 //==================================================================================
-void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI)
+void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, bool bShadow, bool bObject, bool bAI, bool bIcon)
 {
 	if (bCollision == true)
 	{ // 当たり判定を読み込む場合
@@ -315,6 +315,13 @@ void LoadFileChunk(bool bCurve, bool bHumanCurve, bool bStage, bool bCollision, 
 
 		// 影の半径のセットアップ
 		TxtSetShadow();
+	}
+
+	if (bIcon == true)
+	{ // アイコンを読み込む場合
+
+		// アイコンのセットアップ
+		TxtSetIcon();
 	}
 
 	if (bObject == true)

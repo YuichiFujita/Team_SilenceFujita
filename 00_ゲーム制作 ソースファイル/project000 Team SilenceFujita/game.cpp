@@ -211,7 +211,8 @@ void InitGame(void)
 		true,	// 当たり判定
 		true,	// 影
 		true,	// オブジェクト
-		true	// AI
+		true,	// AI
+		true	// アイコン
 	);
 
 	//メインBGMの再生

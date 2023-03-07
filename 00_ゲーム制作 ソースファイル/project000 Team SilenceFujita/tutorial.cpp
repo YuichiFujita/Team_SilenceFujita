@@ -586,7 +586,8 @@ void InitTutorial(void)
 		true,	// 当たり判定
 		true,	// 影
 		false,	// オブジェクト
-		false	// AI
+		false,	// AI
+		false	// アイコン
 	);
 
 	//メインBGMの再生

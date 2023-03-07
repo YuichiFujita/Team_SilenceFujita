@@ -8,6 +8,7 @@
 //	インクルードファイル
 //************************************************************
 #include "icon.h"
+#include "game.h"
 #include "player.h"
 #include "camera.h"
 
@@ -641,7 +642,7 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 //=======================================================================================================
 // オブジェクトのアイコンの設定処理
 //=======================================================================================================
-int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE *pState, ROTSTATE rot)
+int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, JUDGESTATE type, int *pIconID, bool *pUse, ICONSTATE *pState, ROTSTATE rot)
 {
 	//アイコンの番号を初期化する
 	int nIdxIcon = NONE_ICON;
@@ -662,7 +663,6 @@ int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, ICONTYPE type, int *pIcon
 			// 情報の設定
 			g_aIcon[nCntIcon].pos.x = pos.x;			// 位置(X軸)
 			g_aIcon[nCntIcon].pos.z = pos.z;			// 位置(Z軸)
-			g_aIcon[nCntIcon].type = type;				// 種類
 			g_aIcon[nCntIcon].pIconIDParent = pIconID;	// アイコンのインデックス
 			g_aIcon[nCntIcon].pUseParent = pUse;		// 親の使用状況
 			g_aIcon[nCntIcon].pState = pState;			// 状態
@@ -687,19 +687,25 @@ int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, ICONTYPE type, int *pIcon
 				g_aIcon[nCntIcon].radius.z = radius.x;
 			}
 
-			switch (g_aIcon[nCntIcon].type)
+			switch (type)
 			{
-			case ICONTYPE_OBJECT:		// オブジェクトの場合
+			case JUDGESTATE_JUSTICE:		// 良いオブジェクトの場合
 
 				// アイコンの色を設定
 				g_aIcon[nCntIcon].col = OBJECT_ICON_COL;
 
+				// 種類を設定
+				g_aIcon[nCntIcon].type = ICONTYPE_OBJECT;
+
 				break;
 
-			case ICONTYPE_EVIL_OBJECT:	// 悪いオブジェクトの場合
+			case JUDGESTATE_EVIL:			// 悪いオブジェクトの場合
 
 				// アイコンの色を設定
 				g_aIcon[nCntIcon].col = EVIL_ICON_COL;
+
+				// 種類を設定
+				g_aIcon[nCntIcon].type = ICONTYPE_EVIL_OBJECT;
 
 				break;
 			}
