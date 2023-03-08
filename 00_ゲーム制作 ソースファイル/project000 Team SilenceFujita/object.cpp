@@ -964,10 +964,14 @@ void HitObject(Object *pObject, int nDamage)
 				}
 			}
 			
-			//小物用の音量に変更
-			SetSoundVolume(SOUND_LABEL_SE_BREAK_000, 0.5f);
-			// サウンドの再生
-			PlaySound(SOUND_LABEL_SE_BREAK_000);			// SE (ダメージ)
+			//効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				//小物用の音量に変更
+				SetSoundVolume(SOUND_LABEL_SE_BREAK_000, 0.5f);
+				// サウンド（破壊音）の再生
+				PlaySound(SOUND_LABEL_SE_BREAK_000);
+			}
 
 			//// アイテムの設定
 			//SetItem(pObject->pos, ITEMTYPE_HEAL);
