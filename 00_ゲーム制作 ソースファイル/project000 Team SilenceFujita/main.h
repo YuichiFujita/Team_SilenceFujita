@@ -47,7 +47,7 @@
 #define SCREEN_WIDTH	(1280)	// ウインドウの幅
 #define SCREEN_HEIGHT	(720)	// ウインドウの高さ
 #define MAX_STRING		(128)	// セットアップ時のテキスト読み込み文字列の最長
-#define MAX_MATERIAL	(20)	// マテリアルの最大数
+#define MAX_MATERIAL	(30)	// マテリアルの最大数
 
 #define NONE_ID			(-1)	// インデックスの初期値 (インデックスがない場合)
 #define NONE_PARENT		(-1)	// 親の初期値 (親がいない場合)

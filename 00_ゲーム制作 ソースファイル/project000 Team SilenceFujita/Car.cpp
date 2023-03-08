@@ -551,7 +551,8 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 			// ジャッジの情報の設定
 			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			if (g_aCar[nCntCar].type == CARTYPE_ELECTIONCAR)
+			if (g_aCar[nCntCar].type == CARTYPE_ELECTIONCAR
+			 || g_aCar[nCntCar].type == CARTYPE_BOUSOUCAR)
 			{ // 悪いやつだった場合
 
 				g_aCar[nCntCar].judge.state = JUDGESTATE_EVIL;					// 善悪

@@ -123,7 +123,6 @@ void UpdateGameNorPlayer(void);		// ゲーム通常時のプレイヤー更新処理
 void UpdateTutorialNorPlayer(void);	// チュートリアル通常時のプレイヤー更新処理
 void UpdateClearPlayer(void);		// クリア成功時のプレイヤー更新処理
 void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
-void SetPlayerGate(void);			// プレイヤーのゲートの設定処理
 
 PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake);		// プレイヤーの移動量の更新処理
 
@@ -142,7 +141,6 @@ void UpdateFlyAway(void);			// 送風の更新処理
 void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
 void AbiHealPlayer(void);			// 能力ゲージの回復処理
-
 void CameraChange(void);			// カメラを変えたときの処理
 
 //************************************************************
@@ -218,18 +216,6 @@ void InitPlayer(void)
 	//プレイヤーの音
 	g_playerSound.bBoost = false;		//ブースト
 	g_playerSound.bWind = false;		//送風機
-
-	// モデル情報を設定
-	g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
-
-	// 影のインデックスを設定
-	g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
-
-	// アイコンのインデックスを設定
-	g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
-
-	// 影の位置設定
-	SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
 }
 
 //============================================================
@@ -427,11 +413,20 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	if (g_player.bUse == false)
 	{ // プレイヤーが使用されていない場合
 
+		// モデル情報を設定
+		g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
+
+		// 影のインデックスを設定
+		g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
+
+		// アイコンのインデックスを設定
+		g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
+
+		// 影の位置設定
+		SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
+
 		// 使用している状態にする
 		g_player.bUse = true;
-
-		// プレイヤーのゲートの設定処理
-		SetPlayerGate();			
 	}
 }
 
@@ -2028,57 +2023,6 @@ void UpdateGameStartPlayer(void)
 	// プレイヤーの位置の更新
 	PosPlayer();
 
-	//switch (pGate[g_player.nNumEnterGate].collInfo->stateRot)
-	//{
-	//case ROTSTATE_0:		// 0度
-
-	//	if (g_player.pos.z <= pGate[g_player.nNumEnterGate].pos.z)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.z = pGate[g_player.nNumEnterGate].pos.z;
-	//	}
-
-	//	break;
-
-	//case ROTSTATE_180:		// 180度
-
-	//	if (g_player.pos.z >= pGate[g_player.nNumEnterGate].pos.z)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.z = pGate[g_player.nNumEnterGate].pos.z;
-	//	}
-
-	//	break;
-
-	//case ROTSTATE_90:		// 90度
-
-	//	if (g_player.pos.x <= pGate[g_player.nNumEnterGate].pos.x)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.x = pGate[g_player.nNumEnterGate].pos.x;
-	//	}
-
-	//	break;
-
-	//case ROTSTATE_270:		// 270度
-
-	//	if (g_player.pos.x >= pGate[g_player.nNumEnterGate].pos.x)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.x = pGate[g_player.nNumEnterGate].pos.x;
-	//	}
-
-	//	break;
-
-	//default:				// 上記以外
-
-	//	break;
-	//}
-
 	// プレイヤーの向きの更新
 	RotPlayer();
 
@@ -2111,7 +2055,7 @@ void UpdateGameStartPlayer(void)
 //============================================================
 // プレイヤーのゲートの設定処理
 //============================================================
-void SetPlayerGate()
+void SetPlayerGate(void)
 {
 	int nGateNum = GetGateNum();		// ゲートの数を取得する
 	int nSpawnGateNum;					// ゲートの番号

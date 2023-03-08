@@ -97,6 +97,8 @@ typedef enum
 	MODELTYPE_OBJECT_TOWNWALL,				// 町壁（壁）
 	MODELTYPE_OBJECT_TOWNPILLAR,			// 町壁（柱）
 	MODELTYPE_OBJECT_TOWNFENCE001,			// 町壁（フェンス）
+	MODELTYPE_OBJECT_KEIBAJOU000,			// 競馬場（トラック）
+	MODELTYPE_OBJECT_KEIBAJOU001,			// 競馬場（スタンド）
 	
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
