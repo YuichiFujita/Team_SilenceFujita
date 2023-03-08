@@ -164,7 +164,7 @@ void UpdateTimer(void)
 	{ // 状態ごとの処理
 	case TIMERSTATE_COUNT:	// カウント状態の場合
 
-		if (GetGameState() == GAMESTATE_NORMAL
+		if (*GetGameState() == GAMESTATE_NORMAL
 		&&  GetFade()      == FADE_NONE)
 		{ // ゲームが通常状態且つ、フェードしていない場合
 
