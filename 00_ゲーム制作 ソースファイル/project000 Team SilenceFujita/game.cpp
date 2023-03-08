@@ -43,6 +43,7 @@
 #include "particle.h"
 #include "pause.h"
 #include "shadow.h"
+#include "start.h"
 #include "object.h"
 #include "player.h"
 #include "Police.h"
@@ -81,7 +82,7 @@ void InitGame(void)
 	//	ゲームの初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// グローバル変数を初期化
-	g_gameState         = GAMESTATE_NORMAL;		// ゲームの状態
+	g_gameState         = GAMESTATE_START;		// ゲームの状態
 	g_resultState       = RESULTSTATE_NONE;		// リザルトの状態
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
@@ -202,6 +203,9 @@ void InitGame(void)
 	// フラッシュの初期化
 	InitFlash();
 
+	// スタートの初期化
+	InitStart();
+
 	// ファイルをロードする全体処理
 	LoadFileChunk
 	( // 引数
@@ -214,6 +218,9 @@ void InitGame(void)
 		true,	// AI
 		true	// アイコン
 	);
+
+	// プレイヤーの位置・向きの設定
+	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	//メインBGMの再生
 	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
@@ -370,6 +377,9 @@ void UninitGame(void)
 	// フラッシュの終了
 	UninitFlash();
 
+	// スタートの終了
+	UninitStart();
+
 	// BGMの停止
 	StopSound();
 
@@ -509,6 +519,9 @@ void UpdateGame(void)
 
 		if (g_bPause == false)
 		{ // ポーズ状態ではない場合
+
+			// スタートの更新
+			UpdateStart();
 
 			// 天気の設定処理
 			SetWeather();
@@ -799,6 +812,9 @@ void DrawGame(void)
 	// フラッシュの描画
 	DrawFlash();
 
+	// スタートの描画
+	DrawStart();
+
 	// カウントダウンの描画
 	DrawCountDown();
 
@@ -834,10 +850,10 @@ void SetEnablePause(bool bPause)
 //======================================================================================================================
 //	ゲーム画面の状態取得処理
 //======================================================================================================================
-GAMESTATE GetGameState(void)
+GAMESTATE *GetGameState(void)
 {
 	// ゲームの状態を返す
-	return g_gameState;
+	return &g_gameState;
 }
 
 //======================================================================================================================

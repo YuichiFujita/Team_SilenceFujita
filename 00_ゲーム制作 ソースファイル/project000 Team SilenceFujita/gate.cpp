@@ -615,7 +615,7 @@ void CollisionExitGate(Gate *pGate)
 	// プレイヤーを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーを宣言
 
-	if (GetTimerState() != TIMERSTATE_END)
+	if (*GetGameState() == GAMESTATE_NORMAL)
 	{ // タイマーがカウント終了状態ではない場合
 
 		// ゲートの横幅加算量を設定

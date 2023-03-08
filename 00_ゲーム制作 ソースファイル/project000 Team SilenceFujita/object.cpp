@@ -1029,7 +1029,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
-						if (state == BOOSTSTATE_UP)
+						if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 						{ // ブースト中の場合
 
 							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
@@ -1088,7 +1088,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
-						if (state == BOOSTSTATE_UP)
+						if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 						{ // ブースト中の場合
 
 							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
@@ -1154,7 +1154,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
-						if (state == BOOSTSTATE_UP)
+						if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 						{ // ブースト中の場合
 
 							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
@@ -1213,7 +1213,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 							);
 						}
 
-						if (state == BOOSTSTATE_UP)
+						if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 						{ // ブースト中の場合
 
 							if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
@@ -1290,7 +1290,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
-							if (state == BOOSTSTATE_UP)
+							if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 							{ // ブースト中の場合
 
 								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
@@ -1349,7 +1349,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
-							if (state == BOOSTSTATE_UP)
+							if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 							{ // ブースト中の場合
 
 								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
@@ -1415,7 +1415,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
-							if (state == BOOSTSTATE_UP)
+							if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 							{ // ブースト中の場合
 
 								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)
@@ -1474,7 +1474,7 @@ void CollisionObject(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove
 								);
 							}
 
-							if (state == BOOSTSTATE_UP)
+							if (state == BOOSTSTATE_UP || state == BOOSTSTATE_DOWN)
 							{ // ブースト中の場合
 
 								if (g_aObject[nCntObject].nBreakType == BREAKTYPE_ON)

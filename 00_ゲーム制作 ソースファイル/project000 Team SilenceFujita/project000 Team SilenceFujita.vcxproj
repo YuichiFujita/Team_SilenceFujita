@@ -201,6 +201,7 @@
     <ClCompile Include="score.cpp" />
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="start.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="tiremark.cpp" />
     <ClCompile Include="title.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="score.h" />
     <ClInclude Include="shadow.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="start.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="tiremark.h" />
     <ClInclude Include="title.h" />

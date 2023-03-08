@@ -401,7 +401,7 @@ void SetBonus(int nBonus)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffBonus->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (GetGameState() == GAMESTATE_NORMAL)
+	if (*GetGameState() == GAMESTATE_NORMAL)
 	{ // ゲームの進行が通常状態の場合
 
 		for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
