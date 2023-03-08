@@ -507,7 +507,7 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			// カウンターを設定
 			pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 
-			//効果音の停止
+			//効果音の再生
 			if (GetSoundType(SOUND_TYPE_SE) == true)
 			{
 				// サウンドの再生

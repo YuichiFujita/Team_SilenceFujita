@@ -11,6 +11,7 @@
 #include "game.h"
 #include "start.h"
 #include "input.h"
+#include "sound.h"
 #include "2Deffect.h"
 
 //**********************************************************************************************************************
@@ -493,6 +494,13 @@ void StartPrefaceFirst(void)
 
 		// 前置き(後半)状態にする
 		g_StartState = STARTSTATE_PREFACE_SECOND;
+
+		//効果音の再生
+		if (GetSoundType(SOUND_TYPE_SE) == true)
+		{
+			// サウンド（スタートのスライド）の再生
+			PlaySound(SOUND_LABEL_SE_START_SLIDE_000);
+		}
 	}
 }
 
@@ -518,6 +526,13 @@ void StartPrefaceSecond(void)
 
 		// 行動カウントを初期化する
 		g_nActionCount = 0;
+
+		//効果音の再生
+		if (GetSoundType(SOUND_TYPE_SE) == true)
+		{
+			// サウンド（スタートのスライド）の再生
+			PlaySound(SOUND_LABEL_SE_START_SLIDE_000);
+		}
 	}
 }
 
@@ -590,6 +605,13 @@ void StartSignalMove(void)
 
 		// 状態をシグナルの状態にする
 		g_StartState = STARTSTATE_SIGNAL;
+
+		//効果音の再生
+		if (GetSoundType(SOUND_TYPE_SE) == true)
+		{
+			// サウンド（スタートのカウント）の再生
+			PlaySound(SOUND_LABEL_SE_DAMAGE_000);
+		}
 	}
 }
 
@@ -612,6 +634,13 @@ void StartSignal(void)
 
 			//　半径を設定する
 			g_aStart[START_POLIGON_SIGLIGHT].radius.x = (START_SIGLIGHT_RADIUS.x / START_SIGNAL_LIGHT_MAX) * g_nSignalCount;
+
+			//効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド（スタートのカウント）の再生
+				PlaySound(SOUND_LABEL_SE_START_COUNT_000);
+			}
 		}
 		else
 		{ // 上記以外
@@ -630,6 +659,13 @@ void StartSignal(void)
 
 			// 行動カウントを初期化する
 			g_nActionCount = 0;
+
+			//効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド（スタートのカウント）の再生
+				PlaySound(SOUND_LABEL_SE_START_GO_000);
+			}
 		}
 	}
 }
