@@ -53,8 +53,16 @@ SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 	{ "data/BGM/bousoucar000.wav", -1 },	// 暴走車の効果音BGM_000
 	{ "data/BGM/wind000.wav", -1 },			// プレイヤー能力（送風機）の効果音BGM_000
 	{ "data/SE/move000.wav", 0 },			// SE
+	{ "data/SE/select000.wav", 0 },			// 選択のSE_000
+	{ "data/SE/decide000.wav", 0 },			// 決定のSE_000
 	{ "data/SE/boost000.wav", 0 },			// プレイヤー能力（ブースト）のSE_000
 	{ "data/SE/bomb000.wav", 0 },			// プレイヤー能力（ボム）のSE_000
+	{ "data/SE/break000.wav", 0 },			// 破壊音（建物系）のSE_000
+	{ "data/SE/break001.wav", 0 },			// 破壊音（小物系）のSE_001
+	{ "data/SE/gareki000.wav", 0 },			// 崩れる（建物系）のSE_000
+	{ "data/SE/gareki001.wav", 0 },			// 崩れる（小物系）のSE_001
+	{ "data/SE/score000.wav", 0 },			// スコア獲得のSE_000
+
 };
 
 //**********************************************************************************************************************

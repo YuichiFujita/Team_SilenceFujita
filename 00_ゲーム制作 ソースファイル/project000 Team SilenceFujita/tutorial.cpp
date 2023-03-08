@@ -72,12 +72,20 @@
 
 #define RESET_POS_Z		(-2000.0f)	// プレイヤー再設定時の z座標
 
-#define TUTO_EXIT_POS	(D3DXVECTOR3(100.0f, 100.0f, 0.0f))								// 退出の絶対座標
-#define TUTO_EXIT_SIZE	(D3DXVECTOR3(250.0f, 50.0f, 0.0f))								// 退出の大きさ
+#define TUTO_PAUSE_POS	(D3DXVECTOR3(85.0f, 255.0f, 0.0f))								// ポーズの絶対座標
+#define TUTO_PAUSE_SIZE	(D3DXVECTOR3(70.0f, 70.0f, 0.0f))								// ポーズの大きさ
 #define TUTO_LET_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))	// 手紙の絶対座標
 #define TUTO_LET_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// 手紙の大きさ
 #define TUTO_PAP_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 1020.0f, 0.0f))				// 便箋の初期座標
 #define TUTO_PAP_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// 便箋の大きさ
+
+#define TUTO_LET_CHAN	(0.04f)		// 手紙のα値変更量
+#define TUTO_LET_STOP	(1.0f)		// 手紙の最大α値
+#define TUTO_FADE_CHAN	(0.02f)		// フェードのα値変更量
+#define TUTO_FADE_STOP	(0.6f)		// フェードの最大α値
+
+#define TUTO_PAP_MOVE	(0.5f)					// 便箋の位置の更新量
+#define TUTO_PAP_STOP	(SCREEN_HEIGHT * 0.5f)	// 便箋の停止位置 (y)
 
 //**********************************************************************************************************************
 //	列挙型定義 (TEXTURE_TUTORIAL)
@@ -87,6 +95,7 @@ typedef enum
 	TEXTURE_TUTORIAL_BG = 0,		// 背景
 	TEXTURE_TUTORIAL_LETTER,		// 手紙
 	TEXTURE_TUTORIAL_PAPER,			// 便箋
+	TEXTURE_TUTORIAL_PAUSE,			// ポーズアイコン
 	TEXTURE_TUTORIAL_SLUM,			// レッスン4 (破滅疾走) の備考
 	TEXTURE_TUTORIAL_FLY,			// レッスン5 (吹飛散風) の備考
 	TEXTURE_TUTORIAL_SILENCE,		// レッスン6 (無音世界) の備考
@@ -127,6 +136,7 @@ const char *apTextureTutorial[] =		// チュートリアルテクスチャの相対パス
 	"data\\TEXTURE\\ui005.png",			// チュートリアル背景のテクスチャ相対パス
 	"data\\TEXTURE\\tutorial000.png",	// 手紙のテクスチャ相対パス
 	"data\\TEXTURE\\tutorial001.png",	// 便箋のテクスチャ相対パス
+	"data\\TEXTURE\\tutorial002.png",	// ポーズアイコンのテクスチャ相対パス
 	"data\\TEXTURE\\tips000.png",		// レッスン4 (破滅疾走) の備考のテクスチャ相対パス
 	"data\\TEXTURE\\tips001.png",		// レッスン5 (吹飛散風) の備考のテクスチャ相対パス
 	"data\\TEXTURE\\tips002.png",		// レッスン6 (無音世界) の備考のテクスチャ相対パス
@@ -369,13 +379,13 @@ void InitTutorial(void)
 	pVtx[15].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	//------------------------------------------------------------------------------------------------------------------
-	//	退出の初期化
+	//	ポーズの初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[16].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
-	pVtx[17].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y - TUTO_EXIT_SIZE.y, 0.0f);
-	pVtx[18].pos = D3DXVECTOR3(TUTO_EXIT_POS.x - TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
-	pVtx[19].pos = D3DXVECTOR3(TUTO_EXIT_POS.x + TUTO_EXIT_SIZE.x, TUTO_EXIT_POS.y + TUTO_EXIT_SIZE.y, 0.0f);
+	pVtx[16].pos = D3DXVECTOR3(TUTO_PAUSE_POS.x - TUTO_PAUSE_SIZE.x, TUTO_PAUSE_POS.y - TUTO_PAUSE_SIZE.y, 0.0f);
+	pVtx[17].pos = D3DXVECTOR3(TUTO_PAUSE_POS.x + TUTO_PAUSE_SIZE.x, TUTO_PAUSE_POS.y - TUTO_PAUSE_SIZE.y, 0.0f);
+	pVtx[18].pos = D3DXVECTOR3(TUTO_PAUSE_POS.x - TUTO_PAUSE_SIZE.x, TUTO_PAUSE_POS.y + TUTO_PAUSE_SIZE.y, 0.0f);
+	pVtx[19].pos = D3DXVECTOR3(TUTO_PAUSE_POS.x + TUTO_PAUSE_SIZE.x, TUTO_PAUSE_POS.y + TUTO_PAUSE_SIZE.y, 0.0f);
 
 	// rhw の設定
 	pVtx[16].rhw = 1.0f;
@@ -384,10 +394,10 @@ void InitTutorial(void)
 	pVtx[19].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[16].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
-	pVtx[17].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
-	pVtx[18].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
-	pVtx[19].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaLetter);
+	pVtx[16].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[17].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[18].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[19].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// テクスチャ座標の設定
 	pVtx[16].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -808,6 +818,7 @@ void UpdateTutorial(void)
 		break;
 
 	case TUTORIALSTATE_END:			// 終了状態
+	case TUTORIALSTATE_SKIP:		// スキップ状態
 
 		if (g_nCounterTutorialState > 0)
 		{ // カウンターが 0より大きい場合
@@ -1171,14 +1182,6 @@ TUTORIALSTATE GetTutorialState(void)
 //======================================================================================================================
 void UpdateTutorialUi(void)
 {
-#define TUTO_LET_CHANGE		(0.04f)		// 手紙のα値変更量
-#define TUTO_LET_STOP		(1.0f)		// 手紙の最大α値
-#define TUTO_FADE_CHANGE	(0.02f)		// フェードのα値変更量
-#define TUTO_FADE_STOP		(0.6f)		// フェードの最大α値
-
-#define TUTO_PAP_MOVE		(0.5f)					// 便箋の位置の更新量
-#define TUTO_PAP_STOP		(SCREEN_HEIGHT * 0.5f)	// 便箋の停止位置 (y)
-
 	// ポインタを宣言
 	VERTEX_2D *pVtx;	// 頂点情報へのポインタ
 
@@ -1203,7 +1206,7 @@ void UpdateTutorialUi(void)
 	case TUTOSTAGSTATE_LET_ALPHA:	// 手紙の表示状態
 
 		// 手紙のα値を加算
-		g_tutorial.fAlphaLetter += TUTO_LET_CHANGE;
+		g_tutorial.fAlphaLetter += TUTO_LET_CHAN;
 
 		if (g_tutorial.fAlphaLetter >= TUTO_LET_STOP)
 		{ // 手紙のα値が一定値以上の場合
@@ -1227,7 +1230,7 @@ void UpdateTutorialUi(void)
 	case TUTOSTAGSTATE_FADE_ALPHA:	// フェードの表示状態
 
 		// フェードのα値を加算
-		g_tutorial.fAlphaFade += TUTO_FADE_CHANGE;
+		g_tutorial.fAlphaFade += TUTO_FADE_CHAN;
 		
 		if (g_tutorial.fAlphaFade >= TUTO_FADE_STOP)
 		{ // フェードのα値が一定値以上の場合
@@ -1282,10 +1285,21 @@ void UpdateTutorialUi(void)
 
 		if (GetKeyboardTrigger(DIK_O) == true
 		||  GetJoyKeyTrigger(JOYKEY_BACK, 0) == true)
-		{ // 便箋をしまう操作が行われた場合
+		{ // 便箋をしまう操作の場合
 
 			// 便箋のしまい状態にする
 			g_tutorial.state = TUTOSTAGSTATE_PAP_RETURN;
+
+			if (GetKeyboardPress(DIK_P) == true
+			||  GetJoyKeyPress(JOYKEY_START, 0) == true)
+			{ // タイトル遷移の操作も行われていた場合
+
+				// 遷移設定がされた状態にする
+				g_bTutorialEnd = true;
+
+				// ゲーム画面の状態設定
+				SetTutorialState(TUTORIALSTATE_SKIP, END_TUTO_TIME);	// スキップ状態
+			}
 		}
 
 		// 処理を抜ける
@@ -1298,7 +1312,7 @@ void UpdateTutorialUi(void)
 		{ // 手紙のα値が一定値より大きい場合
 
 			// 手紙のα値を減算
-			g_tutorial.fAlphaLetter -= TUTO_LET_CHANGE;
+			g_tutorial.fAlphaLetter -= TUTO_LET_CHAN;
 
 			if (g_tutorial.fAlphaLetter <= 0.0f)
 			{ // 手紙のα値が一定値以下の場合
@@ -1319,7 +1333,7 @@ void UpdateTutorialUi(void)
 		{ // フェードのα値が一定値より大きい場合
 
 			// フェードのα値を減算
-			g_tutorial.fAlphaFade -= TUTO_FADE_CHANGE;
+			g_tutorial.fAlphaFade -= TUTO_FADE_CHAN;
 
 			if (g_tutorial.fAlphaFade <= 0.0f)
 			{ // フェードのα値が一定値以下の場合
@@ -1403,59 +1417,32 @@ void DrawTutorialUi(bool bBefore)
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
 
-		if (g_nLessonState >= LESSON_04)
-		{ // 現在のレッスンがレッスン4 (破滅疾走) 以降の場合
+		//--------------------------------------------------------------------------------------------------------------
+		//	備考の背景の描画
+		//--------------------------------------------------------------------------------------------------------------
+		// テクスチャの設定
+		pDevice->SetTexture(0, NULL);
 
-			//----------------------------------------------------------------------------------------------------------
-			//	備考の背景の描画
-			//----------------------------------------------------------------------------------------------------------
-			// テクスチャの設定
-			pDevice->SetTexture(0, NULL);
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
 
-			// ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
+		//--------------------------------------------------------------------------------------------------------------
+		//	備考の描画
+		//--------------------------------------------------------------------------------------------------------------
+		// テクスチャの設定
+		pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
 
-			//----------------------------------------------------------------------------------------------------------
-			//	備考の描画
-			//----------------------------------------------------------------------------------------------------------
-			switch (g_nLessonState)
-			{ // レッスンごとの処理
-			case LESSON_04:	// レッスン4 (破滅疾走)
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
 
-				// テクスチャの設定
-				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
+		//--------------------------------------------------------------------------------------------------------------
+		//	ポーズの描画
+		//--------------------------------------------------------------------------------------------------------------
+		// テクスチャの設定
+		pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_PAUSE]);
 
-				// 処理を抜ける
-				break;
-
-			case LESSON_05:	// レッスン5 (吹飛散風)
-
-				// テクスチャの設定
-				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_FLY]);
-
-				// 処理を抜ける
-				break;
-
-			case LESSON_06:	// レッスン6 (無音世界)
-
-				// テクスチャの設定
-				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SILENCE]);
-
-				// 処理を抜ける
-				break;
-
-			case LESSON_07:	// レッスン7 (脱出)
-
-				// テクスチャの設定
-				pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_EXIT]);
-
-				// 処理を抜ける
-				break;
-			}
-
-			// ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
-		}
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 16, 2);
 	}
 	else
 	{ // 前の描画の場合

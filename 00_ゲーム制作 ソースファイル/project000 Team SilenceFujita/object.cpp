@@ -608,6 +608,16 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 				// 透明度を設定する
 				g_aObject[nCntObject].appear.fAlpha = 0.0f;
+
+				// 最大値を反映する
+				g_aObject[nCntObject].modelData.vtxMax.x *= g_aObject[nCntObject].appear.scaleCopy.x;
+				g_aObject[nCntObject].modelData.vtxMax.y *= g_aObject[nCntObject].appear.scaleCopy.y;
+				g_aObject[nCntObject].modelData.vtxMax.z *= g_aObject[nCntObject].appear.scaleCopy.z;
+
+				// 最小値を反映する
+				g_aObject[nCntObject].modelData.vtxMin.x *= g_aObject[nCntObject].appear.scaleCopy.x;
+				g_aObject[nCntObject].modelData.vtxMin.y *= g_aObject[nCntObject].appear.scaleCopy.y;
+				g_aObject[nCntObject].modelData.vtxMin.z *= g_aObject[nCntObject].appear.scaleCopy.z;
 			}
 			else
 			{ // 一瞬で出てくる状態だった場合

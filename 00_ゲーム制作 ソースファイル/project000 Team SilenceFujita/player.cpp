@@ -294,6 +294,12 @@ void UpdateTutorialPlayer(void)
 			// クリア成功時のプレイヤー更新
 			UpdateClearPlayer();
 		}
+		else if (GetTutorialState() == TUTORIALSTATE_SKIP)
+		{ // チュートリアルが終了状態の場合
+
+			// クリア失敗時のプレイヤー更新
+			UpdateOverPlayer();
+		}
 	}
 }
 
@@ -1189,7 +1195,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_X, 0) == true)
+	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
@@ -1354,7 +1360,7 @@ Player *GetPlayer(void)
 //============================================================
 void SlumBoostPlayer(void)
 {
-	if (GetKeyboardPress(DIK_LSHIFT) == true || GetJoyKeyPress(JOYKEY_A, 0) == true)
+	if (GetKeyboardPress(DIK_LSHIFT) == true || GetJoyKeyPress(JOYKEY_B, 0) == true)
 	{ // 加速の操作が行われている場合
 
 		// 加速の設定
@@ -1367,7 +1373,7 @@ void SlumBoostPlayer(void)
 //============================================================
 void FlyAwayPlayer(void)
 {
-	if (GetKeyboardPress(DIK_U) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
+	if (GetKeyboardPress(DIK_U) == true || GetJoyKeyPress(JOYKEY_A, 0) == true)
 	{ // 送風機の操作が行われている場合
 
 		if (GetWindInfo()->state == WIND_USABLE)
@@ -1379,7 +1385,7 @@ void FlyAwayPlayer(void)
 			//効果音系BGMの再生
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
-				
+
 				//サウンドの設定
 				if (g_playerSound.bWind == false)
 				{//送風機のサウンドが流れていないとき
@@ -1392,6 +1398,26 @@ void FlyAwayPlayer(void)
 				}
 			}
 		}
+		else
+		{//風が使用不可のとき
+
+			//効果音系BGMの停止
+			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+			{
+				//サウンドの設定
+				if (g_playerSound.bWind == true)
+				{//送風機のサウンドが流れているとき
+
+				 //送風機のサウンド（BGM）の停止
+					StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+
+					//送風機のサウンドのオフに設定
+					g_playerSound.bWind = false;
+
+
+				}
+			}
+		}
 	}
 	else
 	{ // 送風機の操作が行われていない場合
@@ -1399,16 +1425,21 @@ void FlyAwayPlayer(void)
 		// 送風機を使用しない
 		g_player.wind.bUseWind = false;
 
-		//サウンドの設定
-		if (g_playerSound.bWind == true)
-		{//送風機のサウンドが流れているとき
+		//効果音系BGMの停止
+		if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+		{
+			//サウンドの設定
+			if (g_playerSound.bWind == true)
+			{//送風機のサウンドが流れているとき
 
-			//送風機のサウンド（BGM）の停止
-			StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+				//送風機のサウンド（BGM）の停止
+				StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
 
-			//送風機のサウンドのオフに設定
-			g_playerSound.bWind = false;
+				//送風機のサウンドのオフに設定
+				g_playerSound.bWind = false;
 
+
+			}
 		}
 	}
 }
@@ -1418,7 +1449,7 @@ void FlyAwayPlayer(void)
 //============================================================
 void SilenceWorldPlayer(void)
 {
-	if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_B, 0))
+	if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_X, 0))
 	{ // 攻撃モードの変更の操作が行われた場合
 
 		if (g_player.bomb.state == ATTACKSTATE_NONE)
