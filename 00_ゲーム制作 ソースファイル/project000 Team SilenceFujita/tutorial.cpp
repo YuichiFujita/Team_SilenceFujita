@@ -52,7 +52,7 @@
 //**********************************************************************************************************************
 #define LESSON_SETUP_TXT	"data\\TXT\\lesson.txt"	// チュートリアルのレッスンセットアップ用のテキストファイルの相対パス
 
-#define MAX_TUTO		(8)			// 使用するポリゴン数
+#define MAX_TUTO		(9)			// 使用するポリゴン数
 #define END_TUTO_TIME	(120)		// チュートリアル終了までの余韻フレーム
 
 #define TUTO_BG_POS_X	(970.0f)	// チュートリアルの背景の絶対座標 (x)
@@ -78,6 +78,8 @@
 #define TUTO_LET_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// 手紙の大きさ
 #define TUTO_PAP_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 1020.0f, 0.0f))				// 便箋の初期座標
 #define TUTO_PAP_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// 便箋の大きさ
+#define TUTO_CONT_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 600.0f, 0.0f))				// 便箋の初期座標
+#define TUTO_CONT_SIZE	(D3DXVECTOR3(500.0f, 250.0f, 0.0f))								// 便箋の大きさ
 
 #define TUTO_LET_CHAN	(0.04f)		// 手紙のα値変更量
 #define TUTO_LET_STOP	(1.0f)		// 手紙の最大α値
@@ -96,10 +98,7 @@ typedef enum
 	TEXTURE_TUTORIAL_LETTER,		// 手紙
 	TEXTURE_TUTORIAL_PAPER,			// 便箋
 	TEXTURE_TUTORIAL_PAUSE,			// ポーズアイコン
-	TEXTURE_TUTORIAL_SLUM,			// レッスン4 (破滅疾走) の備考
-	TEXTURE_TUTORIAL_FLY,			// レッスン5 (吹飛散風) の備考
-	TEXTURE_TUTORIAL_SILENCE,		// レッスン6 (無音世界) の備考
-	TEXTURE_TUTORIAL_EXIT,			// レッスン7 (脱出)     の備考
+	TEXTURE_TUTORIAL_CONTROL,		// 操作表示
 	TEXTURE_TUTORIAL_MAX,			// この列挙型の総数
 } TEXTURE_TUTORIAL;
 
@@ -137,10 +136,7 @@ const char *apTextureTutorial[] =		// チュートリアルテクスチャの相対パス
 	"data\\TEXTURE\\tutorial000.png",	// 手紙のテクスチャ相対パス
 	"data\\TEXTURE\\tutorial001.png",	// 便箋のテクスチャ相対パス
 	"data\\TEXTURE\\tutorial002.png",	// ポーズアイコンのテクスチャ相対パス
-	"data\\TEXTURE\\tips000.png",		// レッスン4 (破滅疾走) の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips001.png",		// レッスン5 (吹飛散風) の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips002.png",		// レッスン6 (無音世界) の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips003.png",		// レッスン7 (脱出)     の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tutorial003.png",	// 操作表示のテクスチャ相対パス
 };
 
 const int aNextLesson[] =	// レッスンのカウンター
@@ -165,6 +161,18 @@ const char *apTextureLesson[] =		// レッスンテクスチャの相対パス
 	"data\\TEXTURE\\lesson005.png",	// レッスン5 (吹飛散風) のテクスチャ相対パス
 	"data\\TEXTURE\\lesson006.png",	// レッスン6 (無音世界) のテクスチャ相対パス
 	"data\\TEXTURE\\lesson007.png",	// レッスン7 (脱出)     のテクスチャ相対パス
+};
+
+const char *apTextureTips[] =		// 備考テクスチャの相対パス
+{
+	"data\\TEXTURE\\tips000.png",	// レッスン0 (移動)     の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips001.png",	// レッスン1 (旋回)     の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips002.png",	// レッスン2 (停止)     の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips003.png",	// レッスン3 (視点変更) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips004.png",	// レッスン4 (破滅疾走) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips005.png",	// レッスン5 (吹飛散風) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips006.png",	// レッスン6 (無音世界) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips007.png",	// レッスン7 (脱出)     の備考のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
@@ -202,6 +210,7 @@ void TxtSetLesson(LESSON_SETUP lesson);	// レッスンのセットアップ処理
 //**********************************************************************************************************************
 LPDIRECT3DTEXTURE9      g_apTextureTutorial[TEXTURE_TUTORIAL_MAX] = {};	// チュートリアルテクスチャへのポインタ
 LPDIRECT3DTEXTURE9      g_apTextureLesson[LESSON_MAX] = {};				// レッスンテクスチャへのポインタ
+LPDIRECT3DTEXTURE9      g_apTextureTips[LESSON_MAX] = {};				// 備考テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTutorial = NULL;						// 頂点バッファへのポインタ
 
 Tutorial      g_tutorial;				// チュートリアルの情報
@@ -231,12 +240,13 @@ void InitTutorial(void)
 		D3DXCreateTextureFromFile(pDevice, apTextureTutorial[nCntTutorial], &g_apTextureTutorial[nCntTutorial]);
 	}
 
-	// レッスンテクスチャの読み込み
+	// レッスン・備考テクスチャの読み込み
 	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
 	{ // 使用するテクスチャ数分繰り返す
 
 		// テクスチャの読み込み
 		D3DXCreateTextureFromFile(pDevice, apTextureLesson[nCntTutorial], &g_apTextureLesson[nCntTutorial]);
+		D3DXCreateTextureFromFile(pDevice, apTextureTips[nCntTutorial], &g_apTextureTips[nCntTutorial]);
 	}
 
 	// 頂点バッファの生成
@@ -480,6 +490,33 @@ void InitTutorial(void)
 	pVtx[30].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[31].tex = D3DXVECTOR2(1.0f, 1.0f);
 
+	//------------------------------------------------------------------------------------------------------------------
+	//	操作の初期化
+	//------------------------------------------------------------------------------------------------------------------
+	// 頂点座標を設定
+	pVtx[32].pos = D3DXVECTOR3(TUTO_CONT_POS.x - TUTO_CONT_SIZE.x, TUTO_CONT_POS.y - TUTO_CONT_SIZE.y, 0.0f);
+	pVtx[33].pos = D3DXVECTOR3(TUTO_CONT_POS.x + TUTO_CONT_SIZE.x, TUTO_CONT_POS.y - TUTO_CONT_SIZE.y, 0.0f);
+	pVtx[34].pos = D3DXVECTOR3(TUTO_CONT_POS.x - TUTO_CONT_SIZE.x, TUTO_CONT_POS.y + TUTO_CONT_SIZE.y, 0.0f);
+	pVtx[35].pos = D3DXVECTOR3(TUTO_CONT_POS.x + TUTO_CONT_SIZE.x, TUTO_CONT_POS.y + TUTO_CONT_SIZE.y, 0.0f);
+
+	// rhw の設定
+	pVtx[32].rhw = 1.0f;
+	pVtx[33].rhw = 1.0f;
+	pVtx[34].rhw = 1.0f;
+	pVtx[35].rhw = 1.0f;
+
+	// 頂点カラーの設定
+	pVtx[32].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[33].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[34].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[35].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// テクスチャ座標の設定
+	pVtx[32].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[33].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[34].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[35].tex = D3DXVECTOR2(1.0f, 1.0f);
+
 	// 頂点バッファをアンロックする
 	g_pVtxBuffTutorial->Unlock();
 
@@ -620,7 +657,7 @@ void UninitTutorial(void)
 		}
 	}
 
-	// レッスンテクスチャの破棄
+	// レッスン・備考テクスチャの破棄
 	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
 	{ // 使用するテクスチャ数分繰り返す
 
@@ -629,6 +666,13 @@ void UninitTutorial(void)
 
 			g_apTextureLesson[nCntTutorial]->Release();
 			g_apTextureLesson[nCntTutorial] = NULL;
+		}
+
+		if (g_apTextureTips[nCntTutorial] != NULL)
+		{ // 変数 (g_apTextureTips) がNULLではない場合
+
+			g_apTextureTips[nCntTutorial]->Release();
+			g_apTextureTips[nCntTutorial] = NULL;
 		}
 	}
 
@@ -1196,8 +1240,12 @@ void UpdateTutorialUi(void)
 		||  GetJoyKeyTrigger(JOYKEY_START, 0) == true)
 		{ // 便箋を取り出す操作が行われた場合
 
-			// 手紙の表示状態にする
-			g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
+			if (g_tutorialState == TUTORIALSTATE_NORMAL)
+			{ // チュートリアルが通常状態の場合
+
+				// 手紙の表示状態にする
+				g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
+			}
 		}
 
 		// 処理を抜ける
@@ -1430,7 +1478,7 @@ void DrawTutorialUi(bool bBefore)
 		//	備考の描画
 		//--------------------------------------------------------------------------------------------------------------
 		// テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_SLUM]);
+		pDevice->SetTexture(0, g_apTextureTips[g_nLessonState]);
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
@@ -1447,29 +1495,44 @@ void DrawTutorialUi(bool bBefore)
 	else
 	{ // 前の描画の場合
 
-		//--------------------------------------------------------------------------------------------------------------
-		//	演出の描画
-		//--------------------------------------------------------------------------------------------------------------
 		if (g_tutorial.state != TUTOSTAGSTATE_NONE)
 		{ // 何もしない状態ではない場合
 
+			//----------------------------------------------------------------------------------------------------------
+			//	手紙の描画
+			//----------------------------------------------------------------------------------------------------------
 			// テクスチャの設定
 			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_LETTER]);
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 20, 2);
 
+			//----------------------------------------------------------------------------------------------------------
+			//	フェードの描画
+			//----------------------------------------------------------------------------------------------------------
 			// テクスチャの設定
 			pDevice->SetTexture(0, NULL);
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 24, 2);
 
+			//----------------------------------------------------------------------------------------------------------
+			//	便箋の描画
+			//----------------------------------------------------------------------------------------------------------
 			// テクスチャの設定
 			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_PAPER]);
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 28, 2);
+
+			//----------------------------------------------------------------------------------------------------------
+			//	操作の描画
+			//----------------------------------------------------------------------------------------------------------
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_CONTROL]);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 32, 2);
 		}
 	}
 }
@@ -1687,7 +1750,6 @@ void ResetPlayer(void)
 	pPlayer->bMove         = false;								// 移動状況
 	pPlayer->bJump         = false;								// ジャンプ状況
 	pPlayer->nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
-	pPlayer->bCameraFirst  = false;								// 一人称カメラの状況
 
 	// ブーストの情報の初期化
 	pPlayer->boost.plusMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 追加移動量
