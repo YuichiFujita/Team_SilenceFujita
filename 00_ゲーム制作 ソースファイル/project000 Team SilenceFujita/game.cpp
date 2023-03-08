@@ -222,6 +222,9 @@ void InitGame(void)
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
+	// プレイヤーのゲートの設定処理
+	SetPlayerGate();
+
 	//メインBGMの再生
 	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
 	{

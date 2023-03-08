@@ -52,6 +52,7 @@
 #define REDUCE_SCALE	(0.05f)		// 縮小率の補正値
 #define SCALE_CHANGE	(0.5f)		// 拡大率の変更量
 
+#define BOMB_BONUS_INIT	(120)		// ボム状態の時ボーナスの初期化時のカウント数
 #define BOMB_BONUS_CNT	(180)		// ボム状態の時ボーナスが入るカウント数
 #define BOMB_BONUS_END	(8)			// ボム状態のボーナス取得の総数
 
@@ -273,7 +274,7 @@ void ShotBarrier(void)
 			g_aBarrierInfo[nCntBarInfo].state         = BARSCOSTATE_NONE;	// 状態
 			g_aBarrierInfo[nCntBarInfo].nNumBarrier   = 0;					// 使ったバリアの総数
 			g_aBarrierInfo[nCntBarInfo].nNumAddScore  = 0;					// スコア加算回数
-			g_aBarrierInfo[nCntBarInfo].nCounterScore = 0;					// スコア加算カウンター
+			g_aBarrierInfo[nCntBarInfo].nCounterScore = BOMB_BONUS_INIT;	// スコア加算カウンター
 
 			for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++)
 			{ // バリアの最大表示数分繰り返す
@@ -1106,7 +1107,7 @@ void UpdateBarrierInfoData(void)
 							{ // 通常車の場合
 
 								// 車の情報を設定
-								pCar = (Car*)g_aBarrier[nCntBarrier].pCar;
+								pCar = (Car*)g_aBarrierInfo[nCntBarInfo].pBarrier[nCntBarrier]->pCar;
 
 								if (pCar->judge.state == JUDGESTATE_EVIL)
 								{ // 悪い奴の場合

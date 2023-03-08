@@ -9,6 +9,7 @@
 #include "Combo.h"
 #include "score.h"
 #include "game.h"
+#include "tutorial.h"
 #include "Police.h"
 #include "value.h"
 #include "2Deffect.h"
@@ -396,12 +397,40 @@ void SetBonus(int nBonus)
 {
 	VERTEX_2D * pVtx;					// 頂点情報へのポインタ
 	D3DXVECTOR3 posBonus;				// ボーナスの位置
+	bool        bScore = false;			// スコア加算可能状況
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffBonus->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (*GetGameState() == GAMESTATE_NORMAL)
-	{ // ゲームの進行が通常状態の場合
+	switch (GetMode())
+	{ // モードごとの処理
+	case MODE_GAME:		// ゲーム画面
+
+		if (*GetGameState() == GAMESTATE_NORMAL)
+		{ // ゲームが通常状態の場合
+
+			// スコア加算可能にする
+			bScore = true;
+		}
+
+		// 処理を抜ける
+		break;
+
+	case MODE_TUTORIAL:	// チュートリアル画面
+
+		if (GetTutorialState() == TUTORIALSTATE_NORMAL)
+		{ // チュートリアルが通常状態の場合
+
+			// スコア加算可能にする
+			bScore = true;
+		}
+
+		// 処理を抜ける
+		break;
+	}
+
+	if (bScore == true)
+	{ // スコアが加算可能な場合
 
 		for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
 		{
