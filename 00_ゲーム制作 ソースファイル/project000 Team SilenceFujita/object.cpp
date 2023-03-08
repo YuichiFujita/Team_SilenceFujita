@@ -59,6 +59,7 @@
 Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
 Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
 float     g_aShadowRadius[MODEL_OBJ_MAX];		// 影の半径の情報
+bool	  g_aIconSet[MODEL_OBJ_MAX];			// アイコンの設定情報
 int		  g_nObjectItemCount;					// アイテムが落ちるカウント
 
 //======================================================================================================================
@@ -131,6 +132,10 @@ void InitObject(void)
 		g_aObject[nCntObject].appear.scaleAdd = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率の加算数
 		g_aObject[nCntObject].appear.fAlpha = 0.0f;									// 透明度
 
+		// アイコンの情報の初期化
+		g_aObject[nCntObject].icon.state   = ICONSTATE_NONE;						// アイコンの状態
+		g_aObject[nCntObject].icon.nIconID = NONE_ICON;								// アイコンのインデックス
+
 #ifdef _DEBUG	// デバッグ処理
 		// エディット時の状態
 		g_aObject[nCntObject].editState = OBJECTSTATE_NONE;
@@ -161,6 +166,12 @@ void InitObject(void)
 		g_aShadowRadius[nCntObject] = FIRST_RADIUS;
 	}
 
+	for (int nCntIcon = 0; nCntIcon < MODEL_OBJ_MAX; nCntIcon++)
+	{// アイコンの設定情報を総数分繰り返す
+		
+		g_aIconSet[nCntIcon] = false;
+	}
+
 	// アイテムが落ちるカウントを初期化する
 	g_nObjectItemCount = 0;
 }
@@ -178,6 +189,8 @@ void UninitObject(void)
 //======================================================================================================================
 void UpdateObject(void)
 {
+	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
+
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -358,6 +371,26 @@ void UpdateObject(void)
 
 				break;					// 抜け出す(出現完了)
 			}
+
+			// 原点からずれている位置を算出する
+			Pos = D3DXVECTOR3
+			(
+				(g_aObject[nCntObject].modelData.vtxMax.x + g_aObject[nCntObject].modelData.vtxMin.x) * 0.5f,
+				0.0f,
+				(g_aObject[nCntObject].modelData.vtxMax.z + g_aObject[nCntObject].modelData.vtxMin.z) * 0.5f
+			);
+
+			// アイコンの位置設定処理
+			SetPositionIcon
+			(
+				g_aObject[nCntObject].icon.nIconID,			// アイコンのインデックス
+				D3DXVECTOR3									// 位置
+				(
+					g_aObject[nCntObject].pos.x + Pos.x,
+					0.0f,
+					g_aObject[nCntObject].pos.z + Pos.z
+				)
+			);
 		}
 	}
 }
@@ -532,6 +565,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 {
 	// 変数を宣言
 	float AverageScale;			// 拡大率の平均値
+	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
 
 	// ポインタを宣言
 	D3DXMATERIAL *pMatModel;	// マテリアルデータへのポインタ
@@ -574,6 +608,16 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 				// 透明度を設定する
 				g_aObject[nCntObject].appear.fAlpha = 0.0f;
+
+				// 最大値を反映する
+				g_aObject[nCntObject].modelData.vtxMax.x *= g_aObject[nCntObject].appear.scaleCopy.x;
+				g_aObject[nCntObject].modelData.vtxMax.y *= g_aObject[nCntObject].appear.scaleCopy.y;
+				g_aObject[nCntObject].modelData.vtxMax.z *= g_aObject[nCntObject].appear.scaleCopy.z;
+
+				// 最小値を反映する
+				g_aObject[nCntObject].modelData.vtxMin.x *= g_aObject[nCntObject].appear.scaleCopy.x;
+				g_aObject[nCntObject].modelData.vtxMin.y *= g_aObject[nCntObject].appear.scaleCopy.y;
+				g_aObject[nCntObject].modelData.vtxMin.z *= g_aObject[nCntObject].appear.scaleCopy.z;
 			}
 			else
 			{ // 一瞬で出てくる状態だった場合
@@ -644,6 +688,10 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
 			g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
 
+			// アイコンの情報の初期化
+			g_aObject[nCntObject].icon.state   = ICONSTATE_NONE;						// アイコンの状態
+			g_aObject[nCntObject].icon.nIconID = NONE_ICON;								// アイコンのインデックス
+
 			// マテリアルデータへのポインタを取得
 			pMatModel = (D3DXMATERIAL*)g_aObject[nCntObject].modelData.pBuffMat->GetBufferPointer();
 
@@ -693,6 +741,40 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = NONE_SHADOW;	// 影を設定しない
+			}
+
+			// 原点からずれている位置を算出する
+			Pos = D3DXVECTOR3
+			(
+				(g_aObject[nCntObject].modelData.vtxMax.x + g_aObject[nCntObject].modelData.vtxMin.x) * 0.5f,
+				0.0f,
+				(g_aObject[nCntObject].modelData.vtxMax.z + g_aObject[nCntObject].modelData.vtxMin.z) * 0.5f
+			);
+
+			if (g_aIconSet[g_aObject[nCntObject].nType] == true)
+			{ // アイコンを出すオブジェクトの場合
+
+				// アイコンの設定処理
+				g_aObject[nCntObject].icon.nIconID = SetIconObject
+				(
+					D3DXVECTOR3										// 半径
+					(
+					(g_aObject[nCntObject].modelData.size.x * g_aObject[nCntObject].appear.scaleCopy.x) * 0.5f,
+						0.0f,
+						(g_aObject[nCntObject].modelData.size.z * g_aObject[nCntObject].appear.scaleCopy.z) * 0.5f
+					),
+					D3DXVECTOR3										// 位置
+					(
+						g_aObject[nCntObject].pos.x + Pos.x,
+						0.0f,
+						g_aObject[nCntObject].pos.z + Pos.z
+					),
+					g_aObject[nCntObject].judge.state,				// アイコンの種類
+					&g_aObject[nCntObject].icon.nIconID,			// アイコンのインデックス
+					&g_aObject[nCntObject].bUse,					// 使用状況
+					&g_aObject[nCntObject].icon.state,				// アイコンの状態
+					g_aObject[nCntObject].collInfo.stateRot			// 向きの状態
+				);
 			}
 
 			// 影の位置設定
@@ -870,11 +952,15 @@ void HitObject(Object *pObject, int nDamage)
 				// アイテムが落ちるカウントを加算する
 				g_nObjectItemCount++;
 
-				if (g_nObjectItemCount % ITEM_OBJECT_COUNT == 0)
-				{ // アイテムが落ちるカウントが一定数になった場合
+				if (GetMode() == MODE_GAME)
+				{ // ゲーム状態の場合
 
-					// アイテムの設定処理
-					SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
+					if (g_nObjectItemCount % ITEM_OBJECT_COUNT == 0)
+					{ // アイテムが落ちるカウントが一定数になった場合
+
+						// アイテムの設定処理
+						SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
+					}
 				}
 			}
 
@@ -1521,6 +1607,15 @@ float *GetShadowRadius(void)
 {
 	// 影の半径の情報の先頭アドレスを返す
 	return &g_aShadowRadius[0];
+}
+
+//======================================================================================================================
+// アイコンセットの取得処理
+//======================================================================================================================
+bool *GetIconSet(void)
+{
+	// アイコンセットの情報の先頭アドレスを返す
+	return &g_aIconSet[0];
 }
 
 #ifdef _DEBUG	// デバッグ処理

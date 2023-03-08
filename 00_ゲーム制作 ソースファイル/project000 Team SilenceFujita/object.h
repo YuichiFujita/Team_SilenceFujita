@@ -15,6 +15,7 @@
 #include "player.h"
 #include "Police.h"
 #include "calculation.h"
+#include "icon.h"
 
 #ifdef _DEBUG	// ƒfƒoƒbƒOˆ—
 #include "Editmain.h"
@@ -25,18 +26,6 @@
 //**********************************************************************************************************************
 #define MAX_OBJECT		(1080)	// g—p‚·‚éƒ‚ƒfƒ‹” (ƒIƒuƒWƒFƒNƒg‚ÌÅ‘å”)
 #define MAX_COLLISION	(10)	// “–‚½‚è”»’è‚ÌÅ‘å”
-
-//**********************************************************************************************************************
-//	—ñ‹“Œ^’è‹` (ROTSTATE)
-//**********************************************************************************************************************
-typedef enum
-{
-	ROTSTATE_0 = 0,				// Œü‚« 0“x (360“x)
-	ROTSTATE_90,				// Œü‚« 90“x
-	ROTSTATE_180,				// Œü‚« 180“x
-	ROTSTATE_270,				// Œü‚« 270“x
-	ROTSTATE_MAX,				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
-} ROTSTATE;
 
 //**********************************************************************************************************************
 //	—ñ‹“Œ^’è‹` (COLLISIONTYPE)
@@ -144,6 +133,7 @@ typedef struct
 	Smash_Object smash;					// ‚Á”ò‚Ñó‘Ô
 	Judge		 judge;					// ƒWƒƒƒbƒW
 	Appear		 appear;				// oŒ»ŠÖŒW
+	IconInfo	 icon;					// ƒAƒCƒRƒ“ŠÖŒW‚Ìî•ñ
 	int          nLife;					// ‘Ì—Í
 	int          nCollisionType;		// “–‚½‚è”»’è‚Ìí—Ş
 	int          nShadowType;			// ‰e‚Ìí—Ş
@@ -174,6 +164,7 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed);				// ‚Á”ò‚
 Object *GetObjectData(void);	// ƒIƒuƒWƒFƒNƒg‚Ìæ“¾ˆ—
 Collision *GetCollision(void);	// “–‚½‚è”»’è‚Ìæ“¾ˆ—
 float *GetShadowRadius(void);	// ‰e‚Ì”¼Œa‚Ìæ“¾ˆ—
+bool *GetIconSet(void);			// ƒAƒCƒRƒ“ƒZƒbƒg‚Ìæ“¾ˆ—
 
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾ (ƒfƒoƒbƒO—p)

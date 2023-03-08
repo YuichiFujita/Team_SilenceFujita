@@ -234,30 +234,63 @@ void UpdateBonus(void)
 
 			case BONUSSTATE_ADDSCORE:	// スコア加算状態
 
-				// 位置を移動させる
-				g_aBonus[nCntBonus].pos += g_aBonus[nCntBonus].move;
+				if (g_aBonus[nCntBonus].whereBonus == WHEREBONUS_RIGHT)
+				{ // 右側に出た場合
 
-				if (g_aBonus[nCntBonus].pos.x >= ScorePos.x)
-				{ // スコアの位置を過ぎた場合
+					// 位置を移動させる
+					g_aBonus[nCntBonus].pos += g_aBonus[nCntBonus].move;
 
-					// 位置を補正する
-					g_aBonus[nCntBonus].pos = ScorePos;
+					if (g_aBonus[nCntBonus].pos.x <= ScorePos.x)
+					{ // スコアの位置を過ぎた場合
 
-					// 使用しない
-					g_aBonus[nCntBonus].bUse = false;
+						// 位置を補正する
+						g_aBonus[nCntBonus].pos = ScorePos;
 
-					// コンボのスコアの加算処理
-					AddComboScore(g_aBonus[nCntBonus].nScore);
+						// 使用しない
+						g_aBonus[nCntBonus].bUse = false;
 
-					// 2Dパーティクルの発生
-					Set2DParticle
-					( // 引数
-						g_aBonus[nCntBonus].pos,			// 位置
-						D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
-						PARTICLE2DTYPE_SCORE_FIRE,			// 花火
-						20,									// 発生数
-						1									// 寿命
-					);
+						// コンボのスコアの加算処理
+						AddComboScore(g_aBonus[nCntBonus].nScore);
+
+						// 2Dパーティクルの発生
+						Set2DParticle
+						( // 引数
+							g_aBonus[nCntBonus].pos,			// 位置
+							D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+							PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+							20,									// 発生数
+							1									// 寿命
+						);
+					}
+				}
+				else
+				{ // 左側に出た場合
+
+					// 位置を移動させる
+					g_aBonus[nCntBonus].pos += g_aBonus[nCntBonus].move;
+
+					if (g_aBonus[nCntBonus].pos.x >= ScorePos.x)
+					{ // スコアの位置を過ぎた場合
+
+						// 位置を補正する
+						g_aBonus[nCntBonus].pos = ScorePos;
+
+						// 使用しない
+						g_aBonus[nCntBonus].bUse = false;
+
+						// コンボのスコアの加算処理
+						AddComboScore(g_aBonus[nCntBonus].nScore);
+
+						// 2Dパーティクルの発生
+						Set2DParticle
+						( // 引数
+							g_aBonus[nCntBonus].pos,			// 位置
+							D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+							PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+							20,									// 発生数
+							1									// 寿命
+						);
+					}
 				}
 
 				// 2Dパーティクルを発生させる
