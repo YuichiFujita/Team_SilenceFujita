@@ -78,16 +78,21 @@
 #define TUTO_LET_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// 手紙の大きさ
 #define TUTO_PAP_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 1020.0f, 0.0f))				// 便箋の初期座標
 #define TUTO_PAP_SIZE	(D3DXVECTOR3(500.0f, 298.75f, 0.0f))							// 便箋の大きさ
-#define TUTO_CONT_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 600.0f, 0.0f))				// 便箋の初期座標
-#define TUTO_CONT_SIZE	(D3DXVECTOR3(500.0f, 250.0f, 0.0f))								// 便箋の大きさ
+#define TUTO_CONT_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 665.0f, 0.0f))				// 操作の初期座標
+#define TUTO_CONT_SIZE	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 50.0f, 0.0f))					// 操作の大きさ
 
 #define TUTO_LET_CHAN	(0.04f)		// 手紙のα値変更量
 #define TUTO_LET_STOP	(1.0f)		// 手紙の最大α値
 #define TUTO_FADE_CHAN	(0.02f)		// フェードのα値変更量
 #define TUTO_FADE_STOP	(0.6f)		// フェードの最大α値
 
-#define TUTO_PAP_MOVE	(0.5f)					// 便箋の位置の更新量
-#define TUTO_PAP_STOP	(SCREEN_HEIGHT * 0.5f)	// 便箋の停止位置 (y)
+#define TUTO_PAP_MOVE	(0.5f)		// 便箋の位置の更新量
+#define TUTO_PAP_STOP	(315.0f)	// 便箋の停止位置 (y)
+
+#define TUTO_CONT_CHAN			(0.008f)	// 操作説明のα値の変更量
+#define TUTO_CONT_MAX_ALPHA		(1.0f)		// 操作説明のα値の最大値
+#define TUTO_CONT_MIN_ALPHA		(0.2f)		// 操作説明のα値の最小値
+#define TUTO_CONT_CHAN_RETURN	(0.06f)		// 操作説明のしまい時のα値の変更量
 
 //**********************************************************************************************************************
 //	列挙型定義 (TEXTURE_TUTORIAL)
@@ -180,11 +185,13 @@ const char *apTextureTips[] =		// 備考テクスチャの相対パス
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3   pos;			// 便箋の位置
-	TUTOSTAGSTATE state;		// 演出の状態
-	float         fMove;		// 便箋の移動量
-	float         fAlphaLetter;	// 手紙のα値
-	float         fAlphaFade;	// フェードのα値
+	D3DXVECTOR3   pos;				// 便箋の位置
+	TUTOSTAGSTATE state;			// 演出の状態
+	float         fMove;			// 便箋の移動量
+	float         fAlphaLetter;		// 手紙のα値
+	float         fAlphaFade;		// フェードのα値
+	float         fAlphaControl;	// 操作のα値
+	float         fChangeControl;	// 操作のα値の変更量
 }Tutorial;
 
 //**********************************************************************************************************************
@@ -261,18 +268,20 @@ void InitTutorial(void)
 	);
 
 	// グローバル変数を初期化
-	g_tutorialState         = TUTORIALSTATE_NORMAL;		// チュートリアルの状態
-	g_nLessonState          = LESSON_00;				// レッスンの状態
-	g_nCounterTutorialState = 0;						// チュートリアルの状態管理カウンター
-	g_nCounterLessonState   = 0;						// レッスンの状態管理カウンター
-	g_bTutorialEnd          = false;					// モードの遷移状況
+	g_tutorialState         = TUTORIALSTATE_NORMAL;			// チュートリアルの状態
+	g_nLessonState          = LESSON_00;					// レッスンの状態
+	g_nCounterTutorialState = 0;							// チュートリアルの状態管理カウンター
+	g_nCounterLessonState   = 0;							// レッスンの状態管理カウンター
+	g_bTutorialEnd          = false;						// モードの遷移状況
 
 	// チュートリアルの情報を初期化
-	g_tutorial.pos          = TUTO_PAP_POS;				// 便箋の位置
-	g_tutorial.state        = TUTOSTAGSTATE_LET_ALPHA;	// 演出の状態
-	g_tutorial.fMove        = 0.0f;						// 便箋の移動量
-	g_tutorial.fAlphaLetter = 0.0f;						// 手紙のα値
-	g_tutorial.fAlphaFade   = 0.0f;						// フェードのα値
+	g_tutorial.pos            = TUTO_PAP_POS;				// 便箋の位置
+	g_tutorial.state          = TUTOSTAGSTATE_LET_ALPHA;	// 演出の状態
+	g_tutorial.fMove          = 0.0f;						// 便箋の移動量
+	g_tutorial.fAlphaLetter   = 0.0f;						// 手紙のα値
+	g_tutorial.fAlphaFade     = 0.0f;						// フェードのα値
+	g_tutorial.fAlphaControl  = 0.0f;						// 操作のα値
+	g_tutorial.fChangeControl = TUTO_CONT_CHAN;				// 操作のα値の変更量
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	頂点情報の初期化
@@ -506,10 +515,10 @@ void InitTutorial(void)
 	pVtx[35].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[32].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[33].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[34].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[35].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[32].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+	pVtx[33].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+	pVtx[34].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+	pVtx[35].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
 
 	// テクスチャ座標の設定
 	pVtx[32].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -1333,22 +1342,49 @@ void UpdateTutorialUi(void)
 
 		if (GetKeyboardTrigger(DIK_O) == true
 		||  GetJoyKeyTrigger(JOYKEY_BACK, 0) == true)
-		{ // 便箋をしまう操作の場合
+		{ // 便箋をしまう操作が行われた場合
 
 			// 便箋のしまい状態にする
 			g_tutorial.state = TUTOSTAGSTATE_PAP_RETURN;
+		}
 
-			if (GetKeyboardPress(DIK_P) == true
-			||  GetJoyKeyPress(JOYKEY_START, 0) == true)
-			{ // タイトル遷移の操作も行われていた場合
+		if (GetKeyboardTrigger(DIK_P) == true
+		||  GetJoyKeyTrigger(JOYKEY_START, 0) == true)
+		{ // タイトル遷移の操作が行われた場合
+
+			if (g_bTutorialEnd == false)
+			{ // 遷移設定がされていない場合
 
 				// 遷移設定がされた状態にする
 				g_bTutorialEnd = true;
+
+				// 便箋のしまい状態にする
+				g_tutorial.state = TUTOSTAGSTATE_PAP_RETURN;
 
 				// ゲーム画面の状態設定
 				SetTutorialState(TUTORIALSTATE_SKIP, END_TUTO_TIME);	// スキップ状態
 			}
 		}
+
+		// 操作説明のα値を変更
+		g_tutorial.fAlphaControl += g_tutorial.fChangeControl;
+
+		if (g_tutorial.fAlphaControl < TUTO_CONT_MIN_ALPHA
+		||  g_tutorial.fAlphaControl > TUTO_CONT_MAX_ALPHA)
+		{ // 透明度が範囲外の場合
+
+			// 変数の符号を反転
+			g_tutorial.fChangeControl *= -1.0f;
+
+			// 透明度の補正
+			g_tutorial.fAlphaControl = (g_tutorial.fAlphaControl < TUTO_CONT_MIN_ALPHA) ? TUTO_CONT_MIN_ALPHA : TUTO_CONT_MAX_ALPHA;
+		}
+
+		// 頂点カラーの設定
+		pVtx[32].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+		pVtx[33].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+		pVtx[34].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+		pVtx[35].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
 
 		// 処理を抜ける
 		break;
@@ -1397,13 +1433,41 @@ void UpdateTutorialUi(void)
 			pVtx[27].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, g_tutorial.fAlphaFade);
 		}
 
-		// 便箋の位置加算量を設定
-		g_tutorial.fMove += TUTO_PAP_MOVE;
+		// 操作説明の透明化
+		if (g_tutorial.fAlphaControl > 0.0f)
+		{ // 操作説明のα値が一定値より大きい場合
 
-		// 便箋の位置を加算
-		g_tutorial.pos.y += g_tutorial.fMove;
+			// 操作説明のα値を減算
+			g_tutorial.fAlphaControl -= TUTO_CONT_CHAN_RETURN;
 
-		if (g_tutorial.pos.y >= TUTO_PAP_POS.y)
+			if (g_tutorial.fAlphaControl <= 0.0f)
+			{ // 操作説明のα値が一定値以下の場合
+
+				// 操作説明のα値を補正
+				g_tutorial.fAlphaControl = 0.0f;
+
+				// 操作のα値の変更量を初期化
+				g_tutorial.fChangeControl = TUTO_CONT_CHAN;
+			}
+
+			// 頂点カラーの設定
+			pVtx[32].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+			pVtx[33].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+			pVtx[34].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+			pVtx[35].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_tutorial.fAlphaControl);
+		}
+
+		// 便箋の移動
+		if (g_tutorial.pos.y < TUTO_PAP_POS.y)
+		{ // 便箋の位置が一定値より小さい場合
+
+			// 便箋の位置加算量を設定
+			g_tutorial.fMove += TUTO_PAP_MOVE;
+
+			// 便箋の位置を加算
+			g_tutorial.pos.y += g_tutorial.fMove;
+		}
+		else if (g_tutorial.pos.y >= TUTO_PAP_POS.y)
 		{ // 便箋の位置が一定値以上の場合
 
 			// 便箋の位置を補正
@@ -1412,8 +1476,14 @@ void UpdateTutorialUi(void)
 			// 便箋の位置減算量を初期化
 			g_tutorial.fMove = 0;
 
-			// 何もしない状態にする
-			g_tutorial.state = TUTOSTAGSTATE_NONE;
+			if (g_tutorial.fAlphaLetter  <= 0.0f
+			&&  g_tutorial.fAlphaFade    <= 0.0f
+			&&  g_tutorial.fAlphaControl <= 0.0f)
+			{ // 全てのα値が下がり切っている場合
+
+				// 何もしない状態にする
+				g_tutorial.state = TUTOSTAGSTATE_NONE;
+			}
 		}
 
 		// 頂点座標を設定
@@ -1750,6 +1820,7 @@ void ResetPlayer(void)
 	pPlayer->bMove         = false;								// 移動状況
 	pPlayer->bJump         = false;								// ジャンプ状況
 	pPlayer->nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
+	pPlayer->bCameraFirst  = false;								// 一人称カメラの状況
 
 	// ブーストの情報の初期化
 	pPlayer->boost.plusMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 追加移動量
