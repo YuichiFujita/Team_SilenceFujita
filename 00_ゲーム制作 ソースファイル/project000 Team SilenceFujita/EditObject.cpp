@@ -20,7 +20,7 @@
 //マクロ定義
 #define EDITOBJ_SELECT_MATERIAL_ALPHA	(1.0f)		// 選択中のマテリアルの透明度
 #define EDITOBJ_NORMAL_MATERIAL_ALPHA	(0.5f)		// 選択していないマテリアルの透明度
-#define EDITOBJ_DELETE_OBJECT_RANGE		(3000.0f)		// オブジェクト消去の範囲
+#define EDITOBJ_DELETE_OBJECT_RANGE		(70.0f)		// オブジェクト消去の範囲
 #define EDITOBJ_ADJUSTMENT_MOVE			(4.0f)		// 調整用の移動量
 #define EDITOBJ_MOVE					(16.0f)		// 通常の移動量
 #define EDITOBJ_ROT_MOVE				(0.02f)		// 向きの移動量
