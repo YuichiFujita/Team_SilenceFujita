@@ -26,6 +26,7 @@
 #define JUNK_SCALE_MAGNI	(0.05f)		// がれきの拡大率の倍率
 #define JUNK_COL_MAGNI		(0.05f)		// がれきの色の減衰倍率
 #define JUNK_POS_Y_ADD		(40.0f)		// がれきの位置の加算数(Y軸)
+#define JUNK_EMERGENCY_COL	(D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f))
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -346,6 +347,15 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot, SCALETYPE scale, D3DMATERIAL9 col
 
 			// 色を設定する
 			g_aJunk[nCntJunk].matCopy[0].MatD3D = col;
+
+			if (g_aJunk[nCntJunk].matCopy[0].MatD3D.Diffuse.r == 0.800000012f
+			 && g_aJunk[nCntJunk].matCopy[0].MatD3D.Diffuse.g == 0.800000012f
+			 && g_aJunk[nCntJunk].matCopy[0].MatD3D.Diffuse.b == 0.800000012f)
+			{ // 色が白色だった場合
+
+				// 色を灰色に設定する
+				g_aJunk[nCntJunk].matCopy[0].MatD3D.Diffuse = JUNK_EMERGENCY_COL;
+			}
 
 			// 影のインデックスを設定
 			g_aJunk[nCntJunk].nShadowID = SetCircleShadow

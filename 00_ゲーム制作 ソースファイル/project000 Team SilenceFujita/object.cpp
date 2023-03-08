@@ -865,7 +865,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					// ‚ª‚ê‚«‚ÌÝ’èˆ—
@@ -874,7 +874,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					// ‚ª‚ê‚«‚ÌÝ’èˆ—
@@ -883,7 +883,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					// ‚ª‚ê‚«‚ÌÝ’èˆ—
@@ -892,7 +892,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 				}
 
@@ -912,7 +912,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					SetJunk
@@ -920,7 +920,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					SetJunk
@@ -928,7 +928,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					SetJunk
@@ -936,7 +936,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 				}
 
