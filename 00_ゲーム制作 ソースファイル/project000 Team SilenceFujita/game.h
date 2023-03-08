@@ -21,7 +21,8 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	GAMESTATE_NORMAL = 0,	// 通常状態
+	GAMESTATE_START = 0,	// スタート状態
+	GAMESTATE_NORMAL,		// 通常状態
 	GAMESTATE_END,			// 終了状態
 	GAMESTATE_MAX			// この列挙型の総数
 } GAMESTATE;
@@ -41,7 +42,7 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	RESULTSTATE_NONE = 0,	// 初期化状態
+	RESULTSTATE_NONE = 0,	// 通常状態
 	RESULTSTATE_CLEAR,		// クリア状態
 	RESULTSTATE_TIMEOVER,	// タイムオーバー状態
 	RESULTSTATE_LIFEOVER,	// ライフオーバー状態
@@ -87,7 +88,7 @@ void UpdateGame(void);								// ゲーム画面の更新処理
 void DrawGame(void);								// ゲーム画面の描画処理
 void SetGameState(GAMESTATE state, int nCounter);	// ゲーム画面の設定処理
 void SetEnablePause(bool bPause);					// ポーズ状態の設定処理
-GAMESTATE GetGameState(void);						// ゲーム画面の状態取得処理
+GAMESTATE *GetGameState(void);						// ゲーム画面の状態取得処理
 RESULTSTATE GetResultState(void);					// ゲーム状態の取得処理
 bool GetPause(void);								// ポーズ状態の取得処理
 int  GetGameMode(void);								// ゲームモードの取得処理

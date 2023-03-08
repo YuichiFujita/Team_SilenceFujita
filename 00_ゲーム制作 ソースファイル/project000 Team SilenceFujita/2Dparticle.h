@@ -23,6 +23,7 @@ typedef enum
 {
 	PARTICLE2DTYPE_SCORE_FIRE = 0,	// スコア加算時の花火
 	PARTICLE2DTYPE_BONUS_FIRE,		// ボーナス出現時の花火
+	PARTICLE2DTYPE_START,			// 開始
 	PARTICLE2DTYPE_MAX,				// この列挙型の総数
 } PARTICLE2DTYPE;
 

@@ -118,10 +118,12 @@ typedef struct
 //************************************************************
 //	プロトタイプ宣言
 //************************************************************
+void UpdateGameStartPlayer(void);	// ゲームスタート時のプレイヤー更新処理
 void UpdateGameNorPlayer(void);		// ゲーム通常時のプレイヤー更新処理
 void UpdateTutorialNorPlayer(void);	// チュートリアル通常時のプレイヤー更新処理
 void UpdateClearPlayer(void);		// クリア成功時のプレイヤー更新処理
 void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
+void SetPlayerGate(void);			// プレイヤーのゲートの設定処理
 
 PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake);		// プレイヤーの移動量の更新処理
 
@@ -217,8 +219,17 @@ void InitPlayer(void)
 	g_playerSound.bBoost = false;		//ブースト
 	g_playerSound.bWind = false;		//送風機
 
-	// プレイヤーの位置・向きの設定
-	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	// モデル情報を設定
+	g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
+
+	// 影のインデックスを設定
+	g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
+
+	// アイコンのインデックスを設定
+	g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
+
+	// 影の位置設定
+	SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
 }
 
 //============================================================
@@ -238,7 +249,13 @@ void UpdateGamePlayer(void)
 	if (g_player.bUse == true)
 	{ // プレイヤーが使用されている場合
 
-		if (GetGameState() == GAMESTATE_NORMAL)
+		if (*GetGameState() == GAMESTATE_START)
+		{ // ゲームがスタート状態の場合
+
+			// ゲームスタート時のプレイヤー更新処理
+			UpdateGameStartPlayer();
+		}
+		else if (*GetGameState() == GAMESTATE_NORMAL)
 		{ // ゲームが通常状態の場合
 
 			// ゲーム通常時のプレイヤー更新
@@ -410,20 +427,11 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	if (g_player.bUse == false)
 	{ // プレイヤーが使用されていない場合
 
-		// モデル情報を設定
-		g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
-
-		// 影のインデックスを設定
-		g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
-
-		// アイコンのインデックスを設定
-		g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
-
-		// 影の位置設定
-		SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
-
 		// 使用している状態にする
 		g_player.bUse = true;
+
+		// プレイヤーのゲートの設定処理
+		SetPlayerGate();			
 	}
 }
 
@@ -1393,7 +1401,7 @@ void FlyAwayPlayer(void)
 			//効果音系BGMの再生
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
-				
+
 				//サウンドの設定
 				if (g_playerSound.bWind == false)
 				{//送風機のサウンドが流れていないとき
@@ -1406,6 +1414,26 @@ void FlyAwayPlayer(void)
 				}
 			}
 		}
+		else
+		{//風が使用不可のとき
+
+			//効果音系BGMの停止
+			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+			{
+				//サウンドの設定
+				if (g_playerSound.bWind == true)
+				{//送風機のサウンドが流れているとき
+
+				 //送風機のサウンド（BGM）の停止
+					StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+
+					//送風機のサウンドのオフに設定
+					g_playerSound.bWind = false;
+
+
+				}
+			}
+		}
 	}
 	else
 	{ // 送風機の操作が行われていない場合
@@ -1413,16 +1441,21 @@ void FlyAwayPlayer(void)
 		// 送風機を使用しない
 		g_player.wind.bUseWind = false;
 
-		//サウンドの設定
-		if (g_playerSound.bWind == true)
-		{//送風機のサウンドが流れているとき
+		//効果音系BGMの停止
+		if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+		{
+			//サウンドの設定
+			if (g_playerSound.bWind == true)
+			{//送風機のサウンドが流れているとき
 
-			//送風機のサウンド（BGM）の停止
-			StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+				//送風機のサウンド（BGM）の停止
+				StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
 
-			//送風機のサウンドのオフに設定
-			g_playerSound.bWind = false;
+				//送風機のサウンドのオフに設定
+				g_playerSound.bWind = false;
 
+
+			}
 		}
 	}
 }
@@ -1973,6 +2006,172 @@ void CameraChange(void)
 			break;							//抜け出す
 		}
 	}
+}
+
+//============================================================
+// ゲームスタート時のプレイヤー更新処理
+//============================================================
+void UpdateGameStartPlayer(void)
+{
+	Gate *pGate = GetGateData();		// ゲートの情報
+
+	// 前回位置の更新
+	g_player.oldPos = g_player.pos;
+
+	// 移動量を設定する
+	g_player.move.x = 2.0f;
+
+	// プレイヤーの位置の更新
+	PosPlayer();
+
+	//switch (pGate[g_player.nNumEnterGate].collInfo->stateRot)
+	//{
+	//case ROTSTATE_0:		// 0度
+
+	//	if (g_player.pos.z <= pGate[g_player.nNumEnterGate].pos.z)
+	//	{ // 位置に着いた場合
+
+	//		// 位置を補正する
+	//		g_player.pos.z = pGate[g_player.nNumEnterGate].pos.z;
+	//	}
+
+	//	break;
+
+	//case ROTSTATE_180:		// 180度
+
+	//	if (g_player.pos.z >= pGate[g_player.nNumEnterGate].pos.z)
+	//	{ // 位置に着いた場合
+
+	//		// 位置を補正する
+	//		g_player.pos.z = pGate[g_player.nNumEnterGate].pos.z;
+	//	}
+
+	//	break;
+
+	//case ROTSTATE_90:		// 90度
+
+	//	if (g_player.pos.x <= pGate[g_player.nNumEnterGate].pos.x)
+	//	{ // 位置に着いた場合
+
+	//		// 位置を補正する
+	//		g_player.pos.x = pGate[g_player.nNumEnterGate].pos.x;
+	//	}
+
+	//	break;
+
+	//case ROTSTATE_270:		// 270度
+
+	//	if (g_player.pos.x >= pGate[g_player.nNumEnterGate].pos.x)
+	//	{ // 位置に着いた場合
+
+	//		// 位置を補正する
+	//		g_player.pos.x = pGate[g_player.nNumEnterGate].pos.x;
+	//	}
+
+	//	break;
+
+	//default:				// 上記以外
+
+	//	break;
+	//}
+
+	// プレイヤーの向きの更新
+	RotPlayer();
+
+	// プレイヤーの着地の更新
+	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
+
+	//--------------------------------------------------------
+	//	影の更新
+	//--------------------------------------------------------
+	// 影の位置設定
+	SetPositionShadow
+	( // 引数
+		g_player.nShadowID,	// 影のインデックス
+		g_player.pos,		// 位置
+		g_player.rot,		// 向き
+		NONE_SCALE			// 拡大率
+	);
+
+	//--------------------------------------------------------
+	//	アイコンの更新
+	//--------------------------------------------------------
+	// アイコンの位置設定
+	SetPositionIcon
+	(
+		g_player.icon.nIconID,
+		g_player.pos
+	);
+}
+
+//============================================================
+// プレイヤーのゲートの設定処理
+//============================================================
+void SetPlayerGate()
+{
+	int nGateNum = GetGateNum();		// ゲートの数を取得する
+	int nSpawnGateNum;					// ゲートの番号
+	Gate *pGate = GetGateData();		// ゲートの情報
+
+	// 出てくるゲートの番号をランダムで出す
+	nSpawnGateNum = rand() % nGateNum;
+
+	switch (pGate[nSpawnGateNum].collInfo->stateRot)
+	{
+	case ROTSTATE_0:		// 0度
+
+		// 向きを設定する
+		g_player.rot.y = D3DX_PI;
+
+		// ゲートの位置
+		g_player.pos.x = pGate[nSpawnGateNum].pos.x;
+		g_player.pos.z = pGate[nSpawnGateNum].pos.z + 300.0f;
+
+		break;
+
+	case ROTSTATE_180:		// 180度
+
+		// 向きを設定する
+		g_player.rot.y = 0.0f;
+
+		// ゲートの位置
+		g_player.pos.x = pGate[nSpawnGateNum].pos.x;
+		g_player.pos.z = pGate[nSpawnGateNum].pos.z - 300.0f;
+
+		break;
+
+	case ROTSTATE_90:		// 90度
+
+		// 向きを設定する
+		g_player.rot.y = -D3DX_PI * 0.5f;
+
+		// ゲートの位置
+		g_player.pos.x = pGate[nSpawnGateNum].pos.x + 300.0f;
+		g_player.pos.z = pGate[nSpawnGateNum].pos.z;
+
+		break;
+
+	case ROTSTATE_270:		// 270度
+
+		// 向きを設定する
+		g_player.rot.y = D3DX_PI * 0.5f;
+
+		// ゲートの位置
+		g_player.pos.x = pGate[nSpawnGateNum].pos.x - 300.0f;
+		g_player.pos.z = pGate[nSpawnGateNum].pos.z;
+
+		break;
+
+	default:				// 上記以外
+
+		break;
+	}
+
+	// 向きの正規化
+	RotNormalize(&g_player.rot.y);
+
+	// 出てくるゲートの位置を設定する
+	g_player.nNumEnterGate = nSpawnGateNum;
 }
 
 #ifdef _DEBUG	// デバッグ処理
