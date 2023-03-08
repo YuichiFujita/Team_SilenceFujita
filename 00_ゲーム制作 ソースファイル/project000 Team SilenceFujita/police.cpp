@@ -68,6 +68,12 @@
 #define POLICAR_ATTEN_STOP		(0.1f)		// 追加移動量の減衰係数
 
 //**********************************************************************************************************************
+//	音量関係のマクロ定義
+//**********************************************************************************************************************
+#define POLICE_SOUND_VOLUME_MAX	(1.0f)		// 最大値の音量
+#define POLICE_SOUND_RADIUS		(3000.0f)	// 半径を検知を開始する判定
+
+//**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	// プレイヤーの位置の更新処理
@@ -85,6 +91,8 @@ void PoliceGatePos(Police *pPolice);					// 警察の出現ゲート決定処理
 void PoliceSpawn(Police *pPolice);						// 警察の出現処理
 void PoliceCurveCheck(Police *pPolice);					// 警察の曲がり角チェック処理
 void PoliceWaitCheck(Police *pPolice);					// 警察の待機状態チェック処理
+
+void PoliceSoundVolume(D3DXVECTOR3 *pPos);				// プレイヤーとの距離で音量を調整
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -170,6 +178,14 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
+
+	//効果音BGMの音量調整
+	if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+	{
+		//警察の効果音サウンドの音量を0に変更
+		SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, 0.0f);
+	}
+
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
 	{ // オブジェクトの最大表示数分繰り返す
 
@@ -282,6 +298,9 @@ void UpdatePolice(void)
 
 					// プレイヤーの位置の更新
 					PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
+
+					//プレイヤーとの距離で音量を調整
+					PoliceSoundVolume(&g_aPolice[nCntPolice].pos);
 
 					switch (g_aPolice[nCntPolice].state)
 					{//状態で判断する
@@ -2119,6 +2138,44 @@ void PoliceWaitCheck(Police *pPolice)
 		// ゲートの位置
 		pPolice->pos.x = pGate[pPolice->nNumSpawnGate].pos.x;
 		pPolice->pos.z = pGate[pPolice->nNumSpawnGate].pos.z;
+	}
+}
+
+//============================================================
+// プレイヤーとの距離で音量を調整
+//============================================================
+void PoliceSoundVolume(D3DXVECTOR3 *pPos)
+{
+	Player *pPlayer = GetPlayer();				// プレイヤーの情報を取得する
+
+	//効果音BGMの音量調整
+	if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+	{//効果音BGMが使用状態のとき
+		if (pPlayer->bUse == true)
+		{//プレイヤーが使用状態のとき
+
+			//距離を測る変数
+			float fLength = ((pPlayer->pos.x - pPos->x) * (pPlayer->pos.x - pPos->x)
+							+ (pPlayer->pos.z - pPos->z) * (pPlayer->pos.z - pPos->z));
+
+			//効果音BGMの再生
+			if (fLength < (POLICE_SOUND_RADIUS * POLICE_SOUND_RADIUS))
+			{//一定範囲内の場合
+
+			 //音量設定用の変数
+				float fVolume = POLICE_SOUND_VOLUME_MAX - (fLength / (POLICE_SOUND_RADIUS * POLICE_SOUND_RADIUS));
+
+				if (fVolume >= GetSoundVolume(SOUND_LABEL_BGM_POLICE_000))
+				{//現在の音量より大きい場合
+
+					//音量を調整（警察）
+					SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, fVolume);
+
+
+				}
+
+			}
+		}
 	}
 }
 

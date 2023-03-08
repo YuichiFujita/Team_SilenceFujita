@@ -241,10 +241,18 @@ void InitGame(void)
 		//効果音サウンド（暴走車）の再生
 		PlaySound(SOUND_LABEL_BGM_BOUSOUCAR_000);
 
+		//効果音サウンド（選挙カー）の再生
+		PlaySound(SOUND_LABEL_BGM_SENKYOCAR_000);
+
+		//効果音サウンド（警察）の再生
+		PlaySound(SOUND_LABEL_BGM_POLICE_000);
+
 		//車の効果音サウンドの音量を0に変更
 		SetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, 0.0f);
 	}
 
 #ifdef _DEBUG	// デバッグ処理

@@ -35,21 +35,23 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MOVE_FORWARD	(0.18f)		// プレイヤー前進時の移動量
-#define MOVE_BACKWARD	(0.3f)		// プレイヤー後退時の移動量
-#define MOVE_ROT		(0.012f)	// プレイヤーの向き変更量
-#define REV_MOVE_ROT	(0.08f)		// 移動量による向き変更量の補正係数
-#define REV_MOVE_BRAKE	(0.1f)		// ブレーキ時の減速係数
-#define DEL_MOVE_ABS	(1.9f)		// 移動量の削除範囲の絶対値
-#define PLAY_GRAVITY	(0.75f)		// プレイヤーにかかる重力
-#define MAX_BACKWARD	(-12.0f)	// 後退時の最高速度
-#define REV_MOVE_SUB	(0.08f)		// 移動量の減速係数
-#define UNRIVALED_CNT	(10)		// 無敵時にチカチカさせるカウント
-#define STATE_MOVE		(1.5f)		// 停止・旋回時の判定範囲
+#define MOVE_FORWARD		(0.18f)		// プレイヤー前進時の移動量
+#define MOVE_BACKWARD		(0.3f)		// プレイヤー後退時の移動量
+#define MOVE_PLUS_FORWARD	(0.36f)		// プレイヤー前進時の追加の移動量
+#define MOVE_PLUS_BACKWARD	(0.6f)		// プレイヤー後退時の追加の移動量
+#define MOVE_ROT			(0.012f)	// プレイヤーの向き変更量
+#define REV_MOVE_ROT		(0.08f)		// 移動量による向き変更量の補正係数
+#define REV_MOVE_BRAKE		(0.1f)		// ブレーキ時の減速係数
+#define DEL_MOVE_ABS		(1.9f)		// 移動量の削除範囲の絶対値
+#define PLAY_GRAVITY		(0.75f)		// プレイヤーにかかる重力
+#define MAX_BACKWARD		(-12.0f)	// 後退時の最高速度
+#define REV_MOVE_SUB		(0.08f)		// 移動量の減速係数
+#define UNRIVALED_CNT		(10)		// 無敵時にチカチカさせるカウント
+#define STATE_MOVE			(1.5f)		// 停止・旋回時の判定範囲
 
-#define PLAY_CLEAR_MOVE		(4.0f)	// クリア成功時のプレイヤーの自動移動量
-#define REV_PLAY_CLEAR_MOVE	(0.1f)	// クリア成功時のプレイヤーの減速係数
-#define REV_PLAY_OVER_MOVE	(0.02f)	// クリア失敗時のプレイヤーの減速係数
+#define PLAY_CLEAR_MOVE		(4.0f)		// クリア成功時のプレイヤーの自動移動量
+#define REV_PLAY_CLEAR_MOVE	(0.1f)		// クリア成功時のプレイヤーの減速係数
+#define REV_PLAY_OVER_MOVE	(0.02f)		// クリア失敗時のプレイヤーの減速係数
 
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -510,8 +512,12 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			// カウンターを設定
 			pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 
-			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_DMG);			// SE (ダメージ)
+			//効果音の停止
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンドの再生
+				PlaySound(SOUND_LABEL_SE_DAMAGE_000);			// SE (ダメージ)
+			}
 		}
 		else
 		{ // 体力が尽きた場合
@@ -1139,6 +1145,13 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			// 移動量を更新
 			g_player.move.x += MOVE_FORWARD;
 
+			if (g_player.move.x < 0)
+			{ // 移動量が 0より小さい場合
+
+				// 移動量を更新
+				g_player.move.x += MOVE_PLUS_FORWARD;
+			}
+
 			// 移動している状態にする
 			g_player.bMove = true;
 		}
@@ -1150,6 +1163,13 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 
 			// 移動量を更新
 			g_player.move.x -= MOVE_BACKWARD;
+
+			if (g_player.move.x > 0)
+			{ // 移動量が 0より大きい場合
+
+				// 移動量を更新
+				g_player.move.x -= MOVE_PLUS_BACKWARD;
+			}
 
 			// 移動している状態にする
 			g_player.bMove = true;
