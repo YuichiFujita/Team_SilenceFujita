@@ -865,7 +865,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					// がれきの設定処理
@@ -874,7 +874,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					// がれきの設定処理
@@ -883,7 +883,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x + (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z - (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					// がれきの設定処理
@@ -892,7 +892,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pObject->pos.x - (pObject->modelData.vtxMax.x * JUNK_POS_Y), pObject->pos.y + (float)(pObject->modelData.vtxMax.y * ((nCntColl + 1) * 0.3f)), pObject->pos.z + (pObject->modelData.vtxMax.x * 0.5f)),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 				}
 
@@ -912,7 +912,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					SetJunk
@@ -920,7 +920,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z - g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					SetJunk
@@ -928,7 +928,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x - g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 
 					SetJunk
@@ -936,7 +936,7 @@ void HitObject(Object *pObject, int nDamage)
 						D3DXVECTOR3(pos.x + g_aCollision[pObject->nType].fWidth[nCntColl], pos.y + (pObject->modelData.vtxMax.y * JUNK_POS_Y), pos.z + g_aCollision[pObject->nType].fDepth[nCntColl]),
 						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
-						g_aObject[pObject->nType].matCopy[nCntColl].MatD3D
+						pObject->matCopy[0].MatD3D
 					);
 				}
 
@@ -962,6 +962,15 @@ void HitObject(Object *pObject, int nDamage)
 						SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
 					}
 				}
+			}
+			
+			//効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				//小物用の音量に変更
+				SetSoundVolume(SOUND_LABEL_SE_BREAK_000, 0.5f);
+				// サウンド（破壊音）の再生
+				PlaySound(SOUND_LABEL_SE_BREAK_000);
 			}
 
 			//// アイテムの設定

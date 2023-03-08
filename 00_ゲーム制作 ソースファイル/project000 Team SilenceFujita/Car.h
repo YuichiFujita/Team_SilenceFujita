@@ -87,7 +87,6 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType);		// Ô‚Ìİ’
 Car *GetCarData(void);																		// Ô‚Ìæ“¾ˆ—
 void CollisionStopCar(D3DXVECTOR3 targetpos, D3DXVECTOR3 targetrot, D3DXVECTOR3 *move, float fTargetRadius, COLLOBJECTTYPE collObject,int *pTraCnt);	// Ô‚Ì’â~ˆ—
 void CollisionCarBody(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt, TACKLESTATE state);		// Ô“¯m‚Ì“–‚½‚è”»’è
-void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type);	//Ô‚Æ‚Ì‹——£‚Å‰¹—Ê‚ğ’²®
 
 //**********************************************************************************************************************
 //	ƒvƒƒgƒ^ƒCƒvéŒ¾ (ƒfƒoƒbƒO—p)
