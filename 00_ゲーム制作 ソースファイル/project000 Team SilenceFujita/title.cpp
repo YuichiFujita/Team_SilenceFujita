@@ -266,7 +266,8 @@ void InitTitle(void)
 		false,	// 当たり判定
 		true,	// 影
 		true,	// オブジェクト
-		true	// AI
+		true,	// AI
+		false	// アイコン
 	);
 
 
@@ -380,6 +381,13 @@ void UpdateTitle(void)
 			if (GetKeyboardTrigger(DIK_W) == true 
 			||	GetJoyKeyTrigger(JOYKEY_UP, 0) == true)
 			{
+				// 効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// 効果音（選択）の再生
+					PlaySound(SOUND_LABEL_SE_SELECT_000);
+				}
+
 				switch (g_titleCursor.type)
 				{
 					//スタート
@@ -405,6 +413,13 @@ void UpdateTitle(void)
 			if (GetKeyboardTrigger(DIK_S) == true
 			|| GetJoyKeyTrigger(JOYKEY_DOWN, 0) == true)
 			{
+				// 効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// 効果音（選択）の再生
+					PlaySound(SOUND_LABEL_SE_SELECT_000);
+				}
+
 				//カーソルの移動
 				switch (g_titleCursor.type)
 				{
@@ -432,8 +447,12 @@ void UpdateTitle(void)
 			||  GetJoyKeyTrigger(JOYKEY_X, 0)  == true || GetJoyKeyTrigger(JOYKEY_Y, 0) == true)
 			{ // 決定の操作が行われた場合
 
-				//// サウンドの再生
-				//PlaySound(SOUND_LABEL_SE_DECISION_00);	// 決定音00 (システム)
+				// 効果音（決定音）の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// サウンドの再生
+					PlaySound(SOUND_LABEL_SE_DECIDE_000);	// 決定音00 (システム)
+				}
 
 				//タイトルサウンドを使用を停止
 				g_bTitleSound = false;

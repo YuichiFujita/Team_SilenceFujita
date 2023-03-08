@@ -11,6 +11,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "game.h"
 #include "model.h"
 
 //************************************************************
@@ -23,14 +24,16 @@
 //************************************************************
 typedef enum
 {
-	ICONTYPE_PLAY = 0,			// プレイヤーのアイコン
-	ICONTYPE_EVIL_HUMAN,		// 悪い人間のアイコン
+	ICONTYPE_EVIL_HUMAN = 0,	// 悪い人間のアイコン
 	ICONTYPE_EVIL_CAR,			// 悪い車のアイコン
 	ICONTYPE_POLICE,			// 警察のアイコン
 	ICONTYPE_BARRIER,			// バリアのアイコン
 	ICONTYPE_GATE_VERT,			// ゲートの奥手前のアイコン
 	ICONTYPE_GATE_HORIZ,		// ゲートの左右のアイコン
 	ICONTYPE_ITEM,				// アイテム
+	ICONTYPE_EVIL_OBJECT,		// 悪いオブジェクト
+	ICONTYPE_OBJECT,			// 良いオブジェクト
+	ICONTYPE_PLAY,				// プレイヤーのアイコン
 	ICONTYPE_MAX				// この列挙型の総数
 }ICONTYPE;
 
@@ -96,8 +99,9 @@ void UninitIcon(void);		// アイコンの終了処理
 void UpdateIcon(void);		// アイコンの更新処理
 void DrawIcon(void);		// アイコンの描画処理
 int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE *pState);			// アイコンの設定処理
+int SetIconObject(D3DXVECTOR3 radius, D3DXVECTOR3 pos, JUDGESTATE type, int *pIconID, bool *pUse, ICONSTATE *pState, ROTSTATE rot);	// オブジェクトのアイコンの設定処理
 
-void SetPositionIcon(int nIconID, D3DXVECTOR3 pos);	// アイコンの位置の設定処理
+void SetPositionIcon(int nIconID, D3DXVECTOR3 pos);			// アイコンの位置の設定処理
 
 
 #endif

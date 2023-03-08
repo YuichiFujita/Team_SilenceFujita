@@ -5,6 +5,7 @@
 //
 //=======================================
 #include "bonus.h"
+#include "sound.h"
 
 #include "Combo.h"
 #include "score.h"
@@ -234,30 +235,63 @@ void UpdateBonus(void)
 
 			case BONUSSTATE_ADDSCORE:	// スコア加算状態
 
-				// 位置を移動させる
-				g_aBonus[nCntBonus].pos += g_aBonus[nCntBonus].move;
+				if (g_aBonus[nCntBonus].whereBonus == WHEREBONUS_RIGHT)
+				{ // 右側に出た場合
 
-				if (g_aBonus[nCntBonus].pos.x >= ScorePos.x)
-				{ // スコアの位置を過ぎた場合
+					// 位置を移動させる
+					g_aBonus[nCntBonus].pos += g_aBonus[nCntBonus].move;
 
-					// 位置を補正する
-					g_aBonus[nCntBonus].pos = ScorePos;
+					if (g_aBonus[nCntBonus].pos.x <= ScorePos.x)
+					{ // スコアの位置を過ぎた場合
 
-					// 使用しない
-					g_aBonus[nCntBonus].bUse = false;
+						// 位置を補正する
+						g_aBonus[nCntBonus].pos = ScorePos;
 
-					// コンボのスコアの加算処理
-					AddComboScore(g_aBonus[nCntBonus].nScore);
+						// 使用しない
+						g_aBonus[nCntBonus].bUse = false;
 
-					// 2Dパーティクルの発生
-					Set2DParticle
-					( // 引数
-						g_aBonus[nCntBonus].pos,			// 位置
-						D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
-						PARTICLE2DTYPE_SCORE_FIRE,			// 花火
-						20,									// 発生数
-						1									// 寿命
-					);
+						// コンボのスコアの加算処理
+						AddComboScore(g_aBonus[nCntBonus].nScore);
+
+						// 2Dパーティクルの発生
+						Set2DParticle
+						( // 引数
+							g_aBonus[nCntBonus].pos,			// 位置
+							D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+							PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+							20,									// 発生数
+							1									// 寿命
+						);
+					}
+				}
+				else
+				{ // 左側に出た場合
+
+					// 位置を移動させる
+					g_aBonus[nCntBonus].pos += g_aBonus[nCntBonus].move;
+
+					if (g_aBonus[nCntBonus].pos.x >= ScorePos.x)
+					{ // スコアの位置を過ぎた場合
+
+						// 位置を補正する
+						g_aBonus[nCntBonus].pos = ScorePos;
+
+						// 使用しない
+						g_aBonus[nCntBonus].bUse = false;
+
+						// コンボのスコアの加算処理
+						AddComboScore(g_aBonus[nCntBonus].nScore);
+
+						// 2Dパーティクルの発生
+						Set2DParticle
+						( // 引数
+							g_aBonus[nCntBonus].pos,			// 位置
+							D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
+							PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+							20,									// 発生数
+							1									// 寿命
+						);
+					}
 				}
 
 				// 2Dパーティクルを発生させる
@@ -367,7 +401,7 @@ void SetBonus(int nBonus)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffBonus->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (GetGameState() == GAMESTATE_NORMAL)
+	if (*GetGameState() == GAMESTATE_NORMAL)
 	{ // ゲームの進行が通常状態の場合
 
 		for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
@@ -401,6 +435,12 @@ void SetBonus(int nBonus)
 					posBonus.y = (float)(rand() % BONUS_LEFT_SHIFT) + BONUS_LEFT_Y;
 
 					break;				// 抜け出す
+				}
+
+				//効果音系の再生
+				if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+				{
+					PlaySound(SOUND_LABEL_SE_SCORE_000);
 				}
 
 				// 情報の設定

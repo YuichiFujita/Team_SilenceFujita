@@ -206,8 +206,12 @@ void UpdatePause(void)
 			// 変数 (g_nSelectPause) を 1ずつ引いていく ( 0の場合 1に戻す)
 			g_nSelectPause = (g_nSelectPause + (PAUSESELECT_MAX - 1)) % PAUSESELECT_MAX;
 
-			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_MOVE);			// 移動音 (システム)
+			// 効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド（選択）の再生
+				PlaySound(SOUND_LABEL_SE_SELECT_000);			// 移動音 (システム)
+			}
 		}
 		else if (GetKeyboardTrigger(DIK_S) == true || GetKeyboardTrigger(DIK_DOWN) == true || GetJoyKeyTrigger(JOYKEY_DOWN, 0) == true)
 		{ // 下移動の操作が行われた場合
@@ -215,8 +219,12 @@ void UpdatePause(void)
 			// 変数 (g_nSelectPause) を 1ずつ足していく ( 1の場合 0に戻す)
 			g_nSelectPause = (g_nSelectPause + 1) % PAUSESELECT_MAX;
 
-			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_MOVE);			// 移動音 (システム)
+			// 効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド（選択）の再生
+				PlaySound(SOUND_LABEL_SE_SELECT_000);
+			}
 		}
 
 		if (GetKeyboardTrigger(DIK_RETURN) == true || GetKeyboardTrigger(DIK_SPACE) == true
@@ -224,8 +232,13 @@ void UpdatePause(void)
 		||  GetJoyKeyTrigger(JOYKEY_X, 0)  == true || GetJoyKeyTrigger(JOYKEY_Y, 0) == true)
 		{ // 決定の操作が行われた場合
 
-			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_DECISION_01);	// 決定音01 (システム)
+			// 効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド（決定音）の再生
+				PlaySound(SOUND_LABEL_SE_DECIDE_000);
+			}
+
 
 			switch (g_nSelectPause)
 			{ // 画面の移行先の確認

@@ -35,6 +35,7 @@ typedef enum
 	CARTYPE_FIRECAR,					// 消防車
 	CARTYPE_YAKIIMOCAR,					// 焼き芋カー
 	CARTYPE_ELECTIONCAR,				// 選挙カー
+	CARTYPE_BOUSOUCAR,					// 暴走車
 	CARTYPE_MAX							// この列挙型の総数
 }CARTYPE;
 

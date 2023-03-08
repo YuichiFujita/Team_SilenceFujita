@@ -159,9 +159,9 @@ void UpdateLogo(void)
 	g_nLogoCounter++;
 
 	if (GetKeyboardTrigger(DIK_RETURN) == true || GetKeyboardTrigger(DIK_SPACE) == true
-		|| GetJoyKeyTrigger(JOYKEY_A, 0) == true || GetJoyKeyTrigger(JOYKEY_B, 0) == true
-		|| GetJoyKeyTrigger(JOYKEY_X, 0) == true || GetJoyKeyTrigger(JOYKEY_Y, 0) == true
-		|| g_nLogoCounter >= AUTO_LOGO)
+	||  GetJoyKeyTrigger(JOYKEY_A, 0)  == true || GetJoyKeyTrigger(JOYKEY_B, 0) == true
+	||  GetJoyKeyTrigger(JOYKEY_X, 0)  == true || GetJoyKeyTrigger(JOYKEY_Y, 0) == true
+	||  g_nLogoCounter >= AUTO_LOGO)
 	{//ˆê’èŽžŠÔŒo‰ß‚µ‚½
 
 		if (pFade == FADE_NONE)

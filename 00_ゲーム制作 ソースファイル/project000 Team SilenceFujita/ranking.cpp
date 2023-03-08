@@ -335,7 +335,8 @@ void InitRanking(void)
 		false,	// 当たり判定
 		true,	// 影
 		true,	// オブジェクト
-		true	// AI
+		true,	// AI
+		false	// アイコン
 	);
 
 	if (GetTitleState() != TITLESTATE_FADE)

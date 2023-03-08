@@ -30,6 +30,7 @@ typedef enum
 {
 	TUTORIALSTATE_NORMAL = 0,	// 通常状態
 	TUTORIALSTATE_END,			// 終了状態
+	TUTORIALSTATE_SKIP,			// スキップ状態
 	TUTORIALSTATE_MAX			// この列挙型の総数
 } TUTORIALSTATE;
 

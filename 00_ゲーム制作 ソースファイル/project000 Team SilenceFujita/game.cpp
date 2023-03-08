@@ -43,6 +43,7 @@
 #include "particle.h"
 #include "pause.h"
 #include "shadow.h"
+#include "start.h"
 #include "object.h"
 #include "player.h"
 #include "Police.h"
@@ -81,7 +82,7 @@ void InitGame(void)
 	//	ゲームの初期化
 	//------------------------------------------------------------------------------------------------------------------
 	// グローバル変数を初期化
-	g_gameState         = GAMESTATE_NORMAL;		// ゲームの状態
+	g_gameState         = GAMESTATE_START;		// ゲームの状態
 	g_resultState       = RESULTSTATE_NONE;		// リザルトの状態
 	g_nCounterGameState = 0;					// 状態管理カウンター
 	g_bPause            = false;				// ポーズ状態の ON / OFF
@@ -202,6 +203,9 @@ void InitGame(void)
 	// フラッシュの初期化
 	InitFlash();
 
+	// スタートの初期化
+	InitStart();
+
 	// ファイルをロードする全体処理
 	LoadFileChunk
 	( // 引数
@@ -211,18 +215,48 @@ void InitGame(void)
 		true,	// 当たり判定
 		true,	// 影
 		true,	// オブジェクト
-		true	// AI
+		true,	// AI
+		true	// アイコン
 	);
+
+	// プレイヤーの位置・向きの設定
+	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	//メインBGMの再生
 	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
 	{
-		// サウンドの再生
-		PlaySound(SOUND_LABEL_BGM_GAME_000);	// BGM (ゲーム画面)
+		//サウンド（ゲームBGM）の再生
+		PlaySound(SOUND_LABEL_BGM_GAME_000);
+	}
+
+	//効果音BGMの再生
+	if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+	{
+		//効果音サウンド（消防車）の再生
+		PlaySound(SOUND_LABEL_BGM_FIRECAR_000);
+
+		//効果音サウンド（焼き芋）の再生
+		PlaySound(SOUND_LABEL_BGM_YAKIIMO_000);
+
+		//効果音サウンド（暴走車）の再生
+		PlaySound(SOUND_LABEL_BGM_BOUSOUCAR_000);
+
+		//効果音サウンド（選挙カー）の再生
+		PlaySound(SOUND_LABEL_BGM_SENKYOCAR_000);
+
+		//効果音サウンド（警察）の再生
+		PlaySound(SOUND_LABEL_BGM_POLICE_000);
+
+		//車の効果音サウンドの音量を0に変更
+		SetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, 0.0f);
 	}
 
 #ifdef _DEBUG	// デバッグ処理
-	// エディットメインの初期化
+	// エディットメインの初期化6
 	InitEditmain();
 #endif
 }
@@ -342,6 +376,9 @@ void UninitGame(void)
 
 	// フラッシュの終了
 	UninitFlash();
+
+	// スタートの終了
+	UninitStart();
 
 	// BGMの停止
 	StopSound();
@@ -483,6 +520,9 @@ void UpdateGame(void)
 		if (g_bPause == false)
 		{ // ポーズ状態ではない場合
 
+			// スタートの更新
+			UpdateStart();
+
 			// 天気の設定処理
 			SetWeather();
 
@@ -585,11 +625,11 @@ void UpdateGame(void)
 			// ボーナスの更新処理
 			UpdateBonus();
 
-			// 影の更新
-			UpdateShadow();
-
 			// アイコンの更新
 			UpdateIcon();
+
+			// 影の更新
+			UpdateShadow();
 
 			// 警察の追加処理
 			AddPolice();
@@ -772,6 +812,9 @@ void DrawGame(void)
 	// フラッシュの描画
 	DrawFlash();
 
+	// スタートの描画
+	DrawStart();
+
 	// カウントダウンの描画
 	DrawCountDown();
 
@@ -807,10 +850,10 @@ void SetEnablePause(bool bPause)
 //======================================================================================================================
 //	ゲーム画面の状態取得処理
 //======================================================================================================================
-GAMESTATE GetGameState(void)
+GAMESTATE *GetGameState(void)
 {
 	// ゲームの状態を返す
-	return g_gameState;
+	return &g_gameState;
 }
 
 //======================================================================================================================

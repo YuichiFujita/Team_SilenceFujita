@@ -785,10 +785,10 @@ void InitAbiBomb(void)
 	//	能力バー (青)
 	//------------------------------------------------------------------------------------------------------------------
 	// 頂点座標を設定
-	pVtx[4].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                         ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
-	pVtx[5].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOOST_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
-	pVtx[6].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                         ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
-	pVtx[7].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOOST_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[4].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                        ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[5].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOMB_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y - ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[6].pos = D3DXVECTOR3(ABI_BOMB_POS_X,                                        ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
+	pVtx[7].pos = D3DXVECTOR3(ABI_BOMB_POS_X + (BOMB_WAIT_CNT * ABI_BOMB_WIDTH_MUL), ABI_BOMB_POS_Y + ABI_BOMB_HEIGHT, 0.0f);
 
 	// rhw の設定
 	pVtx[4].rhw = 1.0f;

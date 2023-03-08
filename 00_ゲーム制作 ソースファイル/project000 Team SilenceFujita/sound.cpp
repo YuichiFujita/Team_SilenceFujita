@@ -48,25 +48,45 @@ SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 	{ "data/BGM/title_bgm000.wav", -1 },	// タイトル内BGM_000
 	{ "data/BGM/result_bgm000.wav", -1 },	// リザルト内BGM_000
 	{ "data/BGM/tutorial_bgm000.wav", -1 },	// チュートリアル内BGM_000
-	{ "data/BGM/wind000.wav", -1 },			// プレイヤー能力（送風機）のBGM_000
-	{ "data/BGM/wind001.wav", -1 },			// プレイヤー能力（送風機）のBGM_001
+	{ "data/BGM/firecar000.wav", -1 },		// 消防車の効果音BGM_000
+	{ "data/BGM/yakiimo000.wav", -1 },		// 焼き芋屋の効果音BGM_000
+	{ "data/BGM/bousoucar000.wav", -1 },	// 暴走車の効果音BGM_000
+	{ "data/BGM/senkyocar000.wav", -1 },	// 選挙カーの効果音BGM_000
+	{ "data/BGM/police000.wav", -1 },		// 警察の効果音BGM_000
+	{ "data/BGM/wind000.wav", -1 },			// プレイヤー能力（送風機）の効果音BGM_000
 	{ "data/SE/move000.wav", 0 },			// SE
+	{ "data/SE/select000.wav", 0 },			// 選択のSE_000
+	{ "data/SE/decide000.wav", 0 },			// 決定のSE_000
+	{ "data/SE/startcount000.wav", 0 },		// スタートのカウントダウン（ピッ！）のSE_000
+	{ "data/SE/startgo000.wav", 0 },		// 開始時のスタート（ピー！）のSE_000
 	{ "data/SE/boost000.wav", 0 },			// プレイヤー能力（ブースト）のSE_000
 	{ "data/SE/bomb000.wav", 0 },			// プレイヤー能力（ボム）のSE_000
+	{ "data/SE/break000.wav", 0 },			// 破壊音のSE_000
+	{ "data/SE/damage000.wav", 0 },			// プレイヤーダメージのSE_000
+	{ "data/SE/gareki000.wav", 0 },			// 崩れる（建物系）のSE_000
+	{ "data/SE/gareki001.wav", 0 },			// 崩れる（小物系）のSE_001
+	{ "data/SE/score000.wav", 0 },			// スコア獲得のSE_000
+
 };
 
 //**********************************************************************************************************************
 //	グローバル変数（追加で入れたやつ）
 //**********************************************************************************************************************
-SOUND_SWITCH g_soundSwitch;	//サウンドの有無の設定
+SOUND_SWITCH g_soundSwitch;				//サウンドの有無の設定
+float g_aSoundVolume[SOUND_LABEL_MAX];	//サウンドボリュームの値
 
 //======================================================================================================================
 //	サウンドの初期化処理
 //======================================================================================================================
 HRESULT InitSound(HWND hWnd)
 {
-	//追加で入れた変数の初期化
+	////追加で入れた変数の初期化
 	g_soundSwitch = SOUND_SWITCH_RELEASE;
+
+	for (int nCut = 0; nCut < SOUND_LABEL_MAX; nCut++)
+	{
+		g_aSoundVolume[nCut] = 0.0f;
+	}
 
 #ifdef _DEBUG	// デバッグ処理
 
@@ -282,6 +302,10 @@ HRESULT PlaySound(SOUND_LABEL label)
 	// 再生
 	g_apSourceVoice[label]->Start(0);
 
+	//// 追加で入れたやつ
+	// labelのサウンドを設定
+	g_aSoundVolume[label] = 1.0f;
+
 	return S_OK;
 }
 
@@ -301,6 +325,10 @@ void StopSound(SOUND_LABEL label)
 
 		// オーディオバッファの削除
 		g_apSourceVoice[label]->FlushSourceBuffers();
+
+		//// 追加で入れたやつ
+		// labelのサウンドを設定
+		g_aSoundVolume[label] = 0.0f;
 	}
 }
 
@@ -316,6 +344,10 @@ void StopSound(void)
 		{
 			// 一時停止
 			g_apSourceVoice[nCntSound]->Stop(0);
+
+			//// 追加で入れたやつ
+			// labelのサウンドを設定
+			g_aSoundVolume[nCntSound] = 0.0f;
 		}
 	}
 }
@@ -323,17 +355,28 @@ void StopSound(void)
 //======================================================================================================================
 //	音量調整 (ラベル指定)
 //======================================================================================================================
-void SoundVolumeControl(SOUND_LABEL label,float fVolume)
+void SetSoundVolume(SOUND_LABEL label,float fVolume)
 {
 	XAUDIO2_VOICE_STATE xa2state;
 
 	// 状態取得
 	g_apSourceVoice[label]->GetState(&xa2state);
-
+	
 	if (xa2state.BuffersQueued != 0)
 	{// 再生中
 		g_apSourceVoice[label]->SetVolume(fVolume);
+
+		// labelのサウンドを設定
+		g_aSoundVolume[label] = fVolume;
 	}
+}
+
+//======================================================================================================================
+//	音量の取得 (ラベル指定)
+//======================================================================================================================
+float GetSoundVolume(SOUND_LABEL label)
+{
+	return g_aSoundVolume[label];
 }
 
 //======================================================================================================================
