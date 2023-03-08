@@ -50,6 +50,9 @@
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 #define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
 
+//**********************************************************************************************************************
+//	音量関係のマクロ定義
+//**********************************************************************************************************************
 #define CAR_SOUND_VOLUME_MAX	(1.0f)		// 最大値の音量
 #define CAR_SOUND_RADIUS		(3000.0f)	// 半径を検知を開始する判定
 
@@ -67,6 +70,8 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// 警察との当たり判定
 
 void CarTrafficImprove(Car *pCar);					// 車の渋滞改善処理
+
+void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type);	//プレイヤーとの距離で音量を調整
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -152,6 +157,7 @@ void UpdateCar(void)
 		SetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, 0.0f);
 	}
 
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
@@ -200,7 +206,7 @@ void UpdateCar(void)
 					g_aCar[nCntCar].pos.y = 0.0f;
 				}
 
-				//車との距離で音量を調整
+				//プレイヤーとの距離で音量を調整
 				CarSoundVolume(&g_aCar[nCntCar].pos, &g_aCar[nCntCar].type);
 			}
 
@@ -1910,7 +1916,7 @@ void CarTrafficImprove(Car *pCar)
 }
 
 //============================================================
-// 車との距離で音量を調整
+// プレイヤーとの距離で音量を調整
 //============================================================
 void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type)
 {
@@ -1963,7 +1969,12 @@ void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type)
 
 					//選挙カー
 				case CARTYPE_ELECTIONCAR:
+					if (fVolume >= GetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000))
+					{//現在の音量より大きい場合
 
+					 //音量を調整（選挙カー）
+						SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, fVolume);
+					}
 					break;
 
 					//暴走車

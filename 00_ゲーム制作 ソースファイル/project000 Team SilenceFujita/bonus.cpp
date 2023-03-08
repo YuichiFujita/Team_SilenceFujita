@@ -5,6 +5,7 @@
 //
 //=======================================
 #include "bonus.h"
+#include "sound.h"
 
 #include "Combo.h"
 #include "score.h"
@@ -434,6 +435,12 @@ void SetBonus(int nBonus)
 					posBonus.y = (float)(rand() % BONUS_LEFT_SHIFT) + BONUS_LEFT_Y;
 
 					break;				// ”²‚¯o‚·
+				}
+
+				//Œø‰Ê‰¹Œn‚ÌÄ¶
+				if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+				{
+					PlaySound(SOUND_LABEL_SE_SCORE_000);
 				}
 
 				// î•ñ‚Ìİ’è
