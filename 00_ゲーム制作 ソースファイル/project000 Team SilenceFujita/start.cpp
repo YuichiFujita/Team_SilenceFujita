@@ -610,7 +610,7 @@ void StartSignalMove(void)
 		if (GetSoundType(SOUND_TYPE_SE) == true)
 		{
 			// サウンド（スタートのカウント）の再生
-			PlaySound(SOUND_LABEL_SE_DAMAGE_000);
+			PlaySound(SOUND_LABEL_SE_START_LANDING_000);
 		}
 	}
 }

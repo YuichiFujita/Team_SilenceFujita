@@ -946,6 +946,13 @@ void HomingBarrier(int nCntBarrier)
 			break;
 		}
 
+		//効果音の再生
+		if (GetSoundType(SOUND_TYPE_SE) == true)
+		{
+			// サウンド（バリアの生成）の再生
+			PlaySound(SOUND_LABEL_SE_BARRIER_000);
+		}
+
 		// 座標を補正
 		g_aBarrier[nCntBarrier].pos.x = destPos.x;
 		g_aBarrier[nCntBarrier].pos.y = 0.0f;
