@@ -71,6 +71,7 @@
 #define TIPS_HEIGHT		(100.0f)	// チュートリアルの備考の幅 / 2 (高さ)
 
 #define RESET_POS_Z		(-2000.0f)	// プレイヤー再設定時の z座標
+#define LESSON_NUM_COM	(10)		// コンボのレッスンクリアに必要なコンボ数
 
 #define TUTO_PAUSE_POS	(D3DXVECTOR3(85.0f, 255.0f, 0.0f))								// ポーズの絶対座標
 #define TUTO_PAUSE_SIZE	(D3DXVECTOR3(70.0f, 70.0f, 0.0f))								// ポーズの大きさ
@@ -152,7 +153,7 @@ const int aNextLesson[] =	// レッスンのカウンター
 	30,		// レッスン2 (破滅疾走) のレッスンカウンター
 	60,		// レッスン3 (吹飛散風) のレッスンカウンター
 	120,	// レッスン4 (無音世界) のレッスンカウンター
-	0,		// レッスン5 (コンボ)   のレッスンカウンター
+	120,	// レッスン5 (コンボ)   のレッスンカウンター
 	0,		// レッスン6 (脱出)     のレッスンカウンター
 };
 
@@ -224,6 +225,7 @@ int           g_nLessonState;			// レッスンの状態
 int           g_nCounterTutorialState;	// チュートリアルの状態管理カウンター
 int           g_nCounterLessonState;	// レッスンの状態管理カウンター
 bool          g_bTutorialEnd;			// モードの遷移状況
+bool          g_bComboClear;			// コンボのレッスンのクリア判定
 
 //======================================================================================================================
 //	チュートリアル画面の初期化処理
@@ -271,6 +273,7 @@ void InitTutorial(void)
 	g_nCounterTutorialState = 0;							// チュートリアルの状態管理カウンター
 	g_nCounterLessonState   = 0;							// レッスンの状態管理カウンター
 	g_bTutorialEnd          = false;						// モードの遷移状況
+	g_bComboClear           = false;						// コンボのレッスンのクリア判定
 
 	// チュートリアルの情報を初期化
 	g_tutorial.pos            = TUTO_PAP_POS;				// 便箋の位置
@@ -853,7 +856,19 @@ void UpdateTutorial(void)
 
 	case LESSON_05:	// レッスン5 (コンボ)
 
-		// 無し
+		if (GetCurrentCombo() >= LESSON_NUM_COM)
+		{ // 現在のコンボが一定値以上の場合
+
+			// コンボのレッスンをクリア判定にする
+			g_bComboClear = true;
+		}
+
+		if (g_bComboClear == true)
+		{ // コンボのレッスンがクリア判定の場合
+
+			// レッスンの状態の加算
+			AddLessonState();
+		}
 
 		// 処理を抜ける
 		break;
