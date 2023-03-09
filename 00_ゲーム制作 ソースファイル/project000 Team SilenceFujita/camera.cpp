@@ -1079,6 +1079,25 @@ CAMERASTATE *GetCameraState(void)
 	return &g_CameraState;
 }
 
+//============================================================
+// 最初のプレイヤーに標準を合わせる処理
+//============================================================
+void SetPlayerView(void)
+{
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+
+	// 目標の注視点の位置を更新
+	g_aCamera[CAMERATYPE_MAIN].posR.x = pPlayer->pos.x + sinf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+	g_aCamera[CAMERATYPE_MAIN].posR.y = pPlayer->pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
+	g_aCamera[CAMERATYPE_MAIN].posR.z = pPlayer->pos.z + cosf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+
+	// 目標の視点の位置を更新
+	g_aCamera[CAMERATYPE_MAIN].posV.x = g_aCamera[CAMERATYPE_MAIN].posR.x + ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * sinf(pPlayer->rot.y + D3DX_PI));	// 目標注視点から距離分離れた位置
+	g_aCamera[CAMERATYPE_MAIN].posV.y = POS_V_Y;																																			// 固定の高さ
+	g_aCamera[CAMERATYPE_MAIN].posV.z = g_aCamera[CAMERATYPE_MAIN].posR.z + ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * cosf(pPlayer->rot.y + D3DX_PI));	// 目標注視点から距離分離れた位置
+}
+
 #ifdef _DEBUG	// デバッグ処理
 //============================================================
 //	デバッグ処理一覧

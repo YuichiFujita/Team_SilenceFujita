@@ -225,6 +225,9 @@ void InitGame(void)
 	// プレイヤーのゲートの設定処理
 	SetPlayerGate();
 
+	// 最初のプレイヤーに標準を合わせる処理
+	SetPlayerView();
+
 	//メインBGMの再生
 	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
 	{

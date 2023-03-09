@@ -19,20 +19,20 @@
 //**********************************************************************************************************************
 #define NONE_START_TEXTURE				(-1)																// テクスチャがいらない番号
 
-#define START_PREFACE_FIRST_RADIUS		(D3DXVECTOR3(200.0f, 40.0f, 0.0f))									// 前置き(前半)の半径
-#define START_PREFACE_SECOND_RADIUS		(D3DXVECTOR3(200.0f, 40.0f, 0.0f))									// 前置き(後半)の半径
+#define START_PREFACE_FIRST_RADIUS		(D3DXVECTOR3(300.0f, 88.0f, 0.0f))									// 前置き(前半)の半径
+#define START_PREFACE_SECOND_RADIUS		(D3DXVECTOR3(300.0f, 88.0f, 0.0f))									// 前置き(後半)の半径
 #define START_SIGLIGHT_INIT_RADIUS		(D3DXVECTOR3(0.0f, 60.0f, 0.0f))									// シグナルの光源の全長
 #define START_SIGNAL_RADIUS				(D3DXVECTOR3(250.0f, 80.0f, 0.0f))									// シグナルの半径
 #define START_GO_RADIUS					(D3DXVECTOR3(200.0f, 100.0f, 0.0f))									// Goの半径
 
-#define START_PREFACE_FIRST_INIT_POS	(D3DXVECTOR3(-250.0f, 250.0f, 0.0f))													// 前置き(前半)の初期位置
-#define START_PREFACE_SECOND_INIT_POS	(D3DXVECTOR3(SCREEN_WIDTH + 250.0f, 350.0f, 0.0f))										// 前置き(後半)の初期位置
-#define START_SIGLIGHT_INIT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - START_SIGNAL_RADIUS.x + 5.0f, -80.0f, 0.0f))				// シグナルの光源の初期位置
+#define START_PREFACE_FIRST_INIT_POS	(D3DXVECTOR3(-300.0f, 250.0f, 0.0f))													// 前置き(前半)の初期位置
+#define START_PREFACE_SECOND_INIT_POS	(D3DXVECTOR3(SCREEN_WIDTH + 300.0f, 430.0f, 0.0f))										// 前置き(後半)の初期位置
+#define START_SIGLIGHT_INIT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - START_SIGNAL_RADIUS.x + 5.0f, -80.0f, 0.0f))			// シグナルの光源の初期位置
 #define START_SIGNAL_INIT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, -80.0f, 0.0f))										// シグナルの初期位置
 #define START_GO_INIT_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))							// Goの初期位置
 
-#define START_PREFACE_FIRST_POS			(D3DXVECTOR3(600.0f, 250.0f, 0.0f))									// 前置き(前半)の移動した後の位置
-#define START_PREFACE_SECOND_POS		(D3DXVECTOR3(750.0f, 250.0f, 0.0f))									// 前置き(後半)の移動した後の位置
+#define START_PREFACE_FIRST_POS			(D3DXVECTOR3(450.0f, SCREEN_HEIGHT * 0.5f - START_PREFACE_FIRST_RADIUS.y, 0.0f))		// 前置き(前半)の移動した後の位置
+#define START_PREFACE_SECOND_POS		(D3DXVECTOR3(850.0f, SCREEN_HEIGHT * 0.5f + START_PREFACE_SECOND_RADIUS.y, 0.0f))		// 前置き(後半)の移動した後の位置
 #define START_SIGLIGHT_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - START_SIGNAL_RADIUS.x, SCREEN_HEIGHT * 0.5f, 0.0f))	// シグナルの光源の移動した後の位置
 #define START_SIGNAL_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))							// シグナルの移動した後の位置
 #define START_SIGLIGHT_RADIUS			(D3DXVECTOR3(490.0f, 60.0f, 0.0f))									// シグナルの光源の処理後の半径
@@ -58,7 +58,7 @@ const char *apTextureStart[] =			// テクスチャの相対パス
 	"data\\TEXTURE\\start000.png",		// スタートコロン(：) (通常) のテクスチャ相対パス
 	"data\\TEXTURE\\start001.png",		// スタートコロン(：) (赤) のテクスチャ相対パス
 	"data\\TEXTURE\\StartSignal.png",	// シグナルのテクスチャ相対パス
-	"data\\TEXTURE\\start001.png",		// スタートコロン(：) (赤) のテクスチャ相対パス
+	"data\\TEXTURE\\start002.png",		// スタートコロン(：) (赤) のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
