@@ -1191,6 +1191,12 @@ void AddLessonState(void)
 			// プレイヤーの再設定
 			ResetPlayer();
 
+			// エフェクトの削除
+			AllFalseEffect();
+
+			// パーティクルの削除
+			AllFalseParticle();
+
 			// 演出の状態を手紙の表示状態に変更
 			g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
 
@@ -2055,7 +2061,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
 
 							// 人間の設定
-							SetHuman(pos, rot, nWalk, bRecur, type);
+							SetHuman(pos, D3DXToRadian(rot), nWalk, bRecur, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_HUMAN") != 0);			// 読み込んだ文字列が END_SETLESSON_HUMAN ではない場合ループ
 				}
@@ -2106,7 +2112,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
 
 							// 車の設定
-							SetCar(pos, rot, nWalk, type);
+							SetCar(pos, D3DXToRadian(rot), nWalk, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_CAR") != 0);			// 読み込んだ文字列が END_SETLESSON_CAR ではない場合ループ
 				}
