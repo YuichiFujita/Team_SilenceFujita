@@ -33,6 +33,8 @@ void UpdateEffect(void);	// エフェクトの更新処理
 void DrawEffect(void);		// エフェクトの描画処理
 void SetEffect(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, int nLife, float fRadius, float fSub, EFFECTTYPE effectType);	// エフェクトの設定処理
 
+void AllFalseEffect(void);	// エフェクトの削除
+
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
 //**********************************************************************************************************************

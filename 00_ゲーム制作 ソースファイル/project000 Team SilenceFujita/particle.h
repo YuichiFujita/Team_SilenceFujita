@@ -45,7 +45,10 @@ void InitParticle(void);		// パーティクルの初期化処理
 void UninitParticle(void);		// パーティクルの終了処理
 void UpdateParticle(void);		// パーティクルの更新処理
 void DrawParticle(void);		// パーティクルの描画処理
+
 void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, int nLife);		// パーティクルの設定処理
+
+void AllFalseParticle(void);	// パーティクルの削除
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)
