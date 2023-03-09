@@ -99,6 +99,8 @@ typedef enum
 	MODELTYPE_OBJECT_TOWNFENCE001,			// 町壁（フェンス）
 	MODELTYPE_OBJECT_KEIBAJOU000,			// 競馬場（トラック）
 	MODELTYPE_OBJECT_KEIBAJOU001,			// 競馬場（スタンド）
+	MODELTYPE_OBJECT_SIGNUNBOOST,			// 標識(ブースト禁止)
+	MODELTYPE_OBJECT_RRESORT,				// いかがわしい店
 	
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー

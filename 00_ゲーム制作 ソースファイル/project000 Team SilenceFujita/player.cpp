@@ -71,7 +71,7 @@
 //------------------------------------------------------------
 #define FLYAWAY_INTERVAL_CNT	(3)			// 風の出る間隔
 #define FLYAWAY_SET_CNT			(10)		// 風の出る量
-#define FLYAWAY_SHIFT_WIDTH		(90.0f)		// 風の出る位置をずらす幅
+#define FLYAWAY_SHIFT_WIDTH		(125.0f)	// 風の出る位置をずらす幅
 #define FLYAWAY_SHIFT_HEIGHT	(50.0f)		// 風の出る位置をずらす距離
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
 #define FLYAWAY_WAIT_SUB		(5)			// 風の待機状態の減算量
@@ -718,22 +718,12 @@ void UpdateTutorialNorPlayer(void)
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
 		aControl[1] = false;	// 旋回
-		aControl[2] = false;	// 停止
+		aControl[2] = true;		// 停止
 
 		// 処理を抜ける
 		break;
 
 	case LESSON_01:	// レッスン1 (旋回)
-
-		// 操作の制限を設定
-		aControl[0] = true;		// 移動
-		aControl[1] = true;		// 旋回
-		aControl[2] = false;	// 停止
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
 
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
@@ -762,22 +752,22 @@ void UpdateTutorialNorPlayer(void)
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 
-	if (GetLessonState() >= LESSON_04)
-	{ // レッスン4に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_02)
+	{ // レッスン2に挑戦中、またはクリアしている場合
 
 		// プレイヤーの加速
 		SlumBoostPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_05)
-	{ // レッスン5に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_03)
+	{ // レッスン3に挑戦中、またはクリアしている場合
 
 		// プレイヤーの送風
 		FlyAwayPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_06)
-	{ // レッスン6に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_04)
+	{ // レッスン4に挑戦中、またはクリアしている場合
 
 		// プレイヤーの爆弾
 		SilenceWorldPlayer();
@@ -789,12 +779,8 @@ void UpdateTutorialNorPlayer(void)
 	// 爆弾の更新
 	UpdateSilenceWorld();
 
-	if (GetLessonState() >= LESSON_03)
-	{ // レッスン3に挑戦中、またはクリアしている場合
-
-		// プレイヤーのカメラの状態変化
-		CameraChangePlayer();
-	}
+	// プレイヤーのカメラの状態変化
+	CameraChangePlayer();
 
 	// 能力ゲージの回復
 	AbiHealPlayer();
@@ -897,31 +883,6 @@ void UpdateTutorialNorPlayer(void)
 
 		if (currentPlayer == PLAYMOVESTATE_ROTATE)
 		{ // 現在のプレイヤーの動きが旋回状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
-
-		if (currentPlayer == PLAYMOVESTATE_BRAKE)
-		{ // 現在のプレイヤーの動きが停止状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_03:	// レッスン3 (視点変更)
-
-		if (g_tutoInfo.bForward == true
-		&&  g_tutoInfo.bFirst   == true)
-		{ // どちらのカメラも変更した場合
 
 			// レッスンの状態の加算
 			AddLessonState();
@@ -1698,7 +1659,7 @@ void UpdateFlyAway(void)
 						// 風の位置を設定する
 						g_player.wind.pos = D3DXVECTOR3
 						(
-							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
+							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
 							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT,												// Y座標
 							g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
 						);

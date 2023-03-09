@@ -266,7 +266,7 @@ void InitGame(void)
 	}
 
 #ifdef _DEBUG	// デバッグ処理
-	// エディットメインの初期化6
+	// エディットメインの初期化
 	InitEditmain();
 #endif
 }

@@ -28,7 +28,7 @@
 #define GATE_OPEN				(2.5f)		// ゲートの開く速度
 #define GATE_DOOR_PLUSPOS		(285.0f)	// ドアの初期位置の y座標加算量
 #define GATE_EXIT_WIDESIZE_MUL	(0.3f)		// 脱出口の横位置加算量の倍率
-#define GATE_EXIT_FORWARDPLUS	(150.0f)	// 脱出口の前方加算量
+#define GATE_EXIT_FORWARDPLUS	(200.0f)	// 脱出口の前方加算量
 
 //**********************************************************************************************************************
 //	グローバル変数

@@ -112,9 +112,10 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	LESSON_SETUP_SLUMBOOST = 0,		// レッスン4 (破滅疾走) の読み込み
-	LESSON_SETUP_FLYAWAY,			// レッスン5 (吹飛散風) の読み込み
-	LESSON_SETUP_SILENCEWORLD,		// レッスン6 (無音世界) の読み込み
+	LESSON_SETUP_SLUMBOOST = 0,		// レッスン2 (破滅疾走) の読み込み
+	LESSON_SETUP_FLYAWAY,			// レッスン3 (吹飛散風) の読み込み
+	LESSON_SETUP_SILENCEWORLD,		// レッスン4 (無音世界) の読み込み
+	LESSON_SETUP_COMBO,				// レッスン5 (コンボ)   の読み込み
 	LESSON_SETUP_MAX				// この列挙型の総数
 } LESSON_SETUP;
 
@@ -148,36 +149,33 @@ const int aNextLesson[] =	// レッスンのカウンター
 {
 	240,	// レッスン0 (移動)     のレッスンカウンター
 	150,	// レッスン1 (旋回)     のレッスンカウンター
-	20,		// レッスン2 (停止)     のレッスンカウンター
-	60,		// レッスン3 (視点変更) のレッスンカウンター
-	30,		// レッスン4 (破滅疾走) のレッスンカウンター
-	60,		// レッスン5 (吹飛散風) のレッスンカウンター
-	120,	// レッスン6 (無音世界) のレッスンカウンター
-	0,		// レッスン7 (脱出)     のレッスンカウンター
+	30,		// レッスン2 (破滅疾走) のレッスンカウンター
+	60,		// レッスン3 (吹飛散風) のレッスンカウンター
+	120,	// レッスン4 (無音世界) のレッスンカウンター
+	0,		// レッスン5 (コンボ)   のレッスンカウンター
+	0,		// レッスン6 (脱出)     のレッスンカウンター
 };
 
 const char *apTextureLesson[] =		// レッスンテクスチャの相対パス
 {
 	"data\\TEXTURE\\lesson000.png",	// レッスン0 (移動)     のテクスチャ相対パス
 	"data\\TEXTURE\\lesson001.png",	// レッスン1 (旋回)     のテクスチャ相対パス
-	"data\\TEXTURE\\lesson002.png",	// レッスン2 (停止)     のテクスチャ相対パス
-	"data\\TEXTURE\\lesson003.png",	// レッスン3 (視点変更) のテクスチャ相対パス
-	"data\\TEXTURE\\lesson004.png",	// レッスン4 (破滅疾走) のテクスチャ相対パス
-	"data\\TEXTURE\\lesson005.png",	// レッスン5 (吹飛散風) のテクスチャ相対パス
-	"data\\TEXTURE\\lesson006.png",	// レッスン6 (無音世界) のテクスチャ相対パス
-	"data\\TEXTURE\\lesson007.png",	// レッスン7 (脱出)     のテクスチャ相対パス
+	"data\\TEXTURE\\lesson002.png",	// レッスン2 (破滅疾走) のテクスチャ相対パス
+	"data\\TEXTURE\\lesson003.png",	// レッスン3 (吹飛散風) のテクスチャ相対パス
+	"data\\TEXTURE\\lesson004.png",	// レッスン4 (無音世界) のテクスチャ相対パス
+	"data\\TEXTURE\\lesson005.png",	// レッスン5 (コンボ)   のテクスチャ相対パス
+	"data\\TEXTURE\\lesson006.png",	// レッスン6 (脱出)     のテクスチャ相対パス
 };
 
 const char *apTextureTips[] =		// 備考テクスチャの相対パス
 {
 	"data\\TEXTURE\\tips000.png",	// レッスン0 (移動)     の備考のテクスチャ相対パス
 	"data\\TEXTURE\\tips001.png",	// レッスン1 (旋回)     の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips002.png",	// レッスン2 (停止)     の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips003.png",	// レッスン3 (視点変更) の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips004.png",	// レッスン4 (破滅疾走) の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips005.png",	// レッスン5 (吹飛散風) の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips006.png",	// レッスン6 (無音世界) の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips007.png",	// レッスン7 (脱出)     の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips002.png",	// レッスン2 (破滅疾走) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips003.png",	// レッスン3 (吹飛散風) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips004.png",	// レッスン4 (無音世界) の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips005.png",	// レッスン5 (コンボ)   の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips006.png",	// レッスン6 (脱出)     の備考のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
@@ -633,7 +631,7 @@ void InitTutorial(void)
 		true,	// ステージ
 		true,	// 当たり判定
 		true,	// 影
-		false,	// オブジェクト
+		true,	// オブジェクト
 		false,	// AI
 		false	// アイコン
 	);
@@ -817,7 +815,7 @@ void UpdateTutorial(void)
 
 	switch (g_nLessonState)
 	{ // レッスンごとの処理
-	case LESSON_04:	// レッスン4 (破滅疾走)
+	case LESSON_02:	// レッスン2 (破滅疾走)
 
 		if (CheckNextSlumBoost() == true)
 		{ // 次のレッスンに遷移可能な場合
@@ -829,7 +827,7 @@ void UpdateTutorial(void)
 		// 処理を抜ける
 		break;
 
-	case LESSON_05:	// レッスン5 (吹飛散風)
+	case LESSON_03:	// レッスン3 (吹飛散風)
 
 		if (CheckNextFlyAway() == true)
 		{ // 次のレッスンに遷移可能な場合
@@ -841,7 +839,7 @@ void UpdateTutorial(void)
 		// 処理を抜ける
 		break;
 
-	case LESSON_06:	// レッスン6 (無音世界)
+	case LESSON_04:	// レッスン4 (無音世界)
 
 		if (CheckNextSilenceWorld() == true)
 		{ // 次のレッスンに遷移可能な場合
@@ -853,7 +851,14 @@ void UpdateTutorial(void)
 		// 処理を抜ける
 		break;
 
-	case LESSON_07:	// レッスン7 (脱出)
+	case LESSON_05:	// レッスン5 (コンボ)
+
+		// 無し
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_06:	// レッスン6 (脱出)
 
 		// 無し
 
@@ -1132,21 +1137,7 @@ void AddLessonState(void)
 				// 処理を抜ける
 				break;
 
-			case LESSON_02:	// レッスン2 (停止)
-
-				// 無し
-
-				// 処理を抜ける
-				break;
-
-			case LESSON_03:	// レッスン3 (視点変更)
-
-				// 無し
-
-				// 処理を抜ける
-				break;
-
-			case LESSON_04:	// レッスン4 (破滅疾走)
+			case LESSON_02:	// レッスン2 (破滅疾走)
 
 				// レッスンのセットアップ
 				TxtSetLesson(LESSON_SETUP_SLUMBOOST);
@@ -1154,7 +1145,7 @@ void AddLessonState(void)
 				// 処理を抜ける
 				break;
 
-			case LESSON_05:	// レッスン5 (吹飛散風)
+			case LESSON_03:	// レッスン3 (吹飛散風)
 
 				// 破滅疾走のレッスン終了後の削除
 				AllFalseSlumBoost();
@@ -1165,7 +1156,7 @@ void AddLessonState(void)
 				// 処理を抜ける
 				break;
 
-			case LESSON_06:	// レッスン6 (無音世界)
+			case LESSON_04:	// レッスン4 (無音世界)
 
 				// 吹飛散風のレッスン終了後の削除
 				AllFalseFlyAway();
@@ -1176,7 +1167,24 @@ void AddLessonState(void)
 				// 処理を抜ける
 				break;
 
-			case LESSON_07:	// レッスン7 (脱出)
+			case LESSON_05:	// レッスン5 (コンボ)
+
+				// 無音世界のレッスン終了後の削除
+				AllFalseSilenceWorld();
+
+				// レッスンのセットアップ
+				TxtSetLesson(LESSON_SETUP_COMBO);
+
+				// 処理を抜ける
+				break;
+
+			case LESSON_06:	// レッスン6 (脱出)
+
+				// 破滅疾走のレッスン終了後の削除
+				AllFalseSlumBoost();
+
+				// 吹飛散風のレッスン終了後の削除
+				AllFalseFlyAway();
 
 				// 無音世界のレッスン終了後の削除
 				AllFalseSilenceWorld();
@@ -1742,8 +1750,12 @@ void AllFalseSlumBoost(void)
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++, pObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		// オブジェクトを使用していない状態にする
-		pObject->bUse = false;
+		if (pObject->judge.state == JUDGESTATE_EVIL)
+		{ // 悪い奴の場合
+
+			// オブジェクトを使用していない状態にする
+			pObject->bUse = false;
+		}
 	}
 
 	// 影の更新
@@ -1893,7 +1905,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 
 			switch (lesson)
 			{ // レッスンごとの処理
-			case LESSON_SETUP_SLUMBOOST:	// レッスン4 (破滅疾走) の読み込み
+			case LESSON_SETUP_SLUMBOOST:	// レッスン2 (破滅疾走) の読み込み
 
 				if (strcmp(&aString[0], "SETLESSON_OBJECT") == 0)
 				{ // 読み込んだ文字列が SETLESSON_OBJECT の場合
@@ -2000,10 +2012,11 @@ void TxtSetLesson(LESSON_SETUP lesson)
 				// 処理を抜ける
 				break;
 
-			case LESSON_SETUP_FLYAWAY:		// レッスン5 (吹飛散風) の読み込み
+			case LESSON_SETUP_FLYAWAY:		// レッスン3 (吹飛散風) の読み込み
 
 				if (strcmp(&aString[0], "SETLESSON_HUMAN") == 0)
 				{ // 読み込んだ文字列が SETLESSON_HUMAN の場合
+
 					do
 					{ // 読み込んだ文字列が END_SETLESSON_HUMAN ではない場合ループ
 
@@ -2069,10 +2082,11 @@ void TxtSetLesson(LESSON_SETUP lesson)
 				// 処理を抜ける
 				break;
 
-			case LESSON_SETUP_SILENCEWORLD:	// レッスン6 (無音世界) の読み込み
+			case LESSON_SETUP_SILENCEWORLD:	// レッスン4 (無音世界) の読み込み
 
 				if (strcmp(&aString[0], "SETLESSON_CAR") == 0)
 				{ // 読み込んだ文字列が SETLESSON_CAR の場合
+
 					do
 					{ // 読み込んだ文字列が END_SETLESSON_CAR ではない場合ループ
 
@@ -2115,6 +2129,245 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							SetCar(pos, D3DXToRadian(rot), nWalk, type);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_CAR") != 0);			// 読み込んだ文字列が END_SETLESSON_CAR ではない場合ループ
+				}
+
+				// 処理を抜ける
+				break;
+
+			case LESSON_SETUP_COMBO:		// レッスン5 (コンボ) の読み込み
+
+				if (strcmp(&aString[0], "SETLESSON_COMBO") == 0)
+				{ // 読み込んだ文字列が SETLESSON_COMBO の場合
+
+					do
+					{ // 読み込んだ文字列が END_SETLESSON_COMBO ではない場合ループ
+
+						// ファイルから文字列を読み込む
+						fscanf(pFile, "%s", &aString[0]);
+
+						//----------------------------------------------------------------------------------------------
+						//	オブジェクトの設定
+						//----------------------------------------------------------------------------------------------
+						if (strcmp(&aString[0], "SETCOMBO_OBJECT") == 0)
+						{ // 読み込んだ文字列が SETCOMBO_OBJECT の場合
+
+							do
+							{ // 読み込んだ文字列が END_SETCOMBO_OBJECT ではない場合ループ
+
+								// ファイルから文字列を読み込む
+								fscanf(pFile, "%s", &aString[0]);
+
+								if (strcmp(&aString[0], "SET_OBJECT") == 0)
+								{ // 読み込んだ文字列が SET_OBJECT の場合
+
+									do
+									{ // 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
+
+										// ファイルから文字列を読み込む
+										fscanf(pFile, "%s", &aString[0]);
+
+										if (strcmp(&aString[0], "POS") == 0)
+										{ // 読み込んだ文字列が POS の場合
+											fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+											fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);		// 位置を読み込む
+										}
+										else if (strcmp(&aString[0], "ROT") == 0)
+										{ // 読み込んだ文字列が ROT の場合
+											fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+											fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);		// 向きを読み込む
+										}
+										else if (strcmp(&aString[0], "SCALE") == 0)
+										{ // 読み込んだ文字列が SCALE の場合
+											fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+											fscanf(pFile, "%f%f%f", &scale.x, &scale.y, &scale.z);	// 拡大率を読み込む
+										}
+										else if (strcmp(&aString[0], "TYPE") == 0)
+										{ // 読み込んだ文字列が TYPE の場合
+											fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+											fscanf(pFile, "%d", &nType);			// オブジェクトの種類を読み込む
+										}
+										else if (strcmp(&aString[0], "BREAKTYPE") == 0)
+										{ // 読み込んだ文字列が BREAKTYPE の場合
+											fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+											fscanf(pFile, "%d", &nBreakType);		// 壊れ方の種類を読み込む
+										}
+										else if (strcmp(&aString[0], "SHADOWTYPE") == 0)
+										{ // 読み込んだ文字列が SHADOWTYPE の場合
+											fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+											fscanf(pFile, "%d", &nShadowType);		// 影の種類を読み込む
+										}
+										else if (strcmp(&aString[0], "COLLTYPE") == 0)
+										{ // 読み込んだ文字列が COLLTYPE の場合
+											fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+											fscanf(pFile, "%d", &nCollisionType);	// 当たり判定の種類を読み込む
+										}
+										else if (strcmp(&aString[0], "COLLROT") == 0)
+										{ // 読み込んだ文字列が COLLROT の場合
+											fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+											fscanf(pFile, "%d", &stateRot);			// 向き状態を読み込む
+										}
+										else if (strcmp(&aString[0], "JUDGE") == 0)
+										{ // 読み込んだ文字列が JUDGE の場合
+											fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+											fscanf(pFile, "%d", &nJudgeType);		// 善悪状態を読み込む
+										}
+										else if (strcmp(&aString[0], "NUMMAT") == 0)
+										{ // 読み込んだ文字列が NUMMAT の場合
+											fscanf(pFile, "%s", &aString[0]);		// = を読み込む (不要)
+											fscanf(pFile, "%d", &nNumMat);			// マテリアル数を読み込む
+
+											for (int nCntMat = 0; nCntMat < nNumMat; nCntMat++)
+											{ // マテリアル数分繰り返す
+
+												fscanf(pFile, "%s", &aString[0]);	// マテリアルの番号を読み込む (不要)
+												fscanf(pFile, "%s", &aString[0]);	// マテリアルの要素を読み込む (不要)
+												fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+
+												// 拡散光を読み込む
+												fscanf(pFile, "%f%f%f%f",
+												&aMat[nCntMat].MatD3D.Diffuse.r,
+												&aMat[nCntMat].MatD3D.Diffuse.g,
+												&aMat[nCntMat].MatD3D.Diffuse.b,
+												&aMat[nCntMat].MatD3D.Diffuse.a);
+
+												fscanf(pFile, "%s", &aString[0]);	// マテリアルの番号を読み込む (不要)
+												fscanf(pFile, "%s", &aString[0]);	// マテリアルの要素を読み込む (不要)
+												fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+
+												// 環境光を読み込む
+												fscanf(pFile, "%f%f%f%f",
+												&aMat[nCntMat].MatD3D.Ambient.r,
+												&aMat[nCntMat].MatD3D.Ambient.g,
+												&aMat[nCntMat].MatD3D.Ambient.b,
+												&aMat[nCntMat].MatD3D.Ambient.a);
+											}
+										}
+									} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);		// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
+
+									// オブジェクトの設定
+									SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY, nJudgeType);
+								}
+							} while (strcmp(&aString[0], "END_SETCOMBO_OBJECT") != 0);			// 読み込んだ文字列が END_SETCOMBO_OBJECT ではない場合ループ
+						}
+
+						//----------------------------------------------------------------------------------------------
+						//	人間の設定
+						//----------------------------------------------------------------------------------------------
+						else if (strcmp(&aString[0], "SETCOMBO_HUMAN") == 0)
+						{ // 読み込んだ文字列が SETCOMBO_HUMAN の場合
+
+							do
+							{ // 読み込んだ文字列が END_SETCOMBO_HUMAN ではない場合ループ
+
+								// ファイルから文字列を読み込む
+								fscanf(pFile, "%s", &aString[0]);
+
+								if (strcmp(&aString[0], "SET_HUMAN") == 0)
+								{ // 読み込んだ文字列が SET_HUMAN の場合
+
+									do
+									{ // 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+										// ファイルから文字列を読み込む
+										fscanf(pFile, "%s", &aString[0]);
+
+										if (strcmp(&aString[0], "POS") == 0)
+										{ // 読み込んだ文字列が POS の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+										}
+										else if (strcmp(&aString[0], "ROT") == 0)
+										{ // 読み込んだ文字列が ROT の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+										}
+										else if (strcmp(&aString[0], "WALK") == 0)
+										{ // 読み込んだ文字列が WALK の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%d", &nWalk);						// 歩きのタイプを読み込む
+										}
+										else if (strcmp(&aString[0], "RECUR") == 0)
+										{ // 読み込んだ文字列が RECUR の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%s", &aString[0]);					// 復活状況を読み込む
+
+											if (strcmp(&aString[0], "TRUE") == 0)
+											{ // 読み込んだ文字列が TRUE の場合
+
+												// 復活する
+												bRecur = true;
+											}
+											else
+											{ // 読み込んだ文字列が FALSE の場合
+
+												// 復活しない
+												bRecur = false;
+											}
+										}
+										else if (strcmp(&aString[0], "TYPE") == 0)
+										{ // 読み込んだ文字列が TYPE の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%d", &type);							// 種類を読み込む
+										}
+
+									} while (strcmp(&aString[0], "END_SET_HUMAN") != 0);		// 読み込んだ文字列が END_SET_HUMAN ではない場合ループ
+
+									// 人間の設定
+									SetHuman(pos, D3DXToRadian(rot), nWalk, bRecur, type);
+								}
+							} while (strcmp(&aString[0], "END_SETCOMBO_HUMAN") != 0);			// 読み込んだ文字列が END_SETCOMBO_HUMAN ではない場合ループ
+						}
+
+						//----------------------------------------------------------------------------------------------
+						//	車の設定
+						//----------------------------------------------------------------------------------------------
+						else if (strcmp(&aString[0], "SETCOMBO_CAR") == 0)
+						{ // 読み込んだ文字列が SETCOMBO_CAR の場合
+
+							do
+							{ // 読み込んだ文字列が END_SETCOMBO_CAR ではない場合ループ
+
+								// ファイルから文字列を読み込む
+								fscanf(pFile, "%s", &aString[0]);
+
+								if (strcmp(&aString[0], "SET_CAR") == 0)
+								{ // 読み込んだ文字列が SET_CAR の場合
+
+									do
+									{ // 読み込んだ文字列が END_SET_CAR ではない場合ループ
+
+										// ファイルから文字列を読み込む
+										fscanf(pFile, "%s", &aString[0]);
+
+										if (strcmp(&aString[0], "POS") == 0)
+										{ // 読み込んだ文字列が POS の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%f%f%f", &pos.x, &pos.y, &pos.z);	// 位置を読み込む
+										}
+										else if (strcmp(&aString[0], "ROT") == 0)
+										{ // 読み込んだ文字列が ROT の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%f%f%f", &rot.x, &rot.y, &rot.z);	// 向きを読み込む
+										}
+										else if (strcmp(&aString[0], "WALK") == 0)
+										{ // 読み込んだ文字列が WALK の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%d", &nWalk);						// 移動のタイプを読み込む
+										}
+										else if (strcmp(&aString[0], "TYPE") == 0)
+										{ // 読み込んだ文字列が TYPE の場合
+											fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+											fscanf(pFile, "%d", &type);							// 種類を読み込む
+										}
+
+									} while (strcmp(&aString[0], "END_SET_CAR") != 0);			// 読み込んだ文字列が END_SET_CAR ではない場合ループ
+
+									// 車の設定
+									SetCar(pos, D3DXToRadian(rot), nWalk, type);
+								}
+							} while (strcmp(&aString[0], "END_SETCOMBO_CAR") != 0);				// 読み込んだ文字列が END_SETCOMBO_CAR ではない場合ループ
+						}
+					} while (strcmp(&aString[0], "END_SETLESSON_COMBO") != 0);					// 読み込んだ文字列が END_SETLESSON_COMBO ではない場合ループ
 				}
 
 				// 処理を抜ける
