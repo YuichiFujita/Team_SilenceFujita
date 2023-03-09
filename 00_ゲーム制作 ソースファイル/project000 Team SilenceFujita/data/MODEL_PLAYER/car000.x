@@ -11674,7 +11674,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\Team SilenceFujita\\00_ゲーム制作 ソ\ースファイル\\project000 Team SilenceFujita\\data\\TEXTURE\\blower000.png";
+    "data\\TEXTURE\\blower000.png";
    }
   }
   Material {

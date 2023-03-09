@@ -6,16 +6,9 @@ Scene {
 	lookat 18.3221 136.0135 10.5815
 	head 215.6603
 	pich -0.0108
-	bank 0.0000
 	ortho 0
 	zoom2 5.1106
 	amb 0.250 0.250 0.250
-	dirlights 1 {
-		light {
-			dir 0.408 0.408 0.816
-			color 1.000 1.000 1.000
-		}
-	}
 }
 Material 17 {
 	"mat1" col(0.965 0.831 0.184 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
