@@ -27,14 +27,13 @@
 #define POLICE_ICON_COL		(D3DXCOLOR(0.2f, 0.2f, 1.0f, 1.0f))		// 警察のアイコンの色
 
 #define BARRIER_ICON_SET_RADIUS		(0.0f)							// アイコンの設定時の半径
-#define BARRIER_ICON_RADIUS	(140.0f)								// バリアのアイコンの半径
+#define BARRIER_ICON_RADIUS	(300.0f)								// バリアのアイコンの半径
 #define BARRIER_ICON_COL	(D3DXCOLOR(0.4f,1.0f,1.0f,1.0f))		// バリアのアイコンの色
 
-#define GATE_ICON_VERT_RADIUS	(D3DXVECTOR3(400.0f, 0.0f, 150.0f))	// ゲート(正面・後ろ向き)アイコンの半径
-#define GATE_ICON_HORIZ_RADIUS	(D3DXVECTOR3(150.0f, 0.0f, 400.0f))	// ゲート(左右向き)アイコンの半径(X軸)
+#define GATE_ICON_RADIUS	(420.0f)								// ゲートアイコンの半径
 #define GATE_ICON_COL		(D3DXCOLOR(1.0f, 0.6f, 1.0f, 1.0f))		// ゲートのアイコンの色
 
-#define ITEM_ICON_RADIUS	(80.0f)									// アイテムのアイコンの半径
+#define ITEM_ICON_RADIUS	(120.0f)								// アイテムのアイコンの半径
 #define ITEM_ICON_COL		(D3DXCOLOR(0.4f, 1.0f, 1.0f, 1.0f))		// アイテムのアイコンの色
 
 #define OBJECT_ICON_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// オブジェクトのアイコンの色
@@ -48,7 +47,7 @@
 #define ICON_REVIVAL_CNT	(20)		// 復活中のカウント
 #define ICON_DAMAGE_COL		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))		// ダメージ時の色
 #define ICON_UNRIVALED_CNT	(10)		// 無敵状態のカウント
-#define ICON_SCALE_CHANGE	(10.0f);	// 拡大縮小時の半径の拡大率
+#define ICON_SCALE_CHANGE	(50.0f);	// 拡大縮小時の半径の拡大率
 
 //************************************************************
 //	グローバル変数
@@ -66,8 +65,8 @@ const char *c_apTextureFileIcon[ICONTYPE_MAX] =
 	"data\\TEXTURE\\icon002.png",
 	"data\\TEXTURE\\icon004.png",
 	"data\\TEXTURE\\icon005.png",
-	"data\\TEXTURE\\icon006.png",
-	"data\\TEXTURE\\icon007.png",
+	"data\\TEXTURE\\icon005.png",
+	"data\\TEXTURE\\icon004.png",
 	"data\\TEXTURE\\icon008.png",
 	"data\\TEXTURE\\icon009.png",
 	"data\\TEXTURE\\icon003.png",
@@ -342,7 +341,7 @@ void UpdateIcon(void)
 
 				case ICONSTATE_ENLARGE:		// 拡大状態
 
-					if (g_aIcon[nCntIcon].radius.x <= BARRIER_ICON_RADIUS)
+					if (g_aIcon[nCntIcon].radius.x < BARRIER_ICON_RADIUS)
 					{ // 一定の半径未満だった場合
 
 						// アイコンの半径に加算する
@@ -379,7 +378,7 @@ void UpdateIcon(void)
 					break;					// 抜け出す
 				}
 
-				if (g_aIcon[nCntIcon].type != ICONTYPE_BARRIER && g_aIcon[nCntIcon].type != ICONTYPE_EVIL_OBJECT && g_aIcon[nCntIcon].type != ICONTYPE_OBJECT)
+				if (g_aIcon[nCntIcon].type != ICONTYPE_EVIL_OBJECT && g_aIcon[nCntIcon].type != ICONTYPE_OBJECT)
 				{ // バリア・建物系のアイコン以外の場合
 
 					if (cameraPos.x + ICON_CORRECT_RIGHT <= g_aIcon[nCntIcon].pos.x + g_aIcon[nCntIcon].radius.x)
@@ -578,7 +577,7 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 			case ICONTYPE_GATE_VERT:	// 正面・後ろ向きゲート
 
 				// 半径を設定
-				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_VERT_RADIUS.x, 0.0f, GATE_ICON_VERT_RADIUS.z);
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_RADIUS, 0.0f, GATE_ICON_RADIUS);
 
 				// 色を設定
 				g_aIcon[nCntIcon].col = GATE_ICON_COL;
@@ -588,7 +587,7 @@ int SetIcon(D3DXVECTOR3 pos, ICONTYPE type, int *pIconID, bool *pUse, ICONSTATE 
 			case ICONTYPE_GATE_HORIZ:	// 左右向きゲート
 
 				// 半径を設定
-				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_HORIZ_RADIUS.x, 0.0f, GATE_ICON_HORIZ_RADIUS.z);
+				g_aIcon[nCntIcon].radius = D3DXVECTOR3(GATE_ICON_RADIUS, 0.0f, GATE_ICON_RADIUS);
 
 				// 色を設定
 				g_aIcon[nCntIcon].col = GATE_ICON_COL;

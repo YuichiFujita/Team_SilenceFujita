@@ -66,6 +66,8 @@ typedef struct
 	CARTYPE		 type;					// 種類
 	MOVETYPE	 typeMove;				// 移動のタイプ
 	int			 nShadowID;				// 影のインデックス
+	int			 nOverlapCounter;		// 重なりカウント
+	int			 nStopCount;			// 停止カウント
 	int			 nBombCount;			// ボム中のカウント
 	bool		 bJump;					// ジャンプしているかどうか
 	bool		 bMove;					// 移動しているかどうか
