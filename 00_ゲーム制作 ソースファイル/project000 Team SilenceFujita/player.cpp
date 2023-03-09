@@ -1390,16 +1390,8 @@ void FlyAwayPlayer(void)
 			//効果音系BGMの再生
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
-				//サウンドの設定
-				if (g_bWindSound == false)
-				{//送風機のサウンドが流れていないとき
-
-					//送風機のサウンドのオンに設定
-					g_bWindSound = true;
-
-					//送風機のサウンド（BGM）の再生
-					PlaySound(SOUND_LABEL_BGM_ABILITY_WIND_000);
-				}
+				//サウンドを再生
+				SetWindSound(true);
 			}
 		}
 		else
@@ -1408,16 +1400,8 @@ void FlyAwayPlayer(void)
 			//効果音系BGMの停止
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
-				//サウンドの設定
-				if (g_bWindSound == true)
-				{//送風機のサウンドが流れているとき
-
-				 //送風機のサウンド（BGM）の停止
-					StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
-
-					//送風機のサウンドのオフに設定
-					g_bWindSound = false;
-				}
+				//サウンドを停止
+				SetWindSound(false);
 			}
 		}
 	}
@@ -1430,18 +1414,8 @@ void FlyAwayPlayer(void)
 		//効果音系BGMの停止
 		if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 		{
-			//サウンドの設定
-			if (g_bWindSound == true)
-			{//送風機のサウンドが流れているとき
-
-				//送風機のサウンド（BGM）の停止
-				StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
-
-				//送風機のサウンドのオフに設定
-				g_bWindSound = false;
-
-
-			}
+			//サウンドを停止
+			SetWindSound(false);
 		}
 	}
 }
@@ -2088,6 +2062,36 @@ void SetPlayerGate(void)
 
 	// 出てくるゲートの位置を設定する
 	g_player.nNumEnterGate = nSpawnGateNum;
+}
+
+//============================================================
+// 風の送風機
+//============================================================
+void SetWindSound(bool bSound)
+{
+	//サウンドの設定
+	if (bSound == true)
+	{//送風機のサウンドが流れていないとき
+		if (g_bWindSound == false)
+		{
+			//送風機のサウンドのオンに設定
+			g_bWindSound = true;
+
+			//送風機のサウンド（BGM）の再生
+			PlaySound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+		}
+	}
+	else
+	{
+		if (g_bWindSound == true)
+		{
+			//送風機のサウンド（BGM）の停止
+			StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+
+			//送風機のサウンドのオフに設定
+			g_bWindSound = false;
+		}
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理
