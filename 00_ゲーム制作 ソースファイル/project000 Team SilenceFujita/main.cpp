@@ -52,8 +52,10 @@
 #define CLASS_NAME		"WindowClass"		// ウインドウクラスの名前
 #define WINDOW_NAME		"AnarchyCars"		// ウインドウの名前 (キャプションに表示)
 
+#define GAME_OBJ_SETUP_TXT		"data\\TXT\\objectGame.txt"		// ゲームのオブジェクトセットアップ用のテキストファイルの相対パス
+#define TUTORIAL_OBJ_SETUP_TXT	"data\\TXT\\objectTutorial.txt"	// チュートリアルのオブジェクトセットアップ用のテキストファイルの相対パス
+
 #define AI_SETUP_TXT	"data\\TXT\\Ai.txt"			// AI系セットアップ用のテキストファイルの相対パス
-#define OBJ_SETUP_TXT	"data\\TXT\\object.txt"		// オブジェクトセットアップ用のテキストファイルの相対パス
 #define SHAD_SETUP_TXT	"data\\TXT\\shadow.txt"		// ステージセットアップ用のテキストファイルの相対パス
 #define ICON_SETUP_TXT	"data\\TXT\\Icon.txt"		// アイコンセットアップ用のテキストファイルの相対パス
 
@@ -438,7 +440,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
+	g_mode = MODE_TUTORIAL;			// モードをチュートリアルに初期化
 #else
 	g_mode = MODE_LOGO;				// モードをロゴに初期化
 #endif
@@ -1095,7 +1097,7 @@ void TxtSetObject(void)
 	FILE *pFile;				// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
-	pFile = fopen(OBJ_SETUP_TXT, "r");
+	pFile = (g_mode == MODE_TUTORIAL) ? fopen(TUTORIAL_OBJ_SETUP_TXT, "r") : fopen(GAME_OBJ_SETUP_TXT, "r");
 
 	if (pFile != NULL)
 	{ // ファイルが開けた場合

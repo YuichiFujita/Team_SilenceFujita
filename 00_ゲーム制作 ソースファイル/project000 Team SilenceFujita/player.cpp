@@ -718,22 +718,12 @@ void UpdateTutorialNorPlayer(void)
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
 		aControl[1] = false;	// 旋回
-		aControl[2] = false;	// 停止
+		aControl[2] = true;		// 停止
 
 		// 処理を抜ける
 		break;
 
 	case LESSON_01:	// レッスン1 (旋回)
-
-		// 操作の制限を設定
-		aControl[0] = true;		// 移動
-		aControl[1] = true;		// 旋回
-		aControl[2] = false;	// 停止
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
 
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
@@ -762,22 +752,22 @@ void UpdateTutorialNorPlayer(void)
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 
-	if (GetLessonState() >= LESSON_04)
-	{ // レッスン4に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_02)
+	{ // レッスン2に挑戦中、またはクリアしている場合
 
 		// プレイヤーの加速
 		SlumBoostPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_05)
-	{ // レッスン5に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_03)
+	{ // レッスン3に挑戦中、またはクリアしている場合
 
 		// プレイヤーの送風
 		FlyAwayPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_06)
-	{ // レッスン6に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_04)
+	{ // レッスン4に挑戦中、またはクリアしている場合
 
 		// プレイヤーの爆弾
 		SilenceWorldPlayer();
@@ -789,12 +779,8 @@ void UpdateTutorialNorPlayer(void)
 	// 爆弾の更新
 	UpdateSilenceWorld();
 
-	if (GetLessonState() >= LESSON_03)
-	{ // レッスン3に挑戦中、またはクリアしている場合
-
-		// プレイヤーのカメラの状態変化
-		CameraChangePlayer();
-	}
+	// プレイヤーのカメラの状態変化
+	CameraChangePlayer();
 
 	// 能力ゲージの回復
 	AbiHealPlayer();
@@ -897,31 +883,6 @@ void UpdateTutorialNorPlayer(void)
 
 		if (currentPlayer == PLAYMOVESTATE_ROTATE)
 		{ // 現在のプレイヤーの動きが旋回状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
-
-		if (currentPlayer == PLAYMOVESTATE_BRAKE)
-		{ // 現在のプレイヤーの動きが停止状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_03:	// レッスン3 (視点変更)
-
-		if (g_tutoInfo.bForward == true
-		&&  g_tutoInfo.bFirst   == true)
-		{ // どちらのカメラも変更した場合
 
 			// レッスンの状態の加算
 			AddLessonState();
