@@ -262,7 +262,7 @@ void InitGame(void)
 		SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, 0.0f);
-		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 1.0f);
 	}
 
 #ifdef _DEBUG	// デバッグ処理
