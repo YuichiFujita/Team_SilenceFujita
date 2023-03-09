@@ -1968,7 +1968,7 @@ void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type)
 			{//ˆê’è”ÍˆÍ“à‚Ìê‡
 
 				//‰¹—ÊÝ’è—p‚Ì•Ï”
-				float fVolume = CAR_SOUND_VOLUME_MAX - (fLength / (CAR_SOUND_RADIUS * CAR_SOUND_RADIUS));
+				float fVolume = 1.0f - (fLength / (CAR_SOUND_RADIUS * CAR_SOUND_RADIUS));
 
 				switch (*type)
 				{//ŽÔ‚ÌŽí—Þ‚²‚Æ‚ÉÝ’è

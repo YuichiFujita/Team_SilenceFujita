@@ -71,7 +71,7 @@
 //------------------------------------------------------------
 #define FLYAWAY_INTERVAL_CNT	(3)			// 風の出る間隔
 #define FLYAWAY_SET_CNT			(10)		// 風の出る量
-#define FLYAWAY_SHIFT_WIDTH		(90.0f)		// 風の出る位置をずらす幅
+#define FLYAWAY_SHIFT_WIDTH		(125.0f)	// 風の出る位置をずらす幅
 #define FLYAWAY_SHIFT_HEIGHT	(50.0f)		// 風の出る位置をずらす距離
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
 #define FLYAWAY_WAIT_SUB		(5)			// 風の待機状態の減算量
@@ -1082,6 +1082,12 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 	if (bMove)
 	{ // 移動の操作が可能な場合
 
+		// プレイヤーの速度を計算
+		float fVolume = (fabsf(g_player.move.x + g_player.boost.plusMove.x) / MAX_REAL_SPEED);
+
+		//プレイヤーの速度で走行音を調整
+		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, fVolume);
+
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
 		{ // 前進の操作が行われた場合
 
@@ -1653,7 +1659,7 @@ void UpdateFlyAway(void)
 						// 風の位置を設定する
 						g_player.wind.pos = D3DXVECTOR3
 						(
-							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
+							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
 							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT,												// Y座標
 							g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
 						);
