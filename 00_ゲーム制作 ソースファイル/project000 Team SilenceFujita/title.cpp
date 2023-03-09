@@ -30,15 +30,15 @@
 #define MAX_TITLE			(3)			// 使用するポリゴン数
 
 #define TITLE_POS_X			(640.0f)	// タイトルの停止時の絶対座標 (x)
-#define TITLE_POS_Y			(250.0f)	// タイトルの停止時の絶対座標 (y)
-#define TITLE_WIDTH			(300.0f)	// タイトルの横幅 / 2
-#define TITLE_HEIGHT		(120.0f)	// タイトルの縦幅 / 2
+#define TITLE_POS_Y			(225.0f)	// タイトルの停止時の絶対座標 (y)
+#define TITLE_WIDTH			(340.0f)	// タイトルの横幅 / 2
+#define TITLE_HEIGHT		(140.0f)	// タイトルの縦幅 / 2
 
 #define TITLE_SELECT_POS_X			(SCREEN_WIDTH * 0.5f)			//タイトル選択肢の開始位置（X)
-#define TITLE_SELECT_POS_Y			(SCREEN_HEIGHT * 0.70f)			//タイトル選択肢の開始位置（Y）	
+#define TITLE_SELECT_POS_Y			(SCREEN_HEIGHT * 0.825f)		//タイトル選択肢の開始位置（Y）	
 #define TITLE_SELECT_SIZE_X			(200.0f)						//タイトル選択肢の大きさ（X）
 #define TITLE_SELECT_SIZE_Y			(60.0f)							//タイトル選択肢の大きさ（Y）
-#define TITLE_SELECT_INTERVAL_Y		(125.0f)						//タイトル選択肢の間隔（Y）
+#define TITLE_SELECT_INTERVAL_X		(225.0f)						//タイトル選択肢の間隔（X）
 
 #define TITLE_MOVE			(2.0f)		// タイトルの移動量
 #define TIT_FIRST_ALPHA		(0.65f)		// 背景の初期の透明度
@@ -165,7 +165,27 @@ void InitTitle(void)
 	//グローバル変数（タイトルの選択）の初期化
 	for (int nCount = 0; nCount < TITLE_SELECT_TYPE_MAX; nCount++)
 	{
-		g_aTitleSelect[nCount].pos = D3DXVECTOR3(TITLE_SELECT_POS_X, TITLE_SELECT_POS_Y + (TITLE_SELECT_INTERVAL_Y * nCount), 0.0f);	//選択肢の数分Yをずらす
+		//数ごとに位置情報を設定
+		switch (nCount)
+		{
+
+		//一つ目の選択肢
+		case 0:
+			
+			g_aTitleSelect[nCount].pos = D3DXVECTOR3(TITLE_SELECT_POS_X - TITLE_SELECT_INTERVAL_X, 	//左にずらす
+													 TITLE_SELECT_POS_Y, 0.0f);
+			
+			break;
+
+		//二つ目の選択肢
+		case 1:
+			
+			g_aTitleSelect[nCount].pos = D3DXVECTOR3(TITLE_SELECT_POS_X + TITLE_SELECT_INTERVAL_X, 	//右にずらす
+													 TITLE_SELECT_POS_Y, 0.0f);
+			
+			break;
+		}
+
 		g_aTitleSelect[nCount].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 		//タイトル選択カーソル
@@ -377,9 +397,9 @@ void UpdateTitle(void)
 		if (GetFade() == FADE_NONE)
 		{ // フェードしていない場合
 
-		  //選択モードの移動（上）
-			if (GetKeyboardTrigger(DIK_W) == true 
-			||	GetJoyKeyTrigger(JOYKEY_UP, 0) == true)
+		  //選択モードの移動（左）
+			if (GetKeyboardTrigger(DIK_A) == true 
+			||	GetJoyKeyTrigger(JOYKEY_LEFT, 0) == true)
 			{
 				// 効果音の再生
 				if (GetSoundType(SOUND_TYPE_SE) == true)
@@ -387,6 +407,9 @@ void UpdateTitle(void)
 					// 効果音（選択）の再生
 					PlaySound(SOUND_LABEL_SE_SELECT_000);
 				}
+
+				//自動遷移カウントをリセット
+				g_nTransCount = 0;
 
 				switch (g_titleCursor.type)
 				{
@@ -409,9 +432,9 @@ void UpdateTitle(void)
 				
 			}
 
-			//選択モードの移動（下）
-			if (GetKeyboardTrigger(DIK_S) == true
-			|| GetJoyKeyTrigger(JOYKEY_DOWN, 0) == true)
+			//選択モードの移動（右）
+			if (GetKeyboardTrigger(DIK_D) == true
+			|| GetJoyKeyTrigger(JOYKEY_RIGHT, 0) == true)
 			{
 				// 効果音の再生
 				if (GetSoundType(SOUND_TYPE_SE) == true)
@@ -419,6 +442,9 @@ void UpdateTitle(void)
 					// 効果音（選択）の再生
 					PlaySound(SOUND_LABEL_SE_SELECT_000);
 				}
+
+				//自動遷移カウントをリセット
+				g_nTransCount = 0;
 
 				//カーソルの移動
 				switch (g_titleCursor.type)
@@ -490,8 +516,8 @@ void UpdateTitle(void)
 
 				//スタート
 			case TITLE_SELECT_TYPE_START:
+				
 				// 頂点カラーの更新
-
 				pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -501,10 +527,12 @@ void UpdateTitle(void)
 				pVtx[9].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
 				pVtx[10].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
 				pVtx[11].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
+				
 				break;
 
 				//チュートリアル
 			case TITLE_SELECT_TYPE_TUTORIAL:
+				
 				// 頂点カラーの更新
 				pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
 				pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitle);
@@ -515,6 +543,7 @@ void UpdateTitle(void)
 				pVtx[9].col = D3DXCOLOR(1.0f, 1.0f, 1.0f,  1.0f);
 				pVtx[10].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				pVtx[11].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				
 				break;
 			}
 
