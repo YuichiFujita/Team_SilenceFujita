@@ -147,6 +147,8 @@ void HealBarrier(Player *pPlayer, int nHeal);	// バリアの回復判定
 void HitPlayer(Player *pPlayer, int nDamage);	// プレイヤーのダメージ判定
 Player *GetPlayer(void);						// プレイヤーの取得処理
 
+void SetWindSound(bool bSound);
+
 //************************************************************
 //	プロトタイプ宣言 (デバッグ用)
 //************************************************************
