@@ -16,9 +16,9 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define PLAY_WIDTH			(65.0f)		// プレイヤーの横幅 / 2
+#define PLAY_WIDTH			(95.0f)		// プレイヤーの横幅 / 2
 #define PLAY_HEIGHT			(25.0f)		// プレイヤーの縦幅
-#define PLAY_DEPTH			(65.0f)		// プレイヤーの奥行 / 2
+#define PLAY_DEPTH			(95.0f)		// プレイヤーの奥行 / 2
 
 #define MAX_FORWARD			(35.0f)						// 前進時の最高速度
 #define MAX_BOOST			(15.0f)						// ブーストの最大移動量
@@ -140,11 +140,14 @@ void UpdateTutorialPlayer(void);	// プレイヤーのチュートリアル更新処理
 void DrawPlayer(void);				// プレイヤーの描画処理
 
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot);	// プレイヤーの位置・向きの設定処理
+void SetPlayerGate(void);									// プレイヤーのゲートの設定処理
 
 void HealPlayer(Player *pPlayer, int nHeal);	// プレイヤーの回復判定
 void HealBarrier(Player *pPlayer, int nHeal);	// バリアの回復判定
 void HitPlayer(Player *pPlayer, int nDamage);	// プレイヤーのダメージ判定
 Player *GetPlayer(void);						// プレイヤーの取得処理
+
+void SetWindSound(bool bSound);
 
 //************************************************************
 //	プロトタイプ宣言 (デバッグ用)

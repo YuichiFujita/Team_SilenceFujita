@@ -71,6 +71,7 @@ void InitCamera(void);				// カメラの初期化処理
 void UninitCamera(void);			// カメラの終了処理
 void UpdateCamera(void);			// カメラの更新処理
 void SetCamera(int nID);			// カメラの設定処理
+void SetPlayerView(void);			// 最初のプレイヤーに標準を合わせる処理
 Camera *GetCamera(int nID);			// カメラの取得処理
 
 //**********************************************************************************************************************

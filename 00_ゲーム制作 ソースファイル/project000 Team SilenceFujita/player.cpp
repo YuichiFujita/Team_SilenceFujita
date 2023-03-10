@@ -61,8 +61,8 @@
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
 #define BOOST_WAIT_SUB	(5)			// ブーストの待機状態の減算量
 
-#define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
-#define BOOST_Y_ADD		(40.0f)		// ブースト噴射位置の y加算量
+#define BOOST_XZ_SUB	(110.0f)	// ブースト噴射位置の xz減算量
+#define BOOST_Y_ADD		(58.0f)		// ブースト噴射位置の y加算量
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
 #define BOOST_MIN_MOVE	(1.5f)		// ブースト時に必要な最低速度
 
@@ -71,7 +71,7 @@
 //------------------------------------------------------------
 #define FLYAWAY_INTERVAL_CNT	(3)			// 風の出る間隔
 #define FLYAWAY_SET_CNT			(10)		// 風の出る量
-#define FLYAWAY_SHIFT_WIDTH		(90.0f)		// 風の出る位置をずらす幅
+#define FLYAWAY_SHIFT_WIDTH		(125.0f)	// 風の出る位置をずらす幅
 #define FLYAWAY_SHIFT_HEIGHT	(50.0f)		// 風の出る位置をずらす距離
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
 #define FLYAWAY_WAIT_SUB		(5)			// 風の待機状態の減算量
@@ -107,15 +107,6 @@ typedef struct
 }TutorialInfo;
 
 //************************************************************
-//	構造体定義 (プレイヤーの音)
-//************************************************************
-typedef struct
-{
-	bool bBoost;		//ブーストの音
-	bool bWind;			//送風機の音
-}PlayerSound;
-
-//************************************************************
 //	プロトタイプ宣言
 //************************************************************
 void UpdateGameStartPlayer(void);	// ゲームスタート時のプレイヤー更新処理
@@ -123,7 +114,6 @@ void UpdateGameNorPlayer(void);		// ゲーム通常時のプレイヤー更新処理
 void UpdateTutorialNorPlayer(void);	// チュートリアル通常時のプレイヤー更新処理
 void UpdateClearPlayer(void);		// クリア成功時のプレイヤー更新処理
 void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
-void SetPlayerGate(void);			// プレイヤーのゲートの設定処理
 
 PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake);		// プレイヤーの移動量の更新処理
 
@@ -142,7 +132,6 @@ void UpdateFlyAway(void);			// 送風の更新処理
 void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
 void AbiHealPlayer(void);			// 能力ゲージの回復処理
-
 void CameraChange(void);			// カメラを変えたときの処理
 
 //************************************************************
@@ -150,7 +139,7 @@ void CameraChange(void);			// カメラを変えたときの処理
 //************************************************************
 Player       g_player;		// プレイヤー情報
 TutorialInfo g_tutoInfo;	// チュートリアル情報
-PlayerSound g_playerSound;	// プレイヤーの音の有無
+bool g_bWindSound;			// プレイヤーの音の有無
 
 //============================================================
 //	プレイヤーの初期化処理
@@ -216,20 +205,7 @@ void InitPlayer(void)
 	g_tutoInfo.bFirst       = false;			// 一人称カメラの状況
 
 	//プレイヤーの音
-	g_playerSound.bBoost = false;		//ブースト
-	g_playerSound.bWind = false;		//送風機
-
-	// モデル情報を設定
-	g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
-
-	// 影のインデックスを設定
-	g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
-
-	// アイコンのインデックスを設定
-	g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
-
-	// 影の位置設定
-	SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
+	g_bWindSound = false;		//送風機
 }
 
 //============================================================
@@ -427,11 +403,20 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	if (g_player.bUse == false)
 	{ // プレイヤーが使用されていない場合
 
+		// モデル情報を設定
+		g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
+
+		// 影のインデックスを設定
+		g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
+
+		// アイコンのインデックスを設定
+		g_player.icon.nIconID = SetIcon(g_player.pos, ICONTYPE_PLAY, &g_player.icon.nIconID, &g_player.bUse, &g_player.icon.state);
+
+		// 影の位置設定
+		SetPositionShadow(g_player.nShadowID, g_player.pos, g_player.rot, NONE_SCALE);
+
 		// 使用している状態にする
 		g_player.bUse = true;
-
-		// プレイヤーのゲートの設定処理
-		SetPlayerGate();			
 	}
 }
 
@@ -512,7 +497,7 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			// カウンターを設定
 			pPlayer->nCounterState = DAMAGE_TIME_PLAY;
 
-			//効果音の停止
+			//効果音の再生
 			if (GetSoundType(SOUND_TYPE_SE) == true)
 			{
 				// サウンドの再生
@@ -733,22 +718,12 @@ void UpdateTutorialNorPlayer(void)
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
 		aControl[1] = false;	// 旋回
-		aControl[2] = false;	// 停止
+		aControl[2] = true;		// 停止
 
 		// 処理を抜ける
 		break;
 
 	case LESSON_01:	// レッスン1 (旋回)
-
-		// 操作の制限を設定
-		aControl[0] = true;		// 移動
-		aControl[1] = true;		// 旋回
-		aControl[2] = false;	// 停止
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
 
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
@@ -777,22 +752,22 @@ void UpdateTutorialNorPlayer(void)
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 
-	if (GetLessonState() >= LESSON_04)
-	{ // レッスン4に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_02)
+	{ // レッスン2に挑戦中、またはクリアしている場合
 
 		// プレイヤーの加速
 		SlumBoostPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_05)
-	{ // レッスン5に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_03)
+	{ // レッスン3に挑戦中、またはクリアしている場合
 
 		// プレイヤーの送風
 		FlyAwayPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_06)
-	{ // レッスン6に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_04)
+	{ // レッスン4に挑戦中、またはクリアしている場合
 
 		// プレイヤーの爆弾
 		SilenceWorldPlayer();
@@ -804,12 +779,8 @@ void UpdateTutorialNorPlayer(void)
 	// 爆弾の更新
 	UpdateSilenceWorld();
 
-	if (GetLessonState() >= LESSON_03)
-	{ // レッスン3に挑戦中、またはクリアしている場合
-
-		// プレイヤーのカメラの状態変化
-		CameraChangePlayer();
-	}
+	// プレイヤーのカメラの状態変化
+	CameraChangePlayer();
 
 	// 能力ゲージの回復
 	AbiHealPlayer();
@@ -912,31 +883,6 @@ void UpdateTutorialNorPlayer(void)
 
 		if (currentPlayer == PLAYMOVESTATE_ROTATE)
 		{ // 現在のプレイヤーの動きが旋回状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
-
-		if (currentPlayer == PLAYMOVESTATE_BRAKE)
-		{ // 現在のプレイヤーの動きが停止状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_03:	// レッスン3 (視点変更)
-
-		if (g_tutoInfo.bForward == true
-		&&  g_tutoInfo.bFirst   == true)
-		{ // どちらのカメラも変更した場合
 
 			// レッスンの状態の加算
 			AddLessonState();
@@ -1136,6 +1082,12 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 	if (bMove)
 	{ // 移動の操作が可能な場合
 
+		// プレイヤーの速度を計算
+		float fVolume = (fabsf(g_player.move.x + g_player.boost.plusMove.x) / MAX_REAL_SPEED);
+
+		//プレイヤーの速度で走行音を調整
+		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, fVolume);
+
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
 		{ // 前進の操作が行われた場合
 
@@ -1215,11 +1167,14 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
+	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
 		{ // 停止の操作が可能な場合
+
+			// 移動していない状態にする
+			g_player.bMove = false;
 
 			// 移動量を減速
 			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
@@ -1405,17 +1360,8 @@ void FlyAwayPlayer(void)
 			//効果音系BGMの再生
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
-
-				//サウンドの設定
-				if (g_playerSound.bWind == false)
-				{//送風機のサウンドが流れていないとき
-
-					//送風機のサウンドのオンに設定
-					g_playerSound.bWind = true;
-
-					//送風機のサウンド（BGM）の再生
-					PlaySound(SOUND_LABEL_BGM_ABILITY_WIND_000);
-				}
+				//サウンドを再生
+				SetWindSound(true);
 			}
 		}
 		else
@@ -1424,18 +1370,8 @@ void FlyAwayPlayer(void)
 			//効果音系BGMの停止
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
-				//サウンドの設定
-				if (g_playerSound.bWind == true)
-				{//送風機のサウンドが流れているとき
-
-				 //送風機のサウンド（BGM）の停止
-					StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
-
-					//送風機のサウンドのオフに設定
-					g_playerSound.bWind = false;
-
-
-				}
+				//サウンドを停止
+				SetWindSound(false);
 			}
 		}
 	}
@@ -1448,18 +1384,8 @@ void FlyAwayPlayer(void)
 		//効果音系BGMの停止
 		if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 		{
-			//サウンドの設定
-			if (g_playerSound.bWind == true)
-			{//送風機のサウンドが流れているとき
-
-				//送風機のサウンド（BGM）の停止
-				StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
-
-				//送風機のサウンドのオフに設定
-				g_playerSound.bWind = false;
-
-
-			}
+			//サウンドを停止
+			SetWindSound(false);
 		}
 	}
 }
@@ -1585,17 +1511,6 @@ void UpdateSlumBoost(void)
 
 			// 減速状態にする
 			g_player.boost.state = BOOSTSTATE_DOWN;
-
-			//サウンドの設定
-			if (g_playerSound.bBoost == true)
-			{//送風機のサウンドが流れているとき
-
-				//送風機のサウンドのオフに設定
-				g_playerSound.bBoost = false;
-
-				//送風機のサウンド（BGM）の停止
-				StopSound(SOUND_LABEL_SE_ABILITY_BOOST_000);
-			}
 		}
 
 		// 左ブーストの放出位置を求める
@@ -1693,16 +1608,8 @@ void SetSlumBoost(void)
 		//効果音系BGMを再生
 		if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 		{
-			//サウンドの設定
-			if (g_playerSound.bBoost == false)
-			{//ブーストのサウンドが流れていないとき
-				
-				//ブーストのサウンドのオンに設定
-				g_playerSound.bBoost = true;
-				
-				//ブーストのサウンド（BGM）の再生
-				PlaySound(SOUND_LABEL_SE_ABILITY_BOOST_000);
-			}
+			//ブーストのサウンド（BGM）の再生
+			PlaySound(SOUND_LABEL_SE_ABILITY_BOOST_000);
 		}
 	}
 }
@@ -1755,7 +1662,7 @@ void UpdateFlyAway(void)
 						// 風の位置を設定する
 						g_player.wind.pos = D3DXVECTOR3
 						(
-							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
+							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
 							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT,												// Y座標
 							g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
 						);
@@ -2028,57 +1935,6 @@ void UpdateGameStartPlayer(void)
 	// プレイヤーの位置の更新
 	PosPlayer();
 
-	//switch (pGate[g_player.nNumEnterGate].collInfo->stateRot)
-	//{
-	//case ROTSTATE_0:		// 0度
-
-	//	if (g_player.pos.z <= pGate[g_player.nNumEnterGate].pos.z)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.z = pGate[g_player.nNumEnterGate].pos.z;
-	//	}
-
-	//	break;
-
-	//case ROTSTATE_180:		// 180度
-
-	//	if (g_player.pos.z >= pGate[g_player.nNumEnterGate].pos.z)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.z = pGate[g_player.nNumEnterGate].pos.z;
-	//	}
-
-	//	break;
-
-	//case ROTSTATE_90:		// 90度
-
-	//	if (g_player.pos.x <= pGate[g_player.nNumEnterGate].pos.x)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.x = pGate[g_player.nNumEnterGate].pos.x;
-	//	}
-
-	//	break;
-
-	//case ROTSTATE_270:		// 270度
-
-	//	if (g_player.pos.x >= pGate[g_player.nNumEnterGate].pos.x)
-	//	{ // 位置に着いた場合
-
-	//		// 位置を補正する
-	//		g_player.pos.x = pGate[g_player.nNumEnterGate].pos.x;
-	//	}
-
-	//	break;
-
-	//default:				// 上記以外
-
-	//	break;
-	//}
-
 	// プレイヤーの向きの更新
 	RotPlayer();
 
@@ -2111,7 +1967,7 @@ void UpdateGameStartPlayer(void)
 //============================================================
 // プレイヤーのゲートの設定処理
 //============================================================
-void SetPlayerGate()
+void SetPlayerGate(void)
 {
 	int nGateNum = GetGateNum();		// ゲートの数を取得する
 	int nSpawnGateNum;					// ゲートの番号
@@ -2176,6 +2032,36 @@ void SetPlayerGate()
 
 	// 出てくるゲートの位置を設定する
 	g_player.nNumEnterGate = nSpawnGateNum;
+}
+
+//============================================================
+// 風の送風機
+//============================================================
+void SetWindSound(bool bSound)
+{
+	//サウンドの設定
+	if (bSound == true)
+	{//送風機のサウンドが流れていないとき
+		if (g_bWindSound == false)
+		{
+			//送風機のサウンドのオンに設定
+			g_bWindSound = true;
+
+			//送風機のサウンド（BGM）の再生
+			PlaySound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+		}
+	}
+	else
+	{
+		if (g_bWindSound == true)
+		{
+			//送風機のサウンド（BGM）の停止
+			StopSound(SOUND_LABEL_BGM_ABILITY_WIND_000);
+
+			//送風機のサウンドのオフに設定
+			g_bWindSound = false;
+		}
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理

@@ -15,8 +15,10 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
+#define MAP_COL_AREA_OVER	(D3DXCOLOR(0.35f, 0.35f, 0.35f, 1.0f))	// マップのエリア外の色
 #define MAP_COL_ROAD		(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f))		// マップの道路の色
 #define MAP_COL_SIDEWALK	(D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f))		// マップの歩道の色
+#define MAP_COL_FIELD		(D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f))		// マップの地面の色
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -27,22 +29,24 @@ const char *apTextureMeshField[] =		// テクスチャの相対パス
 	"data\\TEXTURE\\road001.png",			// 曲がり角度のテクスチャの相対パス
 	"data\\TEXTURE\\road002.png",			// 交差点のテクスチャの相対パス
 	"data\\TEXTURE\\road003.png",			// 丁字路のテクスチャの相対パス
-	"data\\TEXTURE\\sidewalk000.png",		// 歩道のテクスチャの相対パス
+	"data\\TEXTURE\\sidewalk000.png",		// 地面のテクスチャの相対パス
 	"data\\TEXTURE\\Tile.jpg",				// タイルのテクスチャの相対パス
 	"data\\TEXTURE\\shopping_street.jpg",	// 商店街の道のテクスチャの相対パス
 	"data\\TEXTURE\\red_sidewalk.jpg",		// 歩道のテクスチャの相対パス
+	"data\\TEXTURE\\sidewalk002.png",		// 地面のテクスチャの相対パス
 };
 
 const D3DXCOLOR aColorMeshField[] =		// マップの地面カラー
 {
-	MAP_COL_ROAD,						// 直線のテクスチャの地面カラー
-	MAP_COL_ROAD,						// 曲がり角度のテクスチャの地面カラー
-	MAP_COL_ROAD,						// 交差点のテクスチャの地面カラー
-	MAP_COL_ROAD,						// 丁字路のテクスチャの地面カラー
-	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
-	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
-	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
-	MAP_COL_SIDEWALK,					// 歩道のテクスチャの地面カラー
+	MAP_COL_ROAD,		// 直線のテクスチャの地面カラー
+	MAP_COL_ROAD,		// 曲がり角度のテクスチャの地面カラー
+	MAP_COL_ROAD,		// 交差点のテクスチャの地面カラー
+	MAP_COL_ROAD,		// 丁字路のテクスチャの地面カラー
+	MAP_COL_FIELD,		// 地面のテクスチャの地面カラー
+	MAP_COL_FIELD,		// 地面のテクスチャの地面カラー
+	MAP_COL_SIDEWALK,	// 歩道のテクスチャの地面カラー
+	MAP_COL_SIDEWALK,	// 歩道のテクスチャの地面カラー
+	MAP_COL_AREA_OVER,	// エリア外のテクスチャの地面カラー
 };
 
 //**********************************************************************************************************************
@@ -58,6 +62,7 @@ typedef enum
 	TEXTURE_MESHFIELD_TILE,				// タイル
 	TEXTURE_MESHFIELD_SHOPPING_STREET,	// 商店街の道
 	TEXTURE_MESHFIELD_SIDEWALK2,		// 歩道
+	TEXTURE_MESHFIELD_AREAOVER,			// 歩道
 	TEXTURE_MESHFIELD_MAX,				// この列挙型の総数
 } TEXTURE_MESHFIELD;
 

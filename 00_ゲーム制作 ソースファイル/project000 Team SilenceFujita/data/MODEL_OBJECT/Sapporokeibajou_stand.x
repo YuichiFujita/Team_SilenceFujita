@@ -7492,7 +7492,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\wood000.jpeg";
+    "data\\TEXTURE\\wood000.jpeg";
    }
   }
   Material {
@@ -7501,7 +7501,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\wood000.jpeg";
+    "data\\TEXTURE\\wood000.jpeg";
    }
   }
   Material {
@@ -7510,7 +7510,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\renga000.jpg";
+    "data\\TEXTURE\\renga000.jpg";
    }
   }
   Material {
@@ -7519,7 +7519,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\renga000.jpg";
+    "data\\TEXTURE\\renga000.jpg";
    }
   }
   Material {
@@ -7528,7 +7528,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\renga000.jpg";
+    "data\\TEXTURE\\renga000.jpg";
    }
   }
   Material {

@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "Combo.h"
 #include "input.h"
+#include "sound.h"
 #include "item.h"
 #include "particle.h"
 #include "object.h"
@@ -390,8 +391,15 @@ void CollisionWind(Human *pHuman)
 		&&  LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
 		{ // 四辺の内側にいる場合 (当たっている場合)
 
-			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY && pHuman->judge.state == JUDGESTATE_EVIL)
-			{ // 風を使用しているかつ、人が吹き飛んでいない時かつ、悪い奴だった場合
+			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY)
+			{ // 風を使用しているかつ、人が吹き飛んでいない場合
+
+				// 効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// サウンド（吹き飛ばし時）の再生
+					PlaySound(SOUND_LABEL_SE_FLY_000);
+				}
 
 				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;
@@ -399,25 +407,26 @@ void CollisionWind(Human *pHuman)
 				// 人間が吹き飛ばされる処理
 				FlyAwayHuman(pHuman, *pPlayer);
 
-				// アイテムが落ちるカウントを初期化する
-				g_nHumanItemCount++;
+				if (pHuman->judge.state == JUDGESTATE_EVIL)
+				{ // 悪い奴だった場合
 
-				if (GetMode() == MODE_GAME)
-				{ // ゲーム状態の場合
+					// ボーナスの設定処理
+					SetBonus(SCORE_HUMAN);
 
-					if (g_nHumanItemCount % ITEM_WIND_COUNT == 0)
-					{ // 一定数以上になったら
+					// アイテムが落ちるカウントを初期化する
+					g_nHumanItemCount++;
 
-						// アイテムの設定処理
-						SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
+					if (GetMode() == MODE_GAME)
+					{ // ゲーム状態の場合
+
+						if (g_nHumanItemCount % ITEM_WIND_COUNT == 0)
+						{ // 一定数以上になったら
+
+							// アイテムの設定処理
+							SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
+						}
 					}
 				}
-
-				// ボーナスの設定処理
-				SetBonus(SCORE_HUMAN);
-
-				// カメラの状態を変える
-				*GetCameraState() = CAMERASTATE_GOODJOB;
 			}
 		}
 	}

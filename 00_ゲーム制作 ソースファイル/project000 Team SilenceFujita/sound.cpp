@@ -13,7 +13,7 @@
 //	マクロ定義 (追加で入れたやつ)
 //**********************************************************************************************************************
 #define SOUND_SWITCH_RELEASE	(SOUND_SWITCH_ON)		//リリースで使用する音
-#define SOUND_SWITCH_DEBUG		(SOUND_SWITCH_OFF)		//デバックで使用する音
+#define SOUND_SWITCH_DEBUG		(SOUND_SWITCH_ON)		//デバックで使用する音
 
 //**********************************************************************************************************************
 //	構造体定義 (SOUNDINFO)
@@ -54,19 +54,26 @@ SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 	{ "data/BGM/senkyocar000.wav", -1 },	// 選挙カーの効果音BGM_000
 	{ "data/BGM/police000.wav", -1 },		// 警察の効果音BGM_000
 	{ "data/BGM/wind000.wav", -1 },			// プレイヤー能力（送風機）の効果音BGM_000
+	{ "data/BGM/car000.wav", -1 },			// 車走行時のBGM_000
 	{ "data/SE/move000.wav", 0 },			// SE
 	{ "data/SE/select000.wav", 0 },			// 選択のSE_000
 	{ "data/SE/decide000.wav", 0 },			// 決定のSE_000
 	{ "data/SE/startcount000.wav", 0 },		// スタートのカウントダウン（ピッ！）のSE_000
 	{ "data/SE/startgo000.wav", 0 },		// 開始時のスタート（ピー！）のSE_000
+	{ "data/SE/startslide000.wav", 0 },		// スタートのスライド（シュッ！）のSE_000
+	{ "data/SE/startlanding000.wav", 0 },	// スタートシグナルの着地の音（ズドン）のSE_000
 	{ "data/SE/boost000.wav", 0 },			// プレイヤー能力（ブースト）のSE_000
 	{ "data/SE/bomb000.wav", 0 },			// プレイヤー能力（ボム）のSE_000
+	{ "data/SE/carbrake000.wav", 0 },		// ブレーキ音のSE_000
 	{ "data/SE/break000.wav", 0 },			// 破壊音のSE_000
 	{ "data/SE/damage000.wav", 0 },			// プレイヤーダメージのSE_000
+	{ "data/SE/fly000.wav", 0 },			// 吹き飛ばし時のSE_000
+	{ "data/SE/barrier000.wav", 0 },		// バリア生成時のSE_000
 	{ "data/SE/gareki000.wav", 0 },			// 崩れる（建物系）のSE_000
 	{ "data/SE/gareki001.wav", 0 },			// 崩れる（小物系）のSE_001
 	{ "data/SE/score000.wav", 0 },			// スコア獲得のSE_000
-
+	{ "data/SE/tutorialpage000.wav", 0 },	// チュートリアルをめくるSE_000
+	
 };
 
 //**********************************************************************************************************************

@@ -2097,7 +2097,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\siba000.jpg";
+    "data\\TEXTURE\\siba000.jpg";
    }
   }
   Material {
@@ -2106,7 +2106,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\dirt000.jpg";
+    "data\\TEXTURE\\dirt000.jpg";
    }
   }
   Material {
@@ -2115,7 +2115,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2124,7 +2124,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2133,7 +2133,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2142,7 +2142,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2151,7 +2151,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2160,7 +2160,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2169,7 +2169,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2178,7 +2178,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2187,7 +2187,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2196,7 +2196,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {
@@ -2205,7 +2205,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\uma_fance000.png";
+    "data\\TEXTURE\\uma_fance000.png";
    }
   }
   Material {

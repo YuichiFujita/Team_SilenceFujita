@@ -416,3 +416,12 @@ void AddComboScore(int nScore)
 		}
 	}
 }
+
+//===========================================
+// コンボ数の取得処理
+//===========================================
+int GetCurrentCombo(void)
+{
+	// 現在のコンボ数を返す
+	return g_Combo.nMagni;
+}

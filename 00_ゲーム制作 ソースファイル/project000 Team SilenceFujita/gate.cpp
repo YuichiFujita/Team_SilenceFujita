@@ -11,6 +11,9 @@
 #include "calculation.h"
 #include "model.h"
 
+#include "game.h"
+#include "tutorial.h"
+
 #include "gate.h"
 #include "player.h"
 #include "timer.h"
@@ -25,7 +28,7 @@
 #define GATE_OPEN				(2.5f)		// ゲートの開く速度
 #define GATE_DOOR_PLUSPOS		(285.0f)	// ドアの初期位置の y座標加算量
 #define GATE_EXIT_WIDESIZE_MUL	(0.3f)		// 脱出口の横位置加算量の倍率
-#define GATE_EXIT_FORWARDPLUS	(150.0f)	// 脱出口の前方加算量
+#define GATE_EXIT_FORWARDPLUS	(200.0f)	// 脱出口の前方加算量
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -611,12 +614,40 @@ void CollisionExitGate(Gate *pGate)
 	D3DXVECTOR3 leftForwardPos;		// ゲートの左の前方位置
 	D3DXVECTOR3 rightForwardPos;	// ゲートの右の前方位置
 	float       fSideSize;			// ゲートの横幅
+	bool        bExit = false;		// 脱出可能状況
 
 	// プレイヤーを宣言
 	Player *pPlayer = GetPlayer();	// プレイヤーを宣言
 
-	if (*GetGameState() == GAMESTATE_NORMAL)
-	{ // タイマーがカウント終了状態ではない場合
+	switch (GetMode())
+	{ // モードごとの処理
+	case MODE_GAME:		// ゲーム画面
+
+		if (*GetGameState() == GAMESTATE_NORMAL)
+		{ // ゲームが通常状態の場合
+
+			// 脱出可能にする
+			bExit = true;
+		}
+
+		// 処理を抜ける
+		break;
+
+	case MODE_TUTORIAL:	// チュートリアル画面
+
+		if (GetTutorialState() == TUTORIALSTATE_NORMAL)
+		{ // チュートリアルが通常状態の場合
+
+			// 脱出可能にする
+			bExit = true;
+		}
+
+		// 処理を抜ける
+		break;
+	}
+
+	if (bExit == true)
+	{ // 脱出可能な場合
 
 		// ゲートの横幅加算量を設定
 		fSideSize = pGate->modelData.size.x * GATE_EXIT_WIDESIZE_MUL;

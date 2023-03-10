@@ -49,6 +49,8 @@
 #define CAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 #define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
+#define CAR_OVERLAP_COUNT		(180)		// 車の重なりカウント
+#define CAR_STOP_COUNT			(240)		// 車の立ち止まりカウント
 
 //**********************************************************************************************************************
 //	音量関係のマクロ定義
@@ -70,6 +72,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// 警察との当たり判定
 
 void CarTrafficImprove(Car *pCar);					// 車の渋滞改善処理
+bool OverlapCar(Car *pCar);							// 車の重なり防止処理
 
 void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type);	//プレイヤーとの距離で音量を調整
 
@@ -90,20 +93,22 @@ void InitCar(void)
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		g_aCar[nCntCar].pos         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCar[nCntCar].posOld      = g_aCar[nCntCar].pos;				// 前回の位置
-		g_aCar[nCntCar].move        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aCar[nCntCar].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCar[nCntCar].nShadowID   = NONE_SHADOW;						// 影のインデックス
-		g_aCar[nCntCar].type		= CARTYPE_CAR001;					// 種類
-		g_aCar[nCntCar].bombState   = BOMBSTATE_NONE;					// ボムの状態
-		g_aCar[nCntCar].typeMove	= MOVETYPE_MOVE;					// 移動のタイプ
-		g_aCar[nCntCar].nBombCount  = 0;								// ボム中のカウント
-		g_aCar[nCntCar].bJump       = false;							// ジャンプしているかどうか
-		g_aCar[nCntCar].bMove       = false;							// 移動しているか
-		g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
-		g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態
-		g_aCar[nCntCar].bUse		= false;							// 使用状況
+		g_aCar[nCntCar].pos				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCar[nCntCar].posOld			= g_aCar[nCntCar].pos;				// 前回の位置
+		g_aCar[nCntCar].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aCar[nCntCar].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aCar[nCntCar].nShadowID		= NONE_SHADOW;						// 影のインデックス
+		g_aCar[nCntCar].type			= CARTYPE_CAR001;					// 種類
+		g_aCar[nCntCar].bombState		= BOMBSTATE_NONE;					// ボムの状態
+		g_aCar[nCntCar].typeMove		= MOVETYPE_MOVE;					// 移動のタイプ
+		g_aCar[nCntCar].nBombCount		= 0;								// ボム中のカウント
+		g_aCar[nCntCar].bJump			= false;							// ジャンプしているかどうか
+		g_aCar[nCntCar].bMove			= false;							// 移動しているか
+		g_aCar[nCntCar].nTrafficCnt		= 0;								// 渋滞カウント
+		g_aCar[nCntCar].nStopCount		= 0;								// 停止カウント
+		g_aCar[nCntCar].nOverlapCounter = 0;								// 重なりカウント
+		g_aCar[nCntCar].state			= CARSTATE_NORMAL;					// 状態
+		g_aCar[nCntCar].bUse			= false;							// 使用状況
 
 		// 曲がり角の情報の初期化
 		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle   = CURVE_LEFT;	// 左に曲がる
@@ -166,6 +171,30 @@ void UpdateCar(void)
 		{ // オブジェクトが使用されている場合
 			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
+
+				if (g_aCar[nCntCar].nStopCount == 0)
+				{ // 停止カウントが0の場合
+
+					// 移動する
+					g_aCar[nCntCar].bMove = true;
+				}
+				else
+				{ // 上記以外
+
+					// 移動しない
+					g_aCar[nCntCar].bMove = false;
+
+					// 停止カウントを加算する
+					g_aCar[nCntCar].nStopCount++;
+
+					if (g_aCar[nCntCar].nStopCount >= CAR_STOP_COUNT)
+					{ // 停止カウントが一定数になった場合
+
+						// 停止カウントを初期化する
+						g_aCar[nCntCar].nStopCount = 0;
+					}
+				}
+
 				// 前回位置の更新
 				g_aCar[nCntCar].posOld = g_aCar[nCntCar].pos;
 
@@ -441,8 +470,8 @@ void DrawCar(void)
 					}
 				}
 
-				if (g_aCar[nCntCar].bombState == BOMBSTATE_RANGE)
-				{ // 範囲内状態の場合
+				if (g_aCar[nCntCar].bombState == BOMBSTATE_RANGE && GetPlayer()->bomb.state == ATTACKSTATE_NONE)
+				{ // 範囲内状態かつ、プレイヤーがボムを撃てる状態の場合
 
 					// マテリアルのコピーに代入する
 					g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
@@ -491,20 +520,22 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 		if (g_aCar[nCntCar].bUse == false)
 		{ // オブジェクトが使用されていない場合
 			// 引数を代入
-			g_aCar[nCntCar].pos			= pos;								// 現在の位置
-			g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;				// 前回の位置				
-			g_aCar[nCntCar].typeMove	= (MOVETYPE)nWalk;					// 移動のタイプ
-			g_aCar[nCntCar].rot			= rot;								// 向き
-			g_aCar[nCntCar].type		= (CARTYPE)(nType);					// 車の種類
+			g_aCar[nCntCar].pos			= pos;									// 現在の位置
+			g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;					// 前回の位置				
+			g_aCar[nCntCar].typeMove	= (MOVETYPE)nWalk;						// 移動のタイプ
+			g_aCar[nCntCar].rot			= rot;									// 向き
+			g_aCar[nCntCar].type		= (CARTYPE)(nType);						// 車の種類
 
 			// 情報の設定
-			g_aCar[nCntCar].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aCar[nCntCar].bombState	= BOMBSTATE_NONE;					// 何もしていない状態にする
-			g_aCar[nCntCar].nBombCount	= 0;								// ボム中のカウント
-			g_aCar[nCntCar].bJump		= false;							// ジャンプしているかどうか
-			g_aCar[nCntCar].nTrafficCnt = 0;								// 渋滞カウント
-			g_aCar[nCntCar].state		= CARSTATE_NORMAL;					// 状態
-			g_aCar[nCntCar].bMove		= false;							// 移動していない
+			g_aCar[nCntCar].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aCar[nCntCar].bombState		= BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aCar[nCntCar].nBombCount		= 0;								// ボム中のカウント
+			g_aCar[nCntCar].bJump			= false;							// ジャンプしているかどうか
+			g_aCar[nCntCar].nTrafficCnt		= 0;								// 渋滞カウント
+			g_aCar[nCntCar].nStopCount		= 0;								// 停止カウント
+			g_aCar[nCntCar].nOverlapCounter = 0;								// 重なりカウント
+			g_aCar[nCntCar].state			= CARSTATE_NORMAL;					// 状態
+			g_aCar[nCntCar].bMove			= false;							// 移動していない
 
 			// 使用している状態にする
 			g_aCar[nCntCar].bUse = true;
@@ -551,7 +582,8 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 			// ジャッジの情報の設定
 			g_aCar[nCntCar].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			if (g_aCar[nCntCar].type == CARTYPE_ELECTIONCAR)
+			if (g_aCar[nCntCar].type == CARTYPE_ELECTIONCAR
+			 || g_aCar[nCntCar].type == CARTYPE_BOUSOUCAR)
 			{ // 悪いやつだった場合
 
 				g_aCar[nCntCar].judge.state = JUDGESTATE_EVIL;					// 善悪
@@ -1936,7 +1968,7 @@ void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type)
 			{//一定範囲内の場合
 
 				//音量設定用の変数
-				float fVolume = CAR_SOUND_VOLUME_MAX - (fLength / (CAR_SOUND_RADIUS * CAR_SOUND_RADIUS));
+				float fVolume = 1.0f - (fLength / (CAR_SOUND_RADIUS * CAR_SOUND_RADIUS));
 
 				switch (*type)
 				{//車の種類ごとに設定
@@ -1992,6 +2024,47 @@ void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type)
 			}
 		}
 	}
+}
+
+//============================================================
+// 車の重なり防止処理
+//============================================================
+bool OverlapCar(Car *pCar)
+{
+	bool bOverlap = false;			// 重なったかどうか
+
+	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++)
+	{
+		if (g_aCar[nCnt].bUse == true && &g_aCar[nCnt] != pCar)
+		{ // 車が使われていた場合
+
+			if (g_aCar[nCnt].pos == pCar->pos && g_aCar[nCnt].bMove == true)
+			{ // 位置が一致かつ、移動量の最大数が一致していた場合
+
+				// 車の重なり防止カウンターを加算する
+				pCar->nOverlapCounter++;
+
+				// 重なり防止判定を通った
+				bOverlap = true;
+
+				if (pCar->nOverlapCounter >= CAR_OVERLAP_COUNT)
+				{ // 重なり防止のカウンターが一定数を超えた場合
+
+					// 移動量を0,0fにする
+					pCar->move.x = 0.0f;
+
+					// 移動をしない
+					pCar->bMove = false;
+
+					// 停止カウントを加算する
+					pCar->nStopCount++;
+				}
+			}
+		}
+	}
+
+	// 重なったかどうかを返す
+	return bOverlap;
 }
 
 #ifdef _DEBUG	// デバッグ処理

@@ -27,6 +27,9 @@
 #define JUNK_COL_MAGNI		(0.05f)		// がれきの色の減衰倍率
 #define JUNK_POS_Y_ADD		(40.0f)		// がれきの位置の加算数(Y軸)
 #define JUNK_EMERGENCY_COL	(D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f))
+#define JUNK_BIG_SCALE		(D3DXVECTOR3(1.5f, 1.5f, 1.5f))
+#define JUNK_NORMAL_SCALE	(D3DXVECTOR3(1.0f, 1.0f, 1.0f))
+#define JUNK_SMALL_SCALE	(D3DXVECTOR3(0.5f, 0.5f, 0.5f))
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -313,21 +316,21 @@ void SetJunk(D3DXVECTOR3 pos, D3DXVECTOR3 rot, SCALETYPE scale, D3DMATERIAL9 col
 			case SCALETYPE_SMALL:	// 小さいがれき
 
 				// 拡大率を設定する
-				g_aJunk[nCntJunk].scale = D3DXVECTOR3(0.5f, 0.5f, 0.5f);
+				g_aJunk[nCntJunk].scale = JUNK_SMALL_SCALE;
 
 				break;				// 抜け出す
 
 			case SCALETYPE_NORMAL:	// 普通のがれき
 
 				// 拡大率を設定する
-				g_aJunk[nCntJunk].scale = D3DXVECTOR3(0.75f, 0.75f, 0.75f);
+				g_aJunk[nCntJunk].scale = JUNK_NORMAL_SCALE;
 
 				break;				// 抜け出す
 
 			case SCALETYPE_BIG:		// 大きいがれき
 
 				// 拡大率を設定する
-				g_aJunk[nCntJunk].scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+				g_aJunk[nCntJunk].scale = JUNK_BIG_SCALE;
 
 				break;				// 抜け出す
 			}
