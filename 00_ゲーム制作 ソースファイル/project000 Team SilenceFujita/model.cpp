@@ -104,6 +104,8 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\Sapporokeibajou_stand.x",	// 競馬場（スタンド）
 	"data\\MODEL_OBJECT\\SignUnBoost.x",			// 標識(ブースト禁止)
 	"data\\MODEL_OBJECT\\RResort.x",				// いかがわしい店
+	"data\\MODEL_OBJECT\\TrashBag.x",				// ゴミ袋
+	
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
