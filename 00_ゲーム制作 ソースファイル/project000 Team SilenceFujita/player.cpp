@@ -1167,11 +1167,14 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
+	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
 		{ // 停止の操作が可能な場合
+
+			// 移動していない状態にする
+			g_player.bMove = false;
 
 			// 移動量を減速
 			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
@@ -1185,7 +1188,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			}
 
 			// 移動量の補正
-			if (g_player.move.x <= DEL_MOVE_ABS
+			if (g_player.move.x <=  DEL_MOVE_ABS
 			&&  g_player.move.x >= -DEL_MOVE_ABS)
 			{ // 移動量が削除の範囲内の場合
 

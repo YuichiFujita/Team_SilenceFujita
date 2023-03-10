@@ -47,6 +47,7 @@ typedef enum
 	SOUND_LABEL_SE_GAREKI_000,			// 崩壊音（建物系）のSE_000
 	SOUND_LABEL_SE_GAREKI_001,			// 崩壊音（小物系）のSE_001
 	SOUND_LABEL_SE_SCORE_000,			// スコア獲得のSE_000
+	SOUND_LABEL_SE_TUTORIAL_PAGE_000,	// チュートリアルをめくるSE_000
 	SOUND_LABEL_MAX,					// この列挙型の総数
 } SOUND_LABEL;
 
