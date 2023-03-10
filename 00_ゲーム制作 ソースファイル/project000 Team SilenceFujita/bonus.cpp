@@ -419,8 +419,8 @@ void SetBonus(int nBonus)
 
 	case MODE_TUTORIAL:	// チュートリアル画面
 
-		if (GetTutorialState() == TUTORIALSTATE_NORMAL)
-		{ // チュートリアルが通常状態の場合
+		if (GetLessonState() >= LESSON_05)
+		{ // レッスン5に挑戦中、またはクリアしている場合
 
 			// スコア加算可能にする
 			bScore = true;

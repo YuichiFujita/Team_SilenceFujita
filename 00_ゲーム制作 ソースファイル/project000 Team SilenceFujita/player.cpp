@@ -61,8 +61,8 @@
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
 #define BOOST_WAIT_SUB	(5)			// ブーストの待機状態の減算量
 
-#define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
-#define BOOST_Y_ADD		(40.0f)		// ブースト噴射位置の y加算量
+#define BOOST_XZ_SUB	(110.0f)	// ブースト噴射位置の xz減算量
+#define BOOST_Y_ADD		(58.0f)		// ブースト噴射位置の y加算量
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
 #define BOOST_MIN_MOVE	(1.5f)		// ブースト時に必要な最低速度
 
@@ -1167,11 +1167,14 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
+	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
 		{ // 停止の操作が可能な場合
+
+			// 移動していない状態にする
+			g_player.bMove = false;
 
 			// 移動量を減速
 			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
