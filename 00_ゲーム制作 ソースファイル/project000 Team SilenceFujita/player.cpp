@@ -61,8 +61,8 @@
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
 #define BOOST_WAIT_SUB	(5)			// ブーストの待機状態の減算量
 
-#define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
-#define BOOST_Y_ADD		(40.0f)		// ブースト噴射位置の y加算量
+#define BOOST_XZ_SUB	(110.0f)	// ブースト噴射位置の xz減算量
+#define BOOST_Y_ADD		(58.0f)		// ブースト噴射位置の y加算量
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
 #define BOOST_MIN_MOVE	(1.5f)		// ブースト時に必要な最低速度
 
