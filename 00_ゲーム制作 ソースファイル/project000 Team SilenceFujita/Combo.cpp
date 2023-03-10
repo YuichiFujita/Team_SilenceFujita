@@ -9,6 +9,8 @@
 #include "score.h"
 #include "value.h"
 
+#include "tutorial.h"
+
 //マクロ定義
 #define MAX_COMBO			(2)			// 使用するポリゴン数
 
@@ -210,8 +212,13 @@ void UpdateCombo(void)
 	if (g_Combo.bUse == true)
 	{//使用していた場合
 
-		// コンボの止まるカウントを加算
-		g_nComboCount++;
+		if (GetMode() == MODE_GAME
+			|| GetLessonState() != LESSON_05)
+		{ // ゲーム中または、レッスン5に挑戦中、またはクリアしている場合
+
+			// コンボの止まるカウントを加算
+			g_nComboCount++;
+		}
 
 		if (g_nComboCount >= COMBO_CLEAR_CNT)
 		{ // カウントが一定以上になった場合
