@@ -101,6 +101,7 @@ typedef enum
 	MODELTYPE_OBJECT_KEIBAJOU001,			// 競馬場（スタンド）
 	MODELTYPE_OBJECT_SIGNUNBOOST,			// 標識(ブースト禁止)
 	MODELTYPE_OBJECT_RRESORT,				// いかがわしい店
+	MODELTYPE_OBJECT_TRASHBAG,				// ゴミ袋
 	
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
