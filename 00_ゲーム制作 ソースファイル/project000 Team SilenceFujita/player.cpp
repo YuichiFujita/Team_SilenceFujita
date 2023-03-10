@@ -1188,7 +1188,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			}
 
 			// ˆÚ“®—Ê‚Ì•â³
-			if (g_player.move.x <= DEL_MOVE_ABS
+			if (g_player.move.x <=  DEL_MOVE_ABS
 			&&  g_player.move.x >= -DEL_MOVE_ABS)
 			{ // ˆÚ“®—Ê‚ªíœ‚Ì”ÍˆÍ“à‚Ìê‡
 

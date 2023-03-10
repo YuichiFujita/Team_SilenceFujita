@@ -1241,8 +1241,8 @@ void AddLessonState(void)
 			// 演出の状態を手紙の表示状態に変更
 			g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
 
-			//// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_DEC_00);	// SE (決定00)
+			// サウンドの再生
+			PlaySound(SOUND_LABEL_SE_SCORE_000);	// SE (決定00)
 		}
 	}
 }
@@ -1301,6 +1301,9 @@ void UpdateTutorialUi(void)
 
 				// 手紙の表示状態にする
 				g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
+
+				// サウンドの再生
+				PlaySound(SOUND_LABEL_SE_TUTORIAL_PAGE_000);		// SE (チュートリアルをめくるSE_000)
 			}
 		}
 
@@ -1910,6 +1913,9 @@ void ResetPlayer(void)
 	pPlayer->bomb.nCounterState   = BOMB_WAIT_CNT;				// 攻撃管理カウンター
 	pPlayer->bomb.nCounterControl = 0;							// 操作管理カウンター
 	pPlayer->bomb.bShot           = false;						// 発射待機状況
+
+	// 風の送風機
+	SetWindSound(false);
 
 	// 影の位置設定
 	SetPositionShadow(pPlayer->nShadowID, pPlayer->pos, pPlayer->rot, NONE_SCALE);

@@ -476,6 +476,9 @@ void UpdateGame(void)
 
 				// ポーズの開始、解除
 				g_bPause = (g_bPause == false) ? true : false;
+
+				// サウンドの再生
+				PlaySound(SOUND_LABEL_SE_SELECT_000);		// SE (選択のSE)
 			}
 #endif
 		}
@@ -610,7 +613,7 @@ void UpdateGame(void)
 
 			// 体力バーの更新
 			UpdateLife();
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif
