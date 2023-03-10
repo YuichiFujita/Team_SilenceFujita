@@ -714,8 +714,8 @@ void DrawPolice(void)
 					break;
 				}
 
-				if (g_aPolice[nCntPolice].bombState == BOMBSTATE_RANGE)
-				{ // 範囲内状態の場合
+				if (g_aPolice[nCntPolice].bombState == BOMBSTATE_RANGE && GetPlayer()->bomb.state == ATTACKSTATE_NONE)
+				{ // 範囲内状態かつ、プレイヤーがボムを撃てる状態の場合
 
 					// 範囲内時のマテリアルの色を設定
 					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse = POLICAR_BOMB_RANGE_DIF;
