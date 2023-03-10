@@ -470,8 +470,8 @@ void DrawCar(void)
 					}
 				}
 
-				if (g_aCar[nCntCar].bombState == BOMBSTATE_RANGE)
-				{ // 範囲内状態の場合
+				if (g_aCar[nCntCar].bombState == BOMBSTATE_RANGE && GetPlayer()->bomb.state == ATTACKSTATE_NONE)
+				{ // 範囲内状態かつ、プレイヤーがボムを撃てる状態の場合
 
 					// マテリアルのコピーに代入する
 					g_aCar[nCntCar].MatCopy[nCntMat] = pMat[nCntMat];
