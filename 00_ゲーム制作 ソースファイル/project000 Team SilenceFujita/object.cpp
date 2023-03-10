@@ -20,6 +20,7 @@
 #include "particle.h"
 #include "shadow.h"
 #include "sound.h"
+#include "tutorial.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -799,8 +800,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 //======================================================================================================================
 void HitObject(Object *pObject, int nDamage)
 {
-	int nMode = GetMode();			// モードの取得処理
-
 	if (pObject->state == ACTIONSTATE_NORMAL && pObject->appear.state == APPEARSTATE_COMPLETE && pObject->bUse == true)
 	{ // オブジェクトが通常状態かつ、出現完了状態の場合
 
@@ -845,12 +844,24 @@ void HitObject(Object *pObject, int nDamage)
 				2									// 寿命
 			);
 
-			switch (nMode)
+			switch (GetMode())
 			{
 			case MODE_GAME:			// ゲームの場合
 
 				// 再建築タイマーの設定処理
 				SetBuildtimer(pObject->pos, 600, *pObject);
+
+				// 処理から抜ける
+				break;
+
+			case MODE_TUTORIAL:		// チュートリアルの場合
+
+				if (GetLessonState() == LESSON_05)
+				{ // コンボ練習中の場合
+
+					// 再建築タイマーの設定処理
+					SetBuildtimer(pObject->pos, 600, *pObject);
+				}
 
 				// 処理から抜ける
 				break;
