@@ -72,6 +72,7 @@ SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 	{ "data/SE/gareki000.wav", 0 },			// 崩れる（建物系）のSE_000
 	{ "data/SE/gareki001.wav", 0 },			// 崩れる（小物系）のSE_001
 	{ "data/SE/score000.wav", 0 },			// スコア獲得のSE_000
+	{ "data/SE/tutorialpage000.wav", 0 },	// チュートリアルをめくるSE_000
 	
 };
 
