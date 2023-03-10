@@ -460,5 +460,21 @@ WindInfo *GetWindInfo(void)
 	return &g_WindInfo;
 }
 
+//============================================================
+//	風の全消去処理
+//============================================================
+void WindAllClear(void)
+{
+	for (int nCntWind = 0; nCntWind < MAX_WIND; nCntWind++)
+	{ // 風を全消去する
+		if (g_aWind[nCntWind].bUse == true)
+		{ // 風を使用している場合
+
+			// 風を使用しない
+			g_aWind[nCntWind].bUse = false;
+		}
+	}
+}
+
 #ifdef _DEBUG	// デバッグ処理
 #endif
