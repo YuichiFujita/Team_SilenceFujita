@@ -1344,6 +1344,13 @@ void UpdateTutorialUi(void)
 
 			// 便箋の取り出し状態にする
 			g_tutorial.state = TUTOSTAGSTATE_PAP_TAKE;
+
+			// 効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド（チュートリアルのページをめくる音）を再生
+				PlaySound(SOUND_LABEL_SE_TUTORIAL_PAGE_000);
+			}
 		}
 
 		// 頂点カラーの設定
@@ -1393,6 +1400,13 @@ void UpdateTutorialUi(void)
 
 			// 便箋のしまい状態にする
 			g_tutorial.state = TUTOSTAGSTATE_PAP_RETURN;
+
+			// 効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド（チュートリアルのページをめくる音）を再生
+				PlaySound(SOUND_LABEL_SE_TUTORIAL_PAGE_000);
+			}
 		}
 
 		if (GetKeyboardTrigger(DIK_P) == true
@@ -1407,6 +1421,13 @@ void UpdateTutorialUi(void)
 
 				// 便箋のしまい状態にする
 				g_tutorial.state = TUTOSTAGSTATE_PAP_RETURN;
+
+				// 効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// サウンド（チュートリアルのページをめくる音）を再生
+					PlaySound(SOUND_LABEL_SE_TUTORIAL_PAGE_000);
+				}
 
 				// ゲーム画面の状態設定
 				SetTutorialState(TUTORIALSTATE_SKIP, END_TUTO_TIME);	// スキップ状態
