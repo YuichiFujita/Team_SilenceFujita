@@ -36,6 +36,8 @@
 #define JUNK_POS_Y				(220.0f)						// がれきが出現する位置(Y軸)
 #define JUNK_POS_Z				(0.5f)							// がれきが出現する位置の倍率(Z軸)
 #define SPARK_SPEED				(13.0f)							// 火花が出るスピード
+#define GAME_REBUILD_CNT		(600)							// ゲームモードでのオブジェクトの再建築までのカウント
+#define TUTORIAL_REBUILD_CNT	(600)							// チュートリアルモードでのオブジェクトの再建築までのカウント
 
 #define OBJECT_GRAVITY			(-1.5f)							// オブジェクトの重力
 #define SMASH_WIDTH_MAGNI		(3.0f)							// 吹き飛びの幅の倍率
@@ -849,7 +851,7 @@ void HitObject(Object *pObject, int nDamage)
 			case MODE_GAME:			// ゲームの場合
 
 				// 再建築タイマーの設定処理
-				SetBuildtimer(pObject->pos, 600, *pObject);
+				SetBuildtimer(pObject->pos, GAME_REBUILD_CNT, *pObject);
 
 				// 処理から抜ける
 				break;
@@ -860,7 +862,7 @@ void HitObject(Object *pObject, int nDamage)
 				{ // コンボ練習中の場合
 
 					// 再建築タイマーの設定処理
-					SetBuildtimer(pObject->pos, 600, *pObject);
+					SetBuildtimer(pObject->pos, TUTORIAL_REBUILD_CNT, *pObject);
 				}
 
 				// 処理から抜ける

@@ -453,11 +453,6 @@ void TutorialItem(void)
 //======================================================================================================================
 void GameItem(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{ // 0キーを押した場合
-		SetItem(D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_HEAL_BARRIER);
-	}
-
 	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
 	{ // アイテムの最大表示数分繰り返す
 

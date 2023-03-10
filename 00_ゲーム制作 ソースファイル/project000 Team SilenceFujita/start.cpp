@@ -320,12 +320,6 @@ void UninitStart(void)
 //======================================================================================================================
 void UpdateStart(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{
-		// 0を押した場合
-		g_StartState = STARTSTATE_PREFACE_FIRST;
-	}
-
 	VERTEX_2D         *pVtx;					// 頂点情報へのポインタ
 
 	switch (g_StartState)
