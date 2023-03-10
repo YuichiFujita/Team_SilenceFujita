@@ -10,6 +10,7 @@
 #include "main.h"
 #include "input.h"
 #include "sound.h"
+#include "tutorial.h"
 
 #include "bomb.h"
 #include "bonus.h"
@@ -764,8 +765,25 @@ void UpdateBarrierData(void)
 				if (g_aBarrier[nCntBarrier].nCounter <= 0)
 				{ // カウンターが 0以下の場合
 
-					if (GetMode() != MODE_TUTORIAL)
-					{ // 現在のモードがチュートリアルではない場合
+					switch (GetMode())
+					{ // モードごとの処理
+					case MODE_TUTORIAL:	// チュートリアル
+
+						if (GetLessonState() != LESSON_04)
+						{ // レッスン4に挑戦中ではない場合
+
+							if (DownBarrier(nCntBarrier) == true)
+							{ // 下降可能だった場合
+
+								// 下降状態にする
+								g_aBarrier[nCntBarrier].state = BARRIERSTATE_DOWN;
+							}
+						}
+
+						// 処理を抜ける
+						break;
+
+					default:			// 上記以外
 
 						if (DownBarrier(nCntBarrier) == true)
 						{ // 下降可能だった場合
@@ -773,6 +791,9 @@ void UpdateBarrierData(void)
 							// 下降状態にする
 							g_aBarrier[nCntBarrier].state = BARRIERSTATE_DOWN;
 						}
+
+						// 処理を抜ける
+						break;
 					}
 				}
 
@@ -944,6 +965,13 @@ void HomingBarrier(int nCntBarrier)
 
 			// 処理を抜ける
 			break;
+		}
+
+		//効果音の再生
+		if (GetSoundType(SOUND_TYPE_SE) == true)
+		{
+			// サウンド（バリアの生成）の再生
+			PlaySound(SOUND_LABEL_SE_BARRIER_000);
 		}
 
 		// 座標を補正

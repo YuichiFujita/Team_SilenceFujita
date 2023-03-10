@@ -1082,6 +1082,12 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 	if (bMove)
 	{ // 移動の操作が可能な場合
 
+		// プレイヤーの速度を計算
+		float fVolume = (fabsf(g_player.move.x + g_player.boost.plusMove.x) / MAX_REAL_SPEED);
+
+		//プレイヤーの速度で走行音を調整
+		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, fVolume);
+
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
 		{ // 前進の操作が行われた場合
 

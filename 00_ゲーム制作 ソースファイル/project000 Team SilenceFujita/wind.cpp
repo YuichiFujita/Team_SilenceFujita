@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "Combo.h"
 #include "input.h"
+#include "sound.h"
 #include "item.h"
 #include "particle.h"
 #include "object.h"
@@ -392,6 +393,13 @@ void CollisionWind(Human *pHuman)
 
 			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY && pHuman->judge.state == JUDGESTATE_EVIL)
 			{ // 風を使用しているかつ、人が吹き飛んでいない時かつ、悪い奴だった場合
+
+				// 効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// サウンド（吹き飛ばし時）の再生
+					PlaySound(SOUND_LABEL_SE_FLY_000);
+				}
 
 				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;
