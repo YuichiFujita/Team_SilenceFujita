@@ -228,42 +228,42 @@ void InitGame(void)
 	// 最初のプレイヤーに標準を合わせる処理
 	SetPlayerView();
 
-	////メインBGMの再生
-	//if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
-	//{
-	//	//サウンド（ゲームBGM）の再生
-	//	PlaySound(SOUND_LABEL_BGM_GAME_000);
-	//}
+	//メインBGMの再生
+	if (GetSoundType(SOUND_TYPE_MAIN_BGM) == true)
+	{
+		//サウンド（ゲームBGM）の再生
+		PlaySound(SOUND_LABEL_BGM_GAME_000);
+	}
 
-	////効果音BGMの再生
-	//if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
-	//{
-	//	//効果音サウンド（消防車）の再生
-	//	PlaySound(SOUND_LABEL_BGM_FIRECAR_000);
+	//効果音BGMの再生
+	if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+	{
+		//効果音サウンド（消防車）の再生
+		PlaySound(SOUND_LABEL_BGM_FIRECAR_000);
 
-	//	//効果音サウンド（焼き芋）の再生
-	//	PlaySound(SOUND_LABEL_BGM_YAKIIMO_000);
+		//効果音サウンド（焼き芋）の再生
+		PlaySound(SOUND_LABEL_BGM_YAKIIMO_000);
 
-	//	//効果音サウンド（暴走車）の再生
-	//	PlaySound(SOUND_LABEL_BGM_BOUSOUCAR_000);
+		//効果音サウンド（暴走車）の再生
+		PlaySound(SOUND_LABEL_BGM_BOUSOUCAR_000);
 
-	//	//効果音サウンド（選挙カー）の再生
-	//	PlaySound(SOUND_LABEL_BGM_SENKYOCAR_000);
+		//効果音サウンド（選挙カー）の再生
+		PlaySound(SOUND_LABEL_BGM_SENKYOCAR_000);
 
-	//	//効果音サウンド（警察）の再生
-	//	PlaySound(SOUND_LABEL_BGM_POLICE_000);
+		//効果音サウンド（警察）の再生
+		PlaySound(SOUND_LABEL_BGM_POLICE_000);
 
-	//	//効果音サウンド（走行音）の再生
-	//	PlaySound(SOUND_LABEL_BGM_CAR_000);
+		//効果音サウンド（走行音）の再生
+		PlaySound(SOUND_LABEL_BGM_CAR_000);
 
-	//	//車の効果音サウンドの音量を0に変更
-	//	SetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000, 0.0f);
-	//	SetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000, 0.0f);
-	//	SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
-	//	SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, 0.0f);
-	//	SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, 0.0f);
-	//	SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 0.0f);
-	//}
+		//車の効果音サウンドの音量を0に変更
+		SetSoundVolume(SOUND_LABEL_BGM_FIRECAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_YAKIIMO_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, 0.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 0.0f);
+	}
 
 #ifdef _DEBUG	// デバッグ処理
 	// エディットメインの初期化
