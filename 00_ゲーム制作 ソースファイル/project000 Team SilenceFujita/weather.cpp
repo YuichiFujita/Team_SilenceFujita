@@ -92,9 +92,13 @@ void InitWeather(void)
 
 	case MODE_GAME:		// ゲーム
 
+#ifndef _DEBUG
 		// 天気を設定する
 		nRandWeather = rand() % WEATHER_RAND;
-
+#else
+		// 天気を設定する
+		nRandWeather = 0;
+#endif
 		if (nRandWeather <= SUNNY_RAND)
 		{ // 晴れの場合
 			// 天気を晴れに設定する
