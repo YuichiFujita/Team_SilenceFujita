@@ -102,7 +102,6 @@ typedef enum
 {
 	TEXTURE_TUTORIAL_BG = 0,		// 背景
 	TEXTURE_TUTORIAL_LETTER,		// 手紙
-	TEXTURE_TUTORIAL_PAPER,			// 便箋
 	TEXTURE_TUTORIAL_PAUSE,			// ポーズアイコン
 	TEXTURE_TUTORIAL_CONTROL,		// 操作表示
 	TEXTURE_TUTORIAL_MAX,			// この列挙型の総数
@@ -141,15 +140,14 @@ const char *apTextureTutorial[] =		// チュートリアルテクスチャの相対パス
 {
 	"data\\TEXTURE\\ui005.png",			// チュートリアル背景のテクスチャ相対パス
 	"data\\TEXTURE\\tutorial000.png",	// 手紙のテクスチャ相対パス
-	"data\\TEXTURE\\tutorial001.png",	// 便箋のテクスチャ相対パス
-	"data\\TEXTURE\\tutorial002.png",	// ポーズアイコンのテクスチャ相対パス
-	"data\\TEXTURE\\tutorial003.png",	// 操作表示のテクスチャ相対パス
+	"data\\TEXTURE\\tutorial001.png",	// ポーズアイコンのテクスチャ相対パス
+	"data\\TEXTURE\\tutorial002.png",	// 操作表示のテクスチャ相対パス
 };
 
 const int aNextLesson[] =	// レッスンのカウンター
 {
 	240,	// レッスン0 (移動)     のレッスンカウンター
-	150,	// レッスン1 (旋回)     のレッスンカウンター
+	180,	// レッスン1 (旋回)     のレッスンカウンター
 	30,		// レッスン2 (破滅疾走) のレッスンカウンター
 	60,		// レッスン3 (吹飛散風) のレッスンカウンター
 	120,	// レッスン4 (無音世界) のレッスンカウンター
@@ -177,6 +175,17 @@ const char *apTextureTips[] =		// 備考テクスチャの相対パス
 	"data\\TEXTURE\\tips004.png",	// レッスン4 (無音世界) の備考のテクスチャ相対パス
 	"data\\TEXTURE\\tips005.png",	// レッスン5 (コンボ)   の備考のテクスチャ相対パス
 	"data\\TEXTURE\\tips006.png",	// レッスン6 (脱出)     の備考のテクスチャ相対パス
+};
+
+const char *apTexturePaper[] =		// 便箋テクスチャの相対パス
+{
+	"data\\TEXTURE\\paper000.png",	// レッスン0 (移動)     の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper001.png",	// レッスン1 (旋回)     の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper002.png",	// レッスン2 (破滅疾走) の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper003.png",	// レッスン3 (吹飛散風) の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper004.png",	// レッスン4 (無音世界) の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper005.png",	// レッスン5 (コンボ)   の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper006.png",	// レッスン6 (脱出)     の便箋のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
@@ -217,6 +226,7 @@ void TxtSetLesson(LESSON_SETUP lesson);	// レッスンのセットアップ処理
 LPDIRECT3DTEXTURE9      g_apTextureTutorial[TEXTURE_TUTORIAL_MAX] = {};	// チュートリアルテクスチャへのポインタ
 LPDIRECT3DTEXTURE9      g_apTextureLesson[LESSON_MAX] = {};				// レッスンテクスチャへのポインタ
 LPDIRECT3DTEXTURE9      g_apTextureTips[LESSON_MAX] = {};				// 備考テクスチャへのポインタ
+LPDIRECT3DTEXTURE9      g_apTexturePaper[LESSON_MAX] = {};				// 便箋テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTutorial = NULL;						// 頂点バッファへのポインタ
 
 Tutorial      g_tutorial;				// チュートリアルの情報
@@ -247,13 +257,14 @@ void InitTutorial(void)
 		D3DXCreateTextureFromFile(pDevice, apTextureTutorial[nCntTutorial], &g_apTextureTutorial[nCntTutorial]);
 	}
 
-	// レッスン・備考テクスチャの読み込み
+	// レッスン・備考・便箋テクスチャの読み込み
 	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
 	{ // 使用するテクスチャ数分繰り返す
 
 		// テクスチャの読み込み
 		D3DXCreateTextureFromFile(pDevice, apTextureLesson[nCntTutorial], &g_apTextureLesson[nCntTutorial]);
 		D3DXCreateTextureFromFile(pDevice, apTextureTips[nCntTutorial], &g_apTextureTips[nCntTutorial]);
+		D3DXCreateTextureFromFile(pDevice, apTexturePaper[nCntTutorial], &g_apTexturePaper[nCntTutorial]);
 	}
 
 	// 頂点バッファの生成
@@ -667,7 +678,7 @@ void UninitTutorial(void)
 		}
 	}
 
-	// レッスン・備考テクスチャの破棄
+	// レッスン・備考・便箋テクスチャの破棄
 	for (int nCntTutorial = 0; nCntTutorial < LESSON_MAX; nCntTutorial++)
 	{ // 使用するテクスチャ数分繰り返す
 
@@ -683,6 +694,13 @@ void UninitTutorial(void)
 
 			g_apTextureTips[nCntTutorial]->Release();
 			g_apTextureTips[nCntTutorial] = NULL;
+		}
+
+		if (g_apTexturePaper[nCntTutorial] != NULL)
+		{ // 変数 (g_apTexturePaper) がNULLではない場合
+
+			g_apTexturePaper[nCntTutorial]->Release();
+			g_apTexturePaper[nCntTutorial] = NULL;
 		}
 	}
 
@@ -1619,7 +1637,7 @@ void DrawTutorialUi(bool bBefore)
 			//	便箋の描画
 			//----------------------------------------------------------------------------------------------------------
 			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureTutorial[TEXTURE_TUTORIAL_PAPER]);
+			pDevice->SetTexture(0, g_apTexturePaper[g_nLessonState]);
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 28, 2);
