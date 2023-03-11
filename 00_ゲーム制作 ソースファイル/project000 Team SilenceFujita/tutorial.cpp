@@ -138,10 +138,10 @@ typedef enum
 //**********************************************************************************************************************
 const char *apTextureTutorial[] =		// チュートリアルテクスチャの相対パス
 {
-	"data\\TEXTURE\\ui005.png",			// チュートリアル背景のテクスチャ相対パス
-	"data\\TEXTURE\\tutorial000.png",	// 手紙のテクスチャ相対パス
-	"data\\TEXTURE\\tutorial001.png",	// ポーズアイコンのテクスチャ相対パス
-	"data\\TEXTURE\\tutorial002.png",	// 操作表示のテクスチャ相対パス
+	"data\\TEXTURE\\ui005.tga",			// チュートリアル背景のテクスチャ相対パス
+	"data\\TEXTURE\\tutorial000.tga",	// 手紙のテクスチャ相対パス
+	"data\\TEXTURE\\tutorial001.tga",	// ポーズアイコンのテクスチャ相対パス
+	"data\\TEXTURE\\tutorial002.tga",	// 操作表示のテクスチャ相対パス
 };
 
 const int aNextLesson[] =	// レッスンのカウンター

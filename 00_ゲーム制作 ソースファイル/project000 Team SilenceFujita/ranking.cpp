@@ -131,9 +131,9 @@
 //**********************************************************************************************************************
 const char *apTextureRank[] =		// ランキングのテクスチャの相対パス
 {
-	"data\\TEXTURE\\ranking000.png",	// ランキング文字
-	"data\\TEXTURE\\ui001.png",			// ニュースコア背景
-	"data\\TEXTURE\\rankline000.png",	// スコアの下線
+	"data\\TEXTURE\\ranking000.tga",	// ランキング文字
+	"data\\TEXTURE\\ui001.tga",			// ニュースコア背景
+	"data\\TEXTURE\\rankline000.tga",	// スコアの下線
 	"data\\TEXTURE\\rank1st000.png",	// スコアの順位（1位）
 	"data\\TEXTURE\\rank2nd000.png",	// スコアの順位（2位）
 	"data\\TEXTURE\\rank3rd000.png",	// スコアの順位（3位）

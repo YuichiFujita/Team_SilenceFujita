@@ -55,8 +55,8 @@ int   g_nComboCount;	// コンボが止まるまでのカウント
 //テクスチャファイル名
 const char *c_apFilenameCombo[COMBOTEX_MAX] =
 {
-	"data/TEXTURE/ui006.png",	// コンボ下地
-	"data/TEXTURE/ui007.png",	// コンボスコア下地
+	"data/TEXTURE/ui006.tga",	// コンボ下地
+	"data/TEXTURE/ui007.tga",	// コンボスコア下地
 };
 
 //===========================================

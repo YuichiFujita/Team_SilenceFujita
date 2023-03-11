@@ -34,9 +34,9 @@
 const char *apTexturePause[] =		// テクスチャの相対パス
 {
 	NULL,							// NULL
-	"data\\TEXTURE\\pause000.png",	// RESUME のテクスチャ相対パス
-	"data\\TEXTURE\\pause001.png",	// RETRY のテクスチャ相対パス
-	"data\\TEXTURE\\pause002.png",	// EXIT のテクスチャ相対パス
+	"data\\TEXTURE\\pause000.tga",	// RESUME のテクスチャ相対パス
+	"data\\TEXTURE\\pause001.tga",	// RETRY のテクスチャ相対パス
+	"data\\TEXTURE\\pause002.tga",	// EXIT のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
