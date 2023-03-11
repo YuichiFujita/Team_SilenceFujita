@@ -1238,6 +1238,9 @@ void AddLessonState(void)
 			// パーティクルの削除
 			AllFalseParticle();
 
+			//	風の全消去
+			WindAllClear();
+
 			// 演出の状態を手紙の表示状態に変更
 			g_tutorial.state = TUTOSTAGSTATE_LET_ALPHA;
 
