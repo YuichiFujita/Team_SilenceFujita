@@ -30,6 +30,19 @@
 #define GATE_EXIT_WIDESIZE_MUL	(0.3f)		// 脱出口の横位置加算量の倍率
 #define GATE_EXIT_FORWARDPLUS	(200.0f)	// 脱出口の前方加算量
 
+#define GATE_PINCH_CNT			(60)		// ゲートのピンチの境界線
+#define GATE_PINCH_COL			(D3DXCOLOR(1.0f, 0.3f, 0.3f, 1.0f))			// 制限時間間近のゲートの色
+#define GATE_ATTEN_CNT			(10)		// ゲートの注意の境界線
+#define GATE_ATTEN_COL_CNT		(30)		// ゲートの色の変わるカウント数
+#define GATE_ATTEN_EMI			(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))
+#define GATE_ATTEN_DIF			(D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f))
+#define GATE_ATTEN_AMB			(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
+
+//**********************************************************************************************************************
+//	プロトタイプ宣言
+//**********************************************************************************************************************
+void GateAttention(Gate *pGate);			// ゲートの注意処理
+
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
@@ -101,6 +114,11 @@ void InitGate(void)
 		g_aGate[nCntGate].doorData.modelData.vtxMax   = INIT_VTX_MAX;		// 最大の頂点座標
 		g_aGate[nCntGate].doorData.modelData.size     = INIT_SIZE;			// 大きさ
 		g_aGate[nCntGate].doorData.modelData.fRadius  = 0.0f;				// 半径
+
+		// 注意の情報の初期化
+		g_aGate[nCntGate].atten.bUse = false;								// 使用状況
+		g_aGate[nCntGate].atten.nAttenCounter = 0;							// 注意カウント
+		g_aGate[nCntGate].atten.state = ATTENTIONSTATE_NONE;				// 注意の状態
 	}
 
 	// 脱出の情報の初期化
@@ -234,6 +252,9 @@ void UpdateGate(void)
 				break;
 			}
 
+			// ゲートの注意処理
+			GateAttention(&g_aGate[nCntGate]);
+
 			// アイコンの位置設定処理
 			SetPositionIcon
 			(
@@ -256,6 +277,8 @@ void DrawGate(void)
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+	D3DXMATERIAL	  redMat;					// マテリアルデータ(赤)
+	D3DXMATERIAL	  attenMat;					// マテリアルデータ(注意色)
 
 	for (int nCntGate = 0; nCntGate < MAX_GATE; nCntGate++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -289,8 +312,68 @@ void DrawGate(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aGate[nCntGate].modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				switch (GetMode())
+				{
+				case MODE_GAME:			// ゲームの場合
+
+					if (GetTime() <= GATE_ATTEN_CNT)
+					{ // タイムが注意カウント以下だった場合
+
+						switch (g_aGate[nCntGate].atten.state)
+						{
+						case ATTENTIONSTATE_NONE:		// 通常状態
+
+							// マテリアルの設定(通常色で描画)
+							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+							break;
+
+						case ATTENTIONSTATE_FLASH:		// 点滅状態
+
+							// 構造体の要素をクリア
+							ZeroMemory(&attenMat, sizeof(D3DXMATERIAL));
+
+							// 拡散光・環境光・自己発光
+							attenMat.MatD3D.Emissive = GATE_ATTEN_EMI;
+							attenMat.MatD3D.Diffuse = GATE_ATTEN_DIF;
+							attenMat.MatD3D.Ambient = GATE_ATTEN_AMB;
+
+							// マテリアルの設定(注意色で描画)
+							pDevice->SetMaterial(&attenMat.MatD3D);
+
+							break;
+						}
+
+					}
+					else if (GetTime() <= GATE_PINCH_CNT)
+					{ // タイムがピンチカウント以下だった場合
+
+						// 構造体の要素をクリア
+						ZeroMemory(&redMat, sizeof(D3DXMATERIAL));
+
+						// 色を設定する
+						redMat.MatD3D.Diffuse = GATE_PINCH_COL;
+						redMat.MatD3D.Ambient = GATE_PINCH_COL;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&redMat.MatD3D);
+					}
+					else
+					{ // 上記以外
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+
+					break;
+
+				default:				// 上記以外
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+					break;
+				}
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aGate[nCntGate].modelData.pTexture[nCntMat]);
@@ -326,8 +409,68 @@ void DrawGate(void)
 			for (int nCntMat = 0; nCntMat < (int)g_aGate[nCntGate].doorData.modelData.dwNumMat; nCntMat++)
 			{ // マテリアルの数分繰り返す
 
-				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+				switch (GetMode())
+				{
+				case MODE_GAME:			// ゲームの場合
+
+					if (GetTime() <= GATE_ATTEN_CNT)
+					{ // タイムが注意カウント以下だった場合
+
+						switch (g_aGate[nCntGate].atten.state)
+						{
+						case ATTENTIONSTATE_NONE:		// 通常状態
+
+							// マテリアルの設定(通常色で描画)
+							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+							break;
+
+						case ATTENTIONSTATE_FLASH:		// 点滅状態
+
+							// 構造体の要素をクリア
+							ZeroMemory(&attenMat, sizeof(D3DXMATERIAL));
+
+							// 拡散光・環境光・自己発光
+							attenMat.MatD3D.Emissive = GATE_ATTEN_EMI;
+							attenMat.MatD3D.Diffuse = GATE_ATTEN_DIF;
+							attenMat.MatD3D.Ambient = GATE_ATTEN_AMB;
+
+							// マテリアルの設定(注意色で描画)
+							pDevice->SetMaterial(&attenMat.MatD3D);
+
+							break;
+						}
+
+					}
+					else if (GetTime() <= GATE_PINCH_CNT)
+					{ // タイムがピンチカウント以下だった場合
+
+						// 構造体の要素をクリア
+						ZeroMemory(&redMat, sizeof(D3DXMATERIAL));
+
+						// 色を設定する
+						redMat.MatD3D.Diffuse = GATE_PINCH_COL;
+						redMat.MatD3D.Ambient = GATE_PINCH_COL;
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&redMat.MatD3D);
+					}
+					else
+					{ // 上記以外
+
+						// マテリアルの設定
+						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+					}
+
+					break;
+
+				default:				// 上記以外
+
+					// マテリアルの設定
+					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+					break;
+				}
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_aGate[nCntGate].doorData.modelData.pTexture[nCntMat]);
@@ -720,6 +863,34 @@ void AllOpenGate(void)
 
 			// 開放状態にする
 			g_aGate[nCntGate].state = GATESTATE_OPEN;
+		}
+	}
+}
+
+//======================================================================================================================
+// ゲートの注意処理
+//======================================================================================================================
+void GateAttention(Gate *pGate)
+{
+	if (GetTime() <= GATE_ATTEN_CNT
+		&& pGate->atten.bUse == false)
+	{ // 注意時間以内に入っているかつ、注意状態になっていなかった場合
+
+		// 使用していた場合
+		pGate->atten.bUse = true;
+	}
+
+	if (pGate->atten.bUse == true)
+	{ // ゲートの注意情報を使用していた場合
+
+		// 注意カウントを加算する
+		pGate->atten.nAttenCounter++;
+
+		if (pGate->atten.nAttenCounter % GATE_ATTEN_COL_CNT == 0)
+		{ // 注意カウントが一定数カウントに達した場合
+
+			// 状態を変える
+			pGate->atten.state = (ATTENTIONSTATE)((pGate->atten.state + 1) % ATTENTIONSTATE_MAX);
 		}
 	}
 }
