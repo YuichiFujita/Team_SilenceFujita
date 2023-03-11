@@ -172,6 +172,7 @@
     <ClCompile Include="Editmain.cpp" />
     <ClCompile Include="EditObject.cpp" />
     <ClCompile Include="effect.cpp" />
+    <ClCompile Include="escape.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="flash.cpp" />
     <ClCompile Include="game.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="Editmain.h" />
     <ClInclude Include="EditObject.h" />
     <ClInclude Include="effect.h" />
+    <ClInclude Include="escape.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="flash.h" />
     <ClInclude Include="game.h" />

@@ -6,6 +6,7 @@
 //=======================================
 #include"main.h"
 #include"Countdown.h"
+#include "escape.h"
 
 //マクロ定義
 #define COUNTDOWN_APPEAR_CNT	(100)											// カウントダウンの出現からの遷移カウント
@@ -182,6 +183,9 @@ void UpdateCountDown(void)
 
 				// 使用しない
 				g_CountDown.bUse = false;
+
+				// 脱出通知の設定処理
+				SetEscape();
 			}
 
 			break;

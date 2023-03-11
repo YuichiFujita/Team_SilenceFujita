@@ -27,6 +27,7 @@
 #include "Combo.h"
 #include "Countdown.h"
 #include "effect.h"
+#include "escape.h"
 #include "flash.h"
 #include "Human.h"
 #include "gate.h"
@@ -172,6 +173,9 @@ void InitGame(void)
 
 	// カウントダウンの初期化
 	InitCountDown();
+
+	// 脱出通知の初期化
+	InitEscape();
 
 	// エフェクトの初期化
 	InitEffect();
@@ -356,6 +360,9 @@ void UninitGame(void)
 
 	// カウントダウンの終了
 	UninitCountDown();
+
+	// 脱出通知の終了
+	UninitEscape();
 
 	// エフェクトの終了
 	UninitEffect();
@@ -620,6 +627,9 @@ void UpdateGame(void)
 			// カウントダウンの更新
 			UpdateCountDown();
 
+			// 脱出通知の更新
+			UpdateEscape();
+
 			// 能力バーの更新
 			UpdateAbility();
 
@@ -793,6 +803,9 @@ void DrawGame(void)
 	//------------------------------------------------------------------------------------------------------------------
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
+
+	// 脱出通知の描画
+	DrawEscape();
 
 	// 体力バーの描画
 	DrawLife();
