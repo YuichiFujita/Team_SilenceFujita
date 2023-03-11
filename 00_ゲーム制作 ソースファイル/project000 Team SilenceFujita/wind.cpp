@@ -437,12 +437,10 @@ void CollisionWind(Human *pHuman)
 //============================================================
 void FlyAwayHuman(Human *pHuman, Player player)
 {
-	float FlyAngle = atan2f(pHuman->pos.x - player.pos.x, pHuman->pos.z - player.pos.z);
-
 	// ˆÚ“®—Ê‚ðÝ’è‚·‚é
-	pHuman->move.x = sinf(FlyAngle) * FLYAWAY_WIDTH;
+	pHuman->move.x = sinf(player.rot.y) * FLYAWAY_WIDTH;
 	pHuman->move.y = FLYAWAY_HEIGHT;
-	pHuman->move.z = cosf(FlyAngle) * FLYAWAY_DEPTH;
+	pHuman->move.z = cosf(player.rot.y) * FLYAWAY_DEPTH;
 
 	// ”ò‚Î‚·
 	pHuman->pos += pHuman->move;
@@ -467,6 +465,7 @@ void WindAllClear(void)
 {
 	for (int nCntWind = 0; nCntWind < MAX_WIND; nCntWind++)
 	{ // •—‚ð‘SÁ‹Ž‚·‚é
+
 		if (g_aWind[nCntWind].bUse == true)
 		{ // •—‚ðŽg—p‚µ‚Ä‚¢‚éê‡
 
