@@ -636,6 +636,7 @@ bool UpdateAllClear(RESULTSTATE state)
 	pPlayer->boost.state   = BOOSTSTATE_NONE;	// プレイヤーのブースト状態
 	pPlayer->bomb.state    = ATTACKSTATE_NONE;	// プレイヤーのボム状態
 	pPlayer->wind.bUseWind = false;				// 風の使用状況
+	pPlayer->icon.state = ICONSTATE_NONE;		// アイコンの状態を通常状態にする
 
 	// バリアの情報の初期化
 	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier++)

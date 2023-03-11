@@ -378,6 +378,13 @@ void DrawPlayer(void)
 				break;
 			}
 
+			if (*GetGameState() == GAMESTATE_END)
+			{ // 終了状態の場合
+
+				// マテリアルの設定
+				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+			}
+
 			// テクスチャの設定
 			pDevice->SetTexture(0, g_player.modelData.pTexture[nCntMat]);
 
