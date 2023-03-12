@@ -60,15 +60,15 @@ Icon g_aIcon[MAX_ICON];		// アイコンの情報
 // テクスチャファイル名
 const char *c_apTextureFileIcon[ICONTYPE_MAX] =
 {
+	"data\\TEXTURE\\icon006.png",
+	"data\\TEXTURE\\icon006.png",
 	"data\\TEXTURE\\icon001.png",
-	"data\\TEXTURE\\icon000.png",
 	"data\\TEXTURE\\icon002.png",
+	"data\\TEXTURE\\icon000.png",
+	"data\\TEXTURE\\icon004.png",
 	"data\\TEXTURE\\icon004.png",
 	"data\\TEXTURE\\icon005.png",
 	"data\\TEXTURE\\icon005.png",
-	"data\\TEXTURE\\icon004.png",
-	"data\\TEXTURE\\icon008.png",
-	"data\\TEXTURE\\icon009.png",
 	"data\\TEXTURE\\icon003.png",
 };
 
