@@ -21,6 +21,7 @@
 #include "object.h"
 #include "Human.h"
 #include "score.h"
+#include "timer.h"
 #include "bonus.h"
 
 //**********************************************************************************************************************
@@ -410,8 +411,18 @@ void CollisionWind(Human *pHuman)
 				if (pHuman->judge.state == JUDGESTATE_EVIL)
 				{ // 悪い奴だった場合
 
-					// ボーナスの設定処理
-					SetBonus(SCORE_HUMAN);
+					if (GetTime() <= BONUS_SPECIAL_TIME)
+					{ // 制限時間が残り少なかったら
+
+						// ボーナスの設定処理
+						SetBonus(SCORE_HUMAN_SP);
+					}
+					else
+					{ // 通常時の場合
+
+						// ボーナスの設定処理
+						SetBonus(SCORE_HUMAN);
+					}
 
 					// アイテムが落ちるカウントを初期化する
 					g_nHumanItemCount++;

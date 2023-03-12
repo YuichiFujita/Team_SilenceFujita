@@ -18,6 +18,7 @@
 #include "shadow.h"
 #include "sound.h"
 //#include "tutorial.h"
+#include "timer.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -294,8 +295,18 @@ void CollisionPlayer(Item *pItem)
 			else
 			{ // 上記以外
 
-				// ボーナスの設定処理
-				SetBonus(SCORE_ITEM);
+				if (GetTime() <= BONUS_SPECIAL_TIME)
+				{ // 制限時間が残り僅かの場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_ITEM_SP);
+				}
+				else
+				{ // 通常状態の場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_ITEM);
+				}
 			}
 
 			// 使用していない状態にする

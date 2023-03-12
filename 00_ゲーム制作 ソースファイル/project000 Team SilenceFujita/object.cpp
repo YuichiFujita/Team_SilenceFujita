@@ -21,6 +21,7 @@
 #include "shadow.h"
 #include "sound.h"
 #include "tutorial.h"
+#include "timer.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -1029,8 +1030,18 @@ void HitObject(Object *pObject, int nDamage)
 			if (pObject->judge.state == JUDGESTATE_EVIL)
 			{ //オブジェクトが悪いものだった場合
 
-				// ボーナスの設定処理
-				SetBonus(SCORE_OBJECT);
+				if (GetTime() <= BONUS_SPECIAL_TIME)
+				{ // 制限時間が残り僅かだった場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_OBJECT_SP);
+				}
+				else
+				{ // 通常状態の場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_OBJECT);
+				}
 
 				// アイテムが落ちるカウントを加算する
 				g_nObjectItemCount++;
