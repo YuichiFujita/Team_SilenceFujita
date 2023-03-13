@@ -18,6 +18,7 @@
 #define SCORE_OBJECT	(3000)		// オブジェクトを壊した時のスコア
 #define SCORE_CAR		(500)		// 車を封じ込めてる時のスコア
 #define SCORE_ITEM		(100)		// アイテムをゲージ満杯状態で取得した時のスコア
+#define SCORE_GOOD		(10)		// 良い物に影響を与えた時のスコア
 
 #define BONUS_SPECIAL_TIME	(60)	// 高得点になる時間
 

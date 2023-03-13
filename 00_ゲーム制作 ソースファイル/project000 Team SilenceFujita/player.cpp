@@ -50,7 +50,7 @@
 #define STATE_MOVE				(1.5f)		// 停止・旋回時の判定範囲
 #define PLAYER_BROKEN			(50)		// 黒煙が出る体力の境界
 #define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))		// ボロボロになっている車の色の追加量
-#define PLAYER_SMOKE_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// 黒煙の色
+#define PLAYER_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))		// 黒煙の色
 
 #define PLAY_CLEAR_MOVE			(4.0f)		// クリア成功時のプレイヤーの自動移動量
 #define REV_PLAY_CLEAR_MOVE		(0.1f)		// クリア成功時のプレイヤーの減速係数

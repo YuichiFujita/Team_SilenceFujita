@@ -21,7 +21,7 @@
 #define SPAWN_PARTICLE_RAINSPRAY	(8)		// パーティクル（水しぶき）のエフェクト数
 #define SPAWN_PARTICLE_SMOKING		(1)		// パーティクル（タバコの煙）のエフェクト数
 #define SPAWN_PARTICLE_ITEM_LOST	(10)	// パーティクル（アイテム消失）のエフェクト数
-#define SPAWN_PARTICLE_PLAY_SMOKE	(10)	// パーティクル（プレイヤー消失）のエフェクト数
+#define SPAWN_PARTICLE_PLAY_SMOKE	(20)	// パーティクル（プレイヤー消失）のエフェクト数
 #define SPAWN_PARTICLE_BREAKARTICLE	(15)	// パーティクル（オブジェクトの破壊時の煙）のエフェクト数
 #define SPAWN_PARTICLE_BREAKOBJECT	(15)	// パーティクル（オブジェクトの破壊時の煙）のエフェクト数
 

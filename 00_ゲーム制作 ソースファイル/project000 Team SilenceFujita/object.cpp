@@ -1110,12 +1110,18 @@ void HitObject(Object *pObject, int nDamage)
 
 					// ボーナスの設定処理
 					SetBonus(SCORE_OBJECT_SP);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
 				}
 				else
 				{ // 通常状態の場合
 
 					// ボーナスの設定処理
 					SetBonus(SCORE_OBJECT);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
 				}
 
 				// アイテムが落ちるカウントを加算する
@@ -1131,6 +1137,12 @@ void HitObject(Object *pObject, int nDamage)
 						SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
 					}
 				}
+			}
+			else
+			{ // 良い奴だった場合
+
+				// ボーナスの設定処理
+				SetBonus(SCORE_GOOD);
 			}
 			
 			//効果音の再生

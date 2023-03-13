@@ -559,10 +559,10 @@ void ParticlePlaySmoke(Particle *pParticle)
 		move.z *= (float)(rand() % 5 - 2);
 
 		// 半径をランダムに設定
-		fRadius = (float)(rand() % 20 + 40.0f);
+		fRadius = (float)(rand() % 30 + 100.0f);
 
 		// 寿命を設定
-		nLife = (rand() % 20) + 50;
+		nLife = (rand() % 20) + 30;
 
 		// エフェクトの設定
 		SetEffect
@@ -577,7 +577,7 @@ void ParticlePlaySmoke(Particle *pParticle)
 			pParticle->col,		// 色
 			nLife,				// 寿命
 			fRadius,			// 半径
-			0.3f,				// 減算量 (半径)
+			-4.0f,				// 減算量 (半径)
 			EFFECTTYPE_PLAY_SMOKE	// プレイヤーの黒煙
 		);
 	}
@@ -615,7 +615,7 @@ void ParticleBreakArticle(Particle *pParticle)
 			pParticle->col,	// 色
 			40,				// 寿命
 			110.0f,			// 半径
-			1.0f,			// 減算量 (半径)
+			-1.0f,			// 減算量 (半径)
 			EFFECTTYPE_BREAKOBJECT	// その他
 		);
 	}
@@ -653,7 +653,7 @@ void ParticleBreakObject(Particle *pParticle)
 			pParticle->col,	// 色
 			40,				// 寿命
 			220.0f,			// 半径
-			2.0f,			// 減算量 (半径)
+			-2.0f,			// 減算量 (半径)
 			EFFECTTYPE_BREAKOBJECT	// その他
 		);
 	}

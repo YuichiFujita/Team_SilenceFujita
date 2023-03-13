@@ -317,16 +317,9 @@ void DrawEffect(void)
 		if (g_aEffect[nCntEffect].bUse == true)
 		{ // エフェクトが使用されている場合
 
-			if (g_aEffect[nCntEffect].effectType == EFFECTTYPE_PLAY_SMOKE)
-			{ // エフェクトのタイプが煙系だった場合
-
-				// αブレンディングを減算合成に設定
-				pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
-				pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-				pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-			}
-			else
-			{ // 上記以外
+			if (g_aEffect[nCntEffect].effectType != EFFECTTYPE_PLAY_SMOKE
+			 && g_aEffect[nCntEffect].effectType != EFFECTTYPE_BREAKOBJECT)
+			{ // エフェクトのタイプが煙系以外だった場合
 
 				// αブレンディングを加算合成に設定
 				pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
@@ -386,6 +379,11 @@ void DrawEffect(void)
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntEffect * 4, 2);
 		}
+
+		// αブレンディングを元に戻す
+		pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	}
 
 	// Zテストを有効にする
@@ -395,10 +393,6 @@ void DrawEffect(void)
 	// ライティングを有効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 
-	// αブレンディングを元に戻す
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
 //======================================================================================================================

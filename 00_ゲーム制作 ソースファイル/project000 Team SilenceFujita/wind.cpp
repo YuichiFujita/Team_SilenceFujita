@@ -416,12 +416,18 @@ void CollisionWind(Human *pHuman)
 
 						// ボーナスの設定処理
 						SetBonus(SCORE_HUMAN_SP);
+
+						// コンボの倍率処理
+						MagnificCombo(1);
 					}
 					else
 					{ // 通常時の場合
 
 						// ボーナスの設定処理
 						SetBonus(SCORE_HUMAN);
+
+						// コンボの倍率処理
+						MagnificCombo(1);
 					}
 
 					// アイテムが落ちるカウントを初期化する
@@ -437,6 +443,12 @@ void CollisionWind(Human *pHuman)
 							SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
 						}
 					}
+				}
+				else
+				{ // 良い奴だった場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_GOOD);
 				}
 			}
 		}

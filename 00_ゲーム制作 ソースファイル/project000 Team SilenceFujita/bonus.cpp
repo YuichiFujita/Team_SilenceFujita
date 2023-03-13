@@ -442,9 +442,6 @@ void SetBonus(int nBonus)
 				// ‘‰‡‚Ì“¾“_‚ğ‘‚â‚·
 				GetReinforce()->nBonus += 1;
 
-				// ƒRƒ“ƒ{‚Ì”{—¦ˆ—
-				MagnificCombo(1);
-
 				// –J‚ß‚Ìİ’èˆ—
 				SetPraise();
 
