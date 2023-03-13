@@ -317,8 +317,7 @@ void DrawEffect(void)
 		if (g_aEffect[nCntEffect].bUse == true)
 		{ // エフェクトが使用されている場合
 
-			if (g_aEffect[nCntEffect].effectType != EFFECTTYPE_PLAY_SMOKE
-			 && g_aEffect[nCntEffect].effectType != EFFECTTYPE_BREAKOBJECT)
+			if (g_aEffect[nCntEffect].effectType != EFFECTTYPE_PLAY_SMOKE)
 			{ // エフェクトのタイプが煙系以外だった場合
 
 				// αブレンディングを加算合成に設定
