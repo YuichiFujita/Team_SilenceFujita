@@ -130,16 +130,16 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 			{ // パーティクルの種類ごとの設定
 			case PARTICLETYPE_EXPLOSION:
 
-				// ダメージエフェクト
-				ParticleDamage(&g_aParticle[nCntParticle]);
+				// 爆発エフェクト
+				ParticleExplosion(&g_aParticle[nCntParticle]);
 
 				// 処理を抜ける
 				break;
 
 			case PARTICLETYPE_DAMAGE:
 
-				// 爆発エフェクト
-				ParticleExplosion(&g_aParticle[nCntParticle]);
+				// ダメージエフェクト
+				ParticleDamage(&g_aParticle[nCntParticle]);
 
 				// 処理を抜ける
 				break;
@@ -263,6 +263,7 @@ void ParticleExplosion(Particle *pParticle)
 {
 	// 変数を宣言
 	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+	int nLife;			// エフェクトの寿命の代入用
 
 	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
 	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
@@ -276,9 +277,12 @@ void ParticleExplosion(Particle *pParticle)
 		D3DXVec3Normalize(&move, &move);
 
 		// 移動量を乗算
-		move.x *= 2.0f;
-		move.y *= 2.0f;
-		move.z *= 2.0f;
+		move.x *= 4.0f;
+		move.y *= 3.0f;
+		move.z *= 4.0f;
+
+		// 寿命をランダムで設定
+		nLife = rand() % 30 + 50;
 
 		// エフェクトの設定
 		SetEffect
@@ -286,9 +290,9 @@ void ParticleExplosion(Particle *pParticle)
 			pParticle->pos,	// 位置
 			move,			// 移動量
 			pParticle->col,	// 色
-			26,				// 寿命
-			20.0f,			// 半径
-			0.5f,			// 減算量 (半径)
+			nLife,			// 寿命
+			70.0f,			// 半径
+			1.5f,			// 減算量 (半径)
 			EFFECTTYPE_NONE	// その他
 		);
 	}
