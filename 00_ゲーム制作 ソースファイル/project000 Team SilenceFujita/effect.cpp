@@ -214,10 +214,6 @@ void UpdateEffect(void)
 
 				break;					// 抜け出す
 
-			case EFFECTTYPE_SMOKE:		// 煙
-
-				break;					//抜け出す
-
 			case EFFECTTYPE_PLAY_SMOKE:	// プレイヤーの黒煙
 
 				// プレイヤーの移動量を加算する
@@ -311,8 +307,7 @@ void DrawEffect(void)
 		if (g_aEffect[nCntEffect].bUse == true)
 		{ // エフェクトが使用されている場合
 
-			if (g_aEffect[nCntEffect].effectType == EFFECTTYPE_SMOKE
-			 || g_aEffect[nCntEffect].effectType == EFFECTTYPE_PLAY_SMOKE)
+			if (g_aEffect[nCntEffect].effectType == EFFECTTYPE_PLAY_SMOKE)
 			{ // エフェクトのタイプが煙系だった場合
 
 				// αブレンディングを減算合成に設定
@@ -356,13 +351,6 @@ void DrawEffect(void)
 
 			switch (g_aEffect[nCntEffect].effectType)
 			{
-			case EFFECTTYPE_SMOKE:	// 煙
-
-				// テクスチャの設定
-				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_SMOKE]);
-
-				break;				// 抜け出す
-
 			case EFFECTTYPE_PLAY_SMOKE:		// プレイヤーの黒煙
 
 				// テクスチャの設定

@@ -164,7 +164,6 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;						// 影のインデックス
 		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
 		g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
-		g_aHuman[nCntHuman].nSmokeCount		= 0;								// 煙カウント
 		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
 		g_aHuman[nCntHuman].bRecur			= false;							// 復活状況
 		g_aHuman[nCntHuman].bUse			= false;							// 使用状況
@@ -291,32 +290,6 @@ void UpdateHuman(void)
 
 				// アイコンの位置設定処理
 				SetPositionIcon(g_aHuman[nCntHuman].icon.nIconID, g_aHuman[nCntHuman].pos);
-			}
-
-			if (g_aHuman[nCntHuman].type == HUMANTYPE_CIGARETTE)
-			{ // 歩きたばこ人だった場合
-
-				// 煙カウントを加算する
-				g_aHuman[nCntHuman].nSmokeCount++;
-
-				if (g_aHuman[nCntHuman].nSmokeCount % HUMAN_SMOKING_CNT == 0)
-				{ // 喫煙カウントが一定数になった場合
-
-					// パーティクルの設定処理
-					SetParticle
-					(
-						D3DXVECTOR3								// 位置
-						(
-							g_aHuman[nCntHuman].pos.x + sinf(g_aHuman[nCntHuman].rot.y) * HUMAN_CIGARETTE_POS,
-							g_aHuman[nCntHuman].pos.y,
-							g_aHuman[nCntHuman].pos.z + cosf(g_aHuman[nCntHuman].rot.y) * HUMAN_CIGARETTE_POS
-						),
-						D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),		// 色
-						PARTICLETYPE_SMOKING,					// パーティクルの種類
-						SPAWN_PARTICLE_SMOKING,					// 発生数
-						3										// 寿命
-					);
-				}
 			}
 
 			//人間のリアクション処理
@@ -593,7 +566,6 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 			g_aHuman[nCntHuman].bMove			= false;							// 移動していない
 			g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
 			g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
-			g_aHuman[nCntHuman].nSmokeCount		= 0;								// 煙カウント
 			g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 歩き状態
 
 			// 移動量の最大値を設定

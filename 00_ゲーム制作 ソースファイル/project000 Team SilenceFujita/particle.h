@@ -19,7 +19,7 @@
 #define SPAWN_PARTICLE_DAMAGE		(6)		// パーティクル (ダメージ) のエフェクト数
 #define SPAWN_PARTICLE_DUST			(4)		// パーティクル（埃）のエフェクト数
 #define SPAWN_PARTICLE_RAINSPRAY	(8)		// パーティクル（水しぶき）のエフェクト数
-#define SPAWN_PARTICLE_SMOKING		(2)		// パーティクル（タバコの煙）のエフェクト数
+#define SPAWN_PARTICLE_SMOKING		(1)		// パーティクル（タバコの煙）のエフェクト数
 #define SPAWN_PARTICLE_ITEM_LOST	(10)	// パーティクル（アイテム消失）のエフェクト数
 #define SPAWN_PARTICLE_PLAY_SMOKE	(10)	// パーティクル（アイテム消失）のエフェクト数
 
@@ -35,7 +35,6 @@ typedef enum
 	PARTICLETYPE_SPARK,			// パーティクル（火花）
 	PARTICLETYPE_DUST,			// パーティクル (埃)
 	PARTICLETYPE_RAINSPRAY,		// パーティクル（水飛沫）
-	PARTICLETYPE_SMOKING,		// パーティクル（タバコの煙）
 	PARTICLETYPE_ITEM_LOST,		// パーティクル（アイテム消失）
 	PARTICLETYPE_PLAY_SMOKE,	// パーティクル（プレイヤーの黒煙）
 	PARTICLETYPE_MAX,			// この列挙型の総数
