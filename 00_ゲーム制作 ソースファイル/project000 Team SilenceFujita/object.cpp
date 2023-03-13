@@ -59,6 +59,7 @@
 
 #define ITEM_OBJECT_COUNT		(3)								// アイテムが落ちるカウント数
 #define JUNK_COUNT				(3)								// がれきのカウント
+#define OBJECT_RADIUS_ARTICLE	(170.0f)						// オブジェクトの小物判定の半径
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -947,6 +948,43 @@ void HitObject(Object *pObject, int nDamage)
 					);
 				}
 
+				if (pObject->modelData.fRadius < OBJECT_RADIUS_ARTICLE)
+				{ // 小物の場合
+
+					// パーティクルの設定処理
+					SetParticle
+					( // 引数
+						D3DXVECTOR3
+						(
+							pObject->pos.x,
+							pObject->pos.y + 40.0f,
+							pObject->pos.z
+						),
+						D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f),
+						PARTICLETYPE_BREAK_ARTICLE,
+						SPAWN_PARTICLE_BREAKARTICLE,
+						3
+					);
+				}
+				else
+				{ // 上記以外
+
+					// パーティクルの設定処理
+					SetParticle
+					( // 引数
+						D3DXVECTOR3
+						(
+							pObject->pos.x,
+							pObject->pos.y + 40.0f,
+							pObject->pos.z
+						),
+						D3DXCOLOR(1.0f, 0.5f, 0.3f, 1.0f),
+						PARTICLETYPE_BREAK_OBJECT,
+						SPAWN_PARTICLE_BREAKOBJECT,
+						3
+					);
+				}
+
 				break;					// 抜け出す
 
 			case COLLISIONTYPE_CREATE:	// 汎用的な当たり判定
@@ -1022,6 +1060,43 @@ void HitObject(Object *pObject, int nDamage)
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						pObject->matCopy[0].MatD3D
 					);
+
+					if (pObject->modelData.fRadius < OBJECT_RADIUS_ARTICLE)
+					{ // 小物の場合
+
+						// パーティクルの設定処理
+						SetParticle
+						( // 引数
+							D3DXVECTOR3
+							(
+								pObject->pos.x,
+								pObject->pos.y + 40.0f,
+								pObject->pos.z
+							),
+							D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f),
+							PARTICLETYPE_BREAK_ARTICLE,
+							SPAWN_PARTICLE_BREAKARTICLE,
+							3
+						);
+					}
+					else
+					{ // 上記以外
+
+						// パーティクルの設定処理
+						SetParticle
+						( // 引数
+							D3DXVECTOR3
+							(
+								pObject->pos.x,
+								pObject->pos.y + 40.0f,
+								pObject->pos.z
+							),
+							D3DXCOLOR(1.0f, 0.5f, 0.3f, 1.0f),
+							PARTICLETYPE_BREAK_OBJECT,
+							SPAWN_PARTICLE_BREAKOBJECT,
+							3
+						);
+					}
 				}
 
 				break;					// 抜け出す

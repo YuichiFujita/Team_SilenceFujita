@@ -40,6 +40,8 @@ void ParticleDust(Particle *pParticle);			// 埃エフェクト
 void ParticleRainSpray(Particle *pParticle);	// 雨の水しぶきエフェクト
 void ParticleItemLost(Particle *pParticle);		// アイテム消失エフェクト
 void ParticlePlaySmoke(Particle *pParticle);	// プレイヤーの黒煙エフェクト
+void ParticleBreakArticle(Particle *pParticle);	// 小物を破壊した時のエフェクト
+void ParticleBreakObject(Particle *pParticle);	// オブジェクトを破壊した時のエフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -186,6 +188,20 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 
 				// プレイヤーの黒煙エフェクト
 				ParticlePlaySmoke(&g_aParticle[nCntParticle]);
+
+				break;
+
+			case PARTICLETYPE_BREAK_ARTICLE:
+
+				// 小物を破壊した時のエフェクト
+				ParticleBreakArticle(&g_aParticle[nCntParticle]);
+
+				break;
+
+			case PARTICLETYPE_BREAK_OBJECT:
+
+				// オブジェクトを破壊した時のエフェクト
+				ParticleBreakObject(&g_aParticle[nCntParticle]);
 
 				break;
 			}
@@ -563,6 +579,82 @@ void ParticlePlaySmoke(Particle *pParticle)
 			fRadius,			// 半径
 			0.3f,				// 減算量 (半径)
 			EFFECTTYPE_PLAY_SMOKE	// プレイヤーの黒煙
+		);
+	}
+}
+
+//======================================================================================================================
+// 小物を破壊した時のエフェクト
+//======================================================================================================================
+void ParticleBreakArticle(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= 25.0f;
+		move.y *= 25.0f;
+		move.z *= 25.0f;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,	// 位置
+			move,			// 移動量
+			pParticle->col,	// 色
+			40,				// 寿命
+			110.0f,			// 半径
+			1.0f,			// 減算量 (半径)
+			EFFECTTYPE_BREAKOBJECT	// その他
+		);
+	}
+}
+
+//======================================================================================================================
+// オブジェクトを破壊した時のエフェクト
+//======================================================================================================================
+void ParticleBreakObject(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+	  // ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= 25.0f;
+		move.y *= 25.0f;
+		move.z *= 25.0f;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,	// 位置
+			move,			// 移動量
+			pParticle->col,	// 色
+			40,				// 寿命
+			220.0f,			// 半径
+			2.0f,			// 減算量 (半径)
+			EFFECTTYPE_BREAKOBJECT	// その他
 		);
 	}
 }

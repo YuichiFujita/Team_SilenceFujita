@@ -21,6 +21,8 @@
 
 #define SPRAY_MOVE_Y	(1.3f)		// 水しぶきエフェクトの移動量(Y軸)
 
+#define BREAK_OBJECT_MOVE_Y	(1.8f)	// オブジェクトの破壊時の煙の重力
+
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
@@ -62,6 +64,7 @@ typedef struct
 //**********************************************************************************************************************
 void EffectSparkUpdate(Effect *pEffect);			// 火花エフェクトの更新処理
 void EffectSprayUpdate(Effect *pEffect);			// 水しぶきエフェクトの更新処理
+void EffectBreakObjectUpdate(Effect *pEffect);		// オブジェクトの破壊時のエフェクトの更新処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -222,6 +225,13 @@ void UpdateEffect(void)
 
 				break;					// 抜け出す
 
+			case EFFECTTYPE_BREAKOBJECT:	// オブジェクトの破壊時の煙
+
+				// オブジェクトの破壊時のエフェクトの更新処理
+				EffectBreakObjectUpdate(&g_aEffect[nCntEffect]);
+
+				break;					// 抜け出す
+
 			default:					// その他
 
 				// 特に無し
@@ -358,6 +368,13 @@ void DrawEffect(void)
 
 				break;				// 抜け出す
 
+			case EFFECTTYPE_BREAKOBJECT:	// オブジェクトの破壊時
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_SMOKE]);
+
+				break;				//抜け出す
+
 			default:
 
 				// テクスチャの設定
@@ -478,6 +495,25 @@ void EffectSprayUpdate(Effect *pEffect)
 {
 	// 下に移動量を足していく
 	pEffect->move.y -= SPRAY_MOVE_Y;
+}
+
+//======================================================================================================================
+// オブジェクトの破壊時のエフェクトの更新処理
+//======================================================================================================================
+void EffectBreakObjectUpdate(Effect *pEffect)
+{
+	// 下に移動量を足していく
+	pEffect->move.y -= BREAK_OBJECT_MOVE_Y;
+
+	if (pEffect->pos.y <= 0.0f)
+	{ // エフェクトが地面を超えた場合
+
+		// エフェクトの位置を補正する
+		pEffect->pos.y = 0.0f;
+
+		// 使用しない
+		pEffect->bUse = false;
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理
