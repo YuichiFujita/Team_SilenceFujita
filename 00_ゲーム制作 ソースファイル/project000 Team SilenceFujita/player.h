@@ -26,7 +26,7 @@
 
 #define PLAY_REV_ROT_MIN	(0.75f)		// プレイヤーの向き変更量の減速係数の最小値
 #define PLAY_LIFE			(100)		// プレイヤーの体力
-#define PLAY_DAMAGE			(10)		// プレイヤーのダメージ数
+#define PLAY_DAMAGE			(50)		// プレイヤーのダメージ数
 #define BOOST_WAIT_CNT		(180)		// ブーストの再使用までの時間
 #define WIND_OVERHEAT_CNT	(180)		// ウィンドのオーバーヒートまでの時間
 #define BOMB_WAIT_CNT		(2400)		// ボムの再使用までの時間
