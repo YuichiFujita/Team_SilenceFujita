@@ -347,9 +347,6 @@ void InitRanking(void)
 	// 万能初期化の全体処理（3Dマップ）
 	InitAllAroundChunk();
 
-	// アイコンの初期化
-	InitIcon();
-
 	// ファイルをロードする全体処理
 	LoadFileChunk
 	( // 引数
@@ -532,9 +529,6 @@ void UninitRanking(void)
 
 	// 万能終了の全体処理（3Dマップ）
 	UninitAllAroundChunk();
-
-	// アイコンの終了
-	UninitIcon();
 
 	if (GetTitleState() != TITLESTATE_FADE)
 	{//タイトル遷移中じゃないとき

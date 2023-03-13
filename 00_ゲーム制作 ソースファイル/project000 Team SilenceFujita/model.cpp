@@ -105,7 +105,6 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\SignUnBoost.x",			// 標識(ブースト禁止)
 	"data\\MODEL_OBJECT\\RResort.x",				// いかがわしい店
 	"data\\MODEL_OBJECT\\TrashBag.x",				// ゴミ袋
-	
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
@@ -144,6 +143,11 @@ const char *apModelData[] =		// モデルの相対パス
 	// ゲートモデル
 	"data\\MODEL_GATE\\gate000.x",			// ゲート (建物)
 	"data\\MODEL_GATE\\gate001.x",			// ゲート (鉄板)
+
+	// フォントモデル
+	"data\\MODEL_FONT\\break000.x",			// 破壊
+	"data\\MODEL_FONT\\shot000.x",			// 射出
+	"data\\MODEL_FONT\\exit000.x",			// 脱出
 
 	// がれきモデル
 	"data\\MODEL_JUNK\\Junk.x",				// がれき

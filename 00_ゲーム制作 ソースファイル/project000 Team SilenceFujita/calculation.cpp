@@ -10,6 +10,7 @@
 #include "calculation.h"
 #include "meshfield.h"
 
+#include "3Dnotation.h"
 #include "billboard.h"
 #include "camera.h"
 #include "Car.h"
@@ -350,6 +351,12 @@ void InitAllAroundChunk(void)
 	// 影の初期化
 	InitShadow();
 
+	// アイコンの初期化
+	InitIcon();
+
+	// 強調表示の初期化
+	Init3DNotation();
+
 	// 警察の初期化
 	InitPolice();
 
@@ -403,6 +410,12 @@ void UninitAllAroundChunk(void)
 
 	// 影の終了
 	UninitShadow();
+
+	// アイコンの終了
+	UninitIcon();
+
+	// 強調表示の終了
+	Uninit3DNotation();
 
 	// 警察の終了
 	UninitPolice();

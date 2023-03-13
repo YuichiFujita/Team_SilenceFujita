@@ -82,6 +82,7 @@ typedef struct
 	Door         doorData;					// 鉄板の情報
 	IconInfo	 icon;						// アイコンの情報
 	Attention	 atten;						// 注意の情報
+	int          nNotaID;					// 強調表示のインデックス
 	bool         bUse;						// 使用状況
 }Gate;
 

@@ -13,6 +13,7 @@
 #include "calculation.h"
 #include "sound.h"
 
+#include "3Dnotation.h"
 #include "Car.h"
 #include "Combo.h"
 #include "shadow.h"
@@ -98,6 +99,7 @@ void InitCar(void)
 		g_aCar[nCntCar].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aCar[nCntCar].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aCar[nCntCar].nShadowID		= NONE_SHADOW;						// 影のインデックス
+		g_aCar[nCntCar].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
 		g_aCar[nCntCar].type			= CARTYPE_CAR001;					// 種類
 		g_aCar[nCntCar].bombState		= BOMBSTATE_NONE;					// ボムの状態
 		g_aCar[nCntCar].typeMove		= MOVETYPE_MOVE;					// 移動のタイプ
@@ -317,6 +319,18 @@ void UpdateCar(void)
 				// 車の補正の更新処理
 				RevCar(&g_aCar[nCntCar].rot, &g_aCar[nCntCar].pos);
 			}
+
+			// 強調表示の位置設定
+			SetPosition3DNotation
+			( // 引数
+				g_aCar[nCntCar].nNotaID,	// 強調表示インデックス
+				D3DXVECTOR3					// 位置
+				( // 引数
+					g_aCar[nCntCar].pos.x,															// x
+					g_aCar[nCntCar].pos.y + g_aCar[nCntCar].modelData.size.y + NOTA_PLUS_POS_OBJ,	// y
+					g_aCar[nCntCar].pos.z															// z
+				)
+			);
 		}
 	}
 }
@@ -529,6 +543,7 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 			// 情報の設定
 			g_aCar[nCntCar].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aCar[nCntCar].bombState		= BOMBSTATE_NONE;					// 何もしていない状態にする
+			g_aCar[nCntCar].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
 			g_aCar[nCntCar].nBombCount		= 0;								// ボム中のカウント
 			g_aCar[nCntCar].bJump			= false;							// ジャンプしているかどうか
 			g_aCar[nCntCar].nTrafficCnt		= 0;								// 渋滞カウント
@@ -607,6 +622,30 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 					&g_aCar[nCntCar].icon.nIconID,
 					&g_aCar[nCntCar].bUse,
 					&g_aCar[nCntCar].icon.state
+				);
+			}
+
+			if (g_aCar[nCntCar].judge.state == JUDGESTATE_EVIL)
+			{ // 悪い奴だった場合
+
+				// 強調表示のインデックスを設定
+				g_aCar[nCntCar].nNotaID = Set3DNotation
+				( // 引数
+					NOTATIONTYPE_SHOT,			// 強調表示の種類
+					&g_aCar[nCntCar].nNotaID,	// 親の強調表示インデックス
+					&g_aCar[nCntCar].bUse		// 親の使用状況
+				);
+
+				// 強調表示の位置設定
+				SetPosition3DNotation
+				( // 引数
+					g_aCar[nCntCar].nNotaID,	// 強調表示インデックス
+					D3DXVECTOR3					// 位置
+					( // 引数
+						g_aCar[nCntCar].pos.x,															// x
+						g_aCar[nCntCar].pos.y + g_aCar[nCntCar].modelData.size.y+ NOTA_PLUS_POS_OBJ,	// y
+						g_aCar[nCntCar].pos.z															// z
+					)
 				);
 			}
 

@@ -141,6 +141,11 @@ typedef enum
 	MODELTYPE_OBJECT_GATE000,			// ゲート (建物)
 	MODELTYPE_OBJECT_GATE001,			// ゲート (鉄板)
 
+	// フォントモデル
+	MODELTYPE_FONT_BREAK,				// 破壊
+	MODELTYPE_FONT_SHOT,				// 射出
+	MODELTYPE_FONT_EXIT,				// 脱出
+
 	// がれきモデル
 	MODELTYPE_OBJECT_JUNK,				// がれき
 

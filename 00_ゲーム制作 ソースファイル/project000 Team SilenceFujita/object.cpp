@@ -11,6 +11,7 @@
 #include "input.h"
 #include "model.h"
 
+#include "3Dnotation.h"
 #include "buildtimer.h"
 #include "bonus.h"
 #include "Combo.h"
@@ -93,6 +94,7 @@ void InitObject(void)
 		g_aObject[nCntObject].nType          = 0;									// オブジェクトの種類
 		g_aObject[nCntObject].nCounterState  = 0; 									// 状態管理カウンター
 		g_aObject[nCntObject].nShadowID      = NONE_SHADOW;							// 影のインデックス
+		g_aObject[nCntObject].nNotaID        = NONE_3D_NOTATION;					// 強調表示のインデックス
 		g_aObject[nCntObject].bUse           = false;								// 使用状況
 
 		// 当たり判定情報の初期化
@@ -196,6 +198,7 @@ void UninitObject(void)
 //======================================================================================================================
 void UpdateObject(void)
 {
+	// 変数を宣言
 	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
@@ -387,6 +390,9 @@ void UpdateObject(void)
 				(g_aObject[nCntObject].modelData.vtxMax.z + g_aObject[nCntObject].modelData.vtxMin.z) * 0.5f
 			);
 
+			// 影の位置設定
+			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
+
 			// アイコンの位置設定処理
 			SetPositionIcon
 			(
@@ -396,6 +402,18 @@ void UpdateObject(void)
 					g_aObject[nCntObject].pos.x + Pos.x,
 					0.0f,
 					g_aObject[nCntObject].pos.z + Pos.z
+				)
+			);
+
+			// 強調表示の位置設定
+			SetPosition3DNotation
+			( // 引数
+				g_aObject[nCntObject].nNotaID,	// 強調表示インデックス
+				D3DXVECTOR3						// 位置
+				( // 引数
+					g_aObject[nCntObject].pos.x,																								// x
+					g_aObject[nCntObject].pos.y + g_aObject[nCntObject].modelData.size.y * g_aObject[nCntObject].scale.y + NOTA_PLUS_POS_OBJ,	// y
+					g_aObject[nCntObject].pos.z																									// z
 				)
 			);
 		}
@@ -571,7 +589,7 @@ void DrawObject(void)
 void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear,int nJudge)
 {
 	// 変数を宣言
-	float AverageScale;			// 拡大率の平均値
+	float fAverageScale;		// 拡大率の平均値
 	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
 
 	// ポインタを宣言
@@ -644,6 +662,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].state = ACTIONSTATE_NORMAL;	// 状態
 			g_aObject[nCntObject].nLife = OBJ_LIFE;				// 体力
 			g_aObject[nCntObject].nCounterState = 0; 			// 状態管理カウンター
+			g_aObject[nCntObject].nNotaID = NONE_3D_NOTATION;	// 強調表示のインデックス
 
 			// 使用している状態にする
 			g_aObject[nCntObject].bUse = true;
@@ -656,7 +675,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 				// 横幅と縦幅を計算
 				if (stateRot == ROTSTATE_0
-					|| stateRot == ROTSTATE_180)
+				||  stateRot == ROTSTATE_180)
 				{ // 角度が0度、または180度の場合
 					g_aObject[nCntObject].collInfo.fWidth[nCntColl] = g_aCollision[nType].fWidth[nCntColl];
 					g_aObject[nCntObject].collInfo.fDepth[nCntColl] = g_aCollision[nType].fDepth[nCntColl];
@@ -721,13 +740,13 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			{ // 丸影の場合
 
 				// 拡大率の平均を求める
-				AverageScale = (g_aObject[nCntObject].scale.x + g_aObject[nCntObject].scale.z) * 0.5f;
+				fAverageScale = (g_aObject[nCntObject].scale.x + g_aObject[nCntObject].scale.z) * 0.5f;
 
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = SetCircleShadow
 				( // 引数
 					0.5f,										// α値
-					g_aShadowRadius[nType] * AverageScale,		// 半径
+					g_aShadowRadius[nType] * fAverageScale,		// 半径
 					&g_aObject[nCntObject].nShadowID,			// 影の親の影インデックス
 					&g_aObject[nCntObject].bUse					// 影の親の使用状況
 				);
@@ -749,6 +768,9 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = NONE_SHADOW;	// 影を設定しない
 			}
+
+			// 影の位置設定
+			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
 
 			// 原点からずれている位置を算出する
 			Pos = D3DXVECTOR3
@@ -784,8 +806,30 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				);
 			}
 
-			// 影の位置設定
-			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
+
+			if (g_aObject[nCntObject].judge.state == JUDGESTATE_EVIL)
+			{ // 悪い奴だった場合
+
+				// 強調表示のインデックスを設定
+				g_aObject[nCntObject].nNotaID = Set3DNotation
+				( // 引数
+					NOTATIONTYPE_BREAK,				// 強調表示の種類
+					&g_aObject[nCntObject].nNotaID,	// 親の強調表示インデックス
+					&g_aObject[nCntObject].bUse		// 親の使用状況
+				);
+
+				// 強調表示の位置設定
+				SetPosition3DNotation
+				( // 引数
+					g_aObject[nCntObject].nNotaID,	// 強調表示インデックス
+					D3DXVECTOR3						// 位置
+					( // 引数
+						g_aObject[nCntObject].pos.x,																								// x
+						g_aObject[nCntObject].pos.y + g_aObject[nCntObject].modelData.size.y * g_aObject[nCntObject].scale.y + NOTA_PLUS_POS_OBJ,	// y
+						g_aObject[nCntObject].pos.z																									// z
+					)
+				);
+			}
 
 			// ジャッジの情報の設定
 			g_aObject[nCntObject].judge.col = JUDGE_WHITE;				// ピカピカの色
