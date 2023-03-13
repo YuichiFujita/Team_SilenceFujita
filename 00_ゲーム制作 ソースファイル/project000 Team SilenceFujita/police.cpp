@@ -289,8 +289,8 @@ void UpdatePolice(void)
 					// 前回位置の更新
 					g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
-					// プレイヤーの着地の更新処理
-					LandObject(&g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].bJump);
+					//// プレイヤーの着地の更新処理
+					//LandObject(&g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].bJump);
 
 					// プレイヤーの位置の更新
 					PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
