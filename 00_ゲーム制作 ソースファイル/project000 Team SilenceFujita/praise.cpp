@@ -9,22 +9,46 @@
 
 #include "tutorial.h"
 
+//===========================================
 //マクロ定義
+//===========================================
 #define MAX_PRAISE			(30)									// 褒めの最大数
-#define PRAISE_TEXTURE		"data/TEXTURE/Praise.png"				// 褒めのテクスチャ
 
 #define PRAISE_INIT_POS		(D3DXVECTOR3(	0.0f,	0.0f, 0.0f))	// 褒めの初期位置
 #define PRAISE_POS			(D3DXVECTOR3(1100.0f, 500.0f, 0.0f))	// 褒めの位置
 #define PRAISE_SIZE			(D3DXVECTOR3( 100.0f,  30.0f, 0.0f))	// 褒めのサイズ
 #define PRAISE_LAPSE_CNT	(60)									// 褒めを表示しておくカウント
 
-//プロトタイプ宣言
+//===========================================
+//列挙型定義(PRAISE_TEXTURE)
+//===========================================
+typedef enum
+{
+	PRAISE_TEXTURE_NICE = 0,			// ナイスコンボテクスチャ
+	PRAISE_TEXTURE_GREAT,				// グレートコンボテクスチャ
+	PRAISE_TEXTURE_GOOD,				// グッドコンボテクスチャ
+	PRAISE_TEXTURE_MAX					// この列挙型の総数
+}PRAISE_TEXTURE;
 
+//===========================================
+//プロトタイプ宣言
+//===========================================
+
+//===========================================
 //グローバル変数宣言
-LPDIRECT3DTEXTURE9      g_pTexturePraise = {};		// テクスチャへのポインタ
+//===========================================
+LPDIRECT3DTEXTURE9      g_apTexturePraise[PRAISE_TEXTURE_MAX] = {};		// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffPraise = NULL;	// 頂点バッファへのポインタ
 
 Praise g_aPraise[MAX_PRAISE];						// 褒めの情報
+
+// コンスト定義
+const char *c_apPraiseTextureName[PRAISE_TEXTURE_MAX] = 
+{
+	"data/TEXTURE/Praise001.png"		// ナイスコンボテクスチャ
+	"data/TEXTURE/Praise002.png"		// グレートコンボテクスチャ
+	"data/TEXTURE/Praise003.png"		// グッドコンボテクスチャ
+};
 
 //===========================================
 //褒めの初期化処理
@@ -41,13 +65,17 @@ void InitPraise(void)
 		g_aPraise[nCntPra].pos	= PRAISE_INIT_POS;					// 位置
 		g_aPraise[nCntPra].rot	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aPraise[nCntPra].nCount = 0;								// 消滅カウント
+		g_aPraise[nCntPra].nNumTex = 0;								// 
 		g_aPraise[nCntPra].fAngle = atan2f((PRAISE_SIZE.x * 2), (PRAISE_SIZE.y * 2));		// 方向
 		g_aPraise[nCntPra].fLength = sqrtf((PRAISE_SIZE.x * 2) * (PRAISE_SIZE.x * 2) + (PRAISE_SIZE.y * 2) * (PRAISE_SIZE.y * 2)) * 0.5f;		// 長さ
 		g_aPraise[nCntPra].bUse = false;							// 使用状況
 	}
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, PRAISE_TEXTURE, &g_pTexturePraise);
+	for (int nCntTex = 0; nCntTex < PRAISE_TEXTURE_MAX; nCntTex++)
+	{
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice, c_apPraiseTextureName[nCntTex], &g_apTexturePraise[nCntTex]);
+	}
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
@@ -109,11 +137,14 @@ void InitPraise(void)
 //===========================================
 void UninitPraise(void)
 {
-	//テクスチャの破棄
-	if (g_pTexturePraise != NULL)
+	for (int nCntPra = 0; nCntPra < PRAISE_TEXTURE_MAX; nCntPra++)
 	{
-		g_pTexturePraise->Release();
-		g_pTexturePraise = NULL;
+		//テクスチャの破棄
+		if (g_apTexturePraise[nCntPra] != NULL)
+		{
+			g_apTexturePraise[nCntPra]->Release();
+			g_apTexturePraise[nCntPra] = NULL;
+		}
 	}
 
 	//頂点バッファの破棄
@@ -200,7 +231,7 @@ void DrawPraise(void)
 		{//使用されている場合
 
 			// テクスチャの設定
-			pDevice->SetTexture(0, g_pTexturePraise);
+			pDevice->SetTexture(0, g_apTexturePraise[g_aPraise[nCntPra].nNumTex]);
 
 			// ポリゴンの描画
 			pDevice->DrawPrimitive
@@ -236,6 +267,7 @@ void SetPraise(void)
 				0.0f,
 				(rand() % 91 - 45) * 0.01f
 			);
+			g_aPraise[nCntPra].nNumTex = rand() % PRAISE_TEXTURE_MAX;	// テクスチャの番号
 			g_aPraise[nCntPra].nCount = 0;								// 消滅カウント
 			g_aPraise[nCntPra].fAngle = atan2f((PRAISE_SIZE.x * 2), (PRAISE_SIZE.y * 2));		// 方向
 			g_aPraise[nCntPra].fLength = sqrtf((PRAISE_SIZE.x * 2) * (PRAISE_SIZE.x * 2) + (PRAISE_SIZE.y * 2) * (PRAISE_SIZE.y * 2)) * 0.5f;		// 長さ
