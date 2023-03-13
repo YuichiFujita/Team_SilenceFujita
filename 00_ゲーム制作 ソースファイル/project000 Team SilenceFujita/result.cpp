@@ -245,7 +245,7 @@ void UninitResult(void)
 	//StopSound();
 
 	// リザルトの終了全体処理
-	UninitResultChunk();			
+	UninitResultChunk();
 
 	for (int nReslCount = 0; nReslCount < RSL_MAX; nReslCount++)
 	{//破棄

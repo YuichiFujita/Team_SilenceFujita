@@ -18,6 +18,7 @@
 
 #include "2Deffect.h"
 #include "2Dparticle.h"
+#include "3Dnotation.h"
 #include "ability.h"
 #include "billboard.h"
 #include "bomb.h"
@@ -553,6 +554,9 @@ void InitTutorial(void)
 	// アイコンの初期化
 	InitIcon();
 
+	// 強調表示の初期化
+	Init3DNotation();
+
 	// プレイヤーの初期化
 	InitPlayer();
 
@@ -723,6 +727,9 @@ void UninitTutorial(void)
 
 	// アイコンの終了
 	UninitIcon();
+
+	// 強調表示の終了
+	Uninit3DNotation();
 
 	// プレイヤーの終了
 	UninitPlayer();
@@ -964,6 +971,9 @@ void UpdateTutorial(void)
 		// タイヤ痕の更新
 		UpdateTireMark();
 
+		// 強調表示の更新
+		Update3DNotation();
+
 		// 警察の更新
 		UpdatePolice();
 
@@ -1054,6 +1064,9 @@ void DrawTutorial(void)
 
 	// 影の描画
 	DrawShadow();
+
+	// 強調表示の描画
+	Draw3DNotation();
 
 	// プレイヤーの描画
 	DrawPlayer();

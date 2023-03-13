@@ -15,6 +15,7 @@
 #include "tutorial.h"
 
 #include "gate.h"
+#include "3Dnotation.h"
 #include "player.h"
 #include "timer.h"
 #include "particle.h"
@@ -66,10 +67,11 @@ void InitGate(void)
 		//	門の情報を初期化
 		//--------------------------------------------------------------------------------------------------------------
 		// 基本情報の初期化
-		g_aGate[nCntGate].pos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aGate[nCntGate].rot   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aGate[nCntGate].state = GATESTATE_FLY;					// 状態
-		g_aGate[nCntGate].bUse  = false;							// 使用状況
+		g_aGate[nCntGate].pos     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aGate[nCntGate].rot     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aGate[nCntGate].state   = GATESTATE_FLY;					// 状態
+		g_aGate[nCntGate].nNotaID = NONE_3D_NOTATION;				// 強調表示のインデックス
+		g_aGate[nCntGate].bUse    = false;							// 使用状況
 
 		// モデル情報の初期化
 		g_aGate[nCntGate].modelData.dwNumMat = 0;					// マテリアルの数
@@ -267,6 +269,18 @@ void UpdateGate(void)
 			(
 				g_aGate[nCntGate].icon.nIconID,
 				g_aGate[nCntGate].pos
+			);
+
+			// 強調表示の位置設定
+			SetPosition3DNotation
+			( // 引数
+				g_aGate[nCntGate].nNotaID,	// 強調表示インデックス
+				D3DXVECTOR3					// 位置
+				( // 引数
+					g_aGate[nCntGate].pos.x,															// x
+					g_aGate[nCntGate].pos.y + g_aGate[nCntGate].modelData.size.y + NOTA_PLUS_POS_EXIT,	// y
+					g_aGate[nCntGate].pos.z																// z
+				)
 			);
 		}
 	}
@@ -604,6 +618,26 @@ void SetGate(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ROTSTATE stateRot, bool bOpen)
 					}
 				}
 			}
+
+			// 強調表示のインデックスを設定
+			g_aGate[nCntGate].nNotaID = Set3DNotation
+			( // 引数
+				NOTATIONTYPE_EXIT,			// 強調表示の種類
+				&g_aGate[nCntGate].nNotaID,	// 親の強調表示インデックス
+				&g_aGate[nCntGate].bUse		// 親の使用状況
+			);
+
+			// 強調表示の位置設定
+			SetPosition3DNotation
+			( // 引数
+				g_aGate[nCntGate].nNotaID,	// 強調表示インデックス
+				D3DXVECTOR3					// 位置
+				( // 引数
+					g_aGate[nCntGate].pos.x,															// x
+					g_aGate[nCntGate].pos.y + g_aGate[nCntGate].modelData.size.y + NOTA_PLUS_POS_EXIT,	// y
+					g_aGate[nCntGate].pos.z																// z
+				)
+			);
 
 			// 処理を抜ける
 			break;

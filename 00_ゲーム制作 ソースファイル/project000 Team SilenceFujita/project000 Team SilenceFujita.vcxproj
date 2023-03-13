@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="2Deffect.cpp" />
     <ClCompile Include="2Dparticle.cpp" />
+    <ClCompile Include="3Dnotation.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
@@ -216,6 +217,7 @@
   <ItemGroup>
     <ClInclude Include="2Deffect.h" />
     <ClInclude Include="2Dparticle.h" />
+    <ClInclude Include="3Dnotation.h" />
     <ClInclude Include="ability.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />

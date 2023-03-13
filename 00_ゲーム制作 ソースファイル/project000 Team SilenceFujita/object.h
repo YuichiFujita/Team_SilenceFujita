@@ -141,6 +141,7 @@ typedef struct
 	int          nType;					// オブジェクトの種類
 	int          nCounterState;			// 状態管理カウンター
 	int          nShadowID;				// 影のインデックス
+	int          nNotaID;				// 強調表示のインデックス
 	bool         bUse;					// 使用状況
 
 #ifdef _DEBUG	// デバッグ処理
