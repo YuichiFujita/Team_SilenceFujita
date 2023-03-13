@@ -30,10 +30,10 @@
 #define MAX_WIND			(1024)			// 風の最大数
 #define HUMAN_FLY_POS_Y		(50.0f)			// 吹き飛ぶ判定が入る高さ
 #define WIND_WIDTH			(1000.0f)		// 風の範囲(X軸)
-#define WIND_DEPTH			(150.0f)		// 風の範囲(Z軸)
+#define WIND_DEPTH			(300.0f)		// 風の範囲(Z軸)
 #define FLYAWAY_WIDTH		(100.0f)		// 吹き飛ぶ幅
 #define FLYAWAY_HEIGHT		(25.0f)			// 吹き飛ぶ高さ
-#define FLYAWAY_DEPTH		(100.0f)		// 吹き飛ぶ高さ
+#define FLYAWAY_DEPTH		(100.0f)		// 吹き飛ぶ奥行
 
 #define ITEM_WIND_COUNT		(5)								// アイテムが落ちるカウント数
 
