@@ -48,6 +48,7 @@
 #include "object.h"
 #include "player.h"
 #include "Police.h"
+#include "praise.h"
 #include "score.h"
 #include "timer.h"
 #include "tiremark.h"
@@ -200,6 +201,9 @@ void InitGame(void)
 
 	// スコアの初期化
 	InitScore();
+
+	// 褒めの初期化
+	InitPraise();
 
 	// ポーズの初期化
 	InitPause();
@@ -387,6 +391,9 @@ void UninitGame(void)
 
 	// スコアの終了
 	UninitScore();
+
+	// 褒めの終了
+	UninitPraise();
 
 	// ポーズの終了
 	UninitPause();
@@ -648,6 +655,9 @@ void UpdateGame(void)
 			// ボーナスの更新処理
 			UpdateBonus();
 
+			// 褒めの更新
+			UpdatePraise();
+
 			// アイコンの更新
 			UpdateIcon();
 
@@ -827,6 +837,9 @@ void DrawGame(void)
 
 	// ボーナスの描画
 	DrawBonus();
+
+	// 褒めの描画
+	DrawPraise();
 
 	// 2Dエフェクトの描画
 	Draw2DEffect();
