@@ -197,6 +197,7 @@ void UpdatePolice(void)
 
 			if (g_aPolice[nCntPolice].state == POLICESTATE_SPAWN)
 			{ // 出現状態の場合
+
 				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
 				{ // バリア内状態ではない場合
 
@@ -210,55 +211,47 @@ void UpdatePolice(void)
 					GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_LAND)
 				{ // バリアセット状態じゃなかった場合
 
-					if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC)
-					{ // 渋滞状態じゃない場合
+					//----------------------------------------------------
+					//	当たり判定
+					//----------------------------------------------------
+					// オブジェクトとの当たり判定
+					CollisionObject
+					( // 引数
+						&g_aPolice[nCntPolice].pos,			// 現在の位置
+						&g_aPolice[nCntPolice].posOld,		// 前回の位置
+						&g_aPolice[nCntPolice].move,		// 移動量
+						POLICAR_WIDTH,						// 横幅
+						POLICAR_DEPTH,						// 奥行
+						&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
+						BOOSTSTATE_NONE,					// ブーストの状態
+						&g_aPolice[nCntPolice].state,		// 警察の状態
+						&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
+						&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
+					);
 
-						//----------------------------------------------------
-						//	当たり判定
-						//----------------------------------------------------
-						// オブジェクトとの当たり判定
-						CollisionObject
-						( // 引数
-							&g_aPolice[nCntPolice].pos,			// 現在の位置
-							&g_aPolice[nCntPolice].posOld,		// 前回の位置
-							&g_aPolice[nCntPolice].move,		// 移動量
-							POLICAR_WIDTH,						// 横幅
-							POLICAR_DEPTH,						// 奥行
-							&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
-							BOOSTSTATE_NONE,					// ブーストの状態
-							&g_aPolice[nCntPolice].state,		// 警察の状態
-							&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
-							&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
-						);
+					// ゲートとの当たり判定
+					CollisionGate
+					( // 引数
+						&g_aPolice[nCntPolice].pos,			// 現在の位置
+						&g_aPolice[nCntPolice].posOld,		// 前回の位置
+						&g_aPolice[nCntPolice].move,		// 移動量
+						POLICAR_WIDTH,						// 横幅
+						POLICAR_DEPTH						// 奥行
+					);
 
-						// ゲートとの当たり判定
-						CollisionGate
-						( // 引数
-							&g_aPolice[nCntPolice].pos,			// 現在の位置
-							&g_aPolice[nCntPolice].posOld,		// 前回の位置
-							&g_aPolice[nCntPolice].move,		// 移動量
-							POLICAR_WIDTH,						// 横幅
-							POLICAR_DEPTH						// 奥行
-						);
-					}
-
-					if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
-					{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
-
-						// 車同士の当たり判定
-						CollisionCarBody
-						( // 引数
-							&g_aPolice[nCntPolice].pos,
-							&g_aPolice[nCntPolice].posOld,
-							g_aPolice[nCntPolice].rot,
-							&g_aPolice[nCntPolice].move,
-							POLICAR_WIDTH,
-							POLICAR_DEPTH,
-							COLLOBJECTTYPE_POLICE,
-							&g_aPolice[nCntPolice].nTrafficCnt,
-							(g_aPolice[nCntPolice].tackle.tackleState)
-						);
-					}
+					// 車同士の当たり判定
+					CollisionCarBody
+					( // 引数
+						&g_aPolice[nCntPolice].pos,
+						&g_aPolice[nCntPolice].posOld,
+						g_aPolice[nCntPolice].rot,
+						&g_aPolice[nCntPolice].move,
+						POLICAR_WIDTH,
+						POLICAR_DEPTH,
+						COLLOBJECTTYPE_POLICE,
+						&g_aPolice[nCntPolice].nTrafficCnt,
+						(g_aPolice[nCntPolice].tackle.tackleState)
+					);
 				}
 
 				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
@@ -1031,12 +1024,14 @@ void PatrolPoliceAct(Police *pPolice)
 
 	if (pPlayer->bUse == true)
 	{ // プレイヤーが使用されていた場合
+
 		//目的の距離を設定する
 		fDist = fabsf(sqrtf((pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x) + (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z)));
 
 		if (fDist <= POLICAR_CHASE_RANGE)
 		{ // 目的の距離が一定以内に入ったら
-		  // 追跡状態に移行する
+
+			// 追跡状態に移行する
 			pPolice->state = POLICESTATE_CHASE;
 		}
 	}
