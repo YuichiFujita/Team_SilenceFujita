@@ -16,13 +16,15 @@
 
 #define ESCAPE_POS					(D3DXVECTOR3(1150.0f, 40.0f, 0.0f))			// 脱出通知の位置
 #define ESCAPE_RADIUS				(D3DXVECTOR3(80.0f, 20.0f, 0.0f))			// 脱出通知の半径
-#define ESCAPE_INIT_ALPHA			(0.0f)										// 脱出通知の透明度の初期値
-#define ESCAPE_ALPHA				(1.0f)										// 脱出通知の透明度
+#define ESCAPE_INIT_COL				(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f))			// 脱出通知の初期の色
+#define ESCAPE_COL					(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))			// 脱出通知の色
 #define ESCAPE_ADD_ALPHA			(0.01f)										// 脱出通知の透明度の加算数
 #define ESCAPE_EMPHASIS_TIME		(30)										// 脱出通知が強調状態になる時間
 #define ESCAPE_RADIUS_MOVE			(D3DXVECTOR3(2.0f, 0.5f, 0.0f))				// 脱出通知の半径の拡大率
 #define ESCAPE_EMPHASIS_RADIUS		(D3DXVECTOR3(120.0f, 30.0f, 0.0f))			// 脱出通知の強調時の半径
 #define ESCAPE_EMPHASIS_WAIT_CNT	(20)										// 脱出通知の強調時の待機カウント数
+#define ESCAPE_EMPHASIS_COL			(D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f))			// 脱出通知の強調時の色
+#define ESCAPE_EMPHASIS_ADD_COL		(D3DXCOLOR(0.0f, 0.03f, 0.05f, 0.0f))		// 脱出通知の強調時の色の追加量
 
 #define ESCAPE_TEXTURE		"data/TEXTURE/Escape.png"							// 脱出通知のテクスチャ
 
@@ -56,7 +58,7 @@ void InitEscape(void)
 	// 脱出通知の情報の設定
 	g_Escape.pos = ESCAPE_POS;					// 位置
 	g_Escape.length = ESCAPE_RADIUS;			// 長さ
-	g_Escape.fAlpha = ESCAPE_INIT_ALPHA;		// 透明度
+	g_Escape.col = ESCAPE_INIT_COL;				// 色
 	g_Escape.bUse = false;						// 使用状況
 
 	// 脱出通知の状態関係の設定
@@ -90,10 +92,10 @@ void InitEscape(void)
 	pVtx[3].rhw = 1.0f;
 
 	//頂点カラーの設定
-	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
+	pVtx[0].col = g_Escape.col;
+	pVtx[1].col = g_Escape.col;
+	pVtx[2].col = g_Escape.col;
+	pVtx[3].col = g_Escape.col;
 
 	//テクスチャ座標の設定
 	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -140,13 +142,13 @@ void UpdateEscape(void)
 		case ESCAPESTATE_NONE:			// 無状態
 
 			// 透明度を加算する
-			g_Escape.fAlpha += ESCAPE_ADD_ALPHA;
+			g_Escape.col.a += ESCAPE_ADD_ALPHA;
 
-			if (g_Escape.fAlpha >= ESCAPE_ALPHA)
+			if (g_Escape.col.a >= ESCAPE_COL.a)
 			{ // 一定数値を超えた場合
 
 				// 透明度を補正する
-				g_Escape.fAlpha = ESCAPE_ALPHA;
+				g_Escape.col = ESCAPE_COL;
 
 				// 表示状態にする
 				g_Escape.stateInfo.escapeState = ESCAPESTATE_DISP;
@@ -187,10 +189,10 @@ void UpdateEscape(void)
 		pVtx[3].pos = D3DXVECTOR3(g_Escape.pos.x + g_Escape.length.x, g_Escape.pos.y + g_Escape.length.y, 0.0f);
 
 		//頂点カラーの設定
-		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
+		pVtx[0].col = g_Escape.col;
+		pVtx[1].col = g_Escape.col;
+		pVtx[2].col = g_Escape.col;
+		pVtx[3].col = g_Escape.col;
 
 		//頂点バッファをアンロックする
 		g_pVtxBuffEscape->Unlock();
@@ -242,7 +244,7 @@ void SetEscape(void)
 		// 情報の設定
 		g_Escape.pos = ESCAPE_POS;				// 位置
 		g_Escape.length = ESCAPE_RADIUS;		// 長さ
-		g_Escape.fAlpha = ESCAPE_INIT_ALPHA;	// 透明度
+		g_Escape.col = ESCAPE_INIT_COL;			// 透明度
 
 		// 状態関係の情報の設定
 		g_Escape.stateInfo.escapeState	 = ESCAPESTATE_NONE;		// 状態
@@ -259,10 +261,10 @@ void SetEscape(void)
 		pVtx[3].pos = D3DXVECTOR3(g_Escape.pos.x + g_Escape.length.x, g_Escape.pos.y + g_Escape.length.y, 0.0f);
 
 		//頂点カラーの設定
-		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
-		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_Escape.fAlpha);
+		pVtx[0].col = g_Escape.col;
+		pVtx[1].col = g_Escape.col;
+		pVtx[2].col = g_Escape.col;
+		pVtx[3].col = g_Escape.col;
 
 		//頂点バッファをアンロックする
 		g_pVtxBuffEscape->Unlock();
@@ -287,11 +289,17 @@ void EscapeEmphasis(void)
 			g_Escape.length.x += ESCAPE_RADIUS_MOVE.x;
 			g_Escape.length.y += ESCAPE_RADIUS_MOVE.y;
 
+			// 色を変化させる
+			g_Escape.col -= ESCAPE_EMPHASIS_ADD_COL;
+
 			if (g_Escape.length.x >= ESCAPE_EMPHASIS_RADIUS.x)
 			{ // 一定の半径を超えた場合
 
 				// 半径を補正する
 				g_Escape.length = ESCAPE_EMPHASIS_RADIUS;
+
+				// 色を補正する
+				g_Escape.col = ESCAPE_EMPHASIS_COL;
 
 				// 状態カウンターを加算する
 				g_Escape.stateInfo.nStateCounter++;
@@ -325,11 +333,17 @@ void EscapeEmphasis(void)
 			g_Escape.length.x -= ESCAPE_RADIUS_MOVE.x;
 			g_Escape.length.y -= ESCAPE_RADIUS_MOVE.y;
 
+			// 色を変化させる
+			g_Escape.col += ESCAPE_EMPHASIS_ADD_COL;
+
 			if (g_Escape.length.x <= ESCAPE_RADIUS.x)
 			{ // 一定の半径を超えた場合
 
 				// 半径を補正する
 				g_Escape.length = ESCAPE_RADIUS;
+
+				// 色を補正する
+				g_Escape.col = ESCAPE_COL;
 
 				// 状態カウンターを加算する
 				g_Escape.stateInfo.nStateCounter++;

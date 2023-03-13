@@ -48,7 +48,7 @@ typedef struct
 	D3DXVECTOR3		pos;			// 位置
 	D3DXVECTOR3		length;			// 長さ
 	EscapeState		stateInfo;		// 脱出状態関係
-	float			fAlpha;			// 透明度
+	D3DXCOLOR		col;			// 色
 	bool			bUse;			// 使用しているかどうか
 }EscapeInfo;
 
