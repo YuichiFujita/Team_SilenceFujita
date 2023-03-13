@@ -46,6 +46,7 @@
 #define ICON_ALPHA_CHANGE	(0.005f)	// アイコンの透明度の変化量
 #define ICON_REVIVAL_CNT	(20)		// 復活中のカウント
 #define ICON_DAMAGE_COL		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))		// ダメージ時の色
+#define ICON_EMPHASIS_COL	(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))
 #define ICON_UNRIVALED_CNT	(10)		// 無敵状態のカウント
 #define ICON_SCALE_CHANGE	(50.0f);	// 拡大縮小時の半径の拡大率
 
@@ -374,6 +375,13 @@ void UpdateIcon(void)
 						g_aIcon[nCntIcon].radius.x = 0.0f;
 						g_aIcon[nCntIcon].radius.z = 0.0f;
 					}
+
+					break;					// 抜け出す
+
+				case ICONSTATE_EMPHASIS:	// 強調状態
+
+					// 色を設定する
+					g_aIcon[nCntIcon].col = ICON_EMPHASIS_COL;
 
 					break;					// 抜け出す
 				}

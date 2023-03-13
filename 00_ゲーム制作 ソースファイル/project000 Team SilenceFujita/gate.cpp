@@ -252,6 +252,13 @@ void UpdateGate(void)
 				break;
 			}
 
+			if (GetTime() <= GATE_PINCH_CNT)
+			{ // §ŒÀŽžŠÔŽc‚è‹Í‚©‚¾‚Á‚½ê‡
+
+				// ‹­’²ó‘Ô‚É‚·‚é
+				g_aGate[nCntGate].icon.state = ICONSTATE_EMPHASIS;
+			}
+
 			// ƒQ[ƒg‚Ì’ˆÓˆ—
 			GateAttention(&g_aGate[nCntGate]);
 

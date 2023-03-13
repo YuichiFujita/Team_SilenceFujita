@@ -50,6 +50,7 @@ typedef enum
 	ICONSTATE_FLYAWAY,			// l‚ª”ò‚ñ‚Å‚¢‚éó‘Ô
 	ICONSTATE_ENLARGE,			// Šg‘åó‘Ô
 	ICONSTATE_REDUCE,			// k¬ó‘Ô
+	ICONSTATE_EMPHASIS,			// ‹­’²ó‘Ô
 	ICONSTATE_MAX				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 }ICONSTATE;
 
