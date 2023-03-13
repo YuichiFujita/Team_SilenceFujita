@@ -21,6 +21,7 @@ typedef struct
 	D3DXVECTOR3 pos;		// 位置
 	D3DXVECTOR3 rot;		// 向き
 	int			nCount;		// 消滅カウンター
+	int			nNumTex;	// テクスチャの番号
 	float		fAngle;		// 方向
 	float		fLength;	// 長さ
 	bool		bUse;		// 使用状況
