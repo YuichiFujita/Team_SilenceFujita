@@ -31,12 +31,12 @@
 
 #define TITLE_POS_X			(640.0f)	// タイトルの停止時の絶対座標 (x)
 #define TITLE_POS_Y			(225.0f)	// タイトルの停止時の絶対座標 (y)
-#define TITLE_WIDTH			(340.0f)	// タイトルの横幅 / 2
+#define TITLE_WIDTH			(390.0f)	// タイトルの横幅 / 2
 #define TITLE_HEIGHT		(140.0f)	// タイトルの縦幅 / 2
 
 #define TITLE_SELECT_POS_X			(SCREEN_WIDTH * 0.5f)			//タイトル選択肢の開始位置（X)
 #define TITLE_SELECT_POS_Y			(SCREEN_HEIGHT * 0.825f)		//タイトル選択肢の開始位置（Y）	
-#define TITLE_SELECT_SIZE_X			(200.0f)						//タイトル選択肢の大きさ（X）
+#define TITLE_SELECT_SIZE_X			(220.0f)						//タイトル選択肢の大きさ（X）
 #define TITLE_SELECT_SIZE_Y			(60.0f)							//タイトル選択肢の大きさ（Y）
 #define TITLE_SELECT_INTERVAL_X		(225.0f)						//タイトル選択肢の間隔（X）
 
@@ -53,9 +53,9 @@
 //**********************************************************************************************************************
 const char *apTextureTitle[] =			// テクスチャの相対パス
 {
-	"data\\TEXTURE\\title000.png",				// タイトルのテクスチャ相対パス
-	"data\\TEXTURE\\title_select_start.png",	// タイトル選択（スタート）
-	"data\\TEXTURE\\title_select_tutorial.png",	// タイトル選択（チュートリアル）
+	"data\\TEXTURE\\title000.tga",				// タイトルのテクスチャ相対パス
+	"data\\TEXTURE\\title_select_start.tga",	// タイトル選択（スタート）
+	"data\\TEXTURE\\title_select_tutorial.tga",	// タイトル選択（チュートリアル）
 };
 
 //**********************************************************************************************************************

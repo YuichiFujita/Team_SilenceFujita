@@ -55,9 +55,9 @@
 //**********************************************************************************************************************
 const char *apTextureStart[] =			// テクスチャの相対パス
 {
-	"data\\TEXTURE\\start000.png",		// スタートコロン(：) (通常) のテクスチャ相対パス
-	"data\\TEXTURE\\start001.png",		// スタートコロン(：) (赤) のテクスチャ相対パス
-	"data\\TEXTURE\\StartSignal.png",	// シグナルのテクスチャ相対パス
+	"data\\TEXTURE\\start000.tga",		// スタートコロン(：) (通常) のテクスチャ相対パス
+	"data\\TEXTURE\\start001.tga",		// スタートコロン(：) (赤) のテクスチャ相対パス
+	"data\\TEXTURE\\StartSignal.tga",	// シグナルのテクスチャ相対パス
 	"data\\TEXTURE\\start002.png",		// スタートコロン(：) (赤) のテクスチャ相対パス
 };
 
@@ -320,12 +320,6 @@ void UninitStart(void)
 //======================================================================================================================
 void UpdateStart(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{
-		// 0を押した場合
-		g_StartState = STARTSTATE_PREFACE_FIRST;
-	}
-
 	VERTEX_2D         *pVtx;					// 頂点情報へのポインタ
 
 	switch (g_StartState)

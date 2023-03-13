@@ -18,6 +18,7 @@
 #include "player.h"
 #include "car.h"
 #include "police.h"
+#include "timer.h"
 
 #include "particle.h"
 
@@ -1150,8 +1151,18 @@ void UpdateBarrierInfoData(void)
 					if (nNumEvil > 0)
 					{ // 悪い奴がいた場合
 
-						// ボーナスの設定処理
-						SetBonus(SCORE_CAR * nNumEvil);
+						if (GetTime() <= BONUS_SPECIAL_TIME)
+						{ // 制限時間が残り僅かの場合
+
+							// ボーナスの設定処理
+							SetBonus(SCORE_CAR_SP * nNumEvil);
+						}
+						else
+						{ // 通常状態の場合
+
+							// ボーナスの設定処理
+							SetBonus(SCORE_CAR * nNumEvil);
+						}
 					}
 
 					// カウンターを初期化

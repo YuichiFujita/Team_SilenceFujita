@@ -35,23 +35,26 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MOVE_FORWARD		(0.18f)		// プレイヤー前進時の移動量
-#define MOVE_BACKWARD		(0.3f)		// プレイヤー後退時の移動量
-#define MOVE_PLUS_FORWARD	(0.36f)		// プレイヤー前進時の追加の移動量
-#define MOVE_PLUS_BACKWARD	(0.6f)		// プレイヤー後退時の追加の移動量
-#define MOVE_ROT			(0.012f)	// プレイヤーの向き変更量
-#define REV_MOVE_ROT		(0.08f)		// 移動量による向き変更量の補正係数
-#define REV_MOVE_BRAKE		(0.1f)		// ブレーキ時の減速係数
-#define DEL_MOVE_ABS		(1.9f)		// 移動量の削除範囲の絶対値
-#define PLAY_GRAVITY		(0.75f)		// プレイヤーにかかる重力
-#define MAX_BACKWARD		(-12.0f)	// 後退時の最高速度
-#define REV_MOVE_SUB		(0.08f)		// 移動量の減速係数
-#define UNRIVALED_CNT		(10)		// 無敵時にチカチカさせるカウント
-#define STATE_MOVE			(1.5f)		// 停止・旋回時の判定範囲
+#define MOVE_FORWARD			(0.18f)		// プレイヤー前進時の移動量
+#define MOVE_BACKWARD			(0.3f)		// プレイヤー後退時の移動量
+#define MOVE_PLUS_FORWARD		(0.36f)		// プレイヤー前進時の追加の移動量
+#define MOVE_PLUS_BACKWARD		(0.6f)		// プレイヤー後退時の追加の移動量
+#define MOVE_ROT				(0.012f)	// プレイヤーの向き変更量
+#define REV_MOVE_ROT			(0.08f)		// 移動量による向き変更量の補正係数
+#define REV_MOVE_BRAKE			(0.1f)		// ブレーキ時の減速係数
+#define DEL_MOVE_ABS			(1.9f)		// 移動量の削除範囲の絶対値
+#define PLAY_GRAVITY			(0.75f)		// プレイヤーにかかる重力
+#define MAX_BACKWARD			(-12.0f)	// 後退時の最高速度
+#define REV_MOVE_SUB			(0.08f)		// 移動量の減速係数
+#define UNRIVALED_CNT			(10)		// 無敵時にチカチカさせるカウント
+#define STATE_MOVE				(1.5f)		// 停止・旋回時の判定範囲
+#define PLAYER_BROKEN			(50)		// 黒煙が出る体力の境界
+#define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))		// ボロボロになっている車の色の追加量
+#define PLAYER_SMOKE_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// 黒煙の色
 
-#define PLAY_CLEAR_MOVE		(4.0f)		// クリア成功時のプレイヤーの自動移動量
-#define REV_PLAY_CLEAR_MOVE	(0.1f)		// クリア成功時のプレイヤーの減速係数
-#define REV_PLAY_OVER_MOVE	(0.02f)		// クリア失敗時のプレイヤーの減速係数
+#define PLAY_CLEAR_MOVE			(4.0f)		// クリア成功時のプレイヤーの自動移動量
+#define REV_PLAY_CLEAR_MOVE		(0.1f)		// クリア成功時のプレイヤーの減速係数
+#define REV_PLAY_OVER_MOVE		(0.02f)		// クリア失敗時のプレイヤーの減速係数
 
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -159,6 +162,7 @@ void InitPlayer(void)
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
+	g_player.nBrokenCnt	   = 0;									// 黒煙の出る間隔
 	g_player.bMove         = false;								// 移動状況
 	g_player.bJump         = false;								// ジャンプ状況
 	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
@@ -368,14 +372,30 @@ void DrawPlayer(void)
 
 			default:					// それ以外の状態
 
+				if (nCntMat == 0)
+				{ // 最初の色(車のボディの色)のみ
+
+					// 色を変える
+					g_player.MatCopy[nCntMat].MatD3D.Diffuse.r = pMat[nCntMat].MatD3D.Diffuse.r - (PLAYER_BREAK_ADD_COL.r * (PLAY_LIFE - g_player.nLife));
+					g_player.MatCopy[nCntMat].MatD3D.Diffuse.g = pMat[nCntMat].MatD3D.Diffuse.g - (PLAYER_BREAK_ADD_COL.g * (PLAY_LIFE - g_player.nLife));
+					g_player.MatCopy[nCntMat].MatD3D.Diffuse.b = pMat[nCntMat].MatD3D.Diffuse.b - (PLAYER_BREAK_ADD_COL.b * (PLAY_LIFE - g_player.nLife));
+				}
+
 				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+				pDevice->SetMaterial(&g_player.MatCopy[nCntMat].MatD3D);	// 通常
 
 				// 透明状態をOFFにする
 				g_player.bUnrivaled = false;
 
 				// 処理を抜ける
 				break;
+			}
+
+			if (*GetGameState() == GAMESTATE_END)
+			{ // 終了状態の場合
+
+				// マテリアルの設定
+				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
 			}
 
 			// テクスチャの設定
@@ -395,6 +415,8 @@ void DrawPlayer(void)
 //============================================================
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
+	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+
 	// 引数を代入
 	g_player.pos     = pos;		// 現在の位置
 	g_player.oldPos  = pos;		// 前回の位置
@@ -405,6 +427,15 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 		// モデル情報を設定
 		g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
+
+		// マテリアルデータへのポインタを取得
+		pMat = (D3DXMATERIAL*)g_player.modelData.pBuffMat->GetBufferPointer();
+
+		for (int nCntMat = 0; nCntMat < (int)g_player.modelData.dwNumMat; nCntMat++)
+		{
+			// 色をコピーする
+			g_player.MatCopy[nCntMat] = pMat[nCntMat];
+		}
 
 		// 影のインデックスを設定
 		g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
@@ -572,6 +603,30 @@ void UpdateGameNorPlayer(void)
 				// 透明状況の入れ替え
 				g_player.bUnrivaled = g_player.bUnrivaled ? false : true;
 			}
+		}
+	}
+
+	if (g_player.nLife <= PLAYER_BROKEN)
+	{ // 体力が少なくなったら
+
+		// 黒煙カウントを加算する
+		g_player.nBrokenCnt++;
+
+		if (g_player.nBrokenCnt % g_player.nLife == 0)
+		{ // 一定時間経過したら
+
+			// 黒煙カウントを0にする
+			g_player.nBrokenCnt = 0;
+
+			// パーティクルの設定処理
+			SetParticle
+			(
+				g_player.pos,
+				PLAYER_SMOKE_COL,
+				PARTICLETYPE_PLAY_SMOKE,
+				SPAWN_PARTICLE_PLAY_SMOKE,
+				3
+			);
 		}
 	}
 
@@ -1082,11 +1137,16 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 	if (bMove)
 	{ // 移動の操作が可能な場合
 
-		// プレイヤーの速度を計算
-		float fVolume = (fabsf(g_player.move.x + g_player.boost.plusMove.x) / MAX_REAL_SPEED);
+		//効果音系BGMの再生
+		if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+		{
+			// プレイヤーの速度を計算
+			float fVolume = (fabsf(g_player.move.x + g_player.boost.plusMove.x) / MAX_REAL_SPEED);
 
-		//プレイヤーの速度で走行音を調整
-		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, fVolume);
+			//プレイヤーの速度で走行音を調整
+			SetSoundVolume(SOUND_LABEL_BGM_CAR_000, fVolume);
+		}
+
 
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
 		{ // 前進の操作が行われた場合
@@ -1188,7 +1248,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			}
 
 			// 移動量の補正
-			if (g_player.move.x <= DEL_MOVE_ABS
+			if (g_player.move.x <=  DEL_MOVE_ABS
 			&&  g_player.move.x >= -DEL_MOVE_ABS)
 			{ // 移動量が削除の範囲内の場合
 

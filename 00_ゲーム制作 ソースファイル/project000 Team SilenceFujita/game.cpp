@@ -27,6 +27,7 @@
 #include "Combo.h"
 #include "Countdown.h"
 #include "effect.h"
+#include "escape.h"
 #include "flash.h"
 #include "Human.h"
 #include "gate.h"
@@ -47,6 +48,7 @@
 #include "object.h"
 #include "player.h"
 #include "Police.h"
+#include "praise.h"
 #include "score.h"
 #include "timer.h"
 #include "tiremark.h"
@@ -173,6 +175,9 @@ void InitGame(void)
 	// カウントダウンの初期化
 	InitCountDown();
 
+	// 脱出通知の初期化
+	InitEscape();
+
 	// エフェクトの初期化
 	InitEffect();
 
@@ -196,6 +201,9 @@ void InitGame(void)
 
 	// スコアの初期化
 	InitScore();
+
+	// 褒めの初期化
+	InitPraise();
 
 	// ポーズの初期化
 	InitPause();
@@ -357,6 +365,9 @@ void UninitGame(void)
 	// カウントダウンの終了
 	UninitCountDown();
 
+	// 脱出通知の終了
+	UninitEscape();
+
 	// エフェクトの終了
 	UninitEffect();
 
@@ -380,6 +391,9 @@ void UninitGame(void)
 
 	// スコアの終了
 	UninitScore();
+
+	// 褒めの終了
+	UninitPraise();
 
 	// ポーズの終了
 	UninitPause();
@@ -476,6 +490,9 @@ void UpdateGame(void)
 
 				// ポーズの開始、解除
 				g_bPause = (g_bPause == false) ? true : false;
+
+				// サウンドの再生
+				PlaySound(SOUND_LABEL_SE_SELECT_000);		// SE (選択のSE)
 			}
 #endif
 		}
@@ -610,12 +627,15 @@ void UpdateGame(void)
 
 			// 体力バーの更新
 			UpdateLife();
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif
 			// カウントダウンの更新
 			UpdateCountDown();
+
+			// 脱出通知の更新
+			UpdateEscape();
 
 			// 能力バーの更新
 			UpdateAbility();
@@ -634,6 +654,9 @@ void UpdateGame(void)
 
 			// ボーナスの更新処理
 			UpdateBonus();
+
+			// 褒めの更新
+			UpdatePraise();
 
 			// アイコンの更新
 			UpdateIcon();
@@ -791,6 +814,9 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
+	// 脱出通知の描画
+	DrawEscape();
+
 	// 体力バーの描画
 	DrawLife();
 
@@ -811,6 +837,9 @@ void DrawGame(void)
 
 	// ボーナスの描画
 	DrawBonus();
+
+	// 褒めの描画
+	DrawPraise();
 
 	// 2Dエフェクトの描画
 	Draw2DEffect();

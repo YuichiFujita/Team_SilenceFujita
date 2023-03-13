@@ -9,6 +9,8 @@
 #include "score.h"
 #include "value.h"
 
+#include "tutorial.h"
+
 //マクロ定義
 #define MAX_COMBO			(2)			// 使用するポリゴン数
 
@@ -53,8 +55,8 @@ int   g_nComboCount;	// コンボが止まるまでのカウント
 //テクスチャファイル名
 const char *c_apFilenameCombo[COMBOTEX_MAX] =
 {
-	"data/TEXTURE/ui006.png",	// コンボ下地
-	"data/TEXTURE/ui007.png",	// コンボスコア下地
+	"data/TEXTURE/ui006.tga",	// コンボ下地
+	"data/TEXTURE/ui007.tga",	// コンボスコア下地
 };
 
 //===========================================
@@ -210,8 +212,13 @@ void UpdateCombo(void)
 	if (g_Combo.bUse == true)
 	{//使用していた場合
 
-		// コンボの止まるカウントを加算
-		g_nComboCount++;
+		if (GetMode() == MODE_GAME
+			|| GetLessonState() != LESSON_05)
+		{ // ゲーム中または、レッスン5に挑戦中、またはクリアしている場合
+
+			// コンボの止まるカウントを加算
+			g_nComboCount++;
+		}
 
 		if (g_nComboCount >= COMBO_CLEAR_CNT)
 		{ // カウントが一定以上になった場合

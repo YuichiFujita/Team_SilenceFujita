@@ -20,6 +20,8 @@
 #include "particle.h"
 #include "shadow.h"
 #include "sound.h"
+#include "tutorial.h"
+#include "timer.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -35,6 +37,8 @@
 #define JUNK_POS_Y				(220.0f)						// がれきが出現する位置(Y軸)
 #define JUNK_POS_Z				(0.5f)							// がれきが出現する位置の倍率(Z軸)
 #define SPARK_SPEED				(13.0f)							// 火花が出るスピード
+#define GAME_REBUILD_CNT		(600)							// ゲームモードでのオブジェクトの再建築までのカウント
+#define TUTORIAL_REBUILD_CNT	(600)							// チュートリアルモードでのオブジェクトの再建築までのカウント
 
 #define OBJECT_GRAVITY			(-1.5f)							// オブジェクトの重力
 #define SMASH_WIDTH_MAGNI		(3.0f)							// 吹き飛びの幅の倍率
@@ -799,8 +803,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 //======================================================================================================================
 void HitObject(Object *pObject, int nDamage)
 {
-	int nMode = GetMode();			// モードの取得処理
-
 	if (pObject->state == ACTIONSTATE_NORMAL && pObject->appear.state == APPEARSTATE_COMPLETE && pObject->bUse == true)
 	{ // オブジェクトが通常状態かつ、出現完了状態の場合
 
@@ -845,12 +847,24 @@ void HitObject(Object *pObject, int nDamage)
 				2									// 寿命
 			);
 
-			switch (nMode)
+			switch (GetMode())
 			{
 			case MODE_GAME:			// ゲームの場合
 
 				// 再建築タイマーの設定処理
-				SetBuildtimer(pObject->pos, 600, *pObject);
+				SetBuildtimer(pObject->pos, GAME_REBUILD_CNT, *pObject);
+
+				// 処理から抜ける
+				break;
+
+			case MODE_TUTORIAL:		// チュートリアルの場合
+
+				if (GetLessonState() == LESSON_05)
+				{ // コンボ練習中の場合
+
+					// 再建築タイマーの設定処理
+					SetBuildtimer(pObject->pos, TUTORIAL_REBUILD_CNT, *pObject);
+				}
 
 				// 処理から抜ける
 				break;
@@ -1016,8 +1030,18 @@ void HitObject(Object *pObject, int nDamage)
 			if (pObject->judge.state == JUDGESTATE_EVIL)
 			{ //オブジェクトが悪いものだった場合
 
-				// ボーナスの設定処理
-				SetBonus(SCORE_OBJECT);
+				if (GetTime() <= BONUS_SPECIAL_TIME)
+				{ // 制限時間が残り僅かだった場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_OBJECT_SP);
+				}
+				else
+				{ // 通常状態の場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_OBJECT);
+				}
 
 				// アイテムが落ちるカウントを加算する
 				g_nObjectItemCount++;

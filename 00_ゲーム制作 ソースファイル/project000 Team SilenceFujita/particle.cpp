@@ -40,6 +40,7 @@ void ParticleDust(Particle *pParticle);			// 埃エフェクト
 void ParticleRainSpray(Particle *pParticle);	// 雨の水しぶきエフェクト
 void ParticleSmoking(Particle *pParticle);		// タバコの煙エフェクト
 void ParticleItemLost(Particle *pParticle);		// アイテム消失エフェクト
+void ParticlePlaySmoke(Particle *pParticle);	// プレイヤーの黒煙エフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -187,6 +188,13 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 
 				// アイテム消失エフェクト
 				ParticleItemLost(&g_aParticle[nCntParticle]);
+
+				break;
+
+			case PARTICLETYPE_PLAY_SMOKE:
+
+				// プレイヤーの黒煙エフェクト
+				ParticlePlaySmoke(&g_aParticle[nCntParticle]);
 
 				break;
 			}
@@ -555,6 +563,57 @@ void ParticleItemLost(Particle *pParticle)
 			30.0f,			// 半径
 			0.5f,			// 減算量 (半径)
 			EFFECTTYPE_NONE	// その他
+		);
+	}
+}
+
+//======================================================================================================================
+// プレイヤーの黒煙エフェクト
+//======================================================================================================================
+void ParticlePlaySmoke(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;		// エフェクトの移動量の代入用
+	float fRadius;			// エフェクトの半径の代入用
+	int nLife;				// エフェクトの寿命の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = D3DX_PI;
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= (float)(rand() % 5 - 2);
+		move.y *= (float)(rand() % 5 + 2);
+		move.z *= (float)(rand() % 5 - 2);
+
+		// 半径をランダムに設定
+		fRadius = (float)(rand() % 20 + 40.0f);
+
+		// 寿命を設定
+		nLife = (rand() % 20) + 50;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			D3DXVECTOR3
+			(
+				pParticle->pos.x + (rand() % 80 - 40),
+				pParticle->pos.y,
+				pParticle->pos.z + (rand() % 80 - 40)
+			),		// 位置
+			move,				// 移動量
+			pParticle->col,		// 色
+			nLife,				// 寿命
+			fRadius,			// 半径
+			0.3f,				// 減算量 (半径)
+			EFFECTTYPE_PLAY_SMOKE	// プレイヤーの黒煙
 		);
 	}
 }

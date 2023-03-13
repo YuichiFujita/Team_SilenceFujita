@@ -172,6 +172,7 @@
     <ClCompile Include="Editmain.cpp" />
     <ClCompile Include="EditObject.cpp" />
     <ClCompile Include="effect.cpp" />
+    <ClCompile Include="escape.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="flash.cpp" />
     <ClCompile Include="game.cpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="police.cpp" />
+    <ClCompile Include="praise.cpp" />
     <ClCompile Include="ranking.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="score.cpp" />
@@ -230,6 +232,7 @@
     <ClInclude Include="Editmain.h" />
     <ClInclude Include="EditObject.h" />
     <ClInclude Include="effect.h" />
+    <ClInclude Include="escape.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="flash.h" />
     <ClInclude Include="game.h" />
@@ -254,6 +257,7 @@
     <ClInclude Include="pause.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="Police.h" />
+    <ClInclude Include="praise.h" />
     <ClInclude Include="ranking.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="score.h" />

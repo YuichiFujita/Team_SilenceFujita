@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "effect.h"
+#include "player.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -217,6 +218,14 @@ void UpdateEffect(void)
 
 				break;					//抜け出す
 
+			case EFFECTTYPE_PLAY_SMOKE:	// プレイヤーの黒煙
+
+				// プレイヤーの移動量を加算する
+				g_aEffect[nCntEffect].pos.x += (GetPlayer()->pos.x - GetPlayer()->oldPos.x);
+				g_aEffect[nCntEffect].pos.z += (GetPlayer()->pos.z - GetPlayer()->oldPos.z);
+
+				break;					// 抜け出す
+
 			default:					// その他
 
 				// 特に無し
@@ -296,16 +305,29 @@ void DrawEffect(void)
 	// ライティングを無効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	// αブレンディングを加算合成に設定
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-
 	for (int nCntEffect = 0; nCntEffect < MAX_EFFECT; nCntEffect++)
 	{ // エフェクトの最大表示数分繰り返す
 
 		if (g_aEffect[nCntEffect].bUse == true)
 		{ // エフェクトが使用されている場合
+
+			if (g_aEffect[nCntEffect].effectType == EFFECTTYPE_SMOKE
+			 || g_aEffect[nCntEffect].effectType == EFFECTTYPE_PLAY_SMOKE)
+			{ // エフェクトのタイプが煙系だった場合
+
+				// αブレンディングを減算合成に設定
+				pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
+				pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+			}
+			else
+			{ // 上記以外
+
+				// αブレンディングを加算合成に設定
+				pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+			}
 
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aEffect[nCntEffect].mtxWorld);
@@ -335,6 +357,13 @@ void DrawEffect(void)
 			switch (g_aEffect[nCntEffect].effectType)
 			{
 			case EFFECTTYPE_SMOKE:	// 煙
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_SMOKE]);
+
+				break;				// 抜け出す
+
+			case EFFECTTYPE_PLAY_SMOKE:		// プレイヤーの黒煙
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_SMOKE]);

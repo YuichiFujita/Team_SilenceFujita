@@ -312,7 +312,8 @@ void UpdateResult(void)
 		// 表示スコアを加算する
 		g_nDispRslScore += g_nAddDispScore;
 	}
-	else
+
+	if (g_nDispRslScore >= g_nResultScore)
 	{ // 表示スコアが本当のスコアを超えた場合
 
 		// スコアを固定する
