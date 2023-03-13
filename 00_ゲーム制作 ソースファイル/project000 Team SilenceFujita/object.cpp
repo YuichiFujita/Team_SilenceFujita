@@ -901,18 +901,6 @@ void HitObject(Object *pObject, int nDamage)
 
 				// 処理から抜ける
 				break;
-
-			case MODE_TUTORIAL:		// チュートリアルの場合
-
-				if (GetLessonState() == LESSON_05)
-				{ // コンボ練習中の場合
-
-					// 再建築タイマーの設定処理
-					SetBuildtimer(pObject->pos, TUTORIAL_REBUILD_CNT, *pObject);
-				}
-
-				// 処理から抜ける
-				break;
 			}
 
 			switch (pObject->nCollisionType)
