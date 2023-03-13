@@ -128,6 +128,7 @@ typedef struct
 	int			 nShadowID;				// 影のインデックス
 	int			 nOverlapCounter;		// 重なりカウント
 	int			 nStopCount;			// 停止カウント
+	int			 nSmokeCount;			// 煙カウント
 	bool		 bMove;					// 移動しているかどうか
 	bool		 bUse;					// 使用しているか
 	bool		 bRecur;				// 復活するかどうか

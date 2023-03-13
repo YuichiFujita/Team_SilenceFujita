@@ -17,6 +17,7 @@
 #include "sound.h"
 #include "player.h"
 #include "Police.h"
+#include "particle.h"
 #include "curve.h"
 #include "object.h"
 #include "wind.h"
@@ -52,6 +53,7 @@
 #define HUMAN_GROUND			(10.0f)		// 人間の地面
 #define HUMAN_OVERLAP_COUNT		(180)		// 人間の重なりカウント
 #define HUMAN_STOP_COUNT		(240)		// 人間の立ち止まりカウント
+#define HUMAN_CIGARETTE_POS		(5.0f)		// 人間のタバコの煙の位置
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
@@ -59,6 +61,7 @@
 #define SHADOW_HUMAN_RADIUS		(45.0f)		// 人間の影の半径
 
 #define RESURRECT_CNT			(300)		// 復活までのカウント
+#define HUMAN_SMOKING_CNT		(30)		// 煙が出るカウント
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -161,6 +164,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;						// 影のインデックス
 		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
 		g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
+		g_aHuman[nCntHuman].nSmokeCount		= 0;								// 煙カウント
 		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
 		g_aHuman[nCntHuman].bRecur			= false;							// 復活状況
 		g_aHuman[nCntHuman].bUse			= false;							// 使用状況
@@ -287,6 +291,32 @@ void UpdateHuman(void)
 
 				// アイコンの位置設定処理
 				SetPositionIcon(g_aHuman[nCntHuman].icon.nIconID, g_aHuman[nCntHuman].pos);
+			}
+
+			if (g_aHuman[nCntHuman].type == HUMANTYPE_CIGARETTE)
+			{ // 歩きたばこ人だった場合
+
+				// 煙カウントを加算する
+				g_aHuman[nCntHuman].nSmokeCount++;
+
+				if (g_aHuman[nCntHuman].nSmokeCount % HUMAN_SMOKING_CNT == 0)
+				{ // 喫煙カウントが一定数になった場合
+
+					// パーティクルの設定処理
+					SetParticle
+					(
+						D3DXVECTOR3								// 位置
+						(
+							g_aHuman[nCntHuman].pos.x + sinf(g_aHuman[nCntHuman].rot.y) * HUMAN_CIGARETTE_POS,
+							g_aHuman[nCntHuman].pos.y,
+							g_aHuman[nCntHuman].pos.z + cosf(g_aHuman[nCntHuman].rot.y) * HUMAN_CIGARETTE_POS
+						),
+						D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),		// 色
+						PARTICLETYPE_SMOKING,					// パーティクルの種類
+						SPAWN_PARTICLE_SMOKING,					// 発生数
+						3										// 寿命
+					);
+				}
 			}
 
 			//人間のリアクション処理
@@ -563,6 +593,7 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 			g_aHuman[nCntHuman].bMove			= false;							// 移動していない
 			g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
 			g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
+			g_aHuman[nCntHuman].nSmokeCount		= 0;								// 煙カウント
 			g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 歩き状態
 
 			// 移動量の最大値を設定
