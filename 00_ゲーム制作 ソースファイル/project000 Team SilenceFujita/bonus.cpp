@@ -15,6 +15,7 @@
 #include "value.h"
 #include "2Deffect.h"
 #include "2Dparticle.h"
+#include "praise.h"
 
 //**********************************************************************************************************************
 // マクロ定義
@@ -441,8 +442,8 @@ void SetBonus(int nBonus)
 				// 増援の得点を増やす
 				GetReinforce()->nBonus += 1;
 
-				// コンボの倍率処理
-				MagnificCombo(1);
+				// 褒めの設定処理
+				SetPraise();
 
 				// 右に出すか左に出すかをランダムで算出する
 				g_aBonus[nCntBonus].whereBonus = (WHEREBONUS)(rand() % WHEREBONUS_MAX);

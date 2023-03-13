@@ -17,6 +17,7 @@
 #include "sound.h"
 #include "player.h"
 #include "Police.h"
+#include "particle.h"
 #include "curve.h"
 #include "object.h"
 #include "wind.h"
@@ -52,6 +53,7 @@
 #define HUMAN_GROUND			(10.0f)		// 人間の地面
 #define HUMAN_OVERLAP_COUNT		(180)		// 人間の重なりカウント
 #define HUMAN_STOP_COUNT		(240)		// 人間の立ち止まりカウント
+#define HUMAN_CIGARETTE_POS		(5.0f)		// 人間のタバコの煙の位置
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
@@ -59,6 +61,7 @@
 #define SHADOW_HUMAN_RADIUS		(45.0f)		// 人間の影の半径
 
 #define RESURRECT_CNT			(300)		// 復活までのカウント
+#define HUMAN_SMOKING_CNT		(30)		// 煙が出るカウント
 
 //**********************************************************************************************************************
 //	コンスト定義

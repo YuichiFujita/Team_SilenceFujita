@@ -11,6 +11,7 @@
 #include "input.h"
 
 #include "bonus.h"
+#include "Combo.h"
 #include "item.h"
 #include "calculation.h"
 #include "particle.h"
@@ -300,12 +301,18 @@ void CollisionPlayer(Item *pItem)
 
 					// ボーナスの設定処理
 					SetBonus(SCORE_ITEM_SP);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
 				}
 				else
 				{ // 通常状態の場合
 
 					// ボーナスの設定処理
 					SetBonus(SCORE_ITEM);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
 				}
 			}
 

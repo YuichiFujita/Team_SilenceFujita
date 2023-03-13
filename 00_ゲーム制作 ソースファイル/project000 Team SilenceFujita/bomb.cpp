@@ -13,6 +13,7 @@
 #include "tutorial.h"
 
 #include "bomb.h"
+#include "Combo.h"
 #include "bonus.h"
 #include "calculation.h"
 #include "player.h"
@@ -1075,6 +1076,7 @@ void UpdateBarrierInfoData(void)
 {
 	// 変数を宣言
 	int  nNumEvil   = 0;		// 悪い奴の総数
+	int nNumJustice = 0;		// 良い奴の総数
 	bool bNextState = true;		// 状態遷移用
 
 	// ポインタを宣言
@@ -1144,6 +1146,12 @@ void UpdateBarrierInfoData(void)
 									// 悪い奴を加算
 									nNumEvil++;
 								}
+								else
+								{ // 良い奴の場合
+
+									// 良い奴を加算
+									nNumJustice++;
+								}
 							}
 						}
 					}
@@ -1156,13 +1164,26 @@ void UpdateBarrierInfoData(void)
 
 							// ボーナスの設定処理
 							SetBonus(SCORE_CAR_SP * nNumEvil);
+
+							// コンボの倍率処理
+							MagnificCombo(1);
 						}
 						else
 						{ // 通常状態の場合
 
 							// ボーナスの設定処理
 							SetBonus(SCORE_CAR * nNumEvil);
+
+							// コンボの倍率処理
+							MagnificCombo(1);
 						}
+					}
+
+					if (nNumJustice > 0)
+					{ // 良い奴がいた場合
+
+						// ボーナスの設定処理
+						SetBonus(SCORE_GOOD);
 					}
 
 					// カウンターを初期化

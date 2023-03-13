@@ -19,7 +19,8 @@ typedef enum
 {
 	EFFECTTYPE_SPARK = 0,	// 火花
 	EFFECTTYPE_RAINSPRAY,	// 水しぶき
-	EFFECTTYPE_SMOKE,		// 煙
+	EFFECTTYPE_PLAY_SMOKE,	// プレイヤーの黒煙
+	EFFECTTYPE_BREAKOBJECT,	// オブジェクトの煙
 	EFFECTTYPE_NONE,		// その他
 	EFECTTYPE_MAX			// この列挙型の総数
 }EFFECTTYPE;
