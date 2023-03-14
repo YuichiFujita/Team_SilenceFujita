@@ -16,8 +16,8 @@
 
 #define PRAISE_INIT_POS		(D3DXVECTOR3(	0.0f,	0.0f, 0.0f))	// 褒めの初期位置
 #define PRAISE_POS			(D3DXVECTOR3(1100.0f, 500.0f, 0.0f))	// 褒めの位置
-#define PRAISE_SIZE			(D3DXVECTOR3( 100.0f,  30.0f, 0.0f))	// 褒めのサイズ
-#define PRAISE_LAPSE_CNT	(60)									// 褒めを表示しておくカウント
+#define PRAISE_SIZE			(D3DXVECTOR3( 135.0f,  25.0f, 0.0f))	// 褒めのサイズ
+#define PRAISE_LAPSE_CNT	(90)									// 褒めを表示しておくカウント
 
 //===========================================
 //列挙型定義(PRAISE_TEXTURE)
@@ -45,9 +45,9 @@ Praise g_aPraise[MAX_PRAISE];						// 褒めの情報
 // コンスト定義
 const char *c_apPraiseTextureName[PRAISE_TEXTURE_MAX] = 
 {
-	"data/TEXTURE/Praise001.png"		// ナイスコンボテクスチャ
-	"data/TEXTURE/Praise002.png"		// グレートコンボテクスチャ
-	"data/TEXTURE/Praise003.png"		// グッドコンボテクスチャ
+	"data/TEXTURE/praise000.png",		// ナイスコンボテクスチャ
+	"data/TEXTURE/praise001.png",		// グレートコンボテクスチャ
+	"data/TEXTURE/praise002.png",		// グッドコンボテクスチャ
 };
 
 //===========================================

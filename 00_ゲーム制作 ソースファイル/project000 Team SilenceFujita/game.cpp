@@ -557,7 +557,6 @@ void UpdateGame(void)
 	{ // エディットモードだった場合
 
 #ifdef _DEBUG	// デバッグ処理
-
 		// カメラの更新
 		UpdateCamera();
 
