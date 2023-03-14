@@ -9,6 +9,7 @@
 #include "score.h"
 #include "value.h"
 #include "praise.h"
+#include "sound.h"
 
 #include "game.h"
 #include "tutorial.h"
@@ -406,6 +407,12 @@ void MagnificCombo(int nMagni)
 
 			// ”{—¦‚ð‰ÁŽZ‚·‚é
 			g_Combo.nMagni += nMagni;
+
+			//Œø‰Ê‰¹Œn‚ÌÄ¶
+			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+			{
+				PlaySound(SOUND_LABEL_SE_SCORE_000);
+			}
 
 			if (g_Combo.nMagni >= MAX_CONBOCOUNT)
 			{ // ”{—¦‚ªÅ‘å”ˆÈã‚¾‚Á‚½ê‡
