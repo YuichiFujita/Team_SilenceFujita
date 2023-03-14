@@ -2396,6 +2396,102 @@ void DrawTutorialPolice(void)
 	}
 }
 
+//============================================================
+// 警察のチュートリアルでの設定処理
+//============================================================
+void SetTutorialPolice(D3DXVECTOR3 pos)
+{
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	if (g_aPolice[0].bUse == false)
+	{ // 警察が使用されていない場合
+
+		// 引数を代入
+		g_aPolice[0].pos		  = pos;				// 現在の位置
+		g_aPolice[0].posOld	  = g_aPolice[0].pos;		// 前回の位置
+
+		// 変数の設定
+		g_aPolice[0].rotDest	   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目標の向き
+		g_aPolice[0].move		   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+		g_aPolice[0].state		   = POLICESTATE_SPAWN;					// 状態
+		g_aPolice[0].bombState     = BOMBSTATE_NONE;					// 何もしていない状態にする
+		g_aPolice[0].nLife		   = POLI_LIFE;							// 体力
+		g_aPolice[0].bJump		   = false;								// ジャンプしていない
+		g_aPolice[0].nTrafficCnt   = 0;									// 渋滞カウント
+		g_aPolice[0].fAlpha		   = 1.0f;								// 透明度
+		g_aPolice[0].nNumSpawnGate = NONE_NEAREST;						// 出てくるゲートの番号
+		g_aPolice[0].bMove		   = false;								// 移動していない
+		g_aPolice[0].bUse		   = true;								// 使用状況
+
+		// アイコンの情報の初期化
+		g_aPolice[0].icon.nIconID  = NONE_ICON;						// アイコンのインデックス
+		g_aPolice[0].icon.state    = ICONSTATE_NONE;				// アイコンの状態
+
+		// モデル情報を設定
+		g_aPolice[0].modelData	   = GetModelData(MODELTYPE_CAR_POLICE);	// モデル情報
+
+		// 影のインデックスを設定
+		g_aPolice[0].nShadowID     = SetModelShadow
+		( // 引数
+			g_aPolice[0].modelData,	// モデル情報
+			&g_aPolice[0].nShadowID,	// 影の親の影インデックス
+			&g_aPolice[0].bUse			// 影の親の使用状況
+		);
+
+		// 影の位置設定
+		SetPositionShadow(g_aPolice[0].nShadowID, g_aPolice[0].pos, g_aPolice[0].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+
+		// アイコンのインデックスを設定
+		g_aPolice[0].icon.nIconID = SetIcon
+		( // 引数
+			g_aPolice[0].pos,
+			ICONTYPE_POLICE,
+			&g_aPolice[0].icon.nIconID,
+			&g_aPolice[0].bUse,
+			&g_aPolice[0].icon.state
+		);
+
+		D3DXMATERIAL *pMat;					//マテリアルへのポインタ
+
+		//マテリアル情報に対するポインタを取得
+		pMat = (D3DXMATERIAL*)g_aPolice[0].modelData.pBuffMat->GetBufferPointer();
+
+		for (int nCntMat = 0; nCntMat < (int)g_aPolice[0].modelData.dwNumMat; nCntMat++)
+		{
+			//マテリアルの情報を取得する
+			g_aPolice[0].MatCopy[nCntMat] = pMat[nCntMat];
+		}
+
+		// 車の位置と向きの設定処理
+		g_aPolice[0].policeCurve.curveInfo = GetCurveInfo(0);					// 曲がり角の情報
+		g_aPolice[0].policeCurve.nSKipCnt = 0;									// スキップする曲がり角の回数
+		g_aPolice[0].policeCurve.rotDest = g_aPolice[0].rot;					// 前回の向き
+		g_aPolice[0].policeCurve.actionState = CARACT_DASH;						// 走っている状態
+
+		// タックル関係の変数の初期化
+		g_aPolice[0].tackle.nTackleCnt = 0;			// タックルのカウント
+		g_aPolice[0].tackle.tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// タックル時の追加移動量
+		g_aPolice[0].tackle.tackleState = TACKLESTATE_CHARGE;					// タックル時の状態
+
+		if (g_aPolice[0].pos.x < POLICE_TUTORIAL_DEST.x)
+		{ // 目的地が左にあった場合
+
+			// 向きを設定する
+			g_aPolice[0].rot.y = -D3DX_PI * 0.5f;
+		}
+		else
+		{ // 目的地が右にあった場合
+
+			// 向きを設定する
+			g_aPolice[0].rot.y = D3DX_PI * 0.5f;
+		}
+
+		// チュートリアルでの警察の初期化
+		g_TutorialPolice.state = POLITUTOSTATE_DRIVE;				// 状態
+		g_TutorialPolice.fAlpha = 1.0f;								// 透明度
+	}
+}
+
 #ifdef _DEBUG	// デバッグ処理
 //======================================================================================================================
 //	デバッグ処理一覧
