@@ -888,18 +888,21 @@ void UpdateTutorial(void)
 
 	case LESSON_05:	// レッスン5 (コンボ)
 
-		if (GetCurrentCombo() >= LESSON_NUM_COM)
-		{ // 現在のコンボが一定値以上の場合
-
-			// コンボのレッスンをクリア判定にする
-			g_bComboClear = true;
-		}
-
 		if (g_bComboClear == true)
 		{ // コンボのレッスンがクリア判定の場合
 
 			// レッスンの状態の加算
 			AddLessonState();
+		}
+		else
+		{ // コンボのレッスンがクリア判定ではない場合
+
+			if (GetCurrentCombo() >= LESSON_NUM_COM)
+			{ // 現在のコンボが一定値以上の場合
+
+				// コンボのレッスンをクリア判定にする
+				g_bComboClear = true;
+			}
 		}
 
 		// 処理を抜ける
