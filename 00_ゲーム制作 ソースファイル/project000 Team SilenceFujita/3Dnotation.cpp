@@ -60,7 +60,7 @@ void Init3DNotation(void)
 
 		// 基本情報を初期化
 		g_a3DNotation[nCntNota].pos                 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_a3DNotation[nCntNota].rot                 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_a3DNotation[nCntNota].rot                 = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);	// 向き
 		g_a3DNotation[nCntNota].p3DNotationIDParent = NULL;								// 親の強調表示インデックス
 		g_a3DNotation[nCntNota].pUseParent          = NULL;								// 親の使用状況
 		g_a3DNotation[nCntNota].bUse                = false;							// 使用状況
@@ -186,8 +186,8 @@ int Set3DNotation(NOTATIONTYPE type, int *p3DNotationID, bool *pUse)
 			g_a3DNotation[nCntNota].pUseParent          = pUse;				// 親の使用状況
 
 			// 情報を初期化
-			g_a3DNotation[nCntNota].pos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-			g_a3DNotation[nCntNota].rot   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+			g_a3DNotation[nCntNota].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
+			g_a3DNotation[nCntNota].rot = D3DXVECTOR3(0.0f, g_fNotationRot, 0.0f);	// 向き
 
 			switch (type)
 			{ // 引数の種類ごとの処理
