@@ -647,7 +647,7 @@ void UpdateGame(void)
 
 			// 体力バーの更新
 			UpdateLife();
-#if 1
+#if 0
 			// タイマーの更新
 			UpdateTimer();
 #endif
@@ -683,9 +683,10 @@ void UpdateGame(void)
 
 			// 影の更新
 			UpdateShadow();
-
+#if 0
 			// 警察の追加処理
 			AddPolice();
+#endif
 		}
 		else
 		{ // ポーズ状態の場合
