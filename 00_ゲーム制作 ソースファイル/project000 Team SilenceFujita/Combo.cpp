@@ -354,12 +354,8 @@ void MagnificCombo(int nMagni)
 	{ // モードごとの処理
 	case MODE_GAME:		// ゲーム画面
 
-		if (*GetGameState() == GAMESTATE_NORMAL)
-		{ // ゲームが通常状態の場合
-
-			// コンボ加算可能にする
-			bCombo = true;
-		}
+		// コンボ加算可能にする
+		bCombo = true;
 
 		// 処理を抜ける
 		break;

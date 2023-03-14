@@ -147,6 +147,7 @@ const char *apModelData[] =		// モデルの相対パス
 	// フォントモデル
 	"data\\MODEL_FONT\\break000.x",			// 破壊
 	"data\\MODEL_FONT\\shot000.x",			// 射出
+	"data\\MODEL_FONT\\fly000.x",			// 飛翔
 	"data\\MODEL_FONT\\exit000.x",			// 脱出
 
 	// がれきモデル

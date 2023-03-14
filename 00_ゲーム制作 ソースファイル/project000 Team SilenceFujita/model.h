@@ -144,6 +144,7 @@ typedef enum
 	// フォントモデル
 	MODELTYPE_FONT_BREAK,				// 破壊
 	MODELTYPE_FONT_SHOT,				// 射出
+	MODELTYPE_FONT_FLY,					// 飛翔
 	MODELTYPE_FONT_EXIT,				// 脱出
 
 	// がれきモデル

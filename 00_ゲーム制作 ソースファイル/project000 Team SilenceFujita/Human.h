@@ -19,13 +19,14 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_HUMAN	(256)	// 使用する人間の最大数
-#define HUMAN_WIDTH	(10.0f)	// 人の縦幅
-#define HUMAN_DEPTH	(10.0f)	// 人の奥行
+#define MAX_HUMAN		(256)		// 使用する人間の最大数
+#define HUMAN_WIDTH		(10.0f)		// 人の横幅
+#define HUMAN_HEIGHT	(125.0f)	// 人の縦幅
+#define HUMAN_DEPTH		(10.0f)		// 人の奥行
 
-#define MAX_PARTS	(15)	// パーツの最大数
-#define MAX_MOTION	(6)		// モーションの最大数
-#define MAX_KEY		(8)		// キーの最大数
+#define MAX_PARTS		(15)		// パーツの最大数
+#define MAX_MOTION		(6)			// モーションの最大数
+#define MAX_KEY			(8)			// キーの最大数
 
 //**********************************************************************************************************************
 //	列挙型定義(HUMANSTATE)
@@ -126,6 +127,7 @@ typedef struct
 	HUMANTYPE	 type;					// 種類
 	MOVETYPE	 typeMove;				// 行動の種類
 	int			 nShadowID;				// 影のインデックス
+	int			 nNotaID;				// 強調表示のインデックス
 	int			 nOverlapCounter;		// 重なりカウント
 	int			 nStopCount;			// 停止カウント
 	bool		 bMove;					// 移動しているかどうか

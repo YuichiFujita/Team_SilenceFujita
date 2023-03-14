@@ -207,6 +207,14 @@ int Set3DNotation(NOTATIONTYPE type, int *p3DNotationID, bool *pUse)
 				// ˆ—‚ğ”²‚¯‚é
 				break;
 
+			case NOTATIONTYPE_FLY:		// ”òãÄ
+
+				// ƒ‚ƒfƒ‹‚Ìî•ñ‚ğİ’è
+				g_a3DNotation[nCntNota].modelData = GetModelData(MODELTYPE_FONT_FLY);
+
+				// ˆ—‚ğ”²‚¯‚é
+				break;
+
 			case NOTATIONTYPE_EXIT:		// ’Eo
 
 				// ƒ‚ƒfƒ‹‚Ìî•ñ‚ğİ’è
