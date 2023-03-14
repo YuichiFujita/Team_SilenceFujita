@@ -99,6 +99,9 @@ typedef enum
 	MODELTYPE_OBJECT_TOWNFENCE001,			// 町壁（フェンス）
 	MODELTYPE_OBJECT_KEIBAJOU000,			// 競馬場（トラック）
 	MODELTYPE_OBJECT_KEIBAJOU001,			// 競馬場（スタンド）
+	MODELTYPE_OBJECT_SIGNUNBOOST,			// 標識(ブースト禁止)
+	MODELTYPE_OBJECT_RRESORT,				// いかがわしい店
+	MODELTYPE_OBJECT_TRASHBAG,				// ゴミ袋
 	
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
@@ -137,6 +140,12 @@ typedef enum
 	// ゲートモデル
 	MODELTYPE_OBJECT_GATE000,			// ゲート (建物)
 	MODELTYPE_OBJECT_GATE001,			// ゲート (鉄板)
+
+	// フォントモデル
+	MODELTYPE_FONT_BREAK,				// 破壊
+	MODELTYPE_FONT_SHOT,				// 射出
+	MODELTYPE_FONT_FLY,					// 飛翔
+	MODELTYPE_FONT_EXIT,				// 脱出
 
 	// がれきモデル
 	MODELTYPE_OBJECT_JUNK,				// がれき

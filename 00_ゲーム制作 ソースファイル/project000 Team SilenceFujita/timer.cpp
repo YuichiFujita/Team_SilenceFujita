@@ -178,7 +178,7 @@ void UpdateTimer(void)
 				{ // 残り1分になった場合
 
 					// カウントダウンの設定処理
-					SetCountDown();			
+					SetCountDown();
 				}
 			}
 			else

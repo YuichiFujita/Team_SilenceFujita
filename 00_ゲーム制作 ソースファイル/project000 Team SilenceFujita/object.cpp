@@ -11,6 +11,7 @@
 #include "input.h"
 #include "model.h"
 
+#include "3Dnotation.h"
 #include "buildtimer.h"
 #include "bonus.h"
 #include "Combo.h"
@@ -20,6 +21,8 @@
 #include "particle.h"
 #include "shadow.h"
 #include "sound.h"
+#include "tutorial.h"
+#include "timer.h"
 
 #ifdef _DEBUG	// デバッグ処理
 #include "game.h"
@@ -35,6 +38,8 @@
 #define JUNK_POS_Y				(220.0f)						// がれきが出現する位置(Y軸)
 #define JUNK_POS_Z				(0.5f)							// がれきが出現する位置の倍率(Z軸)
 #define SPARK_SPEED				(13.0f)							// 火花が出るスピード
+#define GAME_REBUILD_CNT		(600)							// ゲームモードでのオブジェクトの再建築までのカウント
+#define TUTORIAL_REBUILD_CNT	(600)							// チュートリアルモードでのオブジェクトの再建築までのカウント
 
 #define OBJECT_GRAVITY			(-1.5f)							// オブジェクトの重力
 #define SMASH_WIDTH_MAGNI		(3.0f)							// 吹き飛びの幅の倍率
@@ -55,6 +60,7 @@
 
 #define ITEM_OBJECT_COUNT		(3)								// アイテムが落ちるカウント数
 #define JUNK_COUNT				(3)								// がれきのカウント
+#define OBJECT_RADIUS_ARTICLE	(170.0f)						// オブジェクトの小物判定の半径
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -89,6 +95,7 @@ void InitObject(void)
 		g_aObject[nCntObject].nType          = 0;									// オブジェクトの種類
 		g_aObject[nCntObject].nCounterState  = 0; 									// 状態管理カウンター
 		g_aObject[nCntObject].nShadowID      = NONE_SHADOW;							// 影のインデックス
+		g_aObject[nCntObject].nNotaID        = NONE_3D_NOTATION;					// 強調表示のインデックス
 		g_aObject[nCntObject].bUse           = false;								// 使用状況
 
 		// 当たり判定情報の初期化
@@ -192,6 +199,7 @@ void UninitObject(void)
 //======================================================================================================================
 void UpdateObject(void)
 {
+	// 変数を宣言
 	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
 
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
@@ -383,6 +391,9 @@ void UpdateObject(void)
 				(g_aObject[nCntObject].modelData.vtxMax.z + g_aObject[nCntObject].modelData.vtxMin.z) * 0.5f
 			);
 
+			// 影の位置設定
+			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
+
 			// アイコンの位置設定処理
 			SetPositionIcon
 			(
@@ -392,6 +403,18 @@ void UpdateObject(void)
 					g_aObject[nCntObject].pos.x + Pos.x,
 					0.0f,
 					g_aObject[nCntObject].pos.z + Pos.z
+				)
+			);
+
+			// 強調表示の位置設定
+			SetPosition3DNotation
+			( // 引数
+				g_aObject[nCntObject].nNotaID,	// 強調表示インデックス
+				D3DXVECTOR3						// 位置
+				( // 引数
+					g_aObject[nCntObject].pos.x,																								// x
+					g_aObject[nCntObject].pos.y + g_aObject[nCntObject].modelData.size.y * g_aObject[nCntObject].scale.y + NOTA_PLUS_POS_OBJ,	// y
+					g_aObject[nCntObject].pos.z																									// z
 				)
 			);
 		}
@@ -567,7 +590,7 @@ void DrawObject(void)
 void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL *pMat, int nType, int nBreakType, int nShadowType, int nCollisionType, ROTSTATE stateRot, APPEARSTATE appear,int nJudge)
 {
 	// 変数を宣言
-	float AverageScale;			// 拡大率の平均値
+	float fAverageScale;		// 拡大率の平均値
 	D3DXVECTOR3 Pos;			// 原点からずれている分を補正した位置
 
 	// ポインタを宣言
@@ -640,6 +663,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			g_aObject[nCntObject].state = ACTIONSTATE_NORMAL;	// 状態
 			g_aObject[nCntObject].nLife = OBJ_LIFE;				// 体力
 			g_aObject[nCntObject].nCounterState = 0; 			// 状態管理カウンター
+			g_aObject[nCntObject].nNotaID = NONE_3D_NOTATION;	// 強調表示のインデックス
 
 			// 使用している状態にする
 			g_aObject[nCntObject].bUse = true;
@@ -652,7 +676,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 
 				// 横幅と縦幅を計算
 				if (stateRot == ROTSTATE_0
-					|| stateRot == ROTSTATE_180)
+				||  stateRot == ROTSTATE_180)
 				{ // 角度が0度、または180度の場合
 					g_aObject[nCntObject].collInfo.fWidth[nCntColl] = g_aCollision[nType].fWidth[nCntColl];
 					g_aObject[nCntObject].collInfo.fDepth[nCntColl] = g_aCollision[nType].fDepth[nCntColl];
@@ -717,13 +741,13 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			{ // 丸影の場合
 
 				// 拡大率の平均を求める
-				AverageScale = (g_aObject[nCntObject].scale.x + g_aObject[nCntObject].scale.z) * 0.5f;
+				fAverageScale = (g_aObject[nCntObject].scale.x + g_aObject[nCntObject].scale.z) * 0.5f;
 
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = SetCircleShadow
 				( // 引数
 					0.5f,										// α値
-					g_aShadowRadius[nType] * AverageScale,		// 半径
+					g_aShadowRadius[nType] * fAverageScale,		// 半径
 					&g_aObject[nCntObject].nShadowID,			// 影の親の影インデックス
 					&g_aObject[nCntObject].bUse					// 影の親の使用状況
 				);
@@ -745,6 +769,9 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = NONE_SHADOW;	// 影を設定しない
 			}
+
+			// 影の位置設定
+			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
 
 			// 原点からずれている位置を算出する
 			Pos = D3DXVECTOR3
@@ -780,8 +807,30 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 				);
 			}
 
-			// 影の位置設定
-			SetPositionShadow(g_aObject[nCntObject].nShadowID, g_aObject[nCntObject].pos, g_aObject[nCntObject].rot, g_aObject[nCntObject].scale);
+
+			if (g_aObject[nCntObject].judge.state == JUDGESTATE_EVIL)
+			{ // 悪い奴だった場合
+
+				// 強調表示のインデックスを設定
+				g_aObject[nCntObject].nNotaID = Set3DNotation
+				( // 引数
+					NOTATIONTYPE_BREAK,				// 強調表示の種類
+					&g_aObject[nCntObject].nNotaID,	// 親の強調表示インデックス
+					&g_aObject[nCntObject].bUse		// 親の使用状況
+				);
+
+				// 強調表示の位置設定
+				SetPosition3DNotation
+				( // 引数
+					g_aObject[nCntObject].nNotaID,	// 強調表示インデックス
+					D3DXVECTOR3						// 位置
+					( // 引数
+						g_aObject[nCntObject].pos.x,																								// x
+						g_aObject[nCntObject].pos.y + g_aObject[nCntObject].modelData.size.y * g_aObject[nCntObject].scale.y + NOTA_PLUS_POS_OBJ,	// y
+						g_aObject[nCntObject].pos.z																									// z
+					)
+				);
+			}
 
 			// ジャッジの情報の設定
 			g_aObject[nCntObject].judge.col = JUDGE_WHITE;				// ピカピカの色
@@ -799,8 +848,6 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 //======================================================================================================================
 void HitObject(Object *pObject, int nDamage)
 {
-	int nMode = GetMode();			// モードの取得処理
-
 	if (pObject->state == ACTIONSTATE_NORMAL && pObject->appear.state == APPEARSTATE_COMPLETE && pObject->bUse == true)
 	{ // オブジェクトが通常状態かつ、出現完了状態の場合
 
@@ -845,12 +892,12 @@ void HitObject(Object *pObject, int nDamage)
 				2									// 寿命
 			);
 
-			switch (nMode)
+			switch (GetMode())
 			{
 			case MODE_GAME:			// ゲームの場合
 
 				// 再建築タイマーの設定処理
-				SetBuildtimer(pObject->pos, 600, *pObject);
+				SetBuildtimer(pObject->pos, GAME_REBUILD_CNT, *pObject);
 
 				// 処理から抜ける
 				break;
@@ -933,6 +980,43 @@ void HitObject(Object *pObject, int nDamage)
 					);
 				}
 
+				if (pObject->modelData.fRadius < OBJECT_RADIUS_ARTICLE)
+				{ // 小物の場合
+
+					// パーティクルの設定処理
+					SetParticle
+					( // 引数
+						D3DXVECTOR3
+						(
+							pObject->pos.x,
+							pObject->pos.y + 40.0f,
+							pObject->pos.z
+						),
+						D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f),
+						PARTICLETYPE_BREAK_ARTICLE,
+						SPAWN_PARTICLE_BREAKARTICLE,
+						3
+					);
+				}
+				else
+				{ // 上記以外
+
+					// パーティクルの設定処理
+					SetParticle
+					( // 引数
+						D3DXVECTOR3
+						(
+							pObject->pos.x,
+							pObject->pos.y + 40.0f,
+							pObject->pos.z
+						),
+						D3DXCOLOR(1.0f, 0.5f, 0.3f, 1.0f),
+						PARTICLETYPE_BREAK_OBJECT,
+						SPAWN_PARTICLE_BREAKOBJECT,
+						3
+					);
+				}
+
 				break;					// 抜け出す
 
 			case COLLISIONTYPE_CREATE:	// 汎用的な当たり判定
@@ -1008,6 +1092,43 @@ void HitObject(Object *pObject, int nDamage)
 						(SCALETYPE)((nCntColl + 1) % SCALETYPE_MAX),
 						pObject->matCopy[0].MatD3D
 					);
+
+					if (pObject->modelData.fRadius < OBJECT_RADIUS_ARTICLE)
+					{ // 小物の場合
+
+						// パーティクルの設定処理
+						SetParticle
+						( // 引数
+							D3DXVECTOR3
+							(
+								pObject->pos.x,
+								pObject->pos.y + 40.0f,
+								pObject->pos.z
+							),
+							D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f),
+							PARTICLETYPE_BREAK_ARTICLE,
+							SPAWN_PARTICLE_BREAKARTICLE,
+							3
+						);
+					}
+					else
+					{ // 上記以外
+
+						// パーティクルの設定処理
+						SetParticle
+						( // 引数
+							D3DXVECTOR3
+							(
+								pObject->pos.x,
+								pObject->pos.y + 40.0f,
+								pObject->pos.z
+							),
+							D3DXCOLOR(1.0f, 0.5f, 0.3f, 1.0f),
+							PARTICLETYPE_BREAK_OBJECT,
+							SPAWN_PARTICLE_BREAKOBJECT,
+							3
+						);
+					}
 				}
 
 				break;					// 抜け出す
@@ -1016,8 +1137,24 @@ void HitObject(Object *pObject, int nDamage)
 			if (pObject->judge.state == JUDGESTATE_EVIL)
 			{ //オブジェクトが悪いものだった場合
 
-				// ボーナスの設定処理
-				SetBonus(SCORE_OBJECT);
+				if (GetTime() <= BONUS_SPECIAL_TIME)
+				{ // 制限時間が残り僅かだった場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_OBJECT_SP);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
+				}
+				else
+				{ // 通常状態の場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_OBJECT);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
+				}
 
 				// アイテムが落ちるカウントを加算する
 				g_nObjectItemCount++;
@@ -1032,6 +1169,12 @@ void HitObject(Object *pObject, int nDamage)
 						SetItem(pObject->pos, ITEMTYPE_HEAL_BARRIER);
 					}
 				}
+			}
+			else
+			{ // 良い奴だった場合
+
+				// ボーナスの設定処理
+				SetBonus(SCORE_GOOD);
 			}
 			
 			//効果音の再生

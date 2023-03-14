@@ -52,8 +52,10 @@
 #define CLASS_NAME		"WindowClass"		// ウインドウクラスの名前
 #define WINDOW_NAME		"AnarchyCars"		// ウインドウの名前 (キャプションに表示)
 
+#define GAME_OBJ_SETUP_TXT		"data\\TXT\\objectGame.txt"		// ゲームのオブジェクトセットアップ用のテキストファイルの相対パス
+#define TUTORIAL_OBJ_SETUP_TXT	"data\\TXT\\objectTutorial.txt"	// チュートリアルのオブジェクトセットアップ用のテキストファイルの相対パス
+
 #define AI_SETUP_TXT	"data\\TXT\\Ai.txt"			// AI系セットアップ用のテキストファイルの相対パス
-#define OBJ_SETUP_TXT	"data\\TXT\\object.txt"		// オブジェクトセットアップ用のテキストファイルの相対パス
 #define SHAD_SETUP_TXT	"data\\TXT\\shadow.txt"		// ステージセットアップ用のテキストファイルの相対パス
 #define ICON_SETUP_TXT	"data\\TXT\\Icon.txt"		// アイコンセットアップ用のテキストファイルの相対パス
 
@@ -1095,7 +1097,7 @@ void TxtSetObject(void)
 	FILE *pFile;				// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
-	pFile = fopen(OBJ_SETUP_TXT, "r");
+	pFile = (g_mode == MODE_TUTORIAL) ? fopen(TUTORIAL_OBJ_SETUP_TXT, "r") : fopen(GAME_OBJ_SETUP_TXT, "r");
 
 	if (pFile != NULL)
 	{ // ファイルが開けた場合
@@ -2047,7 +2049,8 @@ void DrawDebug(void)
 		" 　警察の状態：%d\n"
 		" 　警察のタックル状態：%d\n"
 		" 　向き変更量：%.2f\n"
-		" 　向き変更量の減衰量：%.2f\n",
+		" 　向き変更量の減衰量：%.2f\n"
+		" 　走行音の音量：%.2f\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -2075,7 +2078,8 @@ void DrawDebug(void)
 		pPolice->state,
 		pPolice->tackle.tackleState,
 		GetPlayer()->moveRot.y,
-		fRevPlayerRot
+		fRevPlayerRot,
+		GetSoundVolume(SOUND_LABEL_BGM_CAR_000)
 	);
 
 	//--------------------------------------------------------

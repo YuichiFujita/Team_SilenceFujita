@@ -12,11 +12,13 @@
 #include "model.h"
 #include "calculation.h"
 
+#include "3Dnotation.h"
 #include "Human.h"
 #include "shadow.h"
 #include "sound.h"
 #include "player.h"
 #include "Police.h"
+#include "particle.h"
 #include "curve.h"
 #include "object.h"
 #include "wind.h"
@@ -52,6 +54,7 @@
 #define HUMAN_GROUND			(10.0f)		// 人間の地面
 #define HUMAN_OVERLAP_COUNT		(180)		// 人間の重なりカウント
 #define HUMAN_STOP_COUNT		(240)		// 人間の立ち止まりカウント
+#define HUMAN_CIGARETTE_POS		(5.0f)		// 人間のタバコの煙の位置
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
@@ -59,6 +62,7 @@
 #define SHADOW_HUMAN_RADIUS		(45.0f)		// 人間の影の半径
 
 #define RESURRECT_CNT			(300)		// 復活までのカウント
+#define HUMAN_SMOKING_CNT		(30)		// 煙が出るカウント
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -159,6 +163,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].fMaxMove		= 0.0f;								// 移動量の最大数
 		g_aHuman[nCntHuman].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;						// 影のインデックス
+		g_aHuman[nCntHuman].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
 		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
 		g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
 		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
@@ -256,18 +261,6 @@ void UpdateHuman(void)
 
 			// 前回位置の更新
 			g_aHuman[nCntHuman].posOld = g_aHuman[nCntHuman].pos;
-
-			//----------------------------------------------------
-			//	影の更新
-			//----------------------------------------------------
-			// 影の位置設定
-			SetPositionShadow
-			( // 引数
-				g_aHuman[nCntHuman].nShadowID,		// 影のインデックス
-				D3DXVECTOR3(g_aHuman[nCntHuman].pos.x, HUMAN_GROUND, g_aHuman[nCntHuman].pos.z),			// 位置
-				g_aHuman[nCntHuman].rot,			// 向き
-				NONE_SCALE							// 拡大率
-			);
 
 			// プレイヤーの位置の更新
 			PosHuman
@@ -372,6 +365,27 @@ void UpdateHuman(void)
 
 			// プレイヤーの補正の更新処理
 			RevHuman(&g_aHuman[nCntHuman].rot, &g_aHuman[nCntHuman].pos);
+
+			// 影の位置設定
+			SetPositionShadow
+			( // 引数
+				g_aHuman[nCntHuman].nShadowID,		// 影のインデックス
+				D3DXVECTOR3(g_aHuman[nCntHuman].pos.x, HUMAN_GROUND, g_aHuman[nCntHuman].pos.z),			// 位置
+				g_aHuman[nCntHuman].rot,			// 向き
+				NONE_SCALE							// 拡大率
+			);
+
+			// 強調表示の位置設定
+			SetPosition3DNotation
+			( // 引数
+				g_aHuman[nCntHuman].nNotaID,		// 強調表示インデックス
+				D3DXVECTOR3							// 位置
+				( // 引数
+					g_aHuman[nCntHuman].pos.x,										// x
+					g_aHuman[nCntHuman].pos.y + HUMAN_HEIGHT + NOTA_PLUS_POS_HUMAN,	// y
+					g_aHuman[nCntHuman].pos.z										// z
+				)
+			);
 
 			// モーションの更新
 			UpdateMotionHuman(&g_aHuman[nCntHuman]);
@@ -564,6 +578,7 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 			g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
 			g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
 			g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 歩き状態
+			g_aHuman[nCntHuman].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
 
 			// 移動量の最大値を設定
 			g_aHuman[nCntHuman].fMaxMove = (float)(rand() % HUMAN_RANDAM_MOVE + HUMAN_MOVE_LEAST);
@@ -624,6 +639,26 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 				// アイコンの情報の初期化
 				g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;				// アイコンのインデックス
 				g_aHuman[nCntHuman].icon.state = ICONSTATE_NONE;			// アイコンの状態
+
+				// 強調表示のインデックスを設定
+				g_aHuman[nCntHuman].nNotaID = Set3DNotation
+				( // 引数
+					NOTATIONTYPE_FLY,				// 強調表示の種類
+					&g_aHuman[nCntHuman].nNotaID,	// 親の強調表示インデックス
+					&g_aHuman[nCntHuman].bUse		// 親の使用状況
+				);
+
+				// 強調表示の位置設定
+				SetPosition3DNotation
+				( // 引数
+					g_aHuman[nCntHuman].nNotaID,	// 強調表示インデックス
+					D3DXVECTOR3						// 位置
+					( // 引数
+						g_aHuman[nCntHuman].pos.x,										// x
+						g_aHuman[nCntHuman].pos.y + HUMAN_HEIGHT + NOTA_PLUS_POS_HUMAN,	// y
+						g_aHuman[nCntHuman].pos.z										// z
+					)
+				);
 			}
 			else
 			{ // 良い奴だった場合
@@ -1727,7 +1762,7 @@ void SetResurrection(Human human)
 			g_aResurrect[nCnt].bUse = true;				// 使用状況
 
 			// 処理から抜ける
-			break;										
+			break;
 		}
 	}
 }
@@ -1748,9 +1783,10 @@ void ResurrectionHuman(Human human)
 			g_aHuman[nCnt].type   = human.type;		// 種類
 
 			// 情報を初期化
-			g_aHuman[nCnt].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-			g_aHuman[nCnt].bMove = false;							// 移動していない
-			g_aHuman[nCnt].state = HUMANSTATE_WALK;					// 歩き状態
+			g_aHuman[nCnt].move    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+			g_aHuman[nCnt].bMove   = false;							// 移動していない
+			g_aHuman[nCnt].state   = HUMANSTATE_WALK;				// 歩き状態
+			g_aHuman[nCnt].nNotaID = NONE_3D_NOTATION;				// 強調表示のインデックス
 
 			// 移動量の最大値を設定
 			g_aHuman[nCnt].fMaxMove = (float)(rand() % HUMAN_RANDAM_MOVE + HUMAN_MOVE_LEAST);
@@ -1810,22 +1846,46 @@ void ResurrectionHuman(Human human)
 			// ジャッジの情報の設定
 			g_aHuman[nCnt].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			g_aHuman[nCnt].judge.state = JUDGESTATE_EVIL;			// 善悪
+			g_aHuman[nCnt].judge.state    = human.judge.state;		// 善悪
 			g_aHuman[nCnt].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
 
-			// アイコンの情報の初期化
-			g_aHuman[nCnt].icon.nIconID = NONE_ICON;				// アイコンのインデックス
-			g_aHuman[nCnt].icon.state = ICONSTATE_NONE;				// アイコンの状態
+			if (g_aHuman[nCnt].judge.state == JUDGESTATE_EVIL)
+			{ // 悪者の場合
 
-			// アイコンの設定処理
-			g_aHuman[nCnt].icon.nIconID = SetIcon
-			( // 引数
-				g_aHuman[nCnt].pos,
-				ICONTYPE_EVIL_HUMAN,
-				&g_aHuman[nCnt].icon.nIconID,
-				&g_aHuman[nCnt].bUse,
-				&g_aHuman[nCnt].icon.state
-			);
+				// アイコンの情報の初期化
+				g_aHuman[nCnt].icon.nIconID = NONE_ICON;			// アイコンのインデックス
+				g_aHuman[nCnt].icon.state   = ICONSTATE_NONE;		// アイコンの状態
+
+				// アイコンの設定処理
+				g_aHuman[nCnt].icon.nIconID = SetIcon
+				( // 引数
+					g_aHuman[nCnt].pos,
+					ICONTYPE_EVIL_HUMAN,
+					&g_aHuman[nCnt].icon.nIconID,
+					&g_aHuman[nCnt].bUse,
+					&g_aHuman[nCnt].icon.state
+				);
+
+				// 強調表示のインデックスを設定
+				g_aHuman[nCnt].nNotaID = Set3DNotation
+				( // 引数
+					NOTATIONTYPE_FLY,			// 強調表示の種類
+					&g_aHuman[nCnt].nNotaID,	// 親の強調表示インデックス
+					&g_aHuman[nCnt].bUse		// 親の使用状況
+				);
+
+				// 強調表示の位置設定
+				SetPosition3DNotation
+				( // 引数
+					g_aHuman[nCnt].nNotaID,		// 強調表示インデックス
+					D3DXVECTOR3					// 位置
+					( // 引数
+						g_aHuman[nCnt].pos.x,										// x
+						g_aHuman[nCnt].pos.y + HUMAN_HEIGHT + NOTA_PLUS_POS_HUMAN,	// y
+						g_aHuman[nCnt].pos.z										// z
+					)
+				);
+			}
 
 			// 人間モーションの初期化処理
 			InitMotionHuman(&g_aHuman[nCnt], g_aHuman[nCnt].type, g_aHuman[nCnt].typeMove);

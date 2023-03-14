@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "effect.h"
+#include "player.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -19,6 +20,11 @@
 #define SPARK_REV_COL_G	(0.5f)		// 火花エフェクトの緑の最低限補正数
 
 #define SPRAY_MOVE_Y	(1.3f)		// 水しぶきエフェクトの移動量(Y軸)
+
+#define BREAK_OBJECT_MOVE_Y	(1.8f)	// オブジェクトの破壊時の煙の重力
+
+#define EXPL_SUB_COL_G	(0.05f)		// 爆発エフェクトの緑の減衰係数
+#define EXPL_REV_COL_G	(0.7f)		// 爆発エフェクトの緑の最低限補正数
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -61,6 +67,8 @@ typedef struct
 //**********************************************************************************************************************
 void EffectSparkUpdate(Effect *pEffect);			// 火花エフェクトの更新処理
 void EffectSprayUpdate(Effect *pEffect);			// 水しぶきエフェクトの更新処理
+void EffectBreakObjectUpdate(Effect *pEffect);		// オブジェクトの破壊時のエフェクトの更新処理
+void EffectExplosionUpdate(Effect *pEffect);		// 爆発系のエフェクトの更新処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -213,9 +221,27 @@ void UpdateEffect(void)
 
 				break;					// 抜け出す
 
-			case EFFECTTYPE_SMOKE:		// 煙
+			case EFFECTTYPE_PLAY_SMOKE:	// プレイヤーの黒煙
 
-				break;					//抜け出す
+				// プレイヤーの移動量を加算する
+				g_aEffect[nCntEffect].pos.x += (GetPlayer()->pos.x - GetPlayer()->oldPos.x);
+				g_aEffect[nCntEffect].pos.z += (GetPlayer()->pos.z - GetPlayer()->oldPos.z);
+
+				break;					// 抜け出す
+
+			case EFFECTTYPE_BREAKOBJECT:	// オブジェクトの破壊時の煙
+
+				// オブジェクトの破壊時のエフェクトの更新処理
+				EffectBreakObjectUpdate(&g_aEffect[nCntEffect]);
+
+				break;					// 抜け出す
+
+			case EFFECTTYPE_EXPLOSION:		// 爆発
+
+				// 爆発系のエフェクトの更新処理
+				EffectExplosionUpdate(&g_aEffect[nCntEffect]);
+
+				break;					// 抜け出す
 
 			default:					// その他
 
@@ -296,16 +322,20 @@ void DrawEffect(void)
 	// ライティングを無効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	// αブレンディングを加算合成に設定
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-
 	for (int nCntEffect = 0; nCntEffect < MAX_EFFECT; nCntEffect++)
 	{ // エフェクトの最大表示数分繰り返す
 
 		if (g_aEffect[nCntEffect].bUse == true)
 		{ // エフェクトが使用されている場合
+
+			if (g_aEffect[nCntEffect].effectType != EFFECTTYPE_PLAY_SMOKE)
+			{ // エフェクトのタイプが煙系以外だった場合
+
+				// αブレンディングを加算合成に設定
+				pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+			}
 
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_aEffect[nCntEffect].mtxWorld);
@@ -334,12 +364,19 @@ void DrawEffect(void)
 
 			switch (g_aEffect[nCntEffect].effectType)
 			{
-			case EFFECTTYPE_SMOKE:	// 煙
+			case EFFECTTYPE_PLAY_SMOKE:		// プレイヤーの黒煙
 
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_SMOKE]);
 
 				break;				// 抜け出す
+
+			case EFFECTTYPE_BREAKOBJECT:	// オブジェクトの破壊時
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureEffect[TEXTURE_EFFECT_SMOKE]);
+
+				break;				//抜け出す
 
 			default:
 
@@ -352,6 +389,11 @@ void DrawEffect(void)
 			// ポリゴンの描画
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntEffect * 4, 2);
 		}
+
+		// αブレンディングを元に戻す
+		pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	}
 
 	// Zテストを有効にする
@@ -361,10 +403,6 @@ void DrawEffect(void)
 	// ライティングを有効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 
-	// αブレンディングを元に戻す
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
 //======================================================================================================================
@@ -461,6 +499,43 @@ void EffectSprayUpdate(Effect *pEffect)
 {
 	// 下に移動量を足していく
 	pEffect->move.y -= SPRAY_MOVE_Y;
+}
+
+//======================================================================================================================
+// オブジェクトの破壊時のエフェクトの更新処理
+//======================================================================================================================
+void EffectBreakObjectUpdate(Effect *pEffect)
+{
+	// 下に移動量を足していく
+	pEffect->move.y -= BREAK_OBJECT_MOVE_Y;
+
+	if (pEffect->pos.y <= 0.0f)
+	{ // エフェクトが地面を超えた場合
+
+		// エフェクトの位置を補正する
+		pEffect->pos.y = 0.0f;
+
+		// 使用しない
+		pEffect->bUse = false;
+	}
+}
+
+//======================================================================================================================
+// 爆発系のエフェクトの更新処理
+//======================================================================================================================
+void EffectExplosionUpdate(Effect *pEffect)
+{
+	if (pEffect->col.g > EXPL_REV_COL_G)
+	{ // 一定の値を超過した場合
+
+		// G値を補正する
+		pEffect->col.g = EXPL_REV_COL_G;
+	}
+	else
+	{ // 一定の値以下の場合
+		// 火花を赤くしていく
+		pEffect->col.g += EXPL_SUB_COL_G;
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理

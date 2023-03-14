@@ -35,23 +35,26 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MOVE_FORWARD		(0.18f)		// プレイヤー前進時の移動量
-#define MOVE_BACKWARD		(0.3f)		// プレイヤー後退時の移動量
-#define MOVE_PLUS_FORWARD	(0.36f)		// プレイヤー前進時の追加の移動量
-#define MOVE_PLUS_BACKWARD	(0.6f)		// プレイヤー後退時の追加の移動量
-#define MOVE_ROT			(0.012f)	// プレイヤーの向き変更量
-#define REV_MOVE_ROT		(0.08f)		// 移動量による向き変更量の補正係数
-#define REV_MOVE_BRAKE		(0.1f)		// ブレーキ時の減速係数
-#define DEL_MOVE_ABS		(1.9f)		// 移動量の削除範囲の絶対値
-#define PLAY_GRAVITY		(0.75f)		// プレイヤーにかかる重力
-#define MAX_BACKWARD		(-12.0f)	// 後退時の最高速度
-#define REV_MOVE_SUB		(0.08f)		// 移動量の減速係数
-#define UNRIVALED_CNT		(10)		// 無敵時にチカチカさせるカウント
-#define STATE_MOVE			(1.5f)		// 停止・旋回時の判定範囲
+#define MOVE_FORWARD			(0.18f)		// プレイヤー前進時の移動量
+#define MOVE_BACKWARD			(0.3f)		// プレイヤー後退時の移動量
+#define MOVE_PLUS_FORWARD		(0.36f)		// プレイヤー前進時の追加の移動量
+#define MOVE_PLUS_BACKWARD		(0.6f)		// プレイヤー後退時の追加の移動量
+#define MOVE_ROT				(0.012f)	// プレイヤーの向き変更量
+#define REV_MOVE_ROT			(0.08f)		// 移動量による向き変更量の補正係数
+#define REV_MOVE_BRAKE			(0.1f)		// ブレーキ時の減速係数
+#define DEL_MOVE_ABS			(1.9f)		// 移動量の削除範囲の絶対値
+#define PLAY_GRAVITY			(0.75f)		// プレイヤーにかかる重力
+#define MAX_BACKWARD			(-12.0f)	// 後退時の最高速度
+#define REV_MOVE_SUB			(0.08f)		// 移動量の減速係数
+#define UNRIVALED_CNT			(10)		// 無敵時にチカチカさせるカウント
+#define STATE_MOVE				(1.5f)		// 停止・旋回時の判定範囲
+#define PLAYER_BROKEN			(50)		// 黒煙が出る体力の境界
+#define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))		// ボロボロになっている車の色の追加量
+#define PLAYER_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))		// 黒煙の色
 
-#define PLAY_CLEAR_MOVE		(4.0f)		// クリア成功時のプレイヤーの自動移動量
-#define REV_PLAY_CLEAR_MOVE	(0.1f)		// クリア成功時のプレイヤーの減速係数
-#define REV_PLAY_OVER_MOVE	(0.02f)		// クリア失敗時のプレイヤーの減速係数
+#define PLAY_CLEAR_MOVE			(4.0f)		// クリア成功時のプレイヤーの自動移動量
+#define REV_PLAY_CLEAR_MOVE		(0.1f)		// クリア成功時のプレイヤーの減速係数
+#define REV_PLAY_OVER_MOVE		(0.02f)		// クリア失敗時のプレイヤーの減速係数
 
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -61,8 +64,8 @@
 #define BOOST_UP_CNT	(180)		// ブーストの加速状態の時間
 #define BOOST_WAIT_SUB	(5)			// ブーストの待機状態の減算量
 
-#define BOOST_XZ_SUB	(90.0f)		// ブースト噴射位置の xz減算量
-#define BOOST_Y_ADD		(40.0f)		// ブースト噴射位置の y加算量
+#define BOOST_XZ_SUB	(110.0f)	// ブースト噴射位置の xz減算量
+#define BOOST_Y_ADD		(58.0f)		// ブースト噴射位置の y加算量
 #define BOOST_SIDE_PULS	(18.0f)		// ブースト噴射位置の横位置変更量
 #define BOOST_MIN_MOVE	(1.5f)		// ブースト時に必要な最低速度
 
@@ -71,7 +74,7 @@
 //------------------------------------------------------------
 #define FLYAWAY_INTERVAL_CNT	(3)			// 風の出る間隔
 #define FLYAWAY_SET_CNT			(10)		// 風の出る量
-#define FLYAWAY_SHIFT_WIDTH		(90.0f)		// 風の出る位置をずらす幅
+#define FLYAWAY_SHIFT_WIDTH		(125.0f)	// 風の出る位置をずらす幅
 #define FLYAWAY_SHIFT_HEIGHT	(50.0f)		// 風の出る位置をずらす距離
 #define FLYAWAY_OVERHEAT_CNT	(80)		// 風がオーバーヒートしたときのクールダウンまでの時間
 #define FLYAWAY_WAIT_SUB		(5)			// 風の待機状態の減算量
@@ -159,6 +162,7 @@ void InitPlayer(void)
 	g_player.nLife         = PLAY_LIFE;							// 体力
 	g_player.nCounterState = 0;									// 状態管理カウンター
 	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
+	g_player.nBrokenCnt	   = 0;									// 黒煙の出る間隔
 	g_player.bMove         = false;								// 移動状況
 	g_player.bJump         = false;								// ジャンプ状況
 	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
@@ -368,14 +372,30 @@ void DrawPlayer(void)
 
 			default:					// それ以外の状態
 
+				if (nCntMat == 0)
+				{ // 最初の色(車のボディの色)のみ
+
+					// 色を変える
+					g_player.MatCopy[nCntMat].MatD3D.Diffuse.r = pMat[nCntMat].MatD3D.Diffuse.r - (PLAYER_BREAK_ADD_COL.r * (PLAY_LIFE - g_player.nLife));
+					g_player.MatCopy[nCntMat].MatD3D.Diffuse.g = pMat[nCntMat].MatD3D.Diffuse.g - (PLAYER_BREAK_ADD_COL.g * (PLAY_LIFE - g_player.nLife));
+					g_player.MatCopy[nCntMat].MatD3D.Diffuse.b = pMat[nCntMat].MatD3D.Diffuse.b - (PLAYER_BREAK_ADD_COL.b * (PLAY_LIFE - g_player.nLife));
+				}
+
 				// マテリアルの設定
-				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
+				pDevice->SetMaterial(&g_player.MatCopy[nCntMat].MatD3D);	// 通常
 
 				// 透明状態をOFFにする
 				g_player.bUnrivaled = false;
 
 				// 処理を抜ける
 				break;
+			}
+
+			if (*GetGameState() == GAMESTATE_END)
+			{ // 終了状態の場合
+
+				// マテリアルの設定
+				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);	// 通常
 			}
 
 			// テクスチャの設定
@@ -395,6 +415,8 @@ void DrawPlayer(void)
 //============================================================
 void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
+	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+
 	// 引数を代入
 	g_player.pos     = pos;		// 現在の位置
 	g_player.oldPos  = pos;		// 前回の位置
@@ -405,6 +427,15 @@ void SetPositionPlayer(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 		// モデル情報を設定
 		g_player.modelData = GetModelData(MODELTYPE_PLAYER_CAR);
+
+		// マテリアルデータへのポインタを取得
+		pMat = (D3DXMATERIAL*)g_player.modelData.pBuffMat->GetBufferPointer();
+
+		for (int nCntMat = 0; nCntMat < (int)g_player.modelData.dwNumMat; nCntMat++)
+		{
+			// 色をコピーする
+			g_player.MatCopy[nCntMat] = pMat[nCntMat];
+		}
 
 		// 影のインデックスを設定
 		g_player.nShadowID = SetModelShadow(g_player.modelData, &g_player.nShadowID, &g_player.bUse);
@@ -512,9 +543,19 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			( // 引数
 				pPlayer->pos,						// 位置
 				D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f),	// 色
-				PARTICLETYPE_EXPLOSION,				// 種類
-				SPAWN_PARTICLE_EXPLOSION,			// エフェクト数
-				2									// 寿命
+				PARTICLETYPE_PLAY_DEATH,			// 種類
+				SPAWN_PARTICLE_PLAYERDEATH,			// エフェクト数
+				4									// 寿命
+			);
+
+			// パーティクルの設定処理
+			SetParticle
+			(
+				g_player.pos,
+				PLAYER_SMOKE_COL,
+				PARTICLETYPE_PLAY_SMOKE,
+				SPAWN_PARTICLE_PLAY_SMOKE,
+				8
 			);
 
 			// 使用していない状態にする
@@ -528,6 +569,12 @@ void HitPlayer(Player *pPlayer, int nDamage)
 //============================================================
 void UpdateGameNorPlayer(void)
 {
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{
+		// プレイヤーのダメージ処理
+		HitPlayer(&g_player, PLAY_LIFE);
+	}
+
 	// 変数を宣言
 	int nTrafficCnt = 0;		// 引数設定用
 	int nTackleCnt = 0;			// 引数設定用
@@ -572,6 +619,30 @@ void UpdateGameNorPlayer(void)
 				// 透明状況の入れ替え
 				g_player.bUnrivaled = g_player.bUnrivaled ? false : true;
 			}
+		}
+	}
+
+	if (g_player.nLife <= PLAYER_BROKEN && g_player.nLife > 0)
+	{ // 体力が少なくなっていたときかつ、体力が残っていた場合
+
+		// 黒煙カウントを加算する
+		g_player.nBrokenCnt++;
+
+		if (g_player.nBrokenCnt % g_player.nLife == 0)
+		{ // 一定時間経過したら
+
+			// 黒煙カウントを0にする
+			g_player.nBrokenCnt = 0;
+
+			// パーティクルの設定処理
+			SetParticle
+			(
+				g_player.pos,
+				PLAYER_SMOKE_COL,
+				PARTICLETYPE_PLAY_SMOKE,
+				SPAWN_PARTICLE_PLAY_SMOKE,
+				3
+			);
 		}
 	}
 
@@ -718,22 +789,12 @@ void UpdateTutorialNorPlayer(void)
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
 		aControl[1] = false;	// 旋回
-		aControl[2] = false;	// 停止
+		aControl[2] = true;		// 停止
 
 		// 処理を抜ける
 		break;
 
 	case LESSON_01:	// レッスン1 (旋回)
-
-		// 操作の制限を設定
-		aControl[0] = true;		// 移動
-		aControl[1] = true;		// 旋回
-		aControl[2] = false;	// 停止
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
 
 		// 操作の制限を設定
 		aControl[0] = true;		// 移動
@@ -762,22 +823,22 @@ void UpdateTutorialNorPlayer(void)
 	// プレイヤーの着地の更新
 	LandObject(&g_player.pos, &g_player.move, &g_player.bJump);
 
-	if (GetLessonState() >= LESSON_04)
-	{ // レッスン4に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_02)
+	{ // レッスン2に挑戦中、またはクリアしている場合
 
 		// プレイヤーの加速
 		SlumBoostPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_05)
-	{ // レッスン5に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_03)
+	{ // レッスン3に挑戦中、またはクリアしている場合
 
 		// プレイヤーの送風
 		FlyAwayPlayer();
 	}
 
-	if (GetLessonState() >= LESSON_06)
-	{ // レッスン6に挑戦中、またはクリアしている場合
+	if (GetLessonState() >= LESSON_04)
+	{ // レッスン4に挑戦中、またはクリアしている場合
 
 		// プレイヤーの爆弾
 		SilenceWorldPlayer();
@@ -789,12 +850,8 @@ void UpdateTutorialNorPlayer(void)
 	// 爆弾の更新
 	UpdateSilenceWorld();
 
-	if (GetLessonState() >= LESSON_03)
-	{ // レッスン3に挑戦中、またはクリアしている場合
-
-		// プレイヤーのカメラの状態変化
-		CameraChangePlayer();
-	}
+	// プレイヤーのカメラの状態変化
+	CameraChangePlayer();
 
 	// 能力ゲージの回復
 	AbiHealPlayer();
@@ -897,31 +954,6 @@ void UpdateTutorialNorPlayer(void)
 
 		if (currentPlayer == PLAYMOVESTATE_ROTATE)
 		{ // 現在のプレイヤーの動きが旋回状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_02:	// レッスン2 (停止)
-
-		if (currentPlayer == PLAYMOVESTATE_BRAKE)
-		{ // 現在のプレイヤーの動きが停止状態の場合
-
-			// レッスンの状態の加算
-			AddLessonState();
-		}
-
-		// 処理を抜ける
-		break;
-
-	case LESSON_03:	// レッスン3 (視点変更)
-
-		if (g_tutoInfo.bForward == true
-		&&  g_tutoInfo.bFirst   == true)
-		{ // どちらのカメラも変更した場合
 
 			// レッスンの状態の加算
 			AddLessonState();
@@ -1121,6 +1153,17 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 	if (bMove)
 	{ // 移動の操作が可能な場合
 
+		//効果音系BGMの再生
+		if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+		{
+			// プレイヤーの速度を計算
+			float fVolume = (fabsf(g_player.move.x + g_player.boost.plusMove.x) / MAX_REAL_SPEED);
+
+			//プレイヤーの速度で走行音を調整
+			SetSoundVolume(SOUND_LABEL_BGM_CAR_000, fVolume);
+		}
+
+
 		if (GetKeyboardPress(DIK_W) == true || GetJoyKeyR2Press(0) == true)
 		{ // 前進の操作が行われた場合
 
@@ -1200,11 +1243,14 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_Y, 0) == true)
+	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
 		{ // 停止の操作が可能な場合
+
+			// 移動していない状態にする
+			g_player.bMove = false;
 
 			// 移動量を減速
 			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
@@ -1218,7 +1264,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 			}
 
 			// 移動量の補正
-			if (g_player.move.x <= DEL_MOVE_ABS
+			if (g_player.move.x <=  DEL_MOVE_ABS
 			&&  g_player.move.x >= -DEL_MOVE_ABS)
 			{ // 移動量が削除の範囲内の場合
 
@@ -1692,7 +1738,7 @@ void UpdateFlyAway(void)
 						// 風の位置を設定する
 						g_player.wind.pos = D3DXVECTOR3
 						(
-							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI* 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
+							g_player.pos.x + sinf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH,		// X座標
 							g_player.pos.y + FLYAWAY_SHIFT_HEIGHT,												// Y座標
 							g_player.pos.z + cosf(g_player.rot.y + D3DX_PI * 0.5f) * FLYAWAY_SHIFT_WIDTH		// Z座標
 						);

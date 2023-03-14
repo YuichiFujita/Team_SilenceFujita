@@ -11,6 +11,7 @@
 #include "input.h"
 
 #include "bonus.h"
+#include "Combo.h"
 #include "item.h"
 #include "calculation.h"
 #include "particle.h"
@@ -18,6 +19,7 @@
 #include "shadow.h"
 #include "sound.h"
 //#include "tutorial.h"
+#include "timer.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
@@ -294,8 +296,24 @@ void CollisionPlayer(Item *pItem)
 			else
 			{ // 上記以外
 
-				// ボーナスの設定処理
-				SetBonus(SCORE_ITEM);
+				if (GetTime() <= BONUS_SPECIAL_TIME)
+				{ // 制限時間が残り僅かの場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_ITEM_SP);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
+				}
+				else
+				{ // 通常状態の場合
+
+					// ボーナスの設定処理
+					SetBonus(SCORE_ITEM);
+
+					// コンボの倍率処理
+					MagnificCombo(1);
+				}
 			}
 
 			// 使用していない状態にする
@@ -453,11 +471,6 @@ void TutorialItem(void)
 //======================================================================================================================
 void GameItem(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{ // 0キーを押した場合
-		SetItem(D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_HEAL_BARRIER);
-	}
-
 	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
 	{ // アイテムの最大表示数分繰り返す
 

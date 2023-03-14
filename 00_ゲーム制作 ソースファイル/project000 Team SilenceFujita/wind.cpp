@@ -15,11 +15,13 @@
 #include "camera.h"
 #include "Combo.h"
 #include "input.h"
+#include "sound.h"
 #include "item.h"
 #include "particle.h"
 #include "object.h"
 #include "Human.h"
 #include "score.h"
+#include "timer.h"
 #include "bonus.h"
 
 //**********************************************************************************************************************
@@ -28,10 +30,10 @@
 #define MAX_WIND			(1024)			// 風の最大数
 #define HUMAN_FLY_POS_Y		(50.0f)			// 吹き飛ぶ判定が入る高さ
 #define WIND_WIDTH			(1000.0f)		// 風の範囲(X軸)
-#define WIND_DEPTH			(150.0f)		// 風の範囲(Z軸)
+#define WIND_DEPTH			(300.0f)		// 風の範囲(Z軸)
 #define FLYAWAY_WIDTH		(100.0f)		// 吹き飛ぶ幅
 #define FLYAWAY_HEIGHT		(25.0f)			// 吹き飛ぶ高さ
-#define FLYAWAY_DEPTH		(100.0f)		// 吹き飛ぶ高さ
+#define FLYAWAY_DEPTH		(100.0f)		// 吹き飛ぶ奥行
 
 #define ITEM_WIND_COUNT		(5)								// アイテムが落ちるカウント数
 
@@ -390,8 +392,15 @@ void CollisionWind(Human *pHuman)
 		&&  LineOuterProduct(vecPos[3], vecPos[0], pHuman->pos) < 0)
 		{ // 四辺の内側にいる場合 (当たっている場合)
 
-			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY && pHuman->judge.state == JUDGESTATE_EVIL)
-			{ // 風を使用しているかつ、人が吹き飛んでいない時かつ、悪い奴だった場合
+			if (pPlayer->wind.bUseWind == true && pHuman->state != HUMANSTATE_FLY)
+			{ // 風を使用しているかつ、人が吹き飛んでいない場合
+
+				// 効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// サウンド（吹き飛ばし時）の再生
+					PlaySound(SOUND_LABEL_SE_FLY_000);
+				}
 
 				// 吹き飛んでいる状態にする
 				pHuman->state = HUMANSTATE_FLY;
@@ -399,25 +408,48 @@ void CollisionWind(Human *pHuman)
 				// 人間が吹き飛ばされる処理
 				FlyAwayHuman(pHuman, *pPlayer);
 
-				// アイテムが落ちるカウントを初期化する
-				g_nHumanItemCount++;
+				if (pHuman->judge.state == JUDGESTATE_EVIL)
+				{ // 悪い奴だった場合
 
-				if (GetMode() == MODE_GAME)
-				{ // ゲーム状態の場合
+					if (GetTime() <= BONUS_SPECIAL_TIME)
+					{ // 制限時間が残り少なかったら
 
-					if (g_nHumanItemCount % ITEM_WIND_COUNT == 0)
-					{ // 一定数以上になったら
+						// ボーナスの設定処理
+						SetBonus(SCORE_HUMAN_SP);
 
-						// アイテムの設定処理
-						SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
+						// コンボの倍率処理
+						MagnificCombo(1);
+					}
+					else
+					{ // 通常時の場合
+
+						// ボーナスの設定処理
+						SetBonus(SCORE_HUMAN);
+
+						// コンボの倍率処理
+						MagnificCombo(1);
+					}
+
+					// アイテムが落ちるカウントを初期化する
+					g_nHumanItemCount++;
+
+					if (GetMode() == MODE_GAME)
+					{ // ゲーム状態の場合
+
+						if (g_nHumanItemCount % ITEM_WIND_COUNT == 0)
+						{ // 一定数以上になったら
+
+							// アイテムの設定処理
+							SetItem(pHuman->pos, ITEMTYPE_HEAL_BARRIER);
+						}
 					}
 				}
+				else
+				{ // 良い奴だった場合
 
-				// ボーナスの設定処理
-				SetBonus(SCORE_HUMAN);
-
-				// カメラの状態を変える
-				*GetCameraState() = CAMERASTATE_GOODJOB;
+					// ボーナスの設定処理
+					SetBonus(SCORE_GOOD);
+				}
 			}
 		}
 	}
@@ -428,12 +460,10 @@ void CollisionWind(Human *pHuman)
 //============================================================
 void FlyAwayHuman(Human *pHuman, Player player)
 {
-	float FlyAngle = atan2f(pHuman->pos.x - player.pos.x, pHuman->pos.z - player.pos.z);
-
 	// 移動量を設定する
-	pHuman->move.x = sinf(FlyAngle) * FLYAWAY_WIDTH;
+	pHuman->move.x = sinf(player.rot.y) * FLYAWAY_WIDTH;
 	pHuman->move.y = FLYAWAY_HEIGHT;
-	pHuman->move.z = cosf(FlyAngle) * FLYAWAY_DEPTH;
+	pHuman->move.z = cosf(player.rot.y) * FLYAWAY_DEPTH;
 
 	// 飛ばす
 	pHuman->pos += pHuman->move;
@@ -449,6 +479,23 @@ WindInfo *GetWindInfo(void)
 {
 	//風の情報を返す
 	return &g_WindInfo;
+}
+
+//============================================================
+//	風の全消去処理
+//============================================================
+void WindAllClear(void)
+{
+	for (int nCntWind = 0; nCntWind < MAX_WIND; nCntWind++)
+	{ // 風を全消去する
+
+		if (g_aWind[nCntWind].bUse == true)
+		{ // 風を使用している場合
+
+			// 風を使用しない
+			g_aWind[nCntWind].bUse = false;
+		}
+	}
 }
 
 #ifdef _DEBUG	// デバッグ処理

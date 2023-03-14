@@ -45,6 +45,7 @@ void DrawWind(void);		// 送風機の描画処理
 void SetWind(D3DXVECTOR3 pos, D3DXVECTOR3 rot);			// 送風機の設定処理
 void CollisionWind(Human *pHuman);						// 風の当たり判定
 WindInfo *GetWindInfo(void);							//風の情報の取得処理
+void WindAllClear(void);	//風の全消去処理
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言 (デバッグ用)

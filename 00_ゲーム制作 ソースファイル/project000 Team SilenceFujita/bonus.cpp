@@ -396,6 +396,7 @@ void DrawBonus(void)
 //========================================
 void SetBonus(int nBonus)
 {
+	// 変数を宣言
 	VERTEX_2D * pVtx;					// 頂点情報へのポインタ
 	D3DXVECTOR3 posBonus;				// ボーナスの位置
 	bool        bScore = false;			// スコア加算可能状況
@@ -419,8 +420,8 @@ void SetBonus(int nBonus)
 
 	case MODE_TUTORIAL:	// チュートリアル画面
 
-		if (GetTutorialState() == TUTORIALSTATE_NORMAL)
-		{ // チュートリアルが通常状態の場合
+		if (GetLessonState() >= LESSON_05)
+		{ // レッスン5に挑戦中、またはクリアしている場合
 
 			// スコア加算可能にする
 			bScore = true;
@@ -440,9 +441,6 @@ void SetBonus(int nBonus)
 
 				// 増援の得点を増やす
 				GetReinforce()->nBonus += 1;
-
-				// コンボの倍率処理
-				MagnificCombo(1);
 
 				// 右に出すか左に出すかをランダムで算出する
 				g_aBonus[nCntBonus].whereBonus = (WHEREBONUS)(rand() % WHEREBONUS_MAX);

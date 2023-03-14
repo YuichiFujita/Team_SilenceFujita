@@ -8,6 +8,10 @@
 #include "Combo.h"
 #include "score.h"
 #include "value.h"
+#include "praise.h"
+
+#include "game.h"
+#include "tutorial.h"
 
 //マクロ定義
 #define MAX_COMBO			(2)			// 使用するポリゴン数
@@ -53,8 +57,8 @@ int   g_nComboCount;	// コンボが止まるまでのカウント
 //テクスチャファイル名
 const char *c_apFilenameCombo[COMBOTEX_MAX] =
 {
-	"data/TEXTURE/ui006.png",	// コンボ下地
-	"data/TEXTURE/ui007.png",	// コンボスコア下地
+	"data/TEXTURE/ui006.tga",	// コンボ下地
+	"data/TEXTURE/ui007.tga",	// コンボスコア下地
 };
 
 //===========================================
@@ -210,8 +214,13 @@ void UpdateCombo(void)
 	if (g_Combo.bUse == true)
 	{//使用していた場合
 
-		// コンボの止まるカウントを加算
-		g_nComboCount++;
+		if (GetMode() == MODE_GAME
+		||  GetLessonState() != LESSON_05)
+		{ // ゲーム中または、レッスン5に挑戦中、またはクリアしている場合
+
+			// コンボの止まるカウントを加算
+			g_nComboCount++;
+		}
 
 		if (g_nComboCount >= COMBO_CLEAR_CNT)
 		{ // カウントが一定以上になった場合
@@ -338,62 +347,95 @@ void DrawCombo(void)
 //===========================================
 void MagnificCombo(int nMagni)
 {
-	if (nMagni <= COMBO_INTERRUPTION)
-	{ // 倍率が-1以下だった場合
+	// 変数を宣言
+	bool bCombo = false;	// コンボ加算可能状況
 
-		if (g_Combo.nMagni <= 0)
-		{ // 倍率が0以下だった場合
+	switch (GetMode())
+	{ // モードごとの処理
+	case MODE_GAME:		// ゲーム画面
 
-			// 倍率を1に設定する
-			g_Combo.nMagni = 1;
+		// コンボ加算可能にする
+		bCombo = true;
+
+		// 処理を抜ける
+		break;
+
+	case MODE_TUTORIAL:	// チュートリアル画面
+
+		if (GetLessonState() >= LESSON_05)
+		{ // レッスン5に挑戦中、またはクリアしている場合
+
+			// コンボ加算可能にする
+			bCombo = true;
 		}
 
-		// スコアの加算処理
-		AddScore(g_nComboScore * g_Combo.nMagni);
-
-		// 倍率を0にする
-		g_Combo.nMagni = 0;
-
-		// コンボ倍率を使用しない
-		g_Combo.bUse = false;
-
-		// 倍率でかけるスコアを初期化
-		g_nComboScore = 0;
-
-		// コンボの止まるカウントを初期化
-		g_nComboCount = 0;
+		// 処理を抜ける
+		break;
 	}
-	else
-	{ // 倍率が0よりも高かった場合
 
-		// 倍率を加算する
-		g_Combo.nMagni += nMagni;
+	if (bCombo == true)
+	{ // コンボが加算可能な場合
 
-		if (g_Combo.nMagni >= MAX_CONBOCOUNT)
-		{ // 倍率が最大数以上だった場合
+		if (nMagni <= COMBO_INTERRUPTION)
+		{ // 倍率が-1以下だった場合
 
-			// コンボの倍率を補正する
-			g_Combo.nMagni = MAX_CONBOCOUNT;
+			if (g_Combo.nMagni <= 0)
+			{ // 倍率が0以下だった場合
+
+				// 倍率を1に設定する
+				g_Combo.nMagni = 1;
+			}
+
+			// スコアの加算処理
+			AddScore(g_nComboScore * g_Combo.nMagni);
+
+			// 倍率を0にする
+			g_Combo.nMagni = 0;
+
+			// コンボ倍率を使用しない
+			g_Combo.bUse = false;
+
+			// 倍率でかけるスコアを初期化
+			g_nComboScore = 0;
+
+			// コンボの止まるカウントを初期化
+			g_nComboCount = 0;
 		}
+		else
+		{ // 倍率が0よりも高かった場合
 
-		if (g_Combo.nMagni >= DIGIT_TWO)
-		{ // 10以上だった場合
+			// 倍率を加算する
+			g_Combo.nMagni += nMagni;
 
-			// 桁数を設定する
-			g_Combo.nDigit = 2;
+			if (g_Combo.nMagni >= MAX_CONBOCOUNT)
+			{ // 倍率が最大数以上だった場合
+
+				// コンボの倍率を補正する
+				g_Combo.nMagni = MAX_CONBOCOUNT;
+			}
+
+			if (g_Combo.nMagni >= DIGIT_TWO)
+			{ // 10以上だった場合
+
+				// 桁数を設定する
+				g_Combo.nDigit = 2;
+			}
+			else if (g_Combo.nMagni >= DIGIT_ONE)
+			{ // 1以上だった場合
+
+				// 桁数を設定する
+				g_Combo.nDigit = 1;
+			}
+
+			// コンボの止まるカウントを初期化
+			g_nComboCount = 0;
+
+			// 透明度を初期化
+			g_Combo.fAlpha = 1.0f;
+
+			// 褒めの設定処理
+			SetPraise();
 		}
-		else if (g_Combo.nMagni >= DIGIT_ONE)
-		{ // 1以上だった場合
-
-			// 桁数を設定する
-			g_Combo.nDigit = 1;
-		}
-
-		// コンボの止まるカウントを初期化
-		g_nComboCount = 0;
-
-		// 透明度を初期化
-		g_Combo.fAlpha = 1.0f;
 	}
 }
 
@@ -415,4 +457,13 @@ void AddComboScore(int nScore)
 			g_nComboScore = VAL_MAX_SCORE;
 		}
 	}
+}
+
+//===========================================
+// コンボ数の取得処理
+//===========================================
+int GetCurrentCombo(void)
+{
+	// 現在のコンボ数を返す
+	return g_Combo.nMagni;
 }

@@ -10,6 +10,7 @@
 #include "calculation.h"
 #include "meshfield.h"
 
+#include "3Dnotation.h"
 #include "billboard.h"
 #include "camera.h"
 #include "Car.h"
@@ -350,6 +351,12 @@ void InitAllAroundChunk(void)
 	// 影の初期化
 	InitShadow();
 
+	// アイコンの初期化
+	InitIcon();
+
+	// 強調表示の初期化
+	Init3DNotation();
+
 	// 警察の初期化
 	InitPolice();
 
@@ -403,6 +410,12 @@ void UninitAllAroundChunk(void)
 
 	// 影の終了
 	UninitShadow();
+
+	// アイコンの終了
+	UninitIcon();
+
+	// 強調表示の終了
+	Uninit3DNotation();
 
 	// 警察の終了
 	UninitPolice();
@@ -554,10 +567,11 @@ bool UpdateAllClear(RESULTSTATE state)
 	bool bAllClear = true;	// 更新の終了確認用
 
 	// ポインタを宣言
-	Player  *pPlayer  = GetPlayer();		// プレイヤーの情報
-	Gate    *pGate    = GetGateData();		// ゲートの情報
-	Bonus   *pBonus   = GetBonus();			// ボーナスの情報
-	Barrier *pBarrier = GetBarrierData();	// バリアの情報
+	Player      *pPlayer  = GetPlayer();			// プレイヤーの情報
+	Gate        *pGate    = GetGateData();			// ゲートの情報
+	Bonus       *pBonus   = GetBonus();				// ボーナスの情報
+	Barrier     *pBarrier = GetBarrierData();		// バリアの情報
+	BarrierInfo *pBarInfo = GetBarrierInfoData();	// バリアのまとまりの情報
 
 	//------------------------------------------------------------------------------
 	//　未終了の確認
@@ -635,13 +649,22 @@ bool UpdateAllClear(RESULTSTATE state)
 	pPlayer->boost.state   = BOOSTSTATE_NONE;	// プレイヤーのブースト状態
 	pPlayer->bomb.state    = ATTACKSTATE_NONE;	// プレイヤーのボム状態
 	pPlayer->wind.bUseWind = false;				// 風の使用状況
+	pPlayer->icon.state = ICONSTATE_NONE;		// アイコンの状態を通常状態にする
 
 	// バリアの情報の初期化
-	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier)
+	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier++)
 	{ // バリアの最大表示数分繰り返す
 
 		// 使用していない状態にする
 		pBarrier->bUse = false;
+	}
+
+	// バリアのまとまりの情報の初期化
+	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++, pBarInfo++)
+	{ // バリアのまとまりの最大表示数分繰り返す
+
+		// 使用していない状態にする
+		pBarInfo->bUse = false;
 	}
 
 	// 更新状況を返す

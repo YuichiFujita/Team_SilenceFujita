@@ -17,6 +17,7 @@
 
 #include "2Deffect.h"
 #include "2Dparticle.h"
+#include "3Dnotation.h"
 #include "ability.h"
 #include "billboard.h"
 #include "bomb.h"
@@ -27,6 +28,7 @@
 #include "Combo.h"
 #include "Countdown.h"
 #include "effect.h"
+#include "escape.h"
 #include "flash.h"
 #include "Human.h"
 #include "gate.h"
@@ -47,6 +49,7 @@
 #include "object.h"
 #include "player.h"
 #include "Police.h"
+#include "praise.h"
 #include "score.h"
 #include "timer.h"
 #include "tiremark.h"
@@ -100,6 +103,9 @@ void InitGame(void)
 
 	// アイコンの初期化
 	InitIcon();
+
+	// 強調表示の初期化
+	Init3DNotation();
 
 	// プレイヤーの初期化
 	InitPlayer();
@@ -173,6 +179,9 @@ void InitGame(void)
 	// カウントダウンの初期化
 	InitCountDown();
 
+	// 脱出通知の初期化
+	InitEscape();
+
 	// エフェクトの初期化
 	InitEffect();
 
@@ -196,6 +205,9 @@ void InitGame(void)
 
 	// スコアの初期化
 	InitScore();
+
+	// 褒めの初期化
+	InitPraise();
 
 	// ポーズの初期化
 	InitPause();
@@ -262,11 +274,11 @@ void InitGame(void)
 		SetSoundVolume(SOUND_LABEL_BGM_BOUSOUCAR_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_SENKYOCAR_000, 0.0f);
 		SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, 0.0f);
-		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 1.0f);
+		SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 0.0f);
 	}
 
 #ifdef _DEBUG	// デバッグ処理
-	// エディットメインの初期化6
+	// エディットメインの初期化
 	InitEditmain();
 #endif
 }
@@ -284,6 +296,9 @@ void UninitGame(void)
 
 	// アイコンの終了
 	UninitIcon();
+
+	// 強調表示の終了
+	Uninit3DNotation();
 
 	// プレイヤーの終了
 	UninitPlayer();
@@ -357,6 +372,9 @@ void UninitGame(void)
 	// カウントダウンの終了
 	UninitCountDown();
 
+	// 脱出通知の終了
+	UninitEscape();
+
 	// エフェクトの終了
 	UninitEffect();
 
@@ -380,6 +398,9 @@ void UninitGame(void)
 
 	// スコアの終了
 	UninitScore();
+
+	// 褒めの終了
+	UninitPraise();
 
 	// ポーズの終了
 	UninitPause();
@@ -476,6 +497,9 @@ void UpdateGame(void)
 
 				// ポーズの開始、解除
 				g_bPause = (g_bPause == false) ? true : false;
+
+				// サウンドの再生
+				PlaySound(SOUND_LABEL_SE_SELECT_000);		// SE (選択のSE)
 			}
 #endif
 		}
@@ -569,6 +593,9 @@ void UpdateGame(void)
 			// タイヤ痕の更新
 			UpdateTireMark();
 
+			// 強調表示の更新
+			Update3DNotation();
+
 			// 警察の更新
 			UpdatePolice();
 
@@ -610,12 +637,15 @@ void UpdateGame(void)
 
 			// 体力バーの更新
 			UpdateLife();
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif
 			// カウントダウンの更新
 			UpdateCountDown();
+
+			// 脱出通知の更新
+			UpdateEscape();
 
 			// 能力バーの更新
 			UpdateAbility();
@@ -634,6 +664,9 @@ void UpdateGame(void)
 
 			// ボーナスの更新処理
 			UpdateBonus();
+
+			// 褒めの更新
+			UpdatePraise();
 
 			// アイコンの更新
 			UpdateIcon();
@@ -706,6 +739,9 @@ void DrawGame(void)
 	// 影の描画
 	DrawShadow();
 
+	// 強調表示の描画
+	Draw3DNotation();
+
 	// プレイヤーの描画
 	DrawPlayer();
 
@@ -752,7 +788,7 @@ void DrawGame(void)
 	DrawParticle();
 
 	// 天気の描画処理
-	DrawWeather();
+	//DrawWeather();
 	
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
@@ -791,6 +827,9 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera(CAMERATYPE_UI);
 
+	// 脱出通知の描画
+	DrawEscape();
+
 	// 体力バーの描画
 	DrawLife();
 
@@ -811,6 +850,9 @@ void DrawGame(void)
 
 	// ボーナスの描画
 	DrawBonus();
+
+	// 褒めの描画
+	DrawPraise();
 
 	// 2Dエフェクトの描画
 	Draw2DEffect();

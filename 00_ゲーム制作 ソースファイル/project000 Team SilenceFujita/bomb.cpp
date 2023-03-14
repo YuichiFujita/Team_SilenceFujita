@@ -10,13 +10,16 @@
 #include "main.h"
 #include "input.h"
 #include "sound.h"
+#include "tutorial.h"
 
 #include "bomb.h"
+#include "Combo.h"
 #include "bonus.h"
 #include "calculation.h"
 #include "player.h"
 #include "car.h"
 #include "police.h"
+#include "timer.h"
 
 #include "particle.h"
 
@@ -765,7 +768,7 @@ void UpdateBarrierData(void)
 				{ // カウンターが 0以下の場合
 
 					if (GetMode() != MODE_TUTORIAL)
-					{ // 現在のモードがチュートリアルではない場合
+					{ // チュートリアルではない場合
 
 						if (DownBarrier(nCntBarrier) == true)
 						{ // 下降可能だった場合
@@ -946,6 +949,13 @@ void HomingBarrier(int nCntBarrier)
 			break;
 		}
 
+		//効果音の再生
+		if (GetSoundType(SOUND_TYPE_SE) == true)
+		{
+			// サウンド（バリアの生成）の再生
+			PlaySound(SOUND_LABEL_SE_BARRIER_000);
+		}
+
 		// 座標を補正
 		g_aBarrier[nCntBarrier].pos.x = destPos.x;
 		g_aBarrier[nCntBarrier].pos.y = 0.0f;
@@ -959,6 +969,26 @@ void HomingBarrier(int nCntBarrier)
 
 		// 着弾状態にする
 		g_aBarrier[nCntBarrier].state = BARRIERSTATE_LAND;
+
+		// パーティクルの設定
+		SetParticle
+		( // 引数
+			g_aBarrier[nCntBarrier].pos,						// 位置
+			D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f),	// 色
+			PARTICLETYPE_PLAY_DEATH,			// 種類
+			SPAWN_PARTICLE_PLAYERDEATH,			// エフェクト数
+			4									// 寿命
+		);
+
+		// パーティクルの設定処理
+		SetParticle
+		(
+			g_aBarrier[nCntBarrier].pos,
+			D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f),
+			PARTICLETYPE_PLAY_SMOKE,
+			SPAWN_PARTICLE_PLAY_SMOKE,
+			8
+		);
 	}
 }
 
@@ -1046,6 +1076,7 @@ void UpdateBarrierInfoData(void)
 {
 	// 変数を宣言
 	int  nNumEvil   = 0;		// 悪い奴の総数
+	int nNumJustice = 0;		// 良い奴の総数
 	bool bNextState = true;		// 状態遷移用
 
 	// ポインタを宣言
@@ -1115,6 +1146,12 @@ void UpdateBarrierInfoData(void)
 									// 悪い奴を加算
 									nNumEvil++;
 								}
+								else
+								{ // 良い奴の場合
+
+									// 良い奴を加算
+									nNumJustice++;
+								}
 							}
 						}
 					}
@@ -1122,8 +1159,31 @@ void UpdateBarrierInfoData(void)
 					if (nNumEvil > 0)
 					{ // 悪い奴がいた場合
 
+						if (GetTime() <= BONUS_SPECIAL_TIME)
+						{ // 制限時間が残り僅かの場合
+
+							// ボーナスの設定処理
+							SetBonus(SCORE_CAR_SP * nNumEvil);
+
+							// コンボの倍率処理
+							MagnificCombo(1);
+						}
+						else
+						{ // 通常状態の場合
+
+							// ボーナスの設定処理
+							SetBonus(SCORE_CAR * nNumEvil);
+
+							// コンボの倍率処理
+							MagnificCombo(1);
+						}
+					}
+
+					if (nNumJustice > 0)
+					{ // 良い奴がいた場合
+
 						// ボーナスの設定処理
-						SetBonus(SCORE_CAR * nNumEvil);
+						SetBonus(SCORE_GOOD);
 					}
 
 					// カウンターを初期化

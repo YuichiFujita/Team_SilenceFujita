@@ -8,6 +8,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "fade.h"
 #include "input.h"
 #include "camera.h"
 #include "player.h"
@@ -68,15 +69,24 @@
 #define TITLE_POS_Z_ROAD_TWO		(2250.0f)			// 二つ目の道路の視点の位置
 #define TITLE_POS_X_ROAD_THREE		(9000.0f)			// 三つ目の道路の視点の位置
 #define TITLE_POS_Z_ROAD_THREE		(11000.0f)			// 三つ目の道路の視点の位置
+#define TITLE_POS_X_ROAD_FOUR		(-6750.0f)			// 四つ目の道路の視点の位置
+#define TITLE_POS_Z_ROAD_FOUR		(1600.0f)			// 四つ目の道路の視点の位置
+#define TITLE_POS_X_ROAD_FIVE		(-7000.0f)			// 五つ目の道路の視点の位置
+#define TITLE_POS_Z_ROAD_FIVE		(-6750.0f)			// 五つ目の道路の視点の位置
 
-#define TITLE_ROT_ROAD_ONE			(0)					// 一つ目の道路の角度
-#define TITLE_ROT_ROAD_TWO			(-D3DX_PI * 0.5f)	// 二つ目の道路の角度
-#define TITLE_ROT_ROAD_THREE		(-D3DX_PI)			// 三つ目の道路の角度
 
-#define TITLE_POS_MOVE_ROAD			(10.0f)				// 道路の移動量
-#define TITLE_POS_END_ROAD_ONE		(10000.0f)			// 一つ目の道路の終着点
-#define TITLE_POS_END_ROAD_TWO		(-5000.0f)			// 二つ目の道路の終着点
-#define TITLE_POS_END_ROAD_THREE	(-1000.0f)			// 三つ目の道路の終着点
+#define TITLE_ROT_ROAD_ONE		(0)					// 一つ目の道路の角度
+#define TITLE_ROT_ROAD_TWO		(-D3DX_PI * 0.5f)	// 二つ目の道路の角度
+#define TITLE_ROT_ROAD_THREE	(-D3DX_PI)			// 三つ目の道路の角度
+#define TITLE_ROT_ROAD_FOUR		(D3DX_PI )			// 四つ目の道路の角度
+#define TITLE_ROT_ROAD_FIVE		(D3DX_PI * 0.5f)	// 五つ目の道路の角度
+
+#define TITLE_POS_MOVE_ROAD			(10.0f)			// 道路の移動量
+#define TITLE_POS_END_ROAD_ONE		(10000.0f)		// 一つ目の道路の終着点
+#define TITLE_POS_END_ROAD_TWO		(-5000.0f)		// 二つ目の道路の終着点
+#define TITLE_POS_END_ROAD_THREE	(-1000.0f)		// 三つ目の道路の終着点
+#define TITLE_POS_END_ROAD_FOUR		(-7000.0f)		// 四つ目の道路の終着点
+#define TITLE_POS_END_ROAD_FIVE		(2000.0f)		// 五つ目の道路の終着点
 
 // リザルトカメラ
 #define CAMERA_RSL_ROT_MOVE		(0.003f)			// カメラの向きの移動量
@@ -94,15 +104,24 @@
 #define RANK_POS_Z_ROAD_TWO		(2250.0f)			// 二つ目の道路の視点の位置
 #define RANK_POS_X_ROAD_THREE	(9000.0f)			// 三つ目の道路の視点の位置
 #define RANK_POS_Z_ROAD_THREE	(11000.0f)			// 三つ目の道路の視点の位置
+#define RANK_POS_X_ROAD_FOUR	(-6750.0f)			// 四つ目の道路の視点の位置
+#define RANK_POS_Z_ROAD_FOUR	(1600.0f)			// 四つ目の道路の視点の位置
+#define RANK_POS_X_ROAD_FIVE	(-7000.0f)			// 五つ目の道路の視点の位置
+#define RANK_POS_Z_ROAD_FIVE	(-6750.0f)			// 五つ目の道路の視点の位置
 
 #define RANK_ROT_ROAD_ONE		(0)					// 一つ目の道路の角度
 #define RANK_ROT_ROAD_TWO		(-D3DX_PI * 0.5f)	// 二つ目の道路の角度
 #define RANK_ROT_ROAD_THREE		(-D3DX_PI)			// 三つ目の道路の角度
+#define RANK_ROT_ROAD_FOUR		(D3DX_PI )			// 四つ目の道路の角度
+#define RANK_ROT_ROAD_FIVE		(D3DX_PI * 0.5f)	// 五つ目の道路の角度
 
-#define RANK_POS_MOVE_ROAD		(10.0f)		// 道路の移動量
-#define RANK_POS_END_ROAD_ONE	(10000.0f)	// 一つ目の道路の終着点
-#define RANK_POS_END_ROAD_TWO	(-5000.0f)	// 二つ目の道路の終着点
-#define RANK_POS_END_ROAD_THREE	(-1000.0f)	// 三つ目の道路の終着点
+#define RANK_POS_MOVE_ROAD		(10.0f)				// 道路の移動量
+
+#define RANK_POS_END_ROAD_ONE	(10000.0f)			// 一つ目の道路の終着点
+#define RANK_POS_END_ROAD_TWO	(-5000.0f)			// 二つ目の道路の終着点
+#define RANK_POS_END_ROAD_THREE	(-1000.0f)			// 三つ目の道路の終着点
+#define RANK_POS_END_ROAD_FOUR	(-7000.0f)			// 四つ目の道路の終着点
+#define RANK_POS_END_ROAD_FIVE	(2000.0f)			// 五つ目の道路の終着点
 
 //************************************************************
 //	列挙型
@@ -115,6 +134,8 @@ typedef enum
 	ROAD_CAMERA_TYPE_ONE = 0,		// 一つ目の道路（真ん中）
 	ROAD_CAMERA_TYPE_TWO,			// 二つ目の道路（横から）
 	ROAD_CAMERA_TYPE_THREE,			// 三つ目の道路（商店街）
+	ROAD_CAMERA_TYPE_FOUR,			// 四つ目の道路（工事現場）
+	ROAD_CAMERA_TYPE_FIVE,			// 五つ目の道路（競馬）
 	ROAD_CAMERA_TYPE_MAX
 }ROADTYPE;
 
@@ -123,6 +144,8 @@ typedef enum
 //************************************************************
 void InitMapCamera(void);			// マップカメラの初期化処理
 void InitUiCamera(void);			// UIカメラの初期化処理
+
+void InitTitleCamera(ROADTYPE);		// 特定のタイトルカメラの初期化処理
 
 void UpdateResultCamera(void);		// リザルト時のカメラの更新処理
 void UpdateTitleCamera(void);		// タイトル時のカメラの更新処理
@@ -153,7 +176,6 @@ ROADTYPE g_roadType;				// 取得する道路の種類
 void InitCamera(void)
 {
 	MODE mode  = GetMode();			// モードの状態
-	g_roadType = ROADTYPE(rand() % int(ROAD_CAMERA_TYPE_MAX));
 
 	// カメラの状態を初期化
 	g_CameraState = CAMERASTATE_NORMAL;
@@ -214,54 +236,83 @@ void InitCamera(void)
 		InitUiCamera();
 	}
 	else if (mode == MODE_TITLE)
-	{ // モードがリザルトの場合
+	{ // モードがタイトルの場合
+
+		//道路を設定
+		g_roadType = ROADTYPE(rand() % int(ROAD_CAMERA_TYPE_MAX));
 
 	  // メインカメラの初期化
 		switch (g_roadType)
 		{
 		case ROAD_CAMERA_TYPE_ONE:		// 一つ目の道路
 
-			g_aCamera[CAMERATYPE_MAIN].fDis = RANK_DISTANCE;																		// 視点と注視点の距離
-			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(RANK_POS_X_ROAD_ONE, RANK_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
-			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;														// 前回の視点
-			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(RANK_POS_X_ROAD_ONE, RANK_POSR_Y, RANK_POS_Z_ROAD_ONE);					// 注視点の位置
-			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の視点
-			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
+			g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_ONE, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;													// 前回の視点
+			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_ONE, TITLE_POSR_Y, TITLE_POS_Z_ROAD_ONE);					// 注視点の位置
+			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の視点
+			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の注視点
 			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
-			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, RANK_ROT_ROAD_ONE, 0.0f);											// 向き
+			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_ONE, 0.0f);											// 向き
 
 			break;
 
 		case ROAD_CAMERA_TYPE_TWO:		// 二つ目の道路
 
-			g_aCamera[CAMERATYPE_MAIN].fDis = RANK_DISTANCE;																		// 視点と注視点の距離
-			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(RANK_POS_X_ROAD_TWO, RANK_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
-			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;														// 前回の視点
-			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(RANK_POS_X_ROAD_TWO, RANK_POSR_Y, RANK_POS_Z_ROAD_TWO);					// 注視点の位置
-			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の視点
-			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
+			g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_TWO, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;													// 前回の視点
+			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_TWO, TITLE_POSR_Y, TITLE_POS_Z_ROAD_TWO);					// 注視点の位置
+			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の視点
+			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の注視点
 			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
-			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, RANK_ROT_ROAD_TWO, 0.0f);											// 向き
+			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_TWO, 0.0f);											// 向き
 
 			break;
 
 		case ROAD_CAMERA_TYPE_THREE:	// 三つ目の道路
 
-			g_aCamera[CAMERATYPE_MAIN].fDis = RANK_DISTANCE;																		// 視点と注視点の距離
-			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(RANK_POS_X_ROAD_THREE, RANK_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);	// 視点の位置
-			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;														// 前回の視点
-			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(RANK_POS_X_ROAD_THREE, RANK_POSR_Y, RANK_POS_Z_ROAD_THREE);				// 注視点の位置
-			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の視点
-			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
+			g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_THREE, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);	// 視点の位置
+			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;													// 前回の視点
+			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_THREE, TITLE_POSR_Y, TITLE_POS_Z_ROAD_THREE);				// 注視点の位置
+			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の視点
+			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の注視点
 			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
-			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, RANK_ROT_ROAD_THREE, 0.0f);											// 向き
+			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_THREE, 0.0f);											// 向き
+
+			break;
+
+		case ROAD_CAMERA_TYPE_FOUR:	// 四つ目の道路
+
+			g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																	// 視点と注視点の距離
+			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_FOUR, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);	// 視点の位置
+			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;												// 前回の視点
+			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_FOUR, TITLE_POSR_Y, TITLE_POS_Z_ROAD_FOUR);				// 注視点の位置
+			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);												// 目標の視点
+			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);												// 目標の注視点
+			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);													// 上方向ベクトル
+			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_FOUR, 0.0f);										// 向き
+
+			break;
+
+		case ROAD_CAMERA_TYPE_FIVE:	// 五つ目の道路
+
+			g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_FIVE, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;													// 前回の視点
+			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_FIVE, TITLE_POSR_Y, TITLE_POS_Z_ROAD_FIVE);					// 注視点の位置
+			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の視点
+			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の注視点
+			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_FIVE, 0.0f);											// 向き
 
 			break;
 		}
 
 		// ビューポート情報を初期化
-		g_aCamera[CAMERATYPE_MAIN].viewport.X = 0;				// 左上隅のピクセル座標 (x)
-		g_aCamera[CAMERATYPE_MAIN].viewport.Y = 0;				// 左上隅のピクセル座標 (y)
+		g_aCamera[CAMERATYPE_MAIN].viewport.X = 0;					// 左上隅のピクセル座標 (x)
+		g_aCamera[CAMERATYPE_MAIN].viewport.Y = 0;					// 左上隅のピクセル座標 (y)
 		g_aCamera[CAMERATYPE_MAIN].viewport.Width = SCREEN_WIDTH;	// 描画する画面の横幅
 		g_aCamera[CAMERATYPE_MAIN].viewport.Height = SCREEN_HEIGHT;	// 描画する画面の縦幅
 		g_aCamera[CAMERATYPE_MAIN].viewport.MinZ = 0.0f;
@@ -274,7 +325,10 @@ void InitCamera(void)
 		InitUiCamera();
 	}
 	else if (mode == MODE_RANKING)
-	{ // モードがリザルトの場合
+	{ // モードがランキングの場合
+
+		//道路を設定
+		g_roadType = ROADTYPE(rand() % int(ROAD_CAMERA_TYPE_MAX));
 
 		// メインカメラの初期化
 		switch (g_roadType)
@@ -315,6 +369,31 @@ void InitCamera(void)
 			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
 			g_aCamera[CAMERATYPE_MAIN].vecU     = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
 			g_aCamera[CAMERATYPE_MAIN].rot      = D3DXVECTOR3(0.0f, RANK_ROT_ROAD_THREE, 0.0f);											// 向き
+
+			break;
+		case ROAD_CAMERA_TYPE_FOUR:	// 四つ目の道路
+
+			g_aCamera[CAMERATYPE_MAIN].fDis = RANK_DISTANCE;																		// 視点と注視点の距離
+			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(RANK_POS_X_ROAD_FOUR, RANK_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;													// 前回の視点
+			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(RANK_POS_X_ROAD_FOUR, RANK_POSR_Y, RANK_POS_Z_ROAD_FOUR);					// 注視点の位置
+			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の視点
+			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の注視点
+			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, RANK_ROT_ROAD_FOUR, 0.0f);											// 向き
+
+			break;
+
+		case ROAD_CAMERA_TYPE_FIVE:	// 五つ目の道路
+
+			g_aCamera[CAMERATYPE_MAIN].fDis = RANK_DISTANCE;																		// 視点と注視点の距離
+			g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(RANK_POS_X_ROAD_FIVE, RANK_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+			g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;													// 前回の視点
+			g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(RANK_POS_X_ROAD_FIVE, RANK_POSR_Y, RANK_POS_Z_ROAD_FIVE);					// 注視点の位置
+			g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の視点
+			g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の注視点
+			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, RANK_ROT_ROAD_FIVE, 0.0f);											// 向き
 
 			break;
 		}
@@ -564,6 +643,79 @@ void InitUiCamera(void)
 	g_aCamera[CAMERATYPE_UI].viewport.MaxZ   = 1.0f;
 }
 
+//============================================================
+//	特定のタイトルカメラの初期化処理
+//============================================================
+void InitTitleCamera(ROADTYPE type)
+{
+	switch (type)
+	{
+	case ROAD_CAMERA_TYPE_ONE:		// 一つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+		g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_ONE, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;														// 前回の視点
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_ONE, TITLE_POSR_Y, TITLE_POS_Z_ROAD_ONE);					// 注視点の位置
+		g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の視点
+		g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
+		g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_ONE, 0.0f);											// 向き
+
+		break;
+
+	case ROAD_CAMERA_TYPE_TWO:		// 二つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+		g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_TWO, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;														// 前回の視点
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_TWO, TITLE_POSR_Y, TITLE_POS_Z_ROAD_TWO);					// 注視点の位置
+		g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の視点
+		g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
+		g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_TWO, 0.0f);											// 向き
+
+		break;
+
+	case ROAD_CAMERA_TYPE_THREE:	// 三つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+		g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_THREE, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);	// 視点の位置
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;														// 前回の視点
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_THREE, TITLE_POSR_Y, TITLE_POS_Z_ROAD_THREE);				// 注視点の位置
+		g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の視点
+		g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
+		g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_THREE, 0.0f);											// 向き
+
+		break;
+	case ROAD_CAMERA_TYPE_FOUR:	// 四つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+		g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_FOUR, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);	// 視点の位置
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;														// 前回の視点
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_FOUR, TITLE_POSR_Y, TITLE_POS_Z_ROAD_FOUR);				// 注視点の位置
+		g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の視点
+		g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);														// 目標の注視点
+		g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_FOUR, 0.0f);											// 向き
+
+		break;
+
+	case ROAD_CAMERA_TYPE_FIVE:	// 五つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].fDis = TITLE_DISTANCE;																		// 視点と注視点の距離
+		g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(TITLE_POS_X_ROAD_FIVE, TITLE_POSV_Y, -g_aCamera[CAMERATYPE_MAIN].fDis);		// 視点の位置
+		g_aCamera[CAMERATYPE_MAIN].posVOld = g_aCamera[CAMERATYPE_MAIN].posV;													// 前回の視点
+		g_aCamera[CAMERATYPE_MAIN].posR = D3DXVECTOR3(TITLE_POS_X_ROAD_FIVE, TITLE_POSR_Y, TITLE_POS_Z_ROAD_FIVE);					// 注視点の位置
+		g_aCamera[CAMERATYPE_MAIN].destPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の視点
+		g_aCamera[CAMERATYPE_MAIN].destPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);													// 目標の注視点
+		g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);														// 上方向ベクトル
+		g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, TITLE_ROT_ROAD_FIVE, 0.0f);											// 向き
+
+		break;
+	}
+}
+
 //======================================================================================================================
 //	タイトル時のカメラの更新処理
 //======================================================================================================================
@@ -577,6 +729,13 @@ void UpdateTitleCamera(void)
 		g_aCamera[CAMERATYPE_MAIN].posV.z += TITLE_POS_MOVE_ROAD;
 		g_aCamera[CAMERATYPE_MAIN].posR.z += TITLE_POS_MOVE_ROAD;
 
+		if (g_aCamera[CAMERATYPE_MAIN].posV.z >= TITLE_POS_END_ROAD_ONE)
+		{
+			g_roadType = ROAD_CAMERA_TYPE_TWO;
+
+			InitTitleCamera(ROAD_CAMERA_TYPE_TWO);
+		}
+
 		break;
 
 	case ROAD_CAMERA_TYPE_TWO:	//二つ目の道路
@@ -584,12 +743,52 @@ void UpdateTitleCamera(void)
 		g_aCamera[CAMERATYPE_MAIN].posV.x -= TITLE_POS_MOVE_ROAD;
 		g_aCamera[CAMERATYPE_MAIN].posR.x -= TITLE_POS_MOVE_ROAD;
 
+		if (g_aCamera[CAMERATYPE_MAIN].posV.z >= TITLE_POS_END_ROAD_TWO)
+		{
+			g_roadType = ROAD_CAMERA_TYPE_THREE;
+
+			InitTitleCamera(ROAD_CAMERA_TYPE_THREE);
+		}
+
 		break;
 
-	case ROAD_CAMERA_TYPE_THREE://三つ目の道路
+	case ROAD_CAMERA_TYPE_THREE:	//三つ目の道路
 
 		g_aCamera[CAMERATYPE_MAIN].posV.z -= TITLE_POS_MOVE_ROAD;
 		g_aCamera[CAMERATYPE_MAIN].posR.z -= TITLE_POS_MOVE_ROAD;
+
+		if (g_aCamera[CAMERATYPE_MAIN].posV.z >= TITLE_POS_END_ROAD_THREE)
+		{
+			g_roadType = ROAD_CAMERA_TYPE_FOUR;
+
+			InitTitleCamera(ROAD_CAMERA_TYPE_FOUR);
+		}
+
+		break;
+	case ROAD_CAMERA_TYPE_FOUR:	//四つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].posV.z -= TITLE_POS_MOVE_ROAD;
+		g_aCamera[CAMERATYPE_MAIN].posR.z -= TITLE_POS_MOVE_ROAD;
+
+		if (g_aCamera[CAMERATYPE_MAIN].posV.z <= TITLE_POS_END_ROAD_FOUR)
+		{
+			g_roadType = ROAD_CAMERA_TYPE_FIVE;
+
+			InitTitleCamera(ROAD_CAMERA_TYPE_FIVE);
+		}
+
+		break;
+	case ROAD_CAMERA_TYPE_FIVE:	//五つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].posV.x += TITLE_POS_MOVE_ROAD;
+		g_aCamera[CAMERATYPE_MAIN].posR.x += TITLE_POS_MOVE_ROAD;
+
+		if (g_aCamera[CAMERATYPE_MAIN].posV.x >= TITLE_POS_END_ROAD_FIVE)
+		{
+			g_roadType = ROAD_CAMERA_TYPE_ONE;
+
+			InitTitleCamera(ROAD_CAMERA_TYPE_ONE);
+		}
 
 		break;
 	}
@@ -697,6 +896,31 @@ void UpdateRankingCamera(void)
 
 		//道路の終着点を判定
 		if (g_aCamera[CAMERATYPE_MAIN].posV.z <= RANK_POS_END_ROAD_THREE)
+		{
+			//画面を遷移させる
+			SetRankingRoadTrance();
+		}
+
+		break;
+
+	case ROAD_CAMERA_TYPE_FOUR:	//四つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].posV.z -= TITLE_POS_MOVE_ROAD;
+		g_aCamera[CAMERATYPE_MAIN].posR.z -= TITLE_POS_MOVE_ROAD;
+
+		if (g_aCamera[CAMERATYPE_MAIN].posV.z <= RANK_POS_END_ROAD_FOUR)
+		{
+			//画面を遷移させる
+			SetRankingRoadTrance();
+		}
+
+		break;
+	case ROAD_CAMERA_TYPE_FIVE:	//五つ目の道路
+
+		g_aCamera[CAMERATYPE_MAIN].posV.x += TITLE_POS_MOVE_ROAD;
+		g_aCamera[CAMERATYPE_MAIN].posR.x += TITLE_POS_MOVE_ROAD;
+
+		if (g_aCamera[CAMERATYPE_MAIN].posV.x >= RANK_POS_END_ROAD_FIVE)
 		{
 			//画面を遷移させる
 			SetRankingRoadTrance();

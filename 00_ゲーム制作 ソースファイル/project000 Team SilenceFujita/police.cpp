@@ -31,7 +31,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define POLI_LIFE				(50)		// オブジェクトの体力
+#define POLI_LIFE				(50)		// 警察の体力
 #define POLI_GRAVITY			(0.75f)		// プレイヤーにかかる重力
 #define POLI_MOVE_FORWARD		(0.1f)		// プレイヤー前進時の移動量
 #define POLI_MOVE_BACKWARD		(0.2f)		// プレイヤー後退時の移動量
@@ -39,19 +39,21 @@
 #define REV_POLI_MOVE_ROT		(0.085f)	// 移動量による向き変更量の補正係数
 #define SUB_POLI_MOVE_VALUE		(15.0f)		// 向き変更時の減速が行われる移動量
 #define SUB_POLI_MOVE			(0.05f)		// 向き変更時の減速量
-#define MAX_POLI_FORWARD		(30.0f)		// 前進時の最高速度
+#define MAX_POLI_FORWARD		(40.0f)		// 前進時の最高速度
 #define MAX_POLI_FORWARD_PATROL (15.0f)		// パトロール中の前進時の最高速度
 #define MAX_POLI_BACKWARD		(8.0f)		// 後退時の最高速度
 #define REV_POLI_MOVE_SUB		(0.04f)		// 移動量の減速係数
-#define POLI_BACK_ALPHA			(0.02f)		// 戻るときの透明度の変化量
+#define POLI_BACK_ALPHA			(0.01f)		// 戻るときの透明度の変化量
+#define POLI_CHASE_ROT_MAGNI	(0.1f)		// 追跡状態の時の旋回の倍率
 
 #define POLICAR_TRAFFIC_CNT			(400)	// 渋滞が起きたときに改善する用のカウント
 #define POLICAR_TRAFFIC_IMPROVE_CNT	(540)	// 渋滞状態の解除のカウント
 #define POLICAR_TRAFFIC_ALPHA		(0.5f)	// 渋滞時の透明度
 
-#define POLICAR_CHASE_RANGE		(3000.0f)	// 追跡状態になる範囲
-#define POLICAR_TACKLE_RANGE	(500.0f)	// タックル状態になる範囲
-#define POLICAR_SPAWN_RANGE		(1000.0f)	// スポーンしないゲートからの範囲
+#define POLICAR_CHASE_RANGE		(2000.0f)	// 追跡状態になる範囲
+#define POLICAR_PATBACK_RANGE	(4000.0f)	// 追跡を諦める範囲
+#define POLICAR_TACKLE_RANGE	(1000.0f)	// タックル状態になる範囲
+#define POLICAR_SPAWN_RANGE		(3000.0f)	// スポーンしないゲートからの範囲
 
 #define ADDPOLICE_COUNT			(4)			// 警察が増えるカウント
 
@@ -61,10 +63,11 @@
 //	タックル関係のマクロ定義
 //**********************************************************************************************************************
 #define POLICAR_TACKLE_ADD		(3.35f)		// 増していく移動量
-#define MAX_POLICAR_TACKLE_MOVE	(50.0f)		// 追加移動量の最大数
+#define MAX_POLICAR_TACKLE_MOVE	(55.0f)		// 追加移動量の最大数
 #define FINISH_POLICAR_TACKLE	(80)		// タックル終了するまでの時間
-#define STOP_POLICAR_CNT		(40)		// 止まっている間のカウント数
-#define STOP_POLICAR_ROT		(0.01f)		// 車が止まっている間の向きの増加係数
+#define STOP_POLICAR_CNT		(25)		// 止まっている間のカウント数
+#define STOP_POLICAR_ROT		(0.05f)		// 車が止まっている間の向きの増加係数
+#define BOOST_POLICAR_ROT		(0.035f)		// ブースト中の向きの増加係数
 #define POLICAR_ATTEN_STOP		(0.1f)		// 追加移動量の減衰係数
 
 //**********************************************************************************************************************
@@ -194,6 +197,7 @@ void UpdatePolice(void)
 
 			if (g_aPolice[nCntPolice].state == POLICESTATE_SPAWN)
 			{ // 出現状態の場合
+
 				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
 				{ // バリア内状態ではない場合
 
@@ -207,55 +211,47 @@ void UpdatePolice(void)
 					GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_LAND)
 				{ // バリアセット状態じゃなかった場合
 
-					if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC)
-					{ // 渋滞状態じゃない場合
+					//----------------------------------------------------
+					//	当たり判定
+					//----------------------------------------------------
+					// オブジェクトとの当たり判定
+					CollisionObject
+					( // 引数
+						&g_aPolice[nCntPolice].pos,			// 現在の位置
+						&g_aPolice[nCntPolice].posOld,		// 前回の位置
+						&g_aPolice[nCntPolice].move,		// 移動量
+						POLICAR_WIDTH,						// 横幅
+						POLICAR_DEPTH,						// 奥行
+						&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
+						BOOSTSTATE_NONE,					// ブーストの状態
+						&g_aPolice[nCntPolice].state,		// 警察の状態
+						&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
+						&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
+					);
 
-						//----------------------------------------------------
-						//	当たり判定
-						//----------------------------------------------------
-						// オブジェクトとの当たり判定
-						CollisionObject
-						( // 引数
-							&g_aPolice[nCntPolice].pos,			// 現在の位置
-							&g_aPolice[nCntPolice].posOld,		// 前回の位置
-							&g_aPolice[nCntPolice].move,		// 移動量
-							POLICAR_WIDTH,						// 横幅
-							POLICAR_DEPTH,						// 奥行
-							&g_aPolice[nCntPolice].nTrafficCnt,	// 渋滞カウント
-							BOOSTSTATE_NONE,					// ブーストの状態
-							&g_aPolice[nCntPolice].state,		// 警察の状態
-							&g_aPolice[nCntPolice].tackle.nTackleCnt,	// タックルカウント
-							&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
-						);
+					// ゲートとの当たり判定
+					CollisionGate
+					( // 引数
+						&g_aPolice[nCntPolice].pos,			// 現在の位置
+						&g_aPolice[nCntPolice].posOld,		// 前回の位置
+						&g_aPolice[nCntPolice].move,		// 移動量
+						POLICAR_WIDTH,						// 横幅
+						POLICAR_DEPTH						// 奥行
+					);
 
-						// ゲートとの当たり判定
-						CollisionGate
-						( // 引数
-							&g_aPolice[nCntPolice].pos,			// 現在の位置
-							&g_aPolice[nCntPolice].posOld,		// 前回の位置
-							&g_aPolice[nCntPolice].move,		// 移動量
-							POLICAR_WIDTH,						// 横幅
-							POLICAR_DEPTH						// 奥行
-						);
-					}
-
-					if (g_aPolice[nCntPolice].state != POLICESTATE_PATBACK && g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
-					{ // パトロールから戻る処理じゃないかつ、初期値に戻る時以外の場合
-
-						// 車同士の当たり判定
-						CollisionCarBody
-						( // 引数
-							&g_aPolice[nCntPolice].pos,
-							&g_aPolice[nCntPolice].posOld,
-							g_aPolice[nCntPolice].rot,
-							&g_aPolice[nCntPolice].move,
-							POLICAR_WIDTH,
-							POLICAR_DEPTH,
-							COLLOBJECTTYPE_POLICE,
-							&g_aPolice[nCntPolice].nTrafficCnt,
-							(g_aPolice[nCntPolice].tackle.tackleState)
-						);
-					}
+					// 車同士の当たり判定
+					CollisionCarBody
+					( // 引数
+						&g_aPolice[nCntPolice].pos,
+						&g_aPolice[nCntPolice].posOld,
+						g_aPolice[nCntPolice].rot,
+						&g_aPolice[nCntPolice].move,
+						POLICAR_WIDTH,
+						POLICAR_DEPTH,
+						COLLOBJECTTYPE_POLICE,
+						&g_aPolice[nCntPolice].nTrafficCnt,
+						(g_aPolice[nCntPolice].tackle.tackleState)
+					);
 				}
 
 				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
@@ -293,8 +289,8 @@ void UpdatePolice(void)
 					// 前回位置の更新
 					g_aPolice[nCntPolice].posOld = g_aPolice[nCntPolice].pos;
 
-					// プレイヤーの着地の更新処理
-					LandObject(&g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].bJump);
+					//// プレイヤーの着地の更新処理
+					//LandObject(&g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].bJump);
 
 					// プレイヤーの位置の更新
 					PosPolice(&g_aPolice[nCntPolice].move, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].rot, g_aPolice[nCntPolice].bMove);
@@ -473,8 +469,19 @@ void UpdatePolice(void)
 
 				if (g_aPolice[nCntPolice].nTrafficCnt >= POLICAR_TRAFFIC_CNT)
 				{ // 渋滞に巻き込まれた場合
-					// 渋滞状態にする
-					g_aPolice[nCntPolice].state = POLICESTATE_TRAFFIC;
+					if (g_aPolice[nCntPolice].state != POLICESTATE_CHASE
+						&& g_aPolice[nCntPolice].state != POLICESTATE_TACKLE)
+					{ // 追跡状態もしくは、タックル状態以外の場合
+
+						// 渋滞状態にする
+						g_aPolice[nCntPolice].state = POLICESTATE_TRAFFIC;
+					}
+					else
+					{ // 上記以外
+
+						// 渋滞カウントを0にする
+						g_aPolice[nCntPolice].nTrafficCnt = 0;
+					}
 				}
 
 				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
@@ -714,8 +721,8 @@ void DrawPolice(void)
 					break;
 				}
 
-				if (g_aPolice[nCntPolice].bombState == BOMBSTATE_RANGE)
-				{ // 範囲内状態の場合
+				if (g_aPolice[nCntPolice].bombState == BOMBSTATE_RANGE && GetPlayer()->bomb.state == ATTACKSTATE_NONE)
+				{ // 範囲内状態かつ、プレイヤーがボムを撃てる状態の場合
 
 					// 範囲内時のマテリアルの色を設定
 					g_aPolice[nCntPolice].MatCopy[nCntMat].MatD3D.Diffuse = POLICAR_BOMB_RANGE_DIF;
@@ -1017,12 +1024,14 @@ void PatrolPoliceAct(Police *pPolice)
 
 	if (pPlayer->bUse == true)
 	{ // プレイヤーが使用されていた場合
+
 		//目的の距離を設定する
 		fDist = fabsf(sqrtf((pPlayer->pos.x - pPolice->pos.x) * (pPlayer->pos.x - pPolice->pos.x) + (pPlayer->pos.z - pPolice->pos.z) * (pPlayer->pos.z - pPolice->pos.z)));
 
-		if (fDist <= 1000.0f)
+		if (fDist <= POLICAR_CHASE_RANGE)
 		{ // 目的の距離が一定以内に入ったら
-		  // 追跡状態に移行する
+
+			// 追跡状態に移行する
 			pPolice->state = POLICESTATE_CHASE;
 		}
 	}
@@ -1043,7 +1052,7 @@ void PatrolCarSearch(Police *pPolice)
 	// 目的の向きを設定する
 	fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
 
-	if (fDist <= POLICAR_CHASE_RANGE)
+	if (fDist <= POLICAR_PATBACK_RANGE)
 	{ // 目的の距離が一定以内に入ったら
 
 		if (fDist <= POLICAR_TACKLE_RANGE && pPlayer->state != ACTIONSTATE_UNRIVALED)
@@ -1071,7 +1080,7 @@ void PatrolCarSearch(Police *pPolice)
 			RotNormalize(&fRotDiff);
 
 			// 角度を補正する
-			pPolice->rot.y += fRotDiff * 0.1f;
+			pPolice->rot.y += fRotDiff * POLI_CHASE_ROT_MAGNI;
 
 			// 向きの正規化
 			RotNormalize(&pPolice->rot.y);
@@ -1396,12 +1405,12 @@ void PoliceTackle(Police *pPolice)
 
 	float fRotDest, fRotDiff;		// 向きの補正用変数
 
+	// 目的の向きを設定する
+	fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
+
 	switch (pPolice->tackle.tackleState)
 	{
 	case TACKLESTATE_CHARGE:	// チャージ中
-
-		// 目的の向きを設定する
-		fRotDest = atan2f(pPlayer->pos.x - pPolice->pos.x, pPlayer->pos.z - pPolice->pos.z);
 
 		// 向きの差分を求める
 		fRotDiff = fRotDest - pPolice->rot.y;
@@ -1441,6 +1450,18 @@ void PoliceTackle(Police *pPolice)
 
 		// 移動量を加算していく
 		pPolice->move.x += POLI_MOVE_FORWARD;
+
+		// 向きの差分を求める
+		fRotDiff = fRotDest - pPolice->rot.y;
+
+		// 向きの正規化
+		RotNormalize(&fRotDiff);
+
+		// 角度を補正する
+		pPolice->rot.y += fRotDiff * BOOST_POLICAR_ROT;
+
+		// 向きの正規化
+		RotNormalize(&pPolice->rot.y);
 
 		if (pPolice->tackle.tacklemove.x >= MAX_POLICAR_TACKLE_MOVE)
 		{ // 追加分の移動量が一定を超えた場合
@@ -1487,7 +1508,7 @@ void PoliceTrafficImprove(Police *pPolice)
 		pPolice->nTrafficCnt = 0;
 
 		// パトロール状態にする
-		pPolice->state = POLICESTATE_CHASE;
+		pPolice->state = POLICESTATE_PATROL;
 	}
 }
 
