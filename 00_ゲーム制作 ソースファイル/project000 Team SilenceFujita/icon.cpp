@@ -17,7 +17,7 @@
 //************************************************************
 #define MAX_ICON			(1500)		// 使用するポリゴン数 (アイコンの最大数)
 
-#define PLAY_ICON_RADIUS	(250.0f)								// プレイヤーのアイコンの半径
+#define PLAY_ICON_RADIUS	(350.0f)								// プレイヤーのアイコンの半径
 #define PLAY_ICON_COL		(D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f))		// プレイヤーのアイコンの色
 
 #define EVIL_ICON_RADIUS	(250.0f)								// 悪い奴のアイコンの半径

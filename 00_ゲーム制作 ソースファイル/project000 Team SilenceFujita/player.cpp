@@ -577,11 +577,6 @@ void HitPlayer(Player *pPlayer, int nDamage)
 //============================================================
 void UpdateGameNorPlayer(void)
 {
-	if (GetKeyboardTrigger(DIK_0) == true)
-	{
-		HitPlayer(&g_player, PLAY_LIFE);
-	}
-
 	// •Ï”‚ğéŒ¾
 	int nTrafficCnt = 0;		// ˆø”İ’è—p
 	int nTackleCnt = 0;			// ˆø”İ’è—p
