@@ -1002,8 +1002,8 @@ void UpdateTutorial(void)
 		// 強調表示の更新
 		Update3DNotation();
 
-		// 警察の更新
-		UpdatePolice();
+		// 警察のチュートリアル更新
+		UpdateTutorialPolice();
 
 		// オブジェクトの更新
 		UpdateObject();
@@ -1111,8 +1111,8 @@ void DrawTutorial(void)
 	// がれきの描画
 	DrawJunk();
 
-	// 警察の描画
-	DrawPolice();
+	// 警察のチュートリアル描画
+	DrawTutorialPolice();
 
 	// 車の描画処理
 	DrawCar();
@@ -1207,6 +1207,9 @@ void AddLessonState(void)
 			case LESSON_01:	// レッスン1 (旋回)
 
 				// 無し
+
+				// 警察の設定
+				SetPolice(D3DXVECTOR3(-100.0f, 0.0f, 0.0f));
 
 				// 処理を抜ける
 				break;
