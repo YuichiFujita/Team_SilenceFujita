@@ -105,6 +105,7 @@ const char *apModelData[] =		// モデルの相対パス
 	"data\\MODEL_OBJECT\\SignUnBoost.x",			// 標識(ブースト禁止)
 	"data\\MODEL_OBJECT\\RResort.x",				// いかがわしい店
 	"data\\MODEL_OBJECT\\TrashBag.x",				// ゴミ袋
+	"data\\MODEL_OBJECT\\car001.x",					// 自動車
 
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー

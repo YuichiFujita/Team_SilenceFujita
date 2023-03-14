@@ -102,6 +102,7 @@ typedef enum
 	MODELTYPE_OBJECT_SIGNUNBOOST,			// 標識(ブースト禁止)
 	MODELTYPE_OBJECT_RRESORT,				// いかがわしい店
 	MODELTYPE_OBJECT_TRASHBAG,				// ゴミ袋
+	MODELTYPE_OBJECT_CAR000,				// 自動車
 	
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
