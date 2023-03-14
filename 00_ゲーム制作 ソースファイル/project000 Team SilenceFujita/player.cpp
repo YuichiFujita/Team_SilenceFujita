@@ -543,9 +543,19 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			( // 引数
 				pPlayer->pos,						// 位置
 				D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f),	// 色
-				PARTICLETYPE_EXPLOSION,				// 種類
-				SPAWN_PARTICLE_EXPLOSION,			// エフェクト数
-				2									// 寿命
+				PARTICLETYPE_PLAY_DEATH,			// 種類
+				SPAWN_PARTICLE_PLAYERDEATH,			// エフェクト数
+				4									// 寿命
+			);
+
+			// パーティクルの設定処理
+			SetParticle
+			(
+				g_player.pos,
+				PLAYER_SMOKE_COL,
+				PARTICLETYPE_PLAY_SMOKE,
+				SPAWN_PARTICLE_PLAY_SMOKE,
+				8
 			);
 
 			// 使用していない状態にする
@@ -559,6 +569,12 @@ void HitPlayer(Player *pPlayer, int nDamage)
 //============================================================
 void UpdateGameNorPlayer(void)
 {
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{
+		// プレイヤーのダメージ処理
+		HitPlayer(&g_player, PLAY_LIFE);
+	}
+
 	// 変数を宣言
 	int nTrafficCnt = 0;		// 引数設定用
 	int nTackleCnt = 0;			// 引数設定用
@@ -606,8 +622,8 @@ void UpdateGameNorPlayer(void)
 		}
 	}
 
-	if (g_player.nLife <= PLAYER_BROKEN)
-	{ // 体力が少なくなったら
+	if (g_player.nLife <= PLAYER_BROKEN && g_player.nLife > 0)
+	{ // 体力が少なくなっていたときかつ、体力が残っていた場合
 
 		// 黒煙カウントを加算する
 		g_player.nBrokenCnt++;

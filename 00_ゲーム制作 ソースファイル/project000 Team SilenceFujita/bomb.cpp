@@ -969,6 +969,26 @@ void HomingBarrier(int nCntBarrier)
 
 		// 着弾状態にする
 		g_aBarrier[nCntBarrier].state = BARRIERSTATE_LAND;
+
+		// パーティクルの設定
+		SetParticle
+		( // 引数
+			g_aBarrier[nCntBarrier].pos,						// 位置
+			D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f),	// 色
+			PARTICLETYPE_PLAY_DEATH,			// 種類
+			SPAWN_PARTICLE_PLAYERDEATH,			// エフェクト数
+			4									// 寿命
+		);
+
+		// パーティクルの設定処理
+		SetParticle
+		(
+			g_aBarrier[nCntBarrier].pos,
+			D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f),
+			PARTICLETYPE_PLAY_SMOKE,
+			SPAWN_PARTICLE_PLAY_SMOKE,
+			8
+		);
 	}
 }
 
