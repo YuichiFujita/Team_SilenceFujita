@@ -19,6 +19,7 @@
 #define NOTA_PLUS_POS_OBJ	(250.0f)	// 建物の強調表示の y座標加算量
 #define NOTA_PLUS_POS_CAR	(130.0f)	// 車の強調表示の y座標加算量
 #define NOTA_PLUS_POS_EXIT	(300.0f)	// 脱出の強調表示の y座標加算量
+#define NOTA_PLUS_POS_HUMAN	(40.0f)	// 人間の強調表示の y座標加算量
 
 //************************************************************
 //	列挙型定義 (NOTATIONTYPE)
@@ -27,6 +28,7 @@ typedef enum
 {
 	NOTATIONTYPE_BREAK = 0,			// 破壊
 	NOTATIONTYPE_SHOT,				// 射出
+	NOTATIONTYPE_FLY,				// 飛翔
 	NOTATIONTYPE_EXIT,				// 脱出
 	NOTATIONTYPE_MAX,				// この列挙型の総数
 } NOTATIONTYPE;
