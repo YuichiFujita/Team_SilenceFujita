@@ -314,6 +314,16 @@ void UpdateHuman(void)
 
 			case HUMANSTATE_FLY:		//吹き飛んだ状態
 
+				// パーティクルの設定処理
+				SetParticle
+				(
+					g_aHuman[nCntHuman].pos, 
+					D3DXCOLOR(0.2f,0.2f,0.2f,1.0f),
+					PARTICLETYPE_HUMAN_FLY, 
+					5, 
+					3
+				);		
+
 				// 飛ばす
 				g_aHuman[nCntHuman].pos.x += g_aHuman[nCntHuman].move.x;
 				g_aHuman[nCntHuman].pos.z += g_aHuman[nCntHuman].move.z;

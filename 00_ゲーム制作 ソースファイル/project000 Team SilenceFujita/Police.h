@@ -125,6 +125,7 @@ void UpdateTutorialPolice(void);		// 警察のチュートリアルでの更新処理
 void DrawPolice(void);					// 警察の描画処理
 void DrawTutorialPolice(void);			// 警察のチュートリアルでの描画処理
 void SetPolice(D3DXVECTOR3 pos);		// 警察の設定処理
+void SetTutorialPolice(D3DXVECTOR3 pos);// 警察のチュートリアルでの設定処理
 void HitPolice(Police *pPolice, int nDamage);	// 警察のダメージ判定
 void PatrolCarSearch(Police *pPolice);			// 警察車両の探知処理
 Police *GetPoliceData(void);					// 警察の取得処理
