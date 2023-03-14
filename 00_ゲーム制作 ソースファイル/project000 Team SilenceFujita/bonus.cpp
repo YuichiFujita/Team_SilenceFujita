@@ -5,7 +5,6 @@
 //
 //=======================================
 #include "bonus.h"
-#include "sound.h"
 
 #include "Combo.h"
 #include "score.h"
@@ -464,12 +463,6 @@ void SetBonus(int nBonus)
 					break;				// 抜け出す
 				}
 
-				//効果音系の再生
-				if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
-				{
-					PlaySound(SOUND_LABEL_SE_SCORE_000);
-				}
-
 				// 情報の設定
 				g_aBonus[nCntBonus].pos = D3DXVECTOR3(posBonus.x, posBonus.y, 0.0f);	// 位置
 				g_aBonus[nCntBonus].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
@@ -485,6 +478,7 @@ void SetBonus(int nBonus)
 
 					// 桁数を設定する
 					g_aBonus[nCntBonus].nDigit = 1;
+
 				}
 				else if (g_aBonus[nCntBonus].nScore <= BONUS_DIGIT_TWO)
 				{ // スコアが99以上だった場合
