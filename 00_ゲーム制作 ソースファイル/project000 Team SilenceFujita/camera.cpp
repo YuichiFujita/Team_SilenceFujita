@@ -12,9 +12,11 @@
 #include "input.h"
 #include "camera.h"
 #include "player.h"
+#include "Police.h"
 
 #include "Human.h"
 
+#include "tutorial.h"
 #include "ranking.h"
 
 #ifdef _DEBUG	// デバッグ処理
@@ -433,13 +435,31 @@ void UpdateCamera(void)
 	{ // モードごとの処理
 	case MODE_TUTORIAL:	// チュートリアル
 
-#if 1
-		// カメラの位置の更新 (追従)
-		MoveFollowCamera();
-#else
-		// カメラの位置の更新 (固定)
-		MoveFixedCamera();
-#endif
+		if (GetLessonState() == LESSON_06)
+		{ // 現在のレッスンが警察の場合
+
+			if (GetTutorialPoliceData()->fAlpha != 0.0f)
+			{ // 現在の警察のα値が不透明の場合
+
+				// カメラの位置の更新 (固定)
+				MoveFixedCamera();
+			}
+			else
+			{ // 現在の警察のα値が透明の場合
+
+				// カメラの位置の更新 (追従)
+				MoveFollowCamera();
+
+				// レッスンの状態の加算
+				AddLessonState();
+			}
+		}
+		else
+		{ // それ以外のレッスンの場合
+
+			// カメラの位置の更新 (追従)
+			MoveFollowCamera();
+		}
 
 		// 処理を抜ける
 		break;
@@ -1060,12 +1080,12 @@ void MoveFixedCamera(void)
 	D3DXVECTOR3 diffPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// カメラの注視点の位置の計算代入用
 
 	// ポインタを宣言
-	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+	Police *pPolice = GetPoliceData();		// 警察の情報
 
 	// 目標の注視点の位置を更新
-	g_aCamera[CAMERATYPE_MAIN].destPosR.x = pPlayer->pos.x + sinf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
-	g_aCamera[CAMERATYPE_MAIN].destPosR.y = pPlayer->pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
-	g_aCamera[CAMERATYPE_MAIN].destPosR.z = pPlayer->pos.z + cosf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+	g_aCamera[CAMERATYPE_MAIN].destPosR.x = pPolice->pos.x + sinf(pPolice->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+	g_aCamera[CAMERATYPE_MAIN].destPosR.y = pPolice->pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
+	g_aCamera[CAMERATYPE_MAIN].destPosR.z = pPolice->pos.z + cosf(pPolice->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
 
 	// 目標の注視点位置までの差分を計算
 	diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;

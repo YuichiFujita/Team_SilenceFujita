@@ -79,9 +79,9 @@
 //**********************************************************************************************************************
 //	チュートリアルでのマクロ定義
 //**********************************************************************************************************************
-#define POLICE_TUTORIAL_DEST	(D3DXVECTOR3(100.0f,0.0f,0.0f))		// 警察のチュートリアルでの目的地
-#define POLICE_TUTORIAL_MOVE	(1.0f)								// 警察のチュートリアルでの移動量
-#define POLICE_TUTORIAL_ALPHA_MOVE	(0.05f)							// 警察のチュートリアルでの透明度の移動量
+#define POLICE_TUTORIAL_DEST		(D3DXVECTOR3(-2000.0f, 0.0f, 3000.0f))	// 警察のチュートリアルでの目的地
+#define POLICE_TUTORIAL_MOVE		(0.1f)									// 警察のチュートリアルでの移動量
+#define POLICE_TUTORIAL_ALPHA_MOVE	(0.01f)									// 警察のチュートリアルでの透明度の移動量
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -2215,10 +2215,7 @@ void PoliceSoundVolume(D3DXVECTOR3 *pPos)
 
 					//音量を調整（警察）
 					SetSoundVolume(SOUND_LABEL_BGM_POLICE_000, fVolume);
-
-
 				}
-
 			}
 		}
 	}
@@ -2243,7 +2240,7 @@ void UpdateTutorialPolice(void)
 			g_aPolice[0].bMove = true;
 
 			// 移動量を設定する
-			g_aPolice[0].move.x = POLICE_TUTORIAL_MOVE;
+			g_aPolice[0].move.x += POLICE_TUTORIAL_MOVE;
 
 			// プレイヤーの位置の更新
 			PosPolice(&g_aPolice[0].move, &g_aPolice[0].pos, &g_aPolice[0].rot, g_aPolice[0].bMove);
@@ -2261,10 +2258,10 @@ void UpdateTutorialPolice(void)
 				g_aPolice[0].pos.y = 0.0f;
 			}
 
-			if (g_aPolice[0].move.x > 0.0f)
+			if (g_aPolice[0].rot.y <= -D3DX_PI * 0.5f)
 			{ // 移動量が正の数だった場合
 
-				if (g_aPolice[0].pos.x >= POLICE_TUTORIAL_DEST.x)
+				if (g_aPolice[0].pos.x <= POLICE_TUTORIAL_DEST.x)
 				{ // 位置が目的地を超えた場合
 
 					// 消去状態にする
@@ -2319,6 +2316,9 @@ void UpdateTutorialPolice(void)
 
 			break;
 		}
+
+		// 影の位置設定
+		SetPositionShadow(g_aPolice[0].nShadowID, g_aPolice[0].pos, g_aPolice[0].rot, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	}
 }
 
@@ -2483,19 +2483,28 @@ void SetTutorialPolice(D3DXVECTOR3 pos)
 		{ // 目的地が左にあった場合
 
 			// 向きを設定する
-			g_aPolice[0].rot.y = -D3DX_PI * 0.5f;
+			g_aPolice[0].rot.y = D3DX_PI * 0.5f;
 		}
 		else
 		{ // 目的地が右にあった場合
 
 			// 向きを設定する
-			g_aPolice[0].rot.y = D3DX_PI * 0.5f;
+			g_aPolice[0].rot.y = -D3DX_PI * 0.5f;
 		}
 
 		// チュートリアルでの警察の初期化
 		g_TutorialPolice.state = POLITUTOSTATE_DRIVE;				// 状態
 		g_TutorialPolice.fAlpha = 1.0f;								// 透明度
 	}
+}
+
+//======================================================================================================================
+//	チュートリアル警察の取得処理
+//======================================================================================================================
+TutorialPolice *GetTutorialPoliceData(void)
+{
+	// チュートリアル警察の情報アドレスを返す
+	return &g_TutorialPolice;
 }
 
 #ifdef _DEBUG	// デバッグ処理

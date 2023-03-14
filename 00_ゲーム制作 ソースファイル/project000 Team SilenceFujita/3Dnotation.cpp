@@ -120,10 +120,24 @@ void Draw3DNotation(void)
 	// 変数を宣言
 	D3DXMATRIX   mtxRot, mtxTrans;				// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
+	bool         bDrawExit;						// Exit表示の有無
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+
+	switch (GetMode())
+	{ // モードごとの処理
+	case MODE_TUTORIAL:	// チュートリアル
+
+		// 処理を抜ける
+		break;
+
+	case MODE_GAME:		// ゲーム
+
+		// 処理を抜ける
+		break;
+	}
 
 	for (int nCntNota = 0; nCntNota < MAX_3D_NOTATION; nCntNota++)
 	{ // 強調表示の最大表示数分繰り返す
@@ -222,7 +236,6 @@ int Set3DNotation(NOTATIONTYPE type, int *p3DNotationID, bool *pUse)
 
 				// 処理を抜ける
 				break;
-
 			}
 
 			// 使用している状態にする
