@@ -14,6 +14,7 @@
 #include "calculation.h"
 #include "sound.h"
 
+#include "arrow.h"
 #include "camera.h"
 #include "Combo.h"
 #include "death.h"
@@ -568,6 +569,13 @@ void HitPlayer(Player *pPlayer, int nDamage)
 				g_player.pos,			// 位置
 				g_player.rot			// 向き
 			);
+
+			if (GetMode() == MODE_GAME)
+			{ // ゲームモードの場合
+
+				// 矢印の設定処理
+				SetArrow(false);
+			}
 		}
 	}
 }
