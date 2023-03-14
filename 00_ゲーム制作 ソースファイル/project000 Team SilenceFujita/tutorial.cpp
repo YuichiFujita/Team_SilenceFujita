@@ -41,7 +41,8 @@
 #include "shadow.h"
 #include "object.h"
 #include "player.h"
-#include "Police.h"
+#include "police.h"
+#include "praise.h"
 #include "score.h"
 #include "tiremark.h"
 #include "velocity.h"
@@ -641,6 +642,9 @@ void InitTutorial(void)
 	// スコアの初期化
 	InitScore();
 
+	// 褒めの初期化
+	InitPraise();
+
 	// ファイルをロードする全体処理
 	LoadFileChunk
 	( // 引数
@@ -814,6 +818,9 @@ void UninitTutorial(void)
 
 	// スコアの終了
 	UninitScore();
+
+	// 褒めの終了
+	UninitPraise();
 
 	// サウンドの停止
 	StopSound();
@@ -1759,15 +1766,11 @@ bool CheckNextFlyAway(void)
 		if (pHuman->bUse == true)
 		{ // 人間が使用されている場合
 
-			if (pHuman->judge.state == JUDGESTATE_EVIL)
-			{ // 悪い奴の場合
+			// 次のレッスン遷移をできない状態にする
+			bNext = false;
 
-				// 次のレッスン遷移をできない状態にする
-				bNext = false;
-
-				// 処理を抜ける
-				break;
-			}
+			// 処理を抜ける
+			break;
 		}
 	}
 
