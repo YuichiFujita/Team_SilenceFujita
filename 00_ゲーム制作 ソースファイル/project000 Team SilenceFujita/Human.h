@@ -36,7 +36,6 @@ typedef enum
 	HUMANSTATE_WALK = 0,	// 歩き状態
 	HUMANSTATE_STOP,		// ストップ状態
 	HUMANSTATE_FLY,			// 吹き飛ばし状態
-	HUMANSTATE_OTOTO,		// すれ違い状態
 	HUMANSTATE_MAX			// この列挙型の総数
 }HUMANSTATE;
 

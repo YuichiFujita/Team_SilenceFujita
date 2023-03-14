@@ -27,6 +27,7 @@
 #include "Car.h"
 #include "Combo.h"
 #include "Countdown.h"
+#include "death.h"
 #include "effect.h"
 #include "escape.h"
 #include "flash.h"
@@ -109,6 +110,9 @@ void InitGame(void)
 
 	// プレイヤーの初期化
 	InitPlayer();
+
+	// 亡骸の初期化
+	InitDeath();
 
 	// 警察の初期化
 	InitPolice();
@@ -302,6 +306,9 @@ void UninitGame(void)
 
 	// プレイヤーの終了
 	UninitPlayer();
+
+	// 亡骸の終了
+	UninitDeath();
 
 	// 警察の終了
 	UninitPolice();
@@ -587,6 +594,9 @@ void UpdateGame(void)
 			// プレイヤーのゲーム更新
 			UpdateGamePlayer();
 
+			// 亡骸の更新
+			UpdateDeath();
+
 			// カメラの更新
 			UpdateCamera();
 
@@ -744,6 +754,9 @@ void DrawGame(void)
 
 	// プレイヤーの描画
 	DrawPlayer();
+
+	// 亡骸の描画
+	DrawDeath();
 
 	// タイヤ痕の描画
 	DrawTireMark();

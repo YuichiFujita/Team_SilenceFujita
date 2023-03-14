@@ -223,9 +223,13 @@ void UpdateEffect(void)
 
 			case EFFECTTYPE_PLAY_SMOKE:	// プレイヤーの黒煙
 
-				// プレイヤーの移動量を加算する
-				g_aEffect[nCntEffect].pos.x += (GetPlayer()->pos.x - GetPlayer()->oldPos.x);
-				g_aEffect[nCntEffect].pos.z += (GetPlayer()->pos.z - GetPlayer()->oldPos.z);
+				if (GetPlayer()->bUse == true)
+				{ // プレイヤーが使用されていた場合
+
+					// プレイヤーの移動量を加算する
+					g_aEffect[nCntEffect].pos.x += (GetPlayer()->pos.x - GetPlayer()->oldPos.x);
+					g_aEffect[nCntEffect].pos.z += (GetPlayer()->pos.z - GetPlayer()->oldPos.z);
+				}
 
 				break;					// 抜け出す
 

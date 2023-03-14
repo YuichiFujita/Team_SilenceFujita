@@ -16,6 +16,7 @@
 
 #include "camera.h"
 #include "Combo.h"
+#include "death.h"
 #include "gate.h"
 #include "object.h"
 #include "particle.h"
@@ -560,6 +561,13 @@ void HitPlayer(Player *pPlayer, int nDamage)
 
 			// 使用していない状態にする
 			pPlayer->bUse = false;
+
+			// 亡骸の設定処理
+			SetDeath
+			(
+				g_player.pos,			// 位置
+				g_player.rot			// 向き
+			);
 		}
 	}
 }
@@ -571,7 +579,6 @@ void UpdateGameNorPlayer(void)
 {
 	if (GetKeyboardTrigger(DIK_0) == true)
 	{
-		// プレイヤーのダメージ処理
 		HitPlayer(&g_player, PLAY_LIFE);
 	}
 

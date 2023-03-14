@@ -106,6 +106,7 @@ typedef enum
 	// プレイヤーモデル
 	MODELTYPE_PLAYER_CAR,				// プレイヤー
 	MODELTYPE_PLAYER_BARRIER,			// バリア
+	MODELTYPE_PLAYER_DEATH,				// 死んだプレイヤー
 
 	// 警察モデル
 	MODELTYPE_CAR_POLICE,				// パトカー
@@ -165,7 +166,7 @@ typedef enum
 #define FROM_OBJECT		(0)								// オブジェクトのモデル列挙の開始地点
 #define MODEL_OBJ_MAX	(int(MODELTYPE_PLAYER_CAR))		// オブジェクトのモデルの総数
 #define FROM_PLAYER		(int(MODELTYPE_PLAYER_CAR))		// プレイヤーのモデル列挙の開始地点
-#define MODEL_PLAY_MAX	(2)								// プレイヤーのモデルの総数
+#define MODEL_PLAY_MAX	(3)								// プレイヤーのモデルの総数
 #define FROM_POLI		(int(MODELTYPE_CAR_POLICE))		// 警察のモデル列挙の開始地点
 #define MODEL_POLI_MAX	(1)								// 警察のモデルの総数
 #define FROM_CAR		(int(MODELTYPE_CAR_CAR001))		// 車のモデル列挙の開始地点
