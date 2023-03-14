@@ -767,25 +767,8 @@ void UpdateBarrierData(void)
 				if (g_aBarrier[nCntBarrier].nCounter <= 0)
 				{ // カウンターが 0以下の場合
 
-					switch (GetMode())
-					{ // モードごとの処理
-					case MODE_TUTORIAL:	// チュートリアル
-
-						if (GetLessonState() != LESSON_04)
-						{ // レッスン4に挑戦中ではない場合
-
-							if (DownBarrier(nCntBarrier) == true)
-							{ // 下降可能だった場合
-
-								// 下降状態にする
-								g_aBarrier[nCntBarrier].state = BARRIERSTATE_DOWN;
-							}
-						}
-
-						// 処理を抜ける
-						break;
-
-					default:			// 上記以外
+					if (GetMode() != MODE_TUTORIAL)
+					{ // チュートリアルではない場合
 
 						if (DownBarrier(nCntBarrier) == true)
 						{ // 下降可能だった場合
@@ -793,9 +776,6 @@ void UpdateBarrierData(void)
 							// 下降状態にする
 							g_aBarrier[nCntBarrier].state = BARRIERSTATE_DOWN;
 						}
-
-						// 処理を抜ける
-						break;
 					}
 				}
 
