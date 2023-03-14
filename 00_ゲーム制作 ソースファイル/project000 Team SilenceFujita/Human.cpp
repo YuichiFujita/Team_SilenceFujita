@@ -13,6 +13,7 @@
 #include "calculation.h"
 
 #include "3Dnotation.h"
+#include "effect.h"
 #include "Human.h"
 #include "shadow.h"
 #include "sound.h"
@@ -314,15 +315,17 @@ void UpdateHuman(void)
 
 			case HUMANSTATE_FLY:		//吹き飛んだ状態
 
-				// パーティクルの設定処理
-				SetParticle
-				(
-					g_aHuman[nCntHuman].pos, 
-					D3DXCOLOR(0.2f,0.2f,0.2f,1.0f),
-					PARTICLETYPE_HUMAN_FLY, 
-					5, 
-					3
-				);		
+				// エフェクトの設定
+				SetEffect
+				( // 引数
+					g_aHuman[nCntHuman].pos,			// 位置
+					D3DXVECTOR3(0.0f, 0.0f, 0.0f),		// 移動量
+					D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.7f),	// 色
+					40,				// 寿命
+					20.0f,			// 半径
+					-2.0f,			// 減算量 (半径)
+					EFFECTTYPE_NONE	// その他
+				);
 
 				// 飛ばす
 				g_aHuman[nCntHuman].pos.x += g_aHuman[nCntHuman].move.x;

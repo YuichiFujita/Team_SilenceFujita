@@ -43,7 +43,6 @@ typedef enum
 	PARTICLETYPE_BREAK_ARTICLE,	// パーティクル（小物の破壊時）
 	PARTICLETYPE_BREAK_OBJECT,	// パーティクル（オブジェクトの破壊時）
 	PARTICLETYPE_PLAY_DEATH,	// パーティクル（プレイヤーの死亡爆発）
-	PARTICLETYPE_HUMAN_FLY,		// パーティクル（人間が飛んでいる時の煙）
 	PARTICLETYPE_MAX,			// この列挙型の総数
 } PARTICLETYPE;
 

@@ -1175,6 +1175,13 @@ void HitObject(Object *pObject, int nDamage)
 
 				// ボーナスの設定処理
 				SetBonus(SCORE_GOOD);
+
+				if (GetCurrentCombo() <= 0)
+				{ // コンボの倍率が0以下だった場合
+
+					// コンボの倍率処理
+					MagnificCombo(1);
+				}
 			}
 			
 			//効果音の再生

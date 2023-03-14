@@ -1184,6 +1184,13 @@ void UpdateBarrierInfoData(void)
 
 						// ボーナスの設定処理
 						SetBonus(SCORE_GOOD * nNumJustice);
+
+						if (GetCurrentCombo() <= 0)
+						{ // コンボの倍率が0以下だった場合
+
+							// コンボの倍率処理
+							MagnificCombo(1);
+						}
 					}
 
 					// カウンターを初期化
