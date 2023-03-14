@@ -50,6 +50,25 @@ typedef enum
 }TACKLESTATE;
 
 //**********************************************************************************************************************
+//	警察のチュートリアルでの状態
+//**********************************************************************************************************************
+typedef enum
+{
+	POLITUTOSTATE_DRIVE = 0,			// 走行中
+	POLITUTOSTATE_DISAPPEAR,			// 消去中
+	POLITUTOSTATE_MAX					// この列挙型の総数
+}POLITUTOSTATE;
+
+//**********************************************************************************************************************
+//	構造体定義 (TutorialPolice)
+//**********************************************************************************************************************
+typedef struct
+{
+	POLITUTOSTATE state;				// 状態
+	float fAlpha;						// 透明度
+}TutorialPolice;
+
+//**********************************************************************************************************************
 //	構造体定義 (PoliceTackle)
 //**********************************************************************************************************************
 typedef struct
@@ -102,7 +121,9 @@ typedef struct
 void InitPolice(void);					// 警察の初期化処理
 void UninitPolice(void);				// 警察の終了処理
 void UpdatePolice(void);				// 警察の更新処理
+void UpdateTutorialPolice(void);		// 警察のチュートリアルでの更新処理
 void DrawPolice(void);					// 警察の描画処理
+void DrawTutorialPolice(void);			// 警察のチュートリアルでの描画処理
 void SetPolice(D3DXVECTOR3 pos);		// 警察の設定処理
 void HitPolice(Police *pPolice, int nDamage);	// 警察のダメージ判定
 void PatrolCarSearch(Police *pPolice);			// 警察車両の探知処理

@@ -158,6 +158,7 @@
     <ClCompile Include="2Dparticle.cpp" />
     <ClCompile Include="3Dnotation.cpp" />
     <ClCompile Include="ability.cpp" />
+    <ClCompile Include="arrow.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="bomb.cpp" />
     <ClCompile Include="bonus.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="2Dparticle.h" />
     <ClInclude Include="3Dnotation.h" />
     <ClInclude Include="ability.h" />
+    <ClInclude Include="arrow.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="bomb.h" />
     <ClInclude Include="bonus.h" />

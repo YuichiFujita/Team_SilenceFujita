@@ -77,6 +77,13 @@
 #define POLICE_SOUND_RADIUS		(3000.0f)	// 半径を検知を開始する判定
 
 //**********************************************************************************************************************
+//	チュートリアルでのマクロ定義
+//**********************************************************************************************************************
+#define POLICE_TUTORIAL_DEST	(D3DXVECTOR3(0.0f,0.0f,0.0f))		// 警察のチュートリアルでの目的地
+#define POLICE_TUTORIAL_MOVE	(1.0f)								// 警察のチュートリアルでの移動量
+#define POLICE_TUTORIAL_ALPHA_MOVE	(0.05f)							// 警察のチュートリアルでの透明度の移動量
+
+//**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	// プレイヤーの位置の更新処理
@@ -102,6 +109,9 @@ void PoliceSoundVolume(D3DXVECTOR3 *pPos);				// プレイヤーとの距離で音量を調整
 //**********************************************************************************************************************
 Police g_aPolice[MAX_POLICE];	// オブジェクトの情報
 Reinforce g_AddPolice;			// 警察の増援の情報
+
+// チュートリアル用
+TutorialPolice g_TutorialPolice;	// 警察(チュートリアル版)
 
 //======================================================================================================================
 //	警察の初期化処理
@@ -162,6 +172,10 @@ void InitPolice(void)
 		// アイコンの情報の初期化
 		g_aPolice[nCntPolice].icon.nIconID = NONE_ICON;						// アイコンのインデックス
 		g_aPolice[nCntPolice].icon.state = ICONSTATE_NONE;					// アイコンの状態
+
+		// チュートリアルの警察
+		g_TutorialPolice.state = POLITUTOSTATE_DRIVE;						// 状態
+		g_TutorialPolice.fAlpha = 1.0f;									// 透明度
 	}
 
 	// 援軍情報の初期化
@@ -834,6 +848,10 @@ void SetPolice(D3DXVECTOR3 pos)
 
 			// 警察の出現ゲート決定処理
 			PoliceGatePos(&g_aPolice[nCntPolice]);
+
+			// チュートリアルでの警察の初期化
+			g_TutorialPolice.state = POLITUTOSTATE_DRIVE;				// 状態
+			g_TutorialPolice.fAlpha = 1.0f;								// 透明度
 
 			// 処理を抜ける
 			break;
@@ -2203,6 +2221,184 @@ void PoliceSoundVolume(D3DXVECTOR3 *pPos)
 
 			}
 		}
+	}
+}
+
+//============================================================
+// 警察のチュートリアル処理
+//============================================================
+void UpdateTutorialPolice(void)
+{
+	if (g_aPolice[0].bUse == true)
+	{ // 警察を使用していた場合
+
+		switch (g_TutorialPolice.state)
+		{
+		case POLITUTOSTATE_DRIVE:		// 走行中
+
+			// 前回の位置を代入する
+			g_aPolice[0].posOld = g_aPolice[0].pos;
+
+			// 移動状況を設定する
+			g_aPolice[0].bMove = true;
+
+			// 移動量を設定する
+			g_aPolice[0].move.x = POLICE_TUTORIAL_MOVE;
+
+			// プレイヤーの位置の更新
+			PosPolice(&g_aPolice[0].move, &g_aPolice[0].pos, &g_aPolice[0].rot, g_aPolice[0].bMove);
+
+			//プレイヤーとの距離で音量を調整
+			PoliceSoundVolume(&g_aPolice[0].pos);
+
+			if (g_aPolice[0].pos.y < 0.0f)
+			{//Y軸の位置が0.0fだった場合
+
+				//縦への移動量を0.0fにする
+				g_aPolice[0].move.y = 0.0f;
+
+				//位置を0.0fに戻す
+				g_aPolice[0].pos.y = 0.0f;
+			}
+
+			if (g_aPolice[0].move.x > 0.0f)
+			{ // 移動量が正の数だった場合
+
+				if (g_aPolice[0].pos.x >= POLICE_TUTORIAL_DEST.x)
+				{ // 位置が目的地を超えた場合
+
+					// 消去状態にする
+					g_TutorialPolice.state = POLITUTOSTATE_DISAPPEAR;
+
+					// 位置を補正する
+					g_aPolice[0].pos.x = POLICE_TUTORIAL_DEST.x;
+
+					// 移動しない
+					g_aPolice[0].bMove = false;
+
+					// 移動量を補正する
+					g_aPolice[0].move.x = 0.0f;
+				}
+			}
+			else
+			{ // 移動量が負の数だった場合
+
+				if (g_aPolice[0].pos.x <= POLICE_TUTORIAL_DEST.x)
+				{ // 位置が目的地を超えた場合
+
+					// 消去状態にする
+					g_TutorialPolice.state = POLITUTOSTATE_DISAPPEAR;
+
+					// 位置を補正する
+					g_aPolice[0].pos.x = POLICE_TUTORIAL_DEST.x;
+
+					// 移動しない
+					g_aPolice[0].bMove = false;
+
+					// 移動量を補正する
+					g_aPolice[0].move.x = 0.0f;
+				}
+			}
+
+			break;
+
+		case POLITUTOSTATE_DISAPPEAR:	// 消去中
+
+			// 透明度を下げる
+			g_TutorialPolice.fAlpha -= POLICE_TUTORIAL_ALPHA_MOVE;
+
+			if (g_TutorialPolice.fAlpha <= 0.0f)
+			{ // 透明度の透明度が0.0f以下になった場合
+
+				// 透明度を補正する
+				g_TutorialPolice.fAlpha = 0.0f;
+
+				// 警察を消す
+				g_aPolice[0].bUse = false;
+			}
+
+			break;
+		}
+	}
+}
+
+//============================================================
+// 警察のチュートリアルでの描画処理
+//============================================================
+void DrawTutorialPolice(void)
+{
+	// 変数を宣言
+	float        policeRot;						// 警察の向きの計算用
+	D3DXMATRIX   mtxScale, mtxRot, mtxTrans;	// 計算用マトリックス
+	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
+
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
+	Player           *pPlayer = GetPlayer();	// プレイヤーの情報
+	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
+
+	if (g_aPolice[0].bUse == true)
+	{ // オブジェクトが使用されている場合
+
+		// ワールドマトリックスの初期化
+		D3DXMatrixIdentity(&g_aPolice[0].mtxWorld);
+
+		// 警察の向きを設定
+		policeRot = g_aPolice[0].rot.y + D3DX_PI;
+		RotNormalize(&policeRot);	// 向きを正規化
+
+		// 向きを反映
+		D3DXMatrixRotationYawPitchRoll(&mtxRot, policeRot, g_aPolice[0].rot.x, g_aPolice[0].rot.z);
+		D3DXMatrixMultiply(&g_aPolice[0].mtxWorld, &g_aPolice[0].mtxWorld, &mtxRot);
+
+		// 位置を反映
+		D3DXMatrixTranslation(&mtxTrans, g_aPolice[0].pos.x, g_aPolice[0].pos.y, g_aPolice[0].pos.z);
+		D3DXMatrixMultiply(&g_aPolice[0].mtxWorld, &g_aPolice[0].mtxWorld, &mtxTrans);
+
+		// ワールドマトリックスの設定
+		pDevice->SetTransform(D3DTS_WORLD, &g_aPolice[0].mtxWorld);
+
+		// 現在のマテリアルを取得
+		pDevice->GetMaterial(&matDef);
+
+		// マテリアルデータへのポインタを取得
+		pMat = (D3DXMATERIAL*)g_aPolice[0].modelData.pBuffMat->GetBufferPointer();
+
+		for (int nCntMat = 0; nCntMat < (int)g_aPolice[0].modelData.dwNumMat; nCntMat++)
+		{ // マテリアルの数分繰り返す
+
+			switch (g_TutorialPolice.state)
+			{
+			case POLITUTOSTATE_DRIVE:			// 走行中
+
+				// マテリアルの設定
+				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+				break;
+
+			case POLITUTOSTATE_DISAPPEAR:		// 消去中
+
+				// 色をコピーする
+				g_aPolice[0].MatCopy[nCntMat] = pMat[nCntMat];
+
+				//　透明度を設定する
+				g_aPolice[0].MatCopy[nCntMat].MatD3D.Diffuse.a = g_TutorialPolice.fAlpha;
+
+				// マテリアルの設定
+				pDevice->SetMaterial(&g_aPolice[0].MatCopy[nCntMat].MatD3D);
+
+				break;
+			}
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_aPolice[0].modelData.pTexture[nCntMat]);
+
+			// モデルの描画
+			g_aPolice[0].modelData.pMesh->DrawSubset(nCntMat);
+		}
+
+		// 保存していたマテリアルを戻す
+		pDevice->SetMaterial(&matDef);
 	}
 }
 

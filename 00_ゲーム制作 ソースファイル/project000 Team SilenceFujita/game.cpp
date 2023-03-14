@@ -19,6 +19,7 @@
 #include "2Dparticle.h"
 #include "3Dnotation.h"
 #include "ability.h"
+#include "arrow.h"
 #include "billboard.h"
 #include "bomb.h"
 #include "bonus.h"
@@ -174,6 +175,9 @@ void InitGame(void)
 	// 送風機の初期化
 	InitWind();
 
+	// 矢印の初期化
+	InitArrow();
+
 	// 爆弾の初期化
 	InitBomb();
 
@@ -237,6 +241,9 @@ void InitGame(void)
 
 	// プレイヤーの位置・向きの設定
 	SetPositionPlayer(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+	// 矢印の設定処理
+	SetArrow(true);
 
 	// プレイヤーのゲートの設定処理
 	SetPlayerGate();
@@ -369,6 +376,9 @@ void UninitGame(void)
 
 	// 送風機の終了
 	UninitWind();
+
+	// 矢印の終了
+	UninitArrow();
 
 	// 爆弾の終了
 	UninitBomb();
@@ -593,6 +603,9 @@ void UpdateGame(void)
 			// プレイヤーのゲーム更新
 			UpdateGamePlayer();
 
+			// 矢印の更新
+			UpdateArrow();
+
 			// 亡骸の更新
 			UpdateDeath();
 
@@ -682,7 +695,7 @@ void UpdateGame(void)
 
 			// 影の更新
 			UpdateShadow();
-#if 0
+#if 1
 			// 警察の追加処理
 			AddPolice();
 #endif
@@ -833,6 +846,9 @@ void DrawGame(void)
 
 	// アイコンの描画
 	DrawIcon();
+
+	// 矢印の描画
+	DrawArrow();
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	UIの描画
