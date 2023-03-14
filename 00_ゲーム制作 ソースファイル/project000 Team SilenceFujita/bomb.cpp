@@ -1183,7 +1183,7 @@ void UpdateBarrierInfoData(void)
 					{ // 良い奴がいた場合
 
 						// ボーナスの設定処理
-						SetBonus(SCORE_GOOD);
+						SetBonus(SCORE_GOOD * nNumJustice);
 					}
 
 					// カウンターを初期化

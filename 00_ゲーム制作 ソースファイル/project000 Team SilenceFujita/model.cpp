@@ -109,6 +109,7 @@ const char *apModelData[] =		// モデルの相対パス
 	// プレイヤーモデル
 	"data\\MODEL_PLAYER\\car000.x",			// プレイヤー
 	"data\\MODEL_PLAYER\\barrier000.x",		// バリア
+	"data\\MODEL_PLAYER\\breakCar000.x",	// 死んだプレイヤー
 
 	// 警察モデル
 	"data\\MODEL_OBJECT\\policecar.x",		// パトカー
