@@ -8,6 +8,7 @@
 #include "Combo.h"
 #include "score.h"
 #include "value.h"
+#include "praise.h"
 
 #include "tutorial.h"
 
@@ -401,6 +402,9 @@ void MagnificCombo(int nMagni)
 
 		// “§–¾“x‚ğ‰Šú‰»
 		g_Combo.fAlpha = 1.0f;
+
+		// –J‚ß‚Ìİ’èˆ—
+		SetPraise();
 	}
 }
 
