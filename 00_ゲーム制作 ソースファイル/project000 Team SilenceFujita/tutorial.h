@@ -18,7 +18,8 @@ typedef enum
 	LESSON_03,					// レッスン3 (吹飛散風)
 	LESSON_04,					// レッスン4 (無音世界)
 	LESSON_05,					// レッスン5 (コンボ)
-	LESSON_06,					// レッスン6 (脱出)
+	LESSON_06,					// レッスン6 (警察)
+	LESSON_07,					// レッスン7 (脱出)
 	LESSON_MAX					// この列挙型の総数
 } LESSON;
 

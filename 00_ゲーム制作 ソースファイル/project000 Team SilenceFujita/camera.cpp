@@ -152,6 +152,8 @@ void UpdateTitleCamera(void);		// タイトル時のカメラの更新処理
 void UpdateRankingCamera(void);		// ランキング時のカメラの更新処理
 
 void MoveFollowCamera(void);		// メインカメラの位置の更新処理 (追従)
+void MoveFixedCamera(void);			// メインカメラの位置の更新処理 (固定)
+
 void MoveCamera(void);				// メインカメラの位置の更新処理 (操作)
 void DisCamera(void);				// メインカメラの距離の更新処理 (操作)
 void RotCamera(void);				// メインカメラの向きの更新処理 (操作)
@@ -160,8 +162,6 @@ void MoveMiniMap(void);				// マップカメラの位置の更新処理
 
 void RevRotXCamera(void);			// カメラの向きの補正処理 (x)
 void RevRotYCamera(void);			// カメラの向きの補正処理 (y)
-
-//void MoveGoodjobCamera(void);		// ミッション成功時のカメラ更新処理(追従)
 
 //************************************************************
 //	グローバル変数
@@ -433,8 +433,13 @@ void UpdateCamera(void)
 	{ // モードごとの処理
 	case MODE_TUTORIAL:	// チュートリアル
 
+#if 1
 		// カメラの位置の更新 (追従)
 		MoveFollowCamera();
+#else
+		// カメラの位置の更新 (固定)
+		MoveFixedCamera();
+#endif
 
 		// 処理を抜ける
 		break;
@@ -446,27 +451,9 @@ void UpdateCamera(void)
 		{ // ゲームモードごとの処理
 		case GAMEMODE_PLAY:
 
-	#if 0
-			switch (g_CameraState)
-			{
-			case CAMERASTATE_NORMAL:		// 通常カメラ
-
-				// カメラの位置の更新 (追従)
-				MoveFollowCamera();
-
-				break;						// 抜け出す
-
-			case CAMERASTATE_GOODJOB:		// ミッション成功
-
-				// ミッション成功時のカメラ更新処理(追従)
-				MoveGoodjobCamera();
-
-				break;						// 抜け出す
-			}
-	#else
 			// カメラの位置の更新 (追従)
 			MoveFollowCamera();
-	#endif
+
 			// 処理を抜ける
 			break;
 
@@ -494,6 +481,7 @@ void UpdateCamera(void)
 		// カメラの向きの更新 (操作)
 		RotCamera();
 #endif
+
 		// マップカメラの位置の更新
 		MoveMiniMap();
 
@@ -996,7 +984,7 @@ void MoveFollowCamera(void)
 			g_aCamera[CAMERATYPE_MAIN].destPosV.y = POS_V_Y;																																						// 固定の高さ
 			g_aCamera[CAMERATYPE_MAIN].destPosV.z = g_aCamera[CAMERATYPE_MAIN].destPosR.z + ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * cosf(g_aCamera[CAMERATYPE_MAIN].rot.y));	// 目標注視点から距離分離れた位置
 
-																																																					// 目標の位置までの差分を計算
+			// 目標の位置までの差分を計算
 			diffPosV = g_aCamera[CAMERATYPE_MAIN].destPosV - g_aCamera[CAMERATYPE_MAIN].posV;	// 視点
 			diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;	// 注視点
 
@@ -1041,7 +1029,7 @@ void MoveFollowCamera(void)
 			g_aCamera[CAMERATYPE_MAIN].destPosV.y = POS_V_Y;																																						// 固定の高さ
 			g_aCamera[CAMERATYPE_MAIN].destPosV.z = g_aCamera[CAMERATYPE_MAIN].destPosR.z - ((g_aCamera[CAMERATYPE_MAIN].fDis * sinf(g_aCamera[CAMERATYPE_MAIN].rot.x)) * cosf(g_aCamera[CAMERATYPE_MAIN].rot.y));	// 目標注視点から距離分離れた位置
 
-																																																					// 目標の位置までの差分を計算
+			// 目標の位置までの差分を計算
 			diffPosV = g_aCamera[CAMERATYPE_MAIN].destPosV - g_aCamera[CAMERATYPE_MAIN].posV;	// 視点
 			diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;	// 注視点
 
@@ -1063,47 +1051,33 @@ void MoveFollowCamera(void)
 	g_aCamera[CAMERATYPE_MAIN].rot.y = pPlayer->rot.y;
 }
 
-////======================================================================================================================
-//// ミッション成功時のカメラ更新処理(追従)
-////======================================================================================================================
-//void MoveGoodjobCamera(void)
-//{
-//	// 変数を宣言
-//	D3DXVECTOR3 diffPosV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// カメラの視点の位置の計算代入用
-//	D3DXVECTOR3 diffPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// カメラの注視点の位置の計算代入用
-//
-//	// ポインタを宣言
-//	Player *pPlayer = GetPlayer();		// プレイヤーの情報
-//
-//	Human *pHuman = GetHumanData();		// 人間の情報
-//
-//	// 向きを取る
-//	float fRot = atan2f(pHuman->pos.x - pPlayer->pos.x, pHuman->pos.z - pPlayer->pos.z);
-//
-//	// 目標の注視点の位置を更新
-//	g_aCamera[CAMERATYPE_MAIN].destPosR.x = pPlayer->pos.x + sinf(fRot) * POS_R_PLUS;	// プレイヤーの位置より少し前
-//	g_aCamera[CAMERATYPE_MAIN].destPosR.y = pPlayer->pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
-//	g_aCamera[CAMERATYPE_MAIN].destPosR.z = pPlayer->pos.z + cosf(fRot) * POS_R_PLUS;	// プレイヤーの位置より少し前
-//
-//	// 目標の視点の位置を更新
-//	g_aCamera[CAMERATYPE_MAIN].destPosV.x = g_aCamera[CAMERATYPE_MAIN].destPosR.x + (g_aCamera[CAMERATYPE_MAIN].fDis * sinf(fRot));	// 目標注視点から距離分離れた位置
-//	g_aCamera[CAMERATYPE_MAIN].destPosV.y = POS_V_Y;																				// 固定の高さ
-//	g_aCamera[CAMERATYPE_MAIN].destPosV.z = g_aCamera[CAMERATYPE_MAIN].destPosR.z + (g_aCamera[CAMERATYPE_MAIN].fDis * cosf(fRot));	// 目標注視点から距離分離れた位置
-//
-//	// 目標の位置までの差分を計算
-//	diffPosV = g_aCamera[CAMERATYPE_MAIN].destPosV - g_aCamera[CAMERATYPE_MAIN].posV;	// 視点
-//	diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;	// 注視点
-//
-//	// 視点の位置を更新
-//	g_aCamera[CAMERATYPE_MAIN].posV.x += diffPosV.x * REV_POS_V;
-//	g_aCamera[CAMERATYPE_MAIN].posV.y += diffPosV.y * REV_POS_V_Y;
-//	g_aCamera[CAMERATYPE_MAIN].posV.z += diffPosV.z * REV_POS_V;
-//
-//	// 注視点の位置を更新
-//	g_aCamera[CAMERATYPE_MAIN].posR.x += diffPosR.x * REV_POS_R;
-//	g_aCamera[CAMERATYPE_MAIN].posR.y += diffPosR.y * REV_POS_R_Y;
-//	g_aCamera[CAMERATYPE_MAIN].posR.z += diffPosR.z * REV_POS_R;
-//}
+//============================================================
+//	メインカメラの位置の更新処理 (固定)
+//============================================================
+void MoveFixedCamera(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 diffPosR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// カメラの注視点の位置の計算代入用
+
+	// ポインタを宣言
+	Player *pPlayer = GetPlayer();		// プレイヤーの情報
+
+	// 目標の注視点の位置を更新
+	g_aCamera[CAMERATYPE_MAIN].destPosR.x = pPlayer->pos.x + sinf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+	g_aCamera[CAMERATYPE_MAIN].destPosR.y = pPlayer->pos.y + POS_R_PLUS_Y;									// プレイヤーの位置と同じ
+	g_aCamera[CAMERATYPE_MAIN].destPosR.z = pPlayer->pos.z + cosf(pPlayer->rot.y + D3DX_PI) * POS_R_PLUS;	// プレイヤーの位置より少し前
+
+	// 目標の注視点位置までの差分を計算
+	diffPosR = g_aCamera[CAMERATYPE_MAIN].destPosR - g_aCamera[CAMERATYPE_MAIN].posR;
+
+	// 視点の位置を固定
+	g_aCamera[CAMERATYPE_MAIN].posV = D3DXVECTOR3(1800.0f, 800.0f, 1000.0f);
+
+	// 注視点の位置を更新
+	g_aCamera[CAMERATYPE_MAIN].posR.x += diffPosR.x * REV_POS_R;
+	g_aCamera[CAMERATYPE_MAIN].posR.y += diffPosR.y * REV_POS_R_Y;
+	g_aCamera[CAMERATYPE_MAIN].posR.z += diffPosR.z * REV_POS_R;
+}
 
 //============================================================
 //	メインカメラの位置の更新処理 (操作)

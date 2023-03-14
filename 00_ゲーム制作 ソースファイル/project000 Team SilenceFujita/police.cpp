@@ -195,6 +195,8 @@ void UninitPolice(void)
 //======================================================================================================================
 void UpdatePolice(void)
 {
+	// 変数を宣言
+	float fPoliceRot = 0.0f;	// 影の向き設定用
 
 	//効果音BGMの音量調整
 	if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
@@ -471,13 +473,17 @@ void UpdatePolice(void)
 					//----------------------------------------------------
 					//	影の更新
 					//----------------------------------------------------
+					// 警察の向きを設定
+					fPoliceRot = g_aPolice[nCntPolice].rot.y + D3DX_PI;
+					RotNormalize(&fPoliceRot);	// 向きを正規化
+
 					// 影の位置設定
 					SetPositionShadow
 					( // 引数
-						g_aPolice[nCntPolice].nShadowID,	// 影のインデックス
-						g_aPolice[nCntPolice].pos,			// 位置
-						g_aPolice[nCntPolice].rot,			// 向き
-						NONE_SCALE							// 拡大率
+						g_aPolice[nCntPolice].nShadowID,													// 影のインデックス
+						g_aPolice[nCntPolice].pos,															// 位置
+						D3DXVECTOR3(g_aPolice[nCntPolice].rot.x, fPoliceRot, g_aPolice[nCntPolice].rot.z),	// 向き
+						NONE_SCALE																			// 拡大率
 					);
 				}
 
