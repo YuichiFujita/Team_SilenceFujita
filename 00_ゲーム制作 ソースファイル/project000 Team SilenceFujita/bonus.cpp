@@ -396,6 +396,7 @@ void DrawBonus(void)
 //========================================
 void SetBonus(int nBonus)
 {
+	// 変数を宣言
 	VERTEX_2D * pVtx;					// 頂点情報へのポインタ
 	D3DXVECTOR3 posBonus;				// ボーナスの位置
 	bool        bScore = false;			// スコア加算可能状況

@@ -1722,8 +1722,8 @@ bool CheckNextSlumBoost(void)
 		if (pObject->bUse == true)
 		{ // オブジェクトが使用されている場合
 
-			if (pObject->nBreakType == BREAKTYPE_ON)
-			{ // 破壊可能オブジェクトの場合
+			if (pObject->nCollisionType != COLLISIONTYPE_NONE)
+			{ // 当たり判定があるオブジェクトの場合
 
 				// 次のレッスン遷移をできない状態にする
 				bNext = false;
@@ -1798,18 +1798,14 @@ bool CheckNextSilenceWorld(void)
 		if (pCar->bUse == true)
 		{ // 車が使用されている場合
 
-			if (pCar->judge.state == JUDGESTATE_EVIL)
-			{ // 悪い奴の場合
+			if (GetBarrierState(pCar) != BARRIERSTATE_SET)
+			{ // 車のバリア状態が完成状態ではない場合
 
-				if (GetBarrierState(pCar) != BARRIERSTATE_SET)
-				{ // 車のバリア状態が完成状態ではない場合
+				// 次のレッスン遷移をできる状態にする
+				bNext = false;
 
-					// 次のレッスン遷移をできる状態にする
-					bNext = false;
-
-					// 処理を抜ける
-					break;
-				}
+				// 処理を抜ける
+				break;
 			}
 		}
 	}
@@ -1829,8 +1825,8 @@ void AllFalseSlumBoost(void)
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++, pObject++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		if (pObject->judge.state == JUDGESTATE_EVIL)
-		{ // 悪い奴の場合
+		if (pObject->nCollisionType != COLLISIONTYPE_NONE)
+		{ // 当たり判定があるオブジェクトの場合
 
 			// オブジェクトを使用していない状態にする
 			pObject->bUse = false;
@@ -1839,6 +1835,9 @@ void AllFalseSlumBoost(void)
 
 	// 影の更新
 	UpdateShadow();		// 影の削除用
+
+	// 強調表示の更新
+	Update3DNotation();	// 強調表示の削除用
 }
 
 //======================================================================================================================
@@ -1858,6 +1857,9 @@ void AllFalseFlyAway(void)
 
 	// 影の更新
 	UpdateShadow();		// 影の削除用
+
+	// 強調表示の更新
+	Update3DNotation();	// 強調表示の削除用
 }
 
 //======================================================================================================================
@@ -1893,6 +1895,9 @@ void AllFalseSilenceWorld(void)
 
 	// 影の更新
 	UpdateShadow();		// 影の削除用
+
+	// 強調表示の更新
+	Update3DNotation();	// 強調表示の削除用
 }
 
 //======================================================================================================================
@@ -2086,7 +2091,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 							} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);		// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 							// オブジェクトの設定
-							SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY, nJudgeType);
+							SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_NONE, nJudgeType);
 						}
 					} while (strcmp(&aString[0], "END_SETLESSON_OBJECT") != 0);			// 読み込んだ文字列が END_SETLESSON_OBJECT ではない場合ループ
 				}
@@ -2327,7 +2332,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 									} while (strcmp(&aString[0], "END_SET_OBJECT") != 0);		// 読み込んだ文字列が END_SET_OBJECT ではない場合ループ
 
 									// オブジェクトの設定
-									SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_SLOWLY, nJudgeType);
+									SetObject(pos, rot, scale, &aMat[0], nType, nBreakType, nShadowType, nCollisionType, stateRot, APPEARSTATE_NONE, nJudgeType);
 								}
 							} while (strcmp(&aString[0], "END_SETCOMBO_OBJECT") != 0);			// 読み込んだ文字列が END_SETCOMBO_OBJECT ではない場合ループ
 						}
