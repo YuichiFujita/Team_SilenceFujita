@@ -23,6 +23,9 @@
 
 #define BREAK_OBJECT_MOVE_Y	(1.8f)	// オブジェクトの破壊時の煙の重力
 
+#define EXPL_SUB_COL_G	(0.05f)		// 爆発エフェクトの緑の減衰係数
+#define EXPL_REV_COL_G	(0.7f)		// 爆発エフェクトの緑の最低限補正数
+
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
@@ -65,6 +68,7 @@ typedef struct
 void EffectSparkUpdate(Effect *pEffect);			// 火花エフェクトの更新処理
 void EffectSprayUpdate(Effect *pEffect);			// 水しぶきエフェクトの更新処理
 void EffectBreakObjectUpdate(Effect *pEffect);		// オブジェクトの破壊時のエフェクトの更新処理
+void EffectExplosionUpdate(Effect *pEffect);		// 爆発系のエフェクトの更新処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -229,6 +233,13 @@ void UpdateEffect(void)
 
 				// オブジェクトの破壊時のエフェクトの更新処理
 				EffectBreakObjectUpdate(&g_aEffect[nCntEffect]);
+
+				break;					// 抜け出す
+
+			case EFFECTTYPE_EXPLOSION:		// 爆発
+
+				// 爆発系のエフェクトの更新処理
+				EffectExplosionUpdate(&g_aEffect[nCntEffect]);
 
 				break;					// 抜け出す
 
@@ -506,6 +517,24 @@ void EffectBreakObjectUpdate(Effect *pEffect)
 
 		// 使用しない
 		pEffect->bUse = false;
+	}
+}
+
+//======================================================================================================================
+// 爆発系のエフェクトの更新処理
+//======================================================================================================================
+void EffectExplosionUpdate(Effect *pEffect)
+{
+	if (pEffect->col.g > EXPL_REV_COL_G)
+	{ // 一定の値を超過した場合
+
+		// G値を補正する
+		pEffect->col.g = EXPL_REV_COL_G;
+	}
+	else
+	{ // 一定の値以下の場合
+		// 火花を赤くしていく
+		pEffect->col.g += EXPL_SUB_COL_G;
 	}
 }
 
