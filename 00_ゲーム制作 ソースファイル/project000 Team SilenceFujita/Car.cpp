@@ -153,8 +153,10 @@ void UninitCar(void)
 //======================================================================================================================
 void UpdateCar(void)
 {
-	int nTackleCnt = 0;			// 引数設定用
+	// 変数を宣言
+	int   nTackleCnt = 0;		// 引数設定用
 	float fTackleMove = 0.0f;	// 引数設定用
+	float fCarRot = 0.0f;		// 影の向き設定用
 	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
 
 	//効果音BGMの音量調整
@@ -203,13 +205,17 @@ void UpdateCar(void)
 				//----------------------------------------------------
 				//	影の更新
 				//----------------------------------------------------
+				// 車の向きを設定
+				fCarRot = g_aCar[nCntCar].rot.y + D3DX_PI;
+				RotNormalize(&fCarRot);	// 向きを正規化
+
 				// 影の位置設定
 				SetPositionShadow
 				( // 引数
-					g_aCar[nCntCar].nShadowID,	// 影のインデックス
-					g_aCar[nCntCar].pos,		// 位置
-					g_aCar[nCntCar].rot,		// 向き
-					NONE_SCALE					// 拡大率
+					g_aCar[nCntCar].nShadowID,											// 影のインデックス
+					g_aCar[nCntCar].pos,												// 位置
+					D3DXVECTOR3(g_aCar[nCntCar].rot.x, fCarRot, g_aCar[nCntCar].rot.z),	// 向き
+					NONE_SCALE															// 拡大率
 				);
 
 				// プレイヤーの位置の更新

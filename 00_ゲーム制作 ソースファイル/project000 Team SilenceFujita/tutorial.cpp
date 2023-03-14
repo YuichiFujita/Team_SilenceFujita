@@ -154,7 +154,8 @@ const int aNextLesson[] =	// レッスンのカウンター
 	60,		// レッスン3 (吹飛散風) のレッスンカウンター
 	120,	// レッスン4 (無音世界) のレッスンカウンター
 	120,	// レッスン5 (コンボ)   のレッスンカウンター
-	0,		// レッスン6 (脱出)     のレッスンカウンター
+	0,		// レッスン6 (警察)     のレッスンカウンター
+	0,		// レッスン7 (脱出)     のレッスンカウンター
 };
 
 const char *apTextureLesson[] =		// レッスンテクスチャの相対パス
@@ -165,7 +166,8 @@ const char *apTextureLesson[] =		// レッスンテクスチャの相対パス
 	"data\\TEXTURE\\lesson003.png",	// レッスン3 (吹飛散風) のテクスチャ相対パス
 	"data\\TEXTURE\\lesson004.png",	// レッスン4 (無音世界) のテクスチャ相対パス
 	"data\\TEXTURE\\lesson005.png",	// レッスン5 (コンボ)   のテクスチャ相対パス
-	"data\\TEXTURE\\lesson006.png",	// レッスン6 (脱出)     のテクスチャ相対パス
+	"data\\TEXTURE\\lesson006.png",	// レッスン6 (警察)     のテクスチャ相対パス
+	"data\\TEXTURE\\lesson007.png",	// レッスン7 (脱出)     のテクスチャ相対パス
 };
 
 const char *apTextureTips[] =		// 備考テクスチャの相対パス
@@ -176,7 +178,8 @@ const char *apTextureTips[] =		// 備考テクスチャの相対パス
 	"data\\TEXTURE\\tips003.png",	// レッスン3 (吹飛散風) の備考のテクスチャ相対パス
 	"data\\TEXTURE\\tips004.png",	// レッスン4 (無音世界) の備考のテクスチャ相対パス
 	"data\\TEXTURE\\tips005.png",	// レッスン5 (コンボ)   の備考のテクスチャ相対パス
-	"data\\TEXTURE\\tips006.png",	// レッスン6 (脱出)     の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips006.png",	// レッスン6 (警察)     の備考のテクスチャ相対パス
+	"data\\TEXTURE\\tips007.png",	// レッスン7 (脱出)     の備考のテクスチャ相対パス
 };
 
 const char *apTexturePaper[] =		// 便箋テクスチャの相対パス
@@ -187,7 +190,8 @@ const char *apTexturePaper[] =		// 便箋テクスチャの相対パス
 	"data\\TEXTURE\\paper003.png",	// レッスン3 (吹飛散風) の便箋のテクスチャ相対パス
 	"data\\TEXTURE\\paper004.png",	// レッスン4 (無音世界) の便箋のテクスチャ相対パス
 	"data\\TEXTURE\\paper005.png",	// レッスン5 (コンボ)   の便箋のテクスチャ相対パス
-	"data\\TEXTURE\\paper006.png",	// レッスン6 (脱出)     の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper006.png",	// レッスン6 (警察)     の便箋のテクスチャ相対パス
+	"data\\TEXTURE\\paper007.png",	// レッスン7 (脱出)     の便箋のテクスチャ相対パス
 };
 
 //**********************************************************************************************************************
@@ -908,7 +912,21 @@ void UpdateTutorial(void)
 		// 処理を抜ける
 		break;
 
-	case LESSON_06:	// レッスン6 (脱出)
+	case LESSON_06:	// レッスン6 (警察)
+
+		///////////////////////////////
+		if (GetKeyboardTrigger(DIK_0) == true)
+		{ // デバッグキーが押された場合
+
+			// レッスンの状態の加算
+			AddLessonState();
+		}
+		///////////////////////////////
+
+		// 処理を抜ける
+		break;
+
+	case LESSON_07:	// レッスン7 (脱出)
 
 		// 無し
 
@@ -1234,7 +1252,7 @@ void AddLessonState(void)
 				// 処理を抜ける
 				break;
 
-			case LESSON_06:	// レッスン6 (脱出)
+			case LESSON_06:	// レッスン6 (警察)
 
 				// 破滅疾走のレッスン終了後の削除
 				AllFalseSlumBoost();
@@ -1244,6 +1262,11 @@ void AddLessonState(void)
 
 				// 無音世界のレッスン終了後の削除
 				AllFalseSilenceWorld();
+
+				// 処理を抜ける
+				break;
+
+			case LESSON_07:	// レッスン7 (脱出)
 
 				// ゲートの全開け
 				AllOpenGate();
@@ -1261,7 +1284,7 @@ void AddLessonState(void)
 			// パーティクルの削除
 			AllFalseParticle();
 
-			//	風の全消去
+			// 風の全消去
 			WindAllClear();
 
 			// 演出の状態を手紙の表示状態に変更
