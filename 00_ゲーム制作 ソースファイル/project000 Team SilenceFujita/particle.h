@@ -16,7 +16,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define SPAWN_PARTICLE_EXPLOSION	(8)		// パーティクル (爆発) のエフェクト数
-#define SPAWN_PARTICLE_DAMAGE		(6)		// パーティクル (ダメージ) のエフェクト数
+#define SPAWN_PARTICLE_DAMAGE		(10)	// パーティクル (ダメージ) のエフェクト数
 #define SPAWN_PARTICLE_DUST			(4)		// パーティクル（埃）のエフェクト数
 #define SPAWN_PARTICLE_RAINSPRAY	(8)		// パーティクル（水しぶき）のエフェクト数
 #define SPAWN_PARTICLE_SMOKING		(1)		// パーティクル（タバコの煙）のエフェクト数
@@ -43,6 +43,7 @@ typedef enum
 	PARTICLETYPE_BREAK_ARTICLE,	// パーティクル（小物の破壊時）
 	PARTICLETYPE_BREAK_OBJECT,	// パーティクル（オブジェクトの破壊時）
 	PARTICLETYPE_PLAY_DEATH,	// パーティクル（プレイヤーの死亡爆発）
+	PARTICLETYPE_OBJECT_SMASH,	// パーティクル（オブジェクトを吹っ飛ばした時）
 	PARTICLETYPE_MAX,			// この列挙型の総数
 } PARTICLETYPE;
 

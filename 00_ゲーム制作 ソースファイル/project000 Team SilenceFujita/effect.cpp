@@ -17,7 +17,7 @@
 
 #define SPARK_MOVE_Y	(1.0f)		// 火花エフェクトの移動量(Y軸)
 #define SPARK_SUB_COL_G	(0.05f)		// 火花エフェクトの緑の減衰係数
-#define SPARK_REV_COL_G	(0.5f)		// 火花エフェクトの緑の最低限補正数
+#define SPARK_REV_COL_G	(0.3f)		// 火花エフェクトの緑の最低限補正数
 
 #define SPRAY_MOVE_Y	(1.3f)		// 水しぶきエフェクトの移動量(Y軸)
 

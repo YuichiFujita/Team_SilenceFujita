@@ -43,6 +43,7 @@ void ParticlePlaySmoke(Particle *pParticle);	// プレイヤーの黒煙エフェクト
 void ParticleBreakArticle(Particle *pParticle);	// 小物を破壊した時のエフェクト
 void ParticleBreakObject(Particle *pParticle);	// オブジェクトを破壊した時のエフェクト
 void ParticlePlayerDeath(Particle *pParticle);	// プレイヤーの死亡爆発のエフェクト
+void ParticleObjectSmash(Particle *pParticle);	// オブジェクトを吹き飛ばした時のエフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -212,6 +213,13 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 				ParticlePlayerDeath(&g_aParticle[nCntParticle]);
 
 				break;
+
+			case PARTICLETYPE_OBJECT_SMASH:
+
+				// オブジェクトを吹き飛ばした時のエフェクト
+				ParticleObjectSmash(&g_aParticle[nCntParticle]);
+
+				break;
 			}
 
 			// 処理を抜ける
@@ -253,9 +261,9 @@ void ParticleDamage(Particle *pParticle)
 		D3DXVec3Normalize(&move, &move);
 
 		// 移動量を乗算
-		move.x *= 4.0f;
-		move.y *= 4.0f;
-		move.z *= 4.0f;
+		move.x *= 9.0f;
+		move.y *= 9.0f;
+		move.z *= 9.0f;
 
 		// エフェクトの設定
 		SetEffect
@@ -264,8 +272,8 @@ void ParticleDamage(Particle *pParticle)
 			move,			// 移動量
 			pParticle->col,	// 色
 			30,				// 寿命
-			40.0f,			// 半径
-			1.2f,			// 減算量 (半径)
+			90.0f,			// 半径
+			2.0f,			// 減算量 (半径)
 			EFFECTTYPE_NONE	// その他
 		);
 	}
@@ -715,6 +723,44 @@ void ParticlePlayerDeath(Particle *pParticle)
 			fRadius,					// 半径
 			0.4f,						// 減算量 (半径)
 			EFFECTTYPE_EXPLOSION		// 爆発
+		);
+	}
+}
+
+//======================================================================================================================
+// オブジェクトを吹き飛ばした時のエフェクト
+//======================================================================================================================
+void ParticleObjectSmash(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= 10.0f;
+		move.y *= 10.0f;
+		move.z *= 10.0f;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,	// 位置
+			move,			// 移動量
+			pParticle->col,	// 色
+			20,				// 寿命
+			30.0f,			// 半径
+			-3.0f,			// 減算量 (半径)
+			EFFECTTYPE_BREAKOBJECT	// その他
 		);
 	}
 }
