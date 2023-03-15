@@ -26,11 +26,11 @@
 #define SNOW_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// 雪の頂点カラー
 #define THUNDER_COL		(D3DXCOLOR(1.0f, 1.0f, 0.5f, 1.0f))		// 雷の頂点カラー
 
-#define WEATHER_RAND	(10)	// 天気のランダムの範囲
-#define SUNNY_RAND		(6)		// ランダムでの晴れの範囲
-#define RAIN_RAND		(7)		// ランダムでの雨の範囲
-#define SNOW_RAND		(8)		// ランダムでの雪の範囲
-#define THUNDER_RAND	(9)		// ランダムでの雷雨の範囲
+#define WEATHER_RAND	(50)		// 天気のランダムの範囲
+#define SUNNY_RAND		(40)		// ランダムでの晴れの範囲
+#define RAIN_RAND		(44)		// ランダムでの雨の範囲
+#define SNOW_RAND		(48)		// ランダムでの雪の範囲
+#define THUNDER_RAND	(49)		// ランダムでの雷雨の範囲
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -1103,7 +1103,7 @@ void SetThunder(D3DXVECTOR3 pos, D3DXVECTOR2 fRadius)
 			{ // 視界内に雷が落ちた場合
 
 				// フラッシュの設定処理
-				SetFlash(REV_WEATHER_ALPHA);
+				SetFlash(WEATHER_ALPHA,REV_WEATHER_ALPHA);
 			}
 
 			// 使用している状態にする

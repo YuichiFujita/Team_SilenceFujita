@@ -1772,6 +1772,7 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed)
 			
 			if (fLength <= (((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius) * ((g_aObject[nCntObject].modelData.fRadius * g_aObject[nCntObject].scale.y) + fRadius)))
 			{ // オブジェクトが当たっている
+
 				// 吹っ飛ばし状態にする
 				g_aObject[nCntObject].smash.State = SMASHSTATE_ON;
 
@@ -1806,6 +1807,16 @@ void SmashCollision(D3DXVECTOR3 pos, float fRadius, float fSpeed)
 					g_aObject[nCntObject].smash.move.y = cosf(D3DX_PI * SMASH_ANGLE) * SMASH_HEIGHT;
 					g_aObject[nCntObject].smash.move.z = -cosf(fAngle) * SMASH_DEPTH_MAGNI * fSpeed;
 				}
+
+				// パーティクルの設定処理
+				SetParticle
+				(
+					g_aObject[nCntObject].pos,
+					D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f),
+					PARTICLETYPE_OBJECT_SMASH,
+					3,
+					2
+				);
 			}
 		}
 	}
