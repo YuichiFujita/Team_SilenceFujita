@@ -1103,7 +1103,7 @@ void SetThunder(D3DXVECTOR3 pos, D3DXVECTOR2 fRadius)
 			{ // 視界内に雷が落ちた場合
 
 				// フラッシュの設定処理
-				SetFlash(REV_WEATHER_ALPHA);
+				SetFlash(WEATHER_ALPHA,REV_WEATHER_ALPHA);
 			}
 
 			// 使用している状態にする
