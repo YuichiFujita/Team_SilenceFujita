@@ -36,6 +36,7 @@ typedef enum
 	HUMANSTATE_WALK = 0,	// 歩き状態
 	HUMANSTATE_STOP,		// ストップ状態
 	HUMANSTATE_FLY,			// 吹き飛ばし状態
+	HUMANSTATE_APPEAR,		// 出現状態
 	HUMANSTATE_MAX			// この列挙型の総数
 }HUMANSTATE;
 
@@ -114,27 +115,28 @@ typedef struct
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3  pos;					// 現在の位置
-	D3DXVECTOR3  posOld;				// 前回の位置
-	D3DXVECTOR3  move;					// 移動量
-	float		 fMaxMove;				// 移動量の最大数
-	D3DXVECTOR3  rot;					// 向き
-	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
-	MotionInfo   motion;				// モーション情報
-	HumanParts   aParts[MAX_PARTS];		// パーツ情報
-	IconInfo	 icon;					// アイコンの情報
-	HUMANTYPE	 type;					// 種類
-	MOVETYPE	 typeMove;				// 行動の種類
-	int			 nShadowID;				// 影のインデックス
-	int			 nNotaID;				// 強調表示のインデックス
-	int			 nOverlapCounter;		// 重なりカウント
-	int			 nStopCount;			// 停止カウント
-	bool		 bMove;					// 移動しているかどうか
-	bool		 bUse;					// 使用しているか
-	bool		 bRecur;				// 復活するかどうか
-	HUMANSTATE	 state;					// 状態
-	HUMANCURVE	 curveInfo;				// 曲がり角の情報
-	Judge		 judge;					// ジャッジ
+	D3DXVECTOR3 pos;					// 現在の位置
+	D3DXVECTOR3 posOld;					// 前回の位置
+	D3DXVECTOR3 move;					// 移動量
+	float		fMaxMove;				// 移動量の最大数
+	D3DXVECTOR3 rot;					// 向き
+	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
+	MotionInfo  motion;					// モーション情報
+	HumanParts  aParts[MAX_PARTS];		// パーツ情報
+	IconInfo	icon;					// アイコンの情報
+	HUMANTYPE	type;					// 種類
+	MOVETYPE	typeMove;				// 行動の種類
+	int			nShadowID;				// 影のインデックス
+	int			nNotaID;				// 強調表示のインデックス
+	int			nOverlapCounter;		// 重なりカウント
+	int			nStopCount;				// 停止カウント
+	float		fAlpha;					// 透明度
+	bool		bMove;					// 移動しているかどうか
+	bool		bUse;					// 使用しているか
+	bool		bRecur;					// 復活するかどうか
+	HUMANSTATE	state;					// 状態
+	HUMANCURVE	curveInfo;				// 曲がり角の情報
+	Judge		judge;					// ジャッジ
 }Human;
 
 //**********************************************************************************************************************

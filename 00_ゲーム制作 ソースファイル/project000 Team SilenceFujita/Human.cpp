@@ -55,7 +55,7 @@
 #define HUMAN_GROUND			(10.0f)		// 人間の地面
 #define HUMAN_OVERLAP_COUNT		(180)		// 人間の重なりカウント
 #define HUMAN_STOP_COUNT		(240)		// 人間の立ち止まりカウント
-#define HUMAN_CIGARETTE_POS		(5.0f)		// 人間のタバコの煙の位置
+#define HUMAN_APPEAR_ADD_ALPHA	(0.01f)		// 人間の出現時の透明度の加算数
 
 #define REACTION_HUMAN_RANGE	(170.0f)	// リアクションする人間の範囲
 #define REACTION_CAR_RANGE		(50.0f)		// リアクションする車の範囲
@@ -167,6 +167,7 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
 		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
 		g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
+		g_aHuman[nCntHuman].fAlpha			= 1.0f;								// 透明度
 		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
 		g_aHuman[nCntHuman].bRecur			= false;							// 復活状況
 		g_aHuman[nCntHuman].bUse			= false;							// 使用状況
@@ -227,7 +228,7 @@ void UninitHuman(void)
 //======================================================================================================================
 void UpdateHuman(void)
 {
-	int nCnt = 0;		// 引数設定用
+	int nCntTra = 0;	// 引数設定用
 	int nTackleCnt = 0;	// 引数設定用
 	float fMove = 0.0f;	// 引数設定用
 	POLICESTATE policeState = POLICESTATE_CHASE;	// 警察の状態(オブジェクトとの当たり判定に使うため無意味)
@@ -346,6 +347,26 @@ void UpdateHuman(void)
 				}
 
 				break;					//抜け出す
+
+			case HUMANSTATE_APPEAR:		// 出現状態
+
+				// 透明度を加算する
+				g_aHuman[nCntHuman].fAlpha += HUMAN_APPEAR_ADD_ALPHA;
+
+				if (g_aHuman[nCntHuman].fAlpha >= 1.0f)
+				{ // 透明度が1.0fを超えた場合
+
+					// 透明度を補正する
+					g_aHuman[nCntHuman].fAlpha = 1.0f;
+
+					// 歩行状態を設定する
+					g_aHuman[nCntHuman].state = HUMANSTATE_WALK;
+
+					// 移動モーションに設定
+					SetMotionHuman(&g_aHuman[nCntHuman], MOTIONTYPE_MOVE);
+				}
+
+				break;					// 抜け出す
 			}
 
 			if (g_aHuman[nCntHuman].pos.y < HUMAN_GROUND)
@@ -354,7 +375,7 @@ void UpdateHuman(void)
 				// 縦への移動量を0.0fにする
 				g_aHuman[nCntHuman].move.y = 0.0f;
 
-				// 位置を0.0fに戻す
+				// 位置を10.0fに戻す
 				g_aHuman[nCntHuman].pos.y = HUMAN_GROUND;
 			}
 
@@ -369,7 +390,7 @@ void UpdateHuman(void)
 				&g_aHuman[nCntHuman].move,		// 移動量
 				HUMAN_WIDTH,					// 横幅
 				HUMAN_DEPTH,					// 奥行
-				&nCnt,							// 渋滞カウント
+				&nCntTra,						// 渋滞カウント
 				BOOSTSTATE_NONE,				// ブースト状態
 				&policeState,					// 警察の状態
 				&nTackleCnt,					// タックルカウント
@@ -450,6 +471,7 @@ void DrawHuman(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 	D3DXMATERIAL     *pMat;						// マテリアルデータへのポインタ
 	D3DXMATERIAL	  evilMat;					// 悪い奴のマテリアルデータ
+	D3DXMATERIAL	  appearMat;				// 出現時のマテリアルデータ
 
 	for (int nCntHuman = 0; nCntHuman < MAX_HUMAN; nCntHuman++)
 	{ // オブジェクトの最大表示数分繰り返す
@@ -518,26 +540,45 @@ void DrawHuman(void)
 				for (int nCntMat = 0; nCntMat < (int)g_aHuman[nCntHuman].aParts[nCntParts].modelData.dwNumMat; nCntMat++)
 				{ // マテリアルの数分繰り返す
 
-					// 構造体の要素をクリア
-					ZeroMemory(&evilMat, sizeof(D3DXMATERIAL));
+					if (g_aHuman[nCntHuman].state == HUMANSTATE_APPEAR)
+					{ // 出現状態の場合
 
-					// マテリアルのコピーに代入する
-					evilMat = pMat[nCntMat];
+						// 構造体の要素をクリア
+						ZeroMemory(&appearMat, sizeof(D3DXMATERIAL));
 
-					if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_JUSTICE)
-					{ // 良い奴の場合
+						// マテリアルデータのコピーに代入する
+						appearMat = pMat[nCntMat];
+
+						// 透明度を代入する
+						appearMat.MatD3D.Diffuse.a = g_aHuman[nCntHuman].fAlpha;
 
 						// マテリアルの設定
-						pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+						pDevice->SetMaterial(&appearMat.MatD3D);
 					}
 					else
-					{ // 悪い奴の場合
+					{ // 上記以外の場合
 
-						// 自己発光を代入する
-						evilMat.MatD3D.Emissive = g_aHuman[nCntHuman].judge.col;
+						// 構造体の要素をクリア
+						ZeroMemory(&evilMat, sizeof(D3DXMATERIAL));
 
-						// マテリアルの設定
-						pDevice->SetMaterial(&evilMat.MatD3D);
+						// マテリアルのコピーに代入する
+						evilMat = pMat[nCntMat];
+
+						if (g_aHuman[nCntHuman].judge.state == JUDGESTATE_JUSTICE)
+						{ // 良い奴の場合
+
+							// マテリアルの設定
+							pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+						}
+						else
+						{ // 悪い奴の場合
+
+							// 自己発光を代入する
+							evilMat.MatD3D.Emissive = g_aHuman[nCntHuman].judge.col;
+
+							// マテリアルの設定
+							pDevice->SetMaterial(&evilMat.MatD3D);
+						}
 					}
 
 					if (nCntParts < MAX_PARTS - 1)
@@ -590,6 +631,7 @@ void SetHuman(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int walk, bool bRecur, int type)
 			g_aHuman[nCntHuman].bMove			= false;							// 移動していない
 			g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
 			g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
+			g_aHuman[nCntHuman].fAlpha			= 1.0f;								// 透明度
 			g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 歩き状態
 			g_aHuman[nCntHuman].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
 
@@ -991,8 +1033,8 @@ void ReactionHuman(Human *pHuman)
 
 	Player *pPlayer = GetPlayer();
 
-	if (pHuman->state != HUMANSTATE_FLY)
-	{ // 吹き飛び状態じゃない場合
+	if (pHuman->state != HUMANSTATE_FLY && pHuman->state != HUMANSTATE_APPEAR)
+	{ // 吹き飛び状態でも出現状態でもない場合
 
 		if (pPlayer->bUse == true)
 		{ // 使用している場合
@@ -1798,8 +1840,11 @@ void ResurrectionHuman(Human human)
 			// 情報を初期化
 			g_aHuman[nCnt].move    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 			g_aHuman[nCnt].bMove   = false;							// 移動していない
-			g_aHuman[nCnt].state   = HUMANSTATE_WALK;				// 歩き状態
+			g_aHuman[nCnt].state   = HUMANSTATE_APPEAR;				// 出現状態
 			g_aHuman[nCnt].nNotaID = NONE_3D_NOTATION;				// 強調表示のインデックス
+			g_aHuman[nCnt].nStopCount = 0;							// 停止カウント
+			g_aHuman[nCnt].nOverlapCounter = 0;						// 重なり防止カウント
+			g_aHuman[nCnt].fAlpha = 0.0f;							// 透明度
 
 			// 移動量の最大値を設定
 			g_aHuman[nCnt].fMaxMove = (float)(rand() % HUMAN_RANDAM_MOVE + HUMAN_MOVE_LEAST);
@@ -1831,30 +1876,16 @@ void ResurrectionHuman(Human human)
 			// 移動方法を設定する
 			g_aHuman[nCnt].typeMove = MOVETYPE_MOVE;
 
-			switch (g_aHuman[nCnt].typeMove)
-			{
-			case MOVETYPE_MOVE:			// 移動する
+			// 曲がり角情報の設置
+			g_aHuman[nCnt].curveInfo.actionState = HUMANACT_WALK;							// 状態
+			g_aHuman[nCnt].curveInfo.nRandamRoute = rand() % MAX_HUMAN_ROUTE;				// ルートの種類
+			g_aHuman[nCnt].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCnt].curveInfo.nRandamRoute);	// ルート
 
-				// 曲がり角情報の設置
-				g_aHuman[nCnt].curveInfo.actionState = HUMANACT_WALK;							// 状態
-				g_aHuman[nCnt].curveInfo.nRandamRoute = rand() % MAX_HUMAN_ROUTE;				// ルートの種類
-				g_aHuman[nCnt].curveInfo.curveInfo = GetHumanRoute(g_aHuman[nCnt].curveInfo.nRandamRoute);	// ルート
+			// 人間の初期位置の設定処理
+			CorrectCurveHuman(&g_aHuman[nCnt]);
 
-				// 人間の初期位置の設定処理
-				CorrectCurveHuman(&g_aHuman[nCnt]);
-
-				g_aHuman[nCnt].curveInfo.rotDest = g_aHuman[nCnt].rot;					// 目標の向き
-
-				// 処理を抜ける
-				break;
-
-			case MOVETYPE_STOP:			// 停止状態
-
-				// 無し
-
-				// 処理を抜ける
-				break;
-			}
+			// 目標の向きを設定する
+			g_aHuman[nCnt].curveInfo.rotDest = g_aHuman[nCnt].rot;					
 
 			// ジャッジの情報の設定
 			g_aHuman[nCnt].judge.col = JUDGE_WHITE;			// ピカピカの色
@@ -1902,6 +1933,9 @@ void ResurrectionHuman(Human human)
 
 			// 人間モーションの初期化処理
 			InitMotionHuman(&g_aHuman[nCnt], g_aHuman[nCnt].type, g_aHuman[nCnt].typeMove);
+
+			// 停止モーションに設定
+			SetMotionHuman(&g_aHuman[nCnt], MOTIONTYPE_STOP);
 
 			// 人間の重なり防止処理
 			OverlapHuman(&g_aHuman[nCnt]);
