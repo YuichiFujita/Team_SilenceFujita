@@ -695,7 +695,7 @@ void UpdateGame(void)
 
 			// 影の更新
 			UpdateShadow();
-#if 0
+#if 1
 			// 警察の追加処理
 			AddPolice();
 #endif
@@ -814,7 +814,7 @@ void DrawGame(void)
 	DrawParticle();
 
 	// 天気の描画処理
-	//DrawWeather();
+	DrawWeather();
 	
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)

@@ -245,29 +245,29 @@ void UpdatePolice(void)
 						&g_aPolice[nCntPolice].tackle.tacklemove.x	// タックル時の移動量
 					);
 
-					// ゲートとの当たり判定
-					CollisionGate
-					( // 引数
-						&g_aPolice[nCntPolice].pos,			// 現在の位置
-						&g_aPolice[nCntPolice].posOld,		// 前回の位置
-						&g_aPolice[nCntPolice].move,		// 移動量
-						POLICAR_WIDTH,						// 横幅
-						POLICAR_DEPTH						// 奥行
-					);
+					//// ゲートとの当たり判定
+					//CollisionGate
+					//( // 引数
+					//	&g_aPolice[nCntPolice].pos,			// 現在の位置
+					//	&g_aPolice[nCntPolice].posOld,		// 前回の位置
+					//	&g_aPolice[nCntPolice].move,		// 移動量
+					//	POLICAR_WIDTH,						// 横幅
+					//	POLICAR_DEPTH						// 奥行
+					//);
 
-					// 車同士の当たり判定
-					CollisionCarBody
-					( // 引数
-						&g_aPolice[nCntPolice].pos,
-						&g_aPolice[nCntPolice].posOld,
-						g_aPolice[nCntPolice].rot,
-						&g_aPolice[nCntPolice].move,
-						POLICAR_WIDTH,
-						POLICAR_DEPTH,
-						COLLOBJECTTYPE_POLICE,
-						&g_aPolice[nCntPolice].nTrafficCnt,
-						(g_aPolice[nCntPolice].tackle.tackleState)
-					);
+					//// 車同士の当たり判定
+					//CollisionCarBody
+					//( // 引数
+					//	&g_aPolice[nCntPolice].pos,
+					//	&g_aPolice[nCntPolice].posOld,
+					//	g_aPolice[nCntPolice].rot,
+					//	&g_aPolice[nCntPolice].move,
+					//	POLICAR_WIDTH,
+					//	POLICAR_DEPTH,
+					//	COLLOBJECTTYPE_POLICE,
+					//	&g_aPolice[nCntPolice].nTrafficCnt,
+					//	(g_aPolice[nCntPolice].tackle.tackleState)
+					//);
 				}
 
 				if (g_aPolice[nCntPolice].bombState != BOMBSTATE_BAR_IN)
@@ -358,9 +358,6 @@ void UpdatePolice(void)
 							// パトロールに戻る処理
 							PatrolBackAct(&g_aPolice[nCntPolice]);
 
-							// 最初の位置に戻す処理
-							g_aPolice[nCntPolice].state = POLICESTATE_POSBACK;
-
 							// アイコンの状態を復活中にする
 							g_aPolice[nCntPolice].icon.state = ICONSTATE_REVIVAL;
 						}
@@ -420,8 +417,9 @@ void UpdatePolice(void)
 					GetBarrierState(&g_aPolice[nCntPolice]) == BARRIERSTATE_LAND)
 				{ // バリアセット状態じゃなかった場合
 
-					if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC)
-					{ // 渋滞状態じゃない場合
+					if (g_aPolice[nCntPolice].state != POLICESTATE_TRAFFIC
+						&& g_aPolice[nCntPolice].state != POLICESTATE_POSBACK)
+					{ // 渋滞状態じゃないかつ、最初の位置に戻る場合
 
 						//----------------------------------------------------
 						//	当たり判定
@@ -469,22 +467,6 @@ void UpdatePolice(void)
 							(g_aPolice[nCntPolice].tackle.tackleState)
 						);
 					}
-
-					//----------------------------------------------------
-					//	影の更新
-					//----------------------------------------------------
-					// 警察の向きを設定
-					fPoliceRot = g_aPolice[nCntPolice].rot.y + D3DX_PI;
-					RotNormalize(&fPoliceRot);	// 向きを正規化
-
-					// 影の位置設定
-					SetPositionShadow
-					( // 引数
-						g_aPolice[nCntPolice].nShadowID,													// 影のインデックス
-						g_aPolice[nCntPolice].pos,															// 位置
-						D3DXVECTOR3(g_aPolice[nCntPolice].rot.x, fPoliceRot, g_aPolice[nCntPolice].rot.z),	// 向き
-						NONE_SCALE																			// 拡大率
-					);
 				}
 
 				if (g_aPolice[nCntPolice].nTrafficCnt >= POLICAR_TRAFFIC_CNT)
@@ -520,6 +502,22 @@ void UpdatePolice(void)
 					// プレイヤーの補正の更新処理
 					RevPolice(&g_aPolice[nCntPolice].rot, &g_aPolice[nCntPolice].pos, &g_aPolice[nCntPolice].move);
 				}
+
+				//----------------------------------------------------
+				//	影の更新
+				//----------------------------------------------------
+				// 警察の向きを設定
+				fPoliceRot = g_aPolice[nCntPolice].rot.y + D3DX_PI;
+				RotNormalize(&fPoliceRot);	// 向きを正規化
+
+											// 影の位置設定
+				SetPositionShadow
+				( // 引数
+					g_aPolice[nCntPolice].nShadowID,													// 影のインデックス
+					g_aPolice[nCntPolice].pos,															// 位置
+					D3DXVECTOR3(g_aPolice[nCntPolice].rot.x, fPoliceRot, g_aPolice[nCntPolice].rot.z),	// 向き
+					NONE_SCALE																			// 拡大率
+				);
 
 				//----------------------------------------------------
 				//	アイコンの更新
@@ -1558,9 +1556,6 @@ void PoliceSpawn(Police *pPolice)
 	// 前回位置の更新
 	pPolice->posOld = pPolice->pos;
 
-	// プレイヤーの着地の更新処理
-	LandObject(&pPolice->pos, &pPolice->move, &pPolice->bJump);
-
 	// プレイヤーの位置の更新
 	PosPolice(&pPolice->move, &pPolice->pos, &pPolice->rot, pPolice->bMove);
 
@@ -1743,6 +1738,9 @@ void PoliceSpawn(Police *pPolice)
 
 			// パトロール状態にする
 			pPolice->state = POLICESTATE_PATROL;
+
+			// 通常状態にする
+			pPolice->icon.state = ICONSTATE_NONE;
 		}
 
 		break;				//抜け出す
@@ -1763,6 +1761,9 @@ void PoliceSpawn(Police *pPolice)
 
 			// パトロール状態にする
 			pPolice->state = POLICESTATE_PATROL;
+
+			// 通常状態にする
+			pPolice->icon.state = ICONSTATE_NONE;
 		}
 
 		break;				//抜け出す
@@ -1783,6 +1784,9 @@ void PoliceSpawn(Police *pPolice)
 
 			// パトロール状態にする
 			pPolice->state = POLICESTATE_PATROL;
+
+			// 通常状態にする
+			pPolice->icon.state = ICONSTATE_NONE;
 		}
 
 		break;				//抜け出す
@@ -1803,6 +1807,9 @@ void PoliceSpawn(Police *pPolice)
 
 			// パトロール状態にする
 			pPolice->state = POLICESTATE_PATROL;
+
+			// 通常状態にする
+			pPolice->icon.state = ICONSTATE_NONE;
 		}
 
 		break;				//抜け出す
@@ -2054,15 +2061,15 @@ void PoliceGatePos(Police *pPolice)
 			break;
 		}
 
-		// 向きの正規化
-		RotNormalize(&pPolice->rot.y);
-
 		// 出てくるゲートの番号を保存する
 		pPolice->nNumSpawnGate = nSpawnGateNum;
 
 		// ゲートの位置
 		pPolice->pos.x = pGate[nSpawnGateNum].pos.x;
 		pPolice->pos.z = pGate[nSpawnGateNum].pos.z;
+
+		// 前回の位置を設定する
+		pPolice->posOld = pPolice->pos;
 	}
 	else
 	{ // 範囲内だった場合
@@ -2131,6 +2138,9 @@ void PoliceGatePos(Police *pPolice)
 		// ゲートの位置
 		pPolice->pos.x = pGate[nSpawnGateNum].pos.x;
 		pPolice->pos.z = pGate[nSpawnGateNum].pos.z;
+
+		// 前回の位置を設定する
+		pPolice->posOld = pPolice->pos;
 	}
 
 	// 警察の待機状態チェック処理
@@ -2167,6 +2177,9 @@ void PoliceWaitCheck(Police *pPolice)
 					pPolice->pos.x = pGate[pPolice->nNumSpawnGate].pos.x;
 					pPolice->pos.z = pGate[pPolice->nNumSpawnGate].pos.z;
 
+					// 前回の位置を設定する
+					pPolice->posOld = pPolice->pos;
+
 					// 抜け出す
 					break;
 				}
@@ -2183,6 +2196,9 @@ void PoliceWaitCheck(Police *pPolice)
 		// ゲートの位置
 		pPolice->pos.x = pGate[pPolice->nNumSpawnGate].pos.x;
 		pPolice->pos.z = pGate[pPolice->nNumSpawnGate].pos.z;
+
+		// 前回の位置を設定する
+		pPolice->posOld = pPolice->pos;
 	}
 }
 
