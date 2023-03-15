@@ -1200,27 +1200,37 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyL2Press(0) == true)
 		{ // 後退の操作が行われた場合
 
-			// 後退状態にする
-			currentPlayer = PLAYMOVESTATE_BACK;
+			if (g_player.boost.state != BOOSTSTATE_UP
+			&&  g_player.boost.state != BOOSTSTATE_DOWN)
+			{ // ブースト中ではない場合
 
-			// 移動量を更新
-			g_player.move.x -= MOVE_BACKWARD;
-
-			if (g_player.move.x > 0)
-			{ // 移動量が 0より大きい場合
+				// 後退状態にする
+				currentPlayer = PLAYMOVESTATE_BACK;
 
 				// 移動量を更新
-				g_player.move.x -= MOVE_PLUS_BACKWARD;
-			}
+				g_player.move.x -= MOVE_BACKWARD;
 
-			// 移動している状態にする
-			g_player.bMove = true;
+				if (g_player.move.x > 0)
+				{ // 移動量が 0より大きい場合
+
+					// 移動量を更新
+					g_player.move.x -= MOVE_PLUS_BACKWARD;
+				}
+
+				// 移動している状態にする
+				g_player.bMove = true;
+			}
 		}
 		else
 		{ // 移動していない場合
 
-			// 移動していない状態にする
-			g_player.bMove = false;
+			if (g_player.boost.state != BOOSTSTATE_UP
+			&&  g_player.boost.state != BOOSTSTATE_DOWN)
+			{ // ブースト中ではない場合
+
+				// 移動していない状態にする
+				g_player.bMove = false;
+			}
 		}
 	}
 
@@ -1263,27 +1273,32 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		if (bBrake)
 		{ // 停止の操作が可能な場合
 
-			// 移動していない状態にする
-			g_player.bMove = false;
+			if (g_player.boost.state != BOOSTSTATE_UP
+			&&  g_player.boost.state != BOOSTSTATE_DOWN)
+			{ // ブースト中ではない場合
 
-			// 移動量を減速
-			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
+				// 移動していない状態にする
+				g_player.bMove = false;
 
-			if (g_player.move.x <= -STATE_MOVE
-			||  g_player.move.x >=  STATE_MOVE)
-			{ // 移動量が一定値の範囲外の場合
+				// 移動量を減速
+				g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
 
-				// 停止状態にする
-				currentPlayer = PLAYMOVESTATE_BRAKE;
-			}
+				if (g_player.move.x <= -STATE_MOVE
+				||  g_player.move.x >=  STATE_MOVE)
+				{ // 移動量が一定値の範囲外の場合
 
-			// 移動量の補正
-			if (g_player.move.x <=  DEL_MOVE_ABS
-			&&  g_player.move.x >= -DEL_MOVE_ABS)
-			{ // 移動量が削除の範囲内の場合
+					// 停止状態にする
+					currentPlayer = PLAYMOVESTATE_BRAKE;
+				}
 
-				// 移動量を削除
-				g_player.move.x = 0.0f;
+				// 移動量の補正
+				if (g_player.move.x <=  DEL_MOVE_ABS
+				&&  g_player.move.x >= -DEL_MOVE_ABS)
+				{ // 移動量が削除の範囲内の場合
+
+					// 移動量を削除
+					g_player.move.x = 0.0f;
+				}
 			}
 		}
 	}
