@@ -269,8 +269,12 @@ void UpdateTutorialPlayer(void)
 		if (GetTutorialState() == TUTORIALSTATE_NORMAL)
 		{ // チュートリアルが通常状態の場合
 
-			// チュートリアル通常時のプレイヤー更新
-			UpdateTutorialNorPlayer();
+			if (GetLessonState() != LESSON_06)
+			{ // レッスン6に挑戦中ではない場合
+
+				// チュートリアル通常時のプレイヤー更新
+				UpdateTutorialNorPlayer();
+			}
 		}
 		else if (GetTutorialState() == TUTORIALSTATE_END)
 		{ // チュートリアルが終了状態の場合
@@ -1253,7 +1257,7 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
+	if (GetKeyboardPress(DIK_LSHIFT) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
@@ -1421,7 +1425,7 @@ Player *GetPlayer(void)
 //============================================================
 void SlumBoostPlayer(void)
 {
-	if (GetKeyboardPress(DIK_LSHIFT) == true || GetJoyKeyPress(JOYKEY_B, 0) == true)
+	if (GetKeyboardPress(DIK_Y) == true || GetJoyKeyPress(JOYKEY_B, 0) == true)
 	{ // 加速の操作が行われている場合
 
 		// 加速の設定
@@ -1481,7 +1485,7 @@ void FlyAwayPlayer(void)
 //============================================================
 void SilenceWorldPlayer(void)
 {
-	if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_X, 0))
+	if (GetKeyboardTrigger(DIK_I) == true || GetJoyKeyTrigger(JOYKEY_X, 0))
 	{ // 攻撃モードの変更の操作が行われた場合
 
 		if (g_player.bomb.state == ATTACKSTATE_NONE)

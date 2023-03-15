@@ -10,6 +10,7 @@
 #include "3Dnotation.h"
 #include "model.h"
 #include "calculation.h"
+#include "tutorial.h"
 
 //************************************************************
 //	マクロ定義
@@ -22,13 +23,14 @@
 //************************************************************
 typedef struct
 {
-	D3DXVECTOR3 pos;					// 位置
-	D3DXVECTOR3 rot;					// 向き
-	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
-	Model       modelData;				// モデル情報
-	int        *p3DNotationIDParent;	// 親の強調表示インデックス
-	bool       *pUseParent;				// 親の使用状況
-	bool        bUse;					// 使用状況
+	D3DXVECTOR3  pos;					// 位置
+	D3DXVECTOR3  rot;					// 向き
+	D3DXMATRIX   mtxWorld;				// ワールドマトリックス
+	NOTATIONTYPE type;					// 種類
+	Model        modelData;				// モデル情報
+	int         *p3DNotationIDParent;	// 親の強調表示インデックス
+	bool        *pUseParent;			// 親の使用状況
+	bool         bUse;					// 使用状況
 } Notation3D;
 
 //************************************************************
@@ -61,6 +63,7 @@ void Init3DNotation(void)
 		// 基本情報を初期化
 		g_a3DNotation[nCntNota].pos                 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_a3DNotation[nCntNota].rot                 = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);	// 向き
+		g_a3DNotation[nCntNota].type                = NOTATIONTYPE_BREAK;				// 種類
 		g_a3DNotation[nCntNota].p3DNotationIDParent = NULL;								// 親の強調表示インデックス
 		g_a3DNotation[nCntNota].pUseParent          = NULL;								// 親の使用状況
 		g_a3DNotation[nCntNota].bUse                = false;							// 使用状況
@@ -120,7 +123,7 @@ void Draw3DNotation(void)
 	// 変数を宣言
 	D3DXMATRIX   mtxRot, mtxTrans;				// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
-	bool         bDrawExit;						// Exit表示の有無
+	bool         bDrawExit = false;				// Exit表示の有無
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -130,10 +133,20 @@ void Draw3DNotation(void)
 	{ // モードごとの処理
 	case MODE_TUTORIAL:	// チュートリアル
 
+		if (GetLessonState() >= LESSON_07)
+		{ // レッスン7に挑戦中、またはクリアしている場合
+
+			// Exitを表示状態にする
+			bDrawExit = true;
+		}
+
 		// 処理を抜ける
 		break;
 
 	case MODE_GAME:		// ゲーム
+
+		// Exitを表示状態にする
+		bDrawExit = true;
 
 		// 処理を抜ける
 		break;
@@ -174,8 +187,28 @@ void Draw3DNotation(void)
 				// テクスチャの設定
 				pDevice->SetTexture(0, g_a3DNotation[nCntNota].modelData.pTexture[nCntMat]);
 
-				// モデルの描画
-				g_a3DNotation[nCntNota].modelData.pMesh->DrawSubset(nCntMat);
+				switch (g_a3DNotation[nCntNota].type)
+				{ // 種類ごとの処理
+				case NOTATIONTYPE_EXIT:	// 脱出
+
+					if (bDrawExit)
+					{ // 脱出が表示状態の場合
+
+						// モデルの描画
+						g_a3DNotation[nCntNota].modelData.pMesh->DrawSubset(nCntMat);
+					}
+
+					// 処理を抜ける
+					break;
+
+				default:				// 上記以外
+
+					// モデルの描画
+					g_a3DNotation[nCntNota].modelData.pMesh->DrawSubset(nCntMat);
+
+					// 処理を抜ける
+					break;
+				}
 			}
 
 			// 保存していたマテリアルを戻す
@@ -194,6 +227,9 @@ int Set3DNotation(NOTATIONTYPE type, int *p3DNotationID, bool *pUse)
 
 		if (g_a3DNotation[nCntNota].bUse == false)
 		{ // 強調表示が使用されていない場合
+
+			// 種類を設定
+			g_a3DNotation[nCntNota].type = type;
 
 			// 引数のアドレスを代入
 			g_a3DNotation[nCntNota].p3DNotationIDParent = p3DNotationID;	// 親の強調表示インデックス

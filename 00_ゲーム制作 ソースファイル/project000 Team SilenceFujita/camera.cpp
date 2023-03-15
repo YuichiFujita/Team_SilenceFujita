@@ -436,7 +436,7 @@ void UpdateCamera(void)
 	case MODE_TUTORIAL:	// チュートリアル
 
 		if (GetLessonState() == LESSON_06)
-		{ // 現在のレッスンが警察の場合
+		{ // レッスン6に挑戦中の場合
 
 			if (GetTutorialPoliceData()->fAlpha != 0.0f)
 			{ // 現在の警察のα値が不透明の場合
