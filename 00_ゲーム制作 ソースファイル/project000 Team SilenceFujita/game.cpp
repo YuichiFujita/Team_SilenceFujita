@@ -814,7 +814,7 @@ void DrawGame(void)
 	DrawParticle();
 
 	// 天気の描画処理
-	//DrawWeather();
+	DrawWeather();
 	
 #ifdef _DEBUG	// デバッグ処理
 	if (g_nGameMode == GAMEMODE_EDIT)
