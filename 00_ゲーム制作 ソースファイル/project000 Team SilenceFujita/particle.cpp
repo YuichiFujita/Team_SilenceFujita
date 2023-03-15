@@ -45,6 +45,7 @@ void ParticleBreakObject(Particle *pParticle);	// オブジェクトを破壊した時のエフ
 void ParticlePlayerDeath(Particle *pParticle);	// プレイヤーの死亡爆発のエフェクト
 void ParticleObjectSmash(Particle *pParticle);	// オブジェクトを吹き飛ばした時のエフェクト
 void ParticleExhaustGas(Particle *pParticle);	// 排気ガスのエフェクト
+void ParticleShotBarrier(Particle *pParticle);	// バリア発射エフェクト
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -226,6 +227,13 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 
 				// 排気ガスのエフェクト
 				ParticleExhaustGas(&g_aParticle[nCntParticle]);
+
+				break;
+				
+			case PARTICLETYPE_SHOT_BARRIER:
+
+				// バリア発射エフェクト
+				ParticleShotBarrier(&g_aParticle[nCntParticle]);
 
 				break;
 			}
@@ -815,6 +823,44 @@ void ParticleExhaustGas(Particle *pParticle)
 			fRadius,			// 半径
 			-4.0f,				// 減算量 (半径)
 			EFFECTTYPE_BREAKOBJECT	// 破壊の煙
+		);
+	}
+}
+
+//======================================================================================================================
+//	バリア発射エフェクト
+//======================================================================================================================
+void ParticleShotBarrier(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;	// エフェクトの移動量の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		// ベクトルをランダムに設定
+		move.x = sinf((float)(rand() % 629 - 314) / 100.0f);
+		move.y = cosf((float)(rand() % 629 - 314) / 100.0f);
+		move.z = cosf((float)(rand() % 629 - 314) / 100.0f);
+
+		// ベクトルを正規化
+		D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x *= 4.0f;
+		move.y *= 4.0f;
+		move.z *= 4.0f;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			pParticle->pos,	// 位置
+			move,			// 移動量
+			pParticle->col,	// 色
+			30,				// 寿命
+			40.0f,			// 半径
+			1.2f,			// 減算量 (半径)
+			EFFECTTYPE_NONE	// その他
 		);
 	}
 }

@@ -118,18 +118,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 	// 変数を宣言
 	WNDCLASSEX wcex =
 	{ // 初期値
-		sizeof(WNDCLASSEX),					// WNDCLASSEX のメモリサイズ
-		CS_CLASSDC,							// ウインドウのスタイル
-		WindowProc,							// ウインドウプロシージャ
-		0,									// 0 にする (通常は使用しない)
-		0,									// 0 にする (通常は使用しない)
-		hInstance,							// インスタンスハンドル
-		LoadIcon(NULL, IDI_APPLICATION),	// タスクバーのアイコン
-		LoadCursor(NULL, IDC_ARROW),		// マウスカーソル
-		(HBRUSH)(COLOR_WINDOW + 1),			// クライアント領域の背景色
-		NULL,								// メニューバー
-		CLASS_NAME,							// ウインドウクラスの名前
-		LoadIcon(NULL, IDI_APPLICATION)		// ファイルのアイコン
+		sizeof(WNDCLASSEX),									// WNDCLASSEX のメモリサイズ
+		CS_CLASSDC,											// ウインドウのスタイル
+		WindowProc,											// ウインドウプロシージャ
+		0,													// 0 にする (通常は使用しない)
+		0,													// 0 にする (通常は使用しない)
+		hInstance,											// インスタンスハンドル
+		LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)),	// タスクバーのアイコン
+		LoadCursor(NULL, IDC_ARROW),						// マウスカーソル
+		(HBRUSH)(COLOR_WINDOW + 1),							// クライアント領域の背景色
+		NULL,												// メニューバー
+		CLASS_NAME,											// ウインドウクラスの名前
+		LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1))		// ファイルのアイコン
 	};
 
 	// 画面サイズ
@@ -440,7 +440,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
+	g_mode = MODE_RESULT;			// モードをチュートリアルに初期化
 #else
 	g_mode = MODE_LOGO;				// モードをロゴに初期化
 #endif
