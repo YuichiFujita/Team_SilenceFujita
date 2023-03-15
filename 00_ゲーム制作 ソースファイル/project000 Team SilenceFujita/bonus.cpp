@@ -37,6 +37,7 @@
 #define BONUS_MOVE_MAGNI	(0.02f)		// プラスの移動量の倍率
 #define BONUS_STATE_CNT		(120)		// 加算状態になるまでのカウント
 #define BONUS_ADD_ALPHA		(0.02f)		// ボーナスの透明度に加算する値
+#define BONUS_SUB_ALPHA		(0.05f)		// ボーナスの透明度に減算する値
 
 #define BONUS_EFFECT_LIFE	(8)			// ボーナスのエフェクトの寿命
 #define BONUS_EFFECT_RADIUS	(40.0f)		// ボーナスのエフェクトの半径
@@ -220,15 +221,22 @@ void UpdateBonus(void)
 				if (g_aBonus[nCntBonus].nStateCounter >= BONUS_STATE_CNT)
 				{ // 状態カウンターが一定以上になったら
 
-					// 移動量を計算する
-					g_aBonus[nCntBonus].move.x = (ScorePos.x - g_aBonus[nCntBonus].pos.x) * BONUS_MOVE_MAGNI;
-					g_aBonus[nCntBonus].move.y = (ScorePos.y - g_aBonus[nCntBonus].pos.y) * BONUS_MOVE_MAGNI;
+					// 透明度を下げる
+					g_aBonus[nCntBonus].col.a -= BONUS_SUB_ALPHA;
 
-					// 透明度を設定する
-					g_aBonus[nCntBonus].col.a = 0.0f;
+					if (g_aBonus[nCntBonus].col.a <= 0.0f)
+					{ // 透明度が0.0f以下になった場合
 
-					// 加算状態にする
-					g_aBonus[nCntBonus].state = BONUSSTATE_ADDSCORE;
+						// 移動量を計算する
+						g_aBonus[nCntBonus].move.x = (ScorePos.x - g_aBonus[nCntBonus].pos.x) * BONUS_MOVE_MAGNI;
+						g_aBonus[nCntBonus].move.y = (ScorePos.y - g_aBonus[nCntBonus].pos.y) * BONUS_MOVE_MAGNI;
+
+						// 透明度を設定する
+						g_aBonus[nCntBonus].col.a = 0.0f;
+
+						// 加算状態にする
+						g_aBonus[nCntBonus].state = BONUSSTATE_ADDSCORE;
+					}
 				}
 
 				break;					// 抜け出す
