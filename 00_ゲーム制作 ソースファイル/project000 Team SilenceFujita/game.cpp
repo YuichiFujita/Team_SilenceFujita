@@ -695,7 +695,7 @@ void UpdateGame(void)
 
 			// ‰e‚ÌXV
 			UpdateShadow();
-#if 0
+#if 1
 			// Œx@‚Ì’Ç‰Áˆ—
 			AddPolice();
 #endif
