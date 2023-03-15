@@ -18,6 +18,7 @@
 #include "camera.h"
 #include "Combo.h"
 #include "death.h"
+#include "effect.h"
 #include "gate.h"
 #include "object.h"
 #include "particle.h"
@@ -525,7 +526,7 @@ void HitPlayer(Player *pPlayer, int nDamage)
 			SetParticle
 			( // 引数
 				pPlayer->pos,						// 位置
-				D3DXCOLOR(0.8f, 0.0f, 0.3f, 1.0f),	// 色
+				D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f),	// 色
 				PARTICLETYPE_DAMAGE,				// 種類
 				SPAWN_PARTICLE_DAMAGE,				// エフェクト数
 				2									// 寿命

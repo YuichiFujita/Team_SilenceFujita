@@ -16,7 +16,7 @@
 //	マクロ定義
 //**********************************************************************************************************************
 #define SPAWN_PARTICLE_EXPLOSION	(8)		// パーティクル (爆発) のエフェクト数
-#define SPAWN_PARTICLE_DAMAGE		(6)		// パーティクル (ダメージ) のエフェクト数
+#define SPAWN_PARTICLE_DAMAGE		(10)	// パーティクル (ダメージ) のエフェクト数
 #define SPAWN_PARTICLE_DUST			(4)		// パーティクル（埃）のエフェクト数
 #define SPAWN_PARTICLE_RAINSPRAY	(8)		// パーティクル（水しぶき）のエフェクト数
 #define SPAWN_PARTICLE_SMOKING		(1)		// パーティクル（タバコの煙）のエフェクト数
@@ -25,6 +25,7 @@
 #define SPAWN_PARTICLE_BREAKARTICLE	(15)	// パーティクル（小物の破壊時の煙）のエフェクト数
 #define SPAWN_PARTICLE_BREAKOBJECT	(15)	// パーティクル（オブジェクトの破壊時の煙）のエフェクト数
 #define SPAWN_PARTICLE_PLAYERDEATH	(20)	// パーティクル（プレイヤーの死亡爆発）のエフェクト数
+#define SPAWN_PARTICLE_SHOT_BARRIER	(6)		// パーティクル (バリア発射) のエフェクト数
 
 //**********************************************************************************************************************
 //	列挙型定義 (PARTICLETYPE)
@@ -43,6 +44,8 @@ typedef enum
 	PARTICLETYPE_BREAK_ARTICLE,	// パーティクル（小物の破壊時）
 	PARTICLETYPE_BREAK_OBJECT,	// パーティクル（オブジェクトの破壊時）
 	PARTICLETYPE_PLAY_DEATH,	// パーティクル（プレイヤーの死亡爆発）
+	PARTICLETYPE_OBJECT_SMASH,	// パーティクル（オブジェクトを吹っ飛ばした時）
+	PARTICLETYPE_SHOT_BARRIER,	// パーティクル（バリア発射）
 	PARTICLETYPE_MAX,			// この列挙型の総数
 } PARTICLETYPE;
 
