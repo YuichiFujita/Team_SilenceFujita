@@ -269,8 +269,12 @@ void UpdateTutorialPlayer(void)
 		if (GetTutorialState() == TUTORIALSTATE_NORMAL)
 		{ // チュートリアルが通常状態の場合
 
-			// チュートリアル通常時のプレイヤー更新
-			UpdateTutorialNorPlayer();
+			if (GetLessonState() != LESSON_06)
+			{ // レッスン6に挑戦中ではない場合
+
+				// チュートリアル通常時のプレイヤー更新
+				UpdateTutorialNorPlayer();
+			}
 		}
 		else if (GetTutorialState() == TUTORIALSTATE_END)
 		{ // チュートリアルが終了状態の場合
@@ -1196,27 +1200,37 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		else if (GetKeyboardPress(DIK_S) == true || GetJoyKeyL2Press(0) == true)
 		{ // 後退の操作が行われた場合
 
-			// 後退状態にする
-			currentPlayer = PLAYMOVESTATE_BACK;
+			if (g_player.boost.state != BOOSTSTATE_UP
+			&&  g_player.boost.state != BOOSTSTATE_DOWN)
+			{ // ブースト中ではない場合
 
-			// 移動量を更新
-			g_player.move.x -= MOVE_BACKWARD;
-
-			if (g_player.move.x > 0)
-			{ // 移動量が 0より大きい場合
+				// 後退状態にする
+				currentPlayer = PLAYMOVESTATE_BACK;
 
 				// 移動量を更新
-				g_player.move.x -= MOVE_PLUS_BACKWARD;
-			}
+				g_player.move.x -= MOVE_BACKWARD;
 
-			// 移動している状態にする
-			g_player.bMove = true;
+				if (g_player.move.x > 0)
+				{ // 移動量が 0より大きい場合
+
+					// 移動量を更新
+					g_player.move.x -= MOVE_PLUS_BACKWARD;
+				}
+
+				// 移動している状態にする
+				g_player.bMove = true;
+			}
 		}
 		else
 		{ // 移動していない場合
 
-			// 移動していない状態にする
-			g_player.bMove = false;
+			if (g_player.boost.state != BOOSTSTATE_UP
+			&&  g_player.boost.state != BOOSTSTATE_DOWN)
+			{ // ブースト中ではない場合
+
+				// 移動していない状態にする
+				g_player.bMove = false;
+			}
 		}
 	}
 
@@ -1253,33 +1267,38 @@ PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_LCONTROL) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
+	if (GetKeyboardPress(DIK_LSHIFT) == true || GetJoyKeyPress(JOYKEY_L1, 0) == true || GetJoyKeyPress(JOYKEY_R1, 0) == true)
 	{ // ブレーキの操作が行われた場合
 
 		if (bBrake)
 		{ // 停止の操作が可能な場合
 
-			// 移動していない状態にする
-			g_player.bMove = false;
+			if (g_player.boost.state != BOOSTSTATE_UP
+			&&  g_player.boost.state != BOOSTSTATE_DOWN)
+			{ // ブースト中ではない場合
 
-			// 移動量を減速
-			g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
+				// 移動していない状態にする
+				g_player.bMove = false;
 
-			if (g_player.move.x <= -STATE_MOVE
-			||  g_player.move.x >=  STATE_MOVE)
-			{ // 移動量が一定値の範囲外の場合
+				// 移動量を減速
+				g_player.move.x += (0.0f - g_player.move.x) * REV_MOVE_BRAKE;
 
-				// 停止状態にする
-				currentPlayer = PLAYMOVESTATE_BRAKE;
-			}
+				if (g_player.move.x <= -STATE_MOVE
+				||  g_player.move.x >=  STATE_MOVE)
+				{ // 移動量が一定値の範囲外の場合
 
-			// 移動量の補正
-			if (g_player.move.x <=  DEL_MOVE_ABS
-			&&  g_player.move.x >= -DEL_MOVE_ABS)
-			{ // 移動量が削除の範囲内の場合
+					// 停止状態にする
+					currentPlayer = PLAYMOVESTATE_BRAKE;
+				}
 
-				// 移動量を削除
-				g_player.move.x = 0.0f;
+				// 移動量の補正
+				if (g_player.move.x <=  DEL_MOVE_ABS
+				&&  g_player.move.x >= -DEL_MOVE_ABS)
+				{ // 移動量が削除の範囲内の場合
+
+					// 移動量を削除
+					g_player.move.x = 0.0f;
+				}
 			}
 		}
 	}
@@ -1421,7 +1440,7 @@ Player *GetPlayer(void)
 //============================================================
 void SlumBoostPlayer(void)
 {
-	if (GetKeyboardPress(DIK_LSHIFT) == true || GetJoyKeyPress(JOYKEY_B, 0) == true)
+	if (GetKeyboardPress(DIK_Y) == true || GetJoyKeyPress(JOYKEY_B, 0) == true)
 	{ // 加速の操作が行われている場合
 
 		// 加速の設定
@@ -1481,7 +1500,7 @@ void FlyAwayPlayer(void)
 //============================================================
 void SilenceWorldPlayer(void)
 {
-	if (GetKeyboardTrigger(DIK_SPACE) == true || GetJoyKeyTrigger(JOYKEY_X, 0))
+	if (GetKeyboardTrigger(DIK_I) == true || GetJoyKeyTrigger(JOYKEY_X, 0))
 	{ // 攻撃モードの変更の操作が行われた場合
 
 		if (g_player.bomb.state == ATTACKSTATE_NONE)

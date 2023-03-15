@@ -156,7 +156,7 @@ const int aNextLesson[] =	// レッスンのカウンター
 	60,		// レッスン3 (吹飛散風) のレッスンカウンター
 	120,	// レッスン4 (無音世界) のレッスンカウンター
 	120,	// レッスン5 (コンボ)   のレッスンカウンター
-	60,		// レッスン6 (警察)     のレッスンカウンター
+	80,		// レッスン6 (警察)     のレッスンカウンター
 	0,		// レッスン7 (脱出)     のレッスンカウンター
 };
 
@@ -1444,8 +1444,8 @@ void UpdateTutorialUi(void)
 
 	case TUTOSTAGSTATE_WAIT:		// 待機状態
 
-		if (GetKeyboardTrigger(DIK_O) == true
-		||  GetJoyKeyTrigger(JOYKEY_BACK, 0) == true)
+		if (GetKeyboardTrigger(DIK_SPACE) == true
+		||  GetJoyKeyTrigger(JOYKEY_A, 0) == true)
 		{ // 便箋をしまう操作が行われた場合
 
 			// 便箋のしまい状態にする
