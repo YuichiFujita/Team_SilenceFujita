@@ -54,6 +54,8 @@
 #define PLAYER_BROKEN			(50)		// 黒煙が出る体力の境界
 #define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))		// ボロボロになっている車の色の追加量
 #define PLAYER_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))		// 黒煙の色
+#define PLAYER_BACK				(125.0f)	// プレイヤーの後ろ
+#define PLAYER_SHIFT_EXHAUST	(30.0f)		// プレイヤーの排気ガスのずらす幅
 
 #define PLAY_CLEAR_MOVE			(4.0f)		// クリア成功時のプレイヤーの自動移動量
 #define REV_PLAY_CLEAR_MOVE		(0.1f)		// クリア成功時のプレイヤーの減速係数
@@ -139,6 +141,7 @@ void UpdateSilenceWorld(void);		// 爆弾の更新処理
 
 void AbiHealPlayer(void);			// 能力ゲージの回復処理
 void CameraChange(void);			// カメラを変えたときの処理
+void ExhaustGas(void);				// 排気ガス排出処理
 
 //************************************************************
 //	グローバル変数
@@ -1557,7 +1560,8 @@ void UpdateSlumBoost(void)
 	{ // 加速状態ごとの処理
 	case BOOSTSTATE_NONE:	// 何もしない状態
 
-		// 無し
+		// 排気ガス排出処理
+		ExhaustGas();
 
 		// 処理を抜ける
 		break;
@@ -1654,6 +1658,9 @@ void UpdateSlumBoost(void)
 
 	case BOOSTSTATE_DOWN:	// 減速状態
 
+		// 排気ガス排出処理
+		ExhaustGas();
+
 		// 追加速度を減速
 		g_player.boost.plusMove.x -= BOOST_SUB_MOVE;
 
@@ -1674,6 +1681,9 @@ void UpdateSlumBoost(void)
 		break;
 
 	case BOOSTSTATE_WAIT:	// 使用可能の待機状態
+
+		// 排気ガス排出処理
+		ExhaustGas();
 
 		if (g_player.boost.nCounter > 0)
 		{ // カウンターが 0より大きい場合
@@ -2138,6 +2148,42 @@ void SetPlayerGate(void)
 
 	// 出てくるゲートの位置を設定する
 	g_player.nNumEnterGate = nSpawnGateNum;
+}
+
+//============================================================
+// 排気ガス排出処理
+//============================================================
+void ExhaustGas(void)
+{
+	// パーティクルの設定処理
+	SetParticle
+	(
+		D3DXVECTOR3
+		(
+			g_player.pos.x - sinf(g_player.rot.y) * PLAYER_BACK + sinf(g_player.rot.y + (D3DX_PI * 0.5f)) * PLAYER_SHIFT_EXHAUST,
+			g_player.pos.y + 2.0f,
+			g_player.pos.z - cosf(g_player.rot.y) * PLAYER_BACK + cosf(g_player.rot.y + (D3DX_PI * 0.5f)) * PLAYER_SHIFT_EXHAUST
+		),
+		D3DXCOLOR(0.3f, 0.3f, 0.3f, 1.0f),
+		PARTICLETYPE_EXHAUST_GAS,
+		SPAWN_PARTICLE_EXHAUST_GAS,
+		1
+	);
+
+	// パーティクルの設定処理
+	SetParticle
+	(
+		D3DXVECTOR3
+		(
+			g_player.pos.x - sinf(g_player.rot.y) * PLAYER_BACK + sinf(g_player.rot.y - (D3DX_PI * 0.5f)) * PLAYER_SHIFT_EXHAUST,
+			g_player.pos.y + 2.0f,
+			g_player.pos.z - cosf(g_player.rot.y) * PLAYER_BACK + cosf(g_player.rot.y - (D3DX_PI * 0.5f)) * PLAYER_SHIFT_EXHAUST
+		),
+		D3DXCOLOR(0.3f, 0.3f, 0.3f, 1.0f),
+		PARTICLETYPE_EXHAUST_GAS,
+		SPAWN_PARTICLE_EXHAUST_GAS,
+		1
+	);
 }
 
 //============================================================
