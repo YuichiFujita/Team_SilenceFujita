@@ -154,10 +154,10 @@ void InitLife(void)
 	pVtx[7].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[4].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[5].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[6].col = D3DCOLOR_RGBA(205,  0,  0, 255);
-	pVtx[7].col = D3DCOLOR_RGBA(205,  0,  0, 255);
+	pVtx[4].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[5].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[6].col = D3DCOLOR_RGBA(90,  0,  0,  255);
+	pVtx[7].col = D3DCOLOR_RGBA(90,  0,  0,  255);
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	体力バー (黄)
