@@ -488,10 +488,10 @@ void InitAbiBoost(void)
 	pVtx[3].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[0].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[1].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[2].col = D3DCOLOR_RGBA(205,  0,  0, 255);
-	pVtx[3].col = D3DCOLOR_RGBA(205,  0,  0, 255);
+	pVtx[0].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[1].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[2].col = D3DCOLOR_RGBA(90,  0,  0,  255);
+	pVtx[3].col = D3DCOLOR_RGBA(90,  0,  0,  255);
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	能力バー (オレンジ)
@@ -647,10 +647,10 @@ void InitAbiWind(void)
 	pVtx[3].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[0].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[1].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[2].col = D3DCOLOR_RGBA(205,  0,  0, 255);
-	pVtx[3].col = D3DCOLOR_RGBA(205,  0,  0, 255);
+	pVtx[0].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[1].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[2].col = D3DCOLOR_RGBA(90,  0,  0,  255);
+	pVtx[3].col = D3DCOLOR_RGBA(90,  0,  0,  255);
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	能力バー (緑)
@@ -794,10 +794,10 @@ void InitAbiBomb(void)
 	pVtx[3].rhw = 1.0f;
 
 	// 頂点カラーの設定
-	pVtx[0].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[1].col = D3DCOLOR_RGBA(255, 50, 50, 255);
-	pVtx[2].col = D3DCOLOR_RGBA(205,  0,  0, 255);
-	pVtx[3].col = D3DCOLOR_RGBA(205,  0,  0, 255);
+	pVtx[0].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[1].col = D3DCOLOR_RGBA(140, 50, 50, 255);
+	pVtx[2].col = D3DCOLOR_RGBA(90,  0,  0,  255);
+	pVtx[3].col = D3DCOLOR_RGBA(90,  0,  0,  255);
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	能力バー (青)
@@ -850,13 +850,8 @@ void UpdateAbiBomb(void)
 	VERTEX_2D *pVtx;					// 頂点情報へのポインタ
 	Player    *pPlayer = GetPlayer();	// プレイヤーの情報
 
-	// 現在のボムの待機、使用時間を求める
-	//if (pPlayer->boost.state == BOOSTSTATE_UP)
-	{ // ボムが加速状態の場合
-
-		// ボムの使用時間を計算
-		fCurrentBomb = (float)pPlayer->bomb.nCounterState;
-	}
+	// ボムの使用時間を計算
+	fCurrentBomb = (float)pPlayer->bomb.nCounterState;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffAbiBomb->Lock(0, 0, (void**)&pVtx, 0);

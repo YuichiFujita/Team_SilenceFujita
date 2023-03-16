@@ -16,6 +16,8 @@
 
 #define PRAISE_INIT_POS		(D3DXVECTOR3(	0.0f,	0.0f, 0.0f))	// 褒めの初期位置
 #define PRAISE_POS			(D3DXVECTOR3(1100.0f, 500.0f, 0.0f))	// 褒めの位置
+#define PRAISE_INIT_SIZE	(D3DXVECTOR3( 810.0f, 150.0f, 0.0f))	// 褒めの初期サイズ
+#define PRAISE_SUB_SIZE		(D3DXVECTOR3(  81.0f,  15.0f, 0.0f))	// 褒めのサイズの減算量
 #define PRAISE_SIZE			(D3DXVECTOR3( 162.0f,  30.0f, 0.0f))	// 褒めのサイズ
 #define PRAISE_LAPSE_CNT	(90)									// 褒めを表示しておくカウント
 
@@ -62,13 +64,15 @@ void InitPraise(void)
 	for (int nCntPra = 0; nCntPra < MAX_PRAISE; nCntPra++)
 	{
 		// 情報の初期化
-		g_aPraise[nCntPra].pos	= PRAISE_INIT_POS;					// 位置
-		g_aPraise[nCntPra].rot	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aPraise[nCntPra].nCount = 0;								// 消滅カウント
-		g_aPraise[nCntPra].nNumTex = 0;								// 
-		g_aPraise[nCntPra].fAngle = atan2f((PRAISE_SIZE.x * 2), (PRAISE_SIZE.y * 2));		// 方向
-		g_aPraise[nCntPra].fLength = sqrtf((PRAISE_SIZE.x * 2) * (PRAISE_SIZE.x * 2) + (PRAISE_SIZE.y * 2) * (PRAISE_SIZE.y * 2)) * 0.5f;		// 長さ
-		g_aPraise[nCntPra].bUse = false;							// 使用状況
+		g_aPraise[nCntPra].pos		= PRAISE_INIT_POS;					// 位置
+		g_aPraise[nCntPra].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aPraise[nCntPra].size		= PRAISE_INIT_SIZE;					// サイズ
+		g_aPraise[nCntPra].state	= PRAISESTATE_APPEAR;				// 状態
+		g_aPraise[nCntPra].nCount	= 0;								// 消滅カウント
+		g_aPraise[nCntPra].nNumTex	= 0;								// テクスチャの番号
+		g_aPraise[nCntPra].fAngle	= atan2f((g_aPraise[nCntPra].size.x * 2), (g_aPraise[nCntPra].size.y * 2));		// 方向
+		g_aPraise[nCntPra].fLength	= sqrtf((g_aPraise[nCntPra].size.x * 2) * (g_aPraise[nCntPra].size.x * 2) + (g_aPraise[nCntPra].size.y * 2) * (g_aPraise[nCntPra].size.y * 2)) * 0.5f;		// 長さ
+		g_aPraise[nCntPra].bUse		= false;							// 使用状況
 	}
 
 	for (int nCntTex = 0; nCntTex < PRAISE_TEXTURE_MAX; nCntTex++)
@@ -170,17 +174,52 @@ void UpdatePraise(void)
 		if (g_aPraise[nCntPra].bUse == true)
 		{//使用していた場合
 
-			// 消滅カウンターを加算する
-			g_aPraise[nCntPra].nCount++;
+			switch (g_aPraise[nCntPra].state)
+			{
+			case PRAISESTATE_APPEAR:		// 出現状態
 
-			if (g_aPraise[nCntPra].nCount % PRAISE_LAPSE_CNT == 0)
-			{ // カウンターが一定数以上になったら
+				// サイズを加算する
+				g_aPraise[nCntPra].size -= PRAISE_SUB_SIZE;
 
-				// カウンターを初期化する
-				g_aPraise[nCntPra].nCount = 0;
+				if (g_aPraise[nCntPra].size.x <= PRAISE_SIZE.x)
+				{ // サイズが一定を超えた場合
 
-				// 使用しない
-				g_aPraise[nCntPra].bUse = false;
+					// サイズを補正する
+					g_aPraise[nCntPra].size = PRAISE_SIZE;
+
+					// 通常状態にする
+					g_aPraise[nCntPra].state = PRAISESTATE_NONE;
+				}
+
+				// 長さを算出する
+				g_aPraise[nCntPra].fAngle = atan2f((g_aPraise[nCntPra].size.x * 2), (g_aPraise[nCntPra].size.y * 2));		// 方向
+				g_aPraise[nCntPra].fLength = sqrtf((g_aPraise[nCntPra].size.x * 2) * (g_aPraise[nCntPra].size.x * 2) + (g_aPraise[nCntPra].size.y * 2) * (g_aPraise[nCntPra].size.y * 2)) * 0.5f;		// 長さ
+
+				break;
+
+			case PRAISESTATE_NONE:			// 通常状態
+
+				// 消滅カウンターを加算する
+				g_aPraise[nCntPra].nCount++;
+
+				if (g_aPraise[nCntPra].nCount % PRAISE_LAPSE_CNT == 0)
+				{ // カウンターが一定数以上になったら
+
+					// カウンターを初期化する
+					g_aPraise[nCntPra].nCount = 0;
+
+					// 消滅状態にする
+					g_aPraise[nCntPra].state = PRAISESTATE_LAPSE;
+
+					// 使用しない
+					g_aPraise[nCntPra].bUse = false;
+				}
+
+				break;
+
+			case PRAISESTATE_LAPSE:			// 消滅状態
+
+				break;
 			}
 
 			// 頂点座標の設定
@@ -260,17 +299,19 @@ void SetPraise(void)
 		{//使用していなかった場合
 
 			// 情報の設定
-			g_aPraise[nCntPra].pos = PRAISE_POS;		// 位置
-			g_aPraise[nCntPra].rot = D3DXVECTOR3		// 向き
+			g_aPraise[nCntPra].pos		= PRAISE_POS;		// 位置
+			g_aPraise[nCntPra].rot		= D3DXVECTOR3		// 向き
 			(
 				0.0f,
 				0.0f,
 				D3DXToRadian((rand() % 35 - 17))
 			);
-			g_aPraise[nCntPra].nNumTex = rand() % PRAISE_TEXTURE_MAX;	// テクスチャの番号
-			g_aPraise[nCntPra].nCount = 0;								// 消滅カウント
-			g_aPraise[nCntPra].fAngle = atan2f((PRAISE_SIZE.x * 2), (PRAISE_SIZE.y * 2));		// 方向
-			g_aPraise[nCntPra].fLength = sqrtf((PRAISE_SIZE.x * 2) * (PRAISE_SIZE.x * 2) + (PRAISE_SIZE.y * 2) * (PRAISE_SIZE.y * 2)) * 0.5f;		// 長さ
+			g_aPraise[nCntPra].size		= PRAISE_INIT_SIZE;					// サイズ
+			g_aPraise[nCntPra].state	= PRAISESTATE_APPEAR;				// 状態
+			g_aPraise[nCntPra].nNumTex	= rand() % PRAISE_TEXTURE_MAX;		// テクスチャの番号
+			g_aPraise[nCntPra].nCount	= 0;								// 消滅カウント
+			g_aPraise[nCntPra].fAngle	= atan2f((g_aPraise[nCntPra].size.x * 2), (g_aPraise[nCntPra].size.y * 2));		// 方向
+			g_aPraise[nCntPra].fLength	= sqrtf((g_aPraise[nCntPra].size.x * 2) * (g_aPraise[nCntPra].size.x * 2) + (g_aPraise[nCntPra].size.y * 2) * (g_aPraise[nCntPra].size.y * 2)) * 0.5f;		// 長さ
 
 			// 頂点座標の設定
 			pVtx[0].pos.x = g_aPraise[nCntPra].pos.x + sinf(g_aPraise[nCntPra].rot.z + (D3DX_PI + g_aPraise[nCntPra].fAngle)) * g_aPraise[nCntPra].fLength;
