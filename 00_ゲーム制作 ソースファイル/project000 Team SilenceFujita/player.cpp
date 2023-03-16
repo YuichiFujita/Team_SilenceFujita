@@ -568,6 +568,24 @@ void HitPlayer(Player *pPlayer, int nDamage)
 				8
 			);
 
+			//効果音系BGMの停止
+			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+			{
+				//風が使用中なら
+				if (g_player.wind.bUseWind == true)
+				{
+					//サウンドを停止
+					SetWindSound(false);
+				}
+			}
+
+			//効果音の再生
+			if (GetSoundType(SOUND_TYPE_SE) == true)
+			{
+				// サウンド(プレイヤーの死亡音）の再生
+				PlaySound(SOUND_LABEL_SE_LOST_000);
+			}
+
 			// 使用していない状態にする
 			pPlayer->bUse = false;
 
