@@ -570,8 +570,6 @@ bool UpdateAllClear(RESULTSTATE state)
 	Player      *pPlayer  = GetPlayer();			// プレイヤーの情報
 	Gate        *pGate    = GetGateData();			// ゲートの情報
 	Bonus       *pBonus   = GetBonus();				// ボーナスの情報
-	Barrier     *pBarrier = GetBarrierData();		// バリアの情報
-	BarrierInfo *pBarInfo = GetBarrierInfoData();	// バリアのまとまりの情報
 
 	//------------------------------------------------------------------------------
 	//　未終了の確認
@@ -649,23 +647,7 @@ bool UpdateAllClear(RESULTSTATE state)
 	pPlayer->boost.state   = BOOSTSTATE_NONE;	// プレイヤーのブースト状態
 	pPlayer->bomb.state    = ATTACKSTATE_NONE;	// プレイヤーのボム状態
 	pPlayer->wind.bUseWind = false;				// 風の使用状況
-	pPlayer->icon.state = ICONSTATE_NONE;		// アイコンの状態を通常状態にする
-
-	// バリアの情報の初期化
-	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier++)
-	{ // バリアの最大表示数分繰り返す
-
-		// 使用していない状態にする
-		pBarrier->bUse = false;
-	}
-
-	// バリアのまとまりの情報の初期化
-	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++, pBarInfo++)
-	{ // バリアのまとまりの最大表示数分繰り返す
-
-		// 使用していない状態にする
-		pBarInfo->bUse = false;
-	}
+	pPlayer->icon.state    = ICONSTATE_NONE;	// アイコンの状態を通常状態にする
 
 	// 更新状況を返す
 	return bAllClear;

@@ -40,8 +40,8 @@
 //************************************************************
 #define MOVE_FORWARD			(0.18f)		// プレイヤー前進時の移動量
 #define MOVE_BACKWARD			(0.3f)		// プレイヤー後退時の移動量
-#define MOVE_PLUS_FORWARD		(0.36f)		// プレイヤー前進時の追加の移動量
-#define MOVE_PLUS_BACKWARD		(0.6f)		// プレイヤー後退時の追加の移動量
+#define MOVE_PLUS_FORWARD		(0.4f)		// プレイヤー前進時の追加の移動量
+#define MOVE_PLUS_BACKWARD		(1.2f)		// プレイヤー後退時の追加の移動量
 #define MOVE_ROT				(0.012f)	// プレイヤーの向き変更量
 #define REV_MOVE_ROT			(0.08f)		// 移動量による向き変更量の補正係数
 #define REV_MOVE_BRAKE			(0.1f)		// ブレーキ時の減速係数
@@ -52,8 +52,8 @@
 #define UNRIVALED_CNT			(10)		// 無敵時にチカチカさせるカウント
 #define STATE_MOVE				(1.5f)		// 停止・旋回時の判定範囲
 #define PLAYER_BROKEN			(50)		// 黒煙が出る体力の境界
-#define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))		// ボロボロになっている車の色の追加量
-#define PLAYER_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))		// 黒煙の色
+#define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))	// ボロボロになっている車の色の追加量
+#define PLAYER_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))				// 黒煙の色
 #define PLAYER_BACK				(125.0f)	// プレイヤーの後ろ
 #define PLAYER_SHIFT_EXHAUST	(30.0f)		// プレイヤーの排気ガスのずらす幅
 
@@ -223,8 +223,28 @@ void InitPlayer(void)
 //============================================================
 void UninitPlayer(void)
 {
+	// ポインタを宣言
+	Barrier     *pBarrier = GetBarrierData();		// バリアの情報
+	BarrierInfo *pBarInfo = GetBarrierInfoData();	// バリアのまとまりの情報
+
 	// 使用していない状態にする
 	g_player.bUse = false;
+
+	// バリアの情報の初期化
+	for (int nCntBarrier = 0; nCntBarrier < MAX_BARRIER; nCntBarrier++, pBarrier++)
+	{ // バリアの最大表示数分繰り返す
+
+		// 使用していない状態にする
+		pBarrier->bUse = false;
+	}
+
+	// バリアのまとまりの情報の初期化
+	for (int nCntBarInfo = 0; nCntBarInfo < MAX_BARINFO; nCntBarInfo++, pBarInfo++)
+	{ // バリアのまとまりの最大表示数分繰り返す
+
+		// 使用していない状態にする
+		pBarInfo->bUse = false;
+	}
 }
 
 //============================================================
