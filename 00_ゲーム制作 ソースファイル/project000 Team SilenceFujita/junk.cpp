@@ -185,7 +185,12 @@ void UpdateJunk(void)
 			SetPositionShadow
 			(
 				g_aJunk[nCntJunk].nShadowID,
-				g_aJunk[nCntJunk].pos,
+				D3DXVECTOR3
+				(
+					g_aJunk[nCntJunk].pos.x,
+					10.0f,
+					g_aJunk[nCntJunk].pos.z
+				),
 				g_aJunk[nCntJunk].rot,
 				g_aJunk[nCntJunk].scale
 			);
