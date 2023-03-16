@@ -50,7 +50,7 @@
 #define CAR_TRAFFIC_CNT			(400)		// 渋滞が起きたときに改善する用のカウント
 #define CAR_TRAFFIC_IMPROVE_CNT	(540)		// 渋滞状態の解除のカウント
 #define CAR_TRAFFIC_ALPHA		(0.5f)		// 渋滞時の透明度
-#define CAR_OVERLAP_COUNT		(180)		// 車の重なりカウント
+#define CAR_OVERLAP_COUNT		(20)		// 車の重なりカウント
 #define CAR_STOP_COUNT			(240)		// 車の立ち止まりカウント
 
 //**********************************************************************************************************************
@@ -73,7 +73,7 @@ void CarBodyStopCar(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3
 void CarBodyStopPolice(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 rot, D3DXVECTOR3 *pMove, float fWidth, float fDepth, COLLOBJECTTYPE collObject, int *pTraCnt);		// 警察との当たり判定
 
 void CarTrafficImprove(Car *pCar);					// 車の渋滞改善処理
-bool OverlapCar(Car *pCar);							// 車の重なり防止処理
+void OverlapCar(Car *pCar);							// 車の重なり防止処理
 
 void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type);	//プレイヤーとの距離で音量を調整
 
@@ -108,7 +108,6 @@ void InitCar(void)
 		g_aCar[nCntCar].bMove			= false;							// 移動しているか
 		g_aCar[nCntCar].nTrafficCnt		= 0;								// 渋滞カウント
 		g_aCar[nCntCar].nStopCount		= 0;								// 停止カウント
-		g_aCar[nCntCar].nOverlapCounter = 0;								// 重なりカウント
 		g_aCar[nCntCar].state			= CARSTATE_NORMAL;					// 状態
 		g_aCar[nCntCar].bUse			= false;							// 使用状況
 
@@ -176,14 +175,8 @@ void UpdateCar(void)
 			if (g_aCar[nCntCar].bombState != BOMBSTATE_BAR_IN)
 			{ // バリア内状態ではない場合
 
-				if (g_aCar[nCntCar].nStopCount == 0)
-				{ // 停止カウントが0の場合
-
-					// 移動する
-					g_aCar[nCntCar].bMove = true;
-				}
-				else
-				{ // 上記以外
+				if (g_aCar[nCntCar].state == CARSTATE_OVERLAP)
+				{ // 重なり状態の場合
 
 					// 移動しない
 					g_aCar[nCntCar].bMove = false;
@@ -196,7 +189,16 @@ void UpdateCar(void)
 
 						// 停止カウントを初期化する
 						g_aCar[nCntCar].nStopCount = 0;
+
+						// 通常状態にする
+						g_aCar[nCntCar].state = CARSTATE_NORMAL;
 					}
+				}
+				else
+				{ // 上記以外
+
+					// 移動する
+					g_aCar[nCntCar].bMove = true;
 				}
 
 				// 前回位置の更新
@@ -207,6 +209,7 @@ void UpdateCar(void)
 				//----------------------------------------------------
 				// 車の向きを設定
 				fCarRot = g_aCar[nCntCar].rot.y + D3DX_PI;
+
 				RotNormalize(&fCarRot);	// 向きを正規化
 
 				// 影の位置設定
@@ -338,6 +341,12 @@ void UpdateCar(void)
 				)
 			);
 		}
+	}
+
+	for (int nCntOverlap = 0; nCntOverlap < MAX_CAR; nCntOverlap++)
+	{
+		// 車の重なり防止処理
+		OverlapCar(&g_aCar[nCntOverlap]);
 	}
 }
 
@@ -554,7 +563,6 @@ void SetCar(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nWalk, int nType)
 			g_aCar[nCntCar].bJump			= false;							// ジャンプしているかどうか
 			g_aCar[nCntCar].nTrafficCnt		= 0;								// 渋滞カウント
 			g_aCar[nCntCar].nStopCount		= 0;								// 停止カウント
-			g_aCar[nCntCar].nOverlapCounter = 0;								// 重なりカウント
 			g_aCar[nCntCar].state			= CARSTATE_NORMAL;					// 状態
 			g_aCar[nCntCar].bMove			= false;							// 移動していない
 
@@ -2074,42 +2082,30 @@ void CarSoundVolume(D3DXVECTOR3 *pPos, CARTYPE *type)
 //============================================================
 // 車の重なり防止処理
 //============================================================
-bool OverlapCar(Car *pCar)
+void OverlapCar(Car *pCar)
 {
-	bool bOverlap = false;			// 重なったかどうか
-
 	for (int nCnt = 0; nCnt < MAX_CAR; nCnt++)
 	{
 		if (g_aCar[nCnt].bUse == true && &g_aCar[nCnt] != pCar)
 		{ // 車が使われていた場合
 
-			if (g_aCar[nCnt].pos == pCar->pos && g_aCar[nCnt].bMove == true)
-			{ // 位置が一致かつ、移動量の最大数が一致していた場合
+			if (g_aCar[nCnt].pos == pCar->pos && g_aCar[nCnt].state != CARSTATE_OVERLAP)
+			{ // 位置が一致かつ、重なり状態じゃなかった場合
 
-				// 車の重なり防止カウンターを加算する
-				pCar->nOverlapCounter++;
+				// 移動量を0,0fにする
+				pCar->move.x = 0.0f;
 
-				// 重なり防止判定を通った
-				bOverlap = true;
+				// 移動をしない
+				pCar->bMove = false;
 
-				if (pCar->nOverlapCounter >= CAR_OVERLAP_COUNT)
-				{ // 重なり防止のカウンターが一定数を超えた場合
+				// 停止カウントを加算する
+				pCar->nStopCount++;
 
-					// 移動量を0,0fにする
-					pCar->move.x = 0.0f;
-
-					// 移動をしない
-					pCar->bMove = false;
-
-					// 停止カウントを加算する
-					pCar->nStopCount++;
-				}
+				// 重なり状態にする
+				pCar->state = CARSTATE_OVERLAP;
 			}
 		}
 	}
-
-	// 重なったかどうかを返す
-	return bOverlap;
 }
 
 #ifdef _DEBUG	// デバッグ処理

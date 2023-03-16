@@ -2090,7 +2090,7 @@ void SetPlayerGate(void)
 	Gate *pGate = GetGateData();		// ゲートの情報
 
 	// 出てくるゲートの番号をランダムで出す
-	nSpawnGateNum = rand() % nGateNum;
+	nSpawnGateNum = /*rand() % nGateNum*/0;
 
 	switch (pGate[nSpawnGateNum].collInfo->stateRot)
 	{
