@@ -13,13 +13,13 @@
 #define LASTCOUNT_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))			// ラストカウントの位置
 #define LASTCOUNT_INIT_SIZE			(D3DXVECTOR3(10.0f, 10.0f, 0.0f))										// ラストカウントの半径
 #define LASTCOUNT_SIZE				(D3DXVECTOR3(100.0f, 100.0f, 0.0f))										// ラストカウントの半径
-#define LASTCOUNT_ALPHA				(0.5f)				// ラストカウントの透明度
+#define LASTCOUNT_ALPHA				(0.7f)				// ラストカウントの透明度
 #define LASTCOUNT_ADD_SIZE			(5.0f)				// ラストカウントの追加サイズ
 #define LASTCOUNT_TIME				(10)				// ラストカウントが使われるようになる時間
 #define LASTCOUNT_CLEAR_ADDITION	(0.05f)				// ラストカウントの透明度の加算
 #define LASTCOUNT_CLEAR_INTERVAL	(5)					// ラストカウントが薄くなる間隔
 #define LASTCOUNT_INIT_ALPHA		(0.0f)				// ラストカウントの初期数値
-#define LASTCOUNT_SHIFT				(150.0f)			// ラストカウントのずらす幅
+#define LASTCOUNT_SHIFT				(130.0f)			// ラストカウントのずらす幅
 
 //グローバル変数
 LASTCOUNT g_LastCount;									//ラストカウントの情報
@@ -80,7 +80,7 @@ void UpdateLastCount(void)
 				// 位置を設定する
 				g_LastCount.pos = D3DXVECTOR3
 				(
-					LASTCOUNT_POS.x + LASTCOUNT_SIZE.x,
+					LASTCOUNT_POS.x + (LASTCOUNT_SHIFT * 0.5f),
 					LASTCOUNT_POS.y,
 					LASTCOUNT_POS.z
 				);
@@ -151,5 +151,5 @@ void DrawLastCount(void)
 	);
 
 	// 数値の描画
-	DrawValue(g_LastCount.nDigit, VALUETYPE_RED);
+	DrawValue(g_LastCount.nDigit, VALUETYPE_BURNING);
 }
