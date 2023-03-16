@@ -30,8 +30,8 @@ CountDown g_CountDown;											//カウントダウンの情報
 // コンスト定義
 const char *c_apCountdownTextureFilename[CNTDOWNTYPE_MAX] = 
 {
-	"data/TEXTURE/",
-	"data/TEXTURE/",
+	"data/TEXTURE/countdown000.png",			// 1分
+	"data/TEXTURE/countdown001.png",			// 30秒
 };
 
 //==========================================
@@ -197,8 +197,12 @@ void UpdateCountDown(void)
 				// 使用しない
 				g_CountDown.bUse = false;
 
-				// 脱出通知の設定処理
-				SetEscape();
+				if (g_CountDown.type == CNTDOWNTYPE_1MIN)
+				{ // 種類が残り1分の場合
+
+					// 脱出通知の設定処理
+					SetEscape();
+				}
 			}
 
 			break;
