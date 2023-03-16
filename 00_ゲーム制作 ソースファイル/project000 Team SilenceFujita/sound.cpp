@@ -67,6 +67,7 @@ SOUNDINFO g_aSoundInfo[SOUND_LABEL_MAX] =
 	{ "data/SE/carbrake000.wav", 0 },		// ブレーキ音のSE_000
 	{ "data/SE/break000.wav", 0 },			// 破壊音のSE_000
 	{ "data/SE/damage000.wav", 0 },			// プレイヤーダメージのSE_000
+	{ "data/SE/playerlost000.wav", 0 },			// プレイヤー死亡時のSE_000
 	{ "data/SE/fly000.wav", 0 },			// 吹き飛ばし時のSE_000
 	{ "data/SE/barrier000.wav", 0 },		// バリア生成時のSE_000
 	{ "data/SE/gareki000.wav", 0 },			// 崩れる（建物系）のSE_000
