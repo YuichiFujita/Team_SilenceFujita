@@ -11536,7 +11536,7 @@ Mesh {
   3,
   7;;
   Material {
-   0.772000;0.664800;0.147200;1.000000;;
+   0.423529;0.345098;0.053333;1.000000;;
    5.000000;
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
@@ -11619,7 +11619,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\blower000.png";
+    "C:\\Users\\student\\Desktop\\teamclone\\Team_SilenceFujita\\00_ゲーム制作 ソ\ースファイル\\project000 Team SilenceFujita\\data\\TEXTURE\\blower000.png";
    }
   }
   Material {
