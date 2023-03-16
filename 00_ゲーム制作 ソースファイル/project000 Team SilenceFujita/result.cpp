@@ -27,15 +27,16 @@
 // マクロ定義
 //**********************************************************************************************************************
 #define RESULT_FINISH_COUNT		(30)			// リザルトが終了するまでのカウント
-#define RESULT_SCORE_WIDTH		(70.0f)			// 値の縦幅
-#define RESULT_SCORE_HEIGHT		(100.0f)		// 値の横幅
-#define RESULT_SCORE_SHIFT		(110.0f)		// 値の横幅
-#define RESULT_SCORE_POS		(D3DXVECTOR3(1080.0f, 500.0f, 0.0f))
-#define RESULT_SCORE_BACK_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 500.0f, 0.0f))
-#define RESULT_SCORE_BACK_SIZE	(D3DXVECTOR3(500.0f, 100.0f, 0.0f))
+#define RESULT_SCORE_WIDTH		(60.0f)			// 値の縦幅
+#define RESULT_SCORE_HEIGHT		(60.0f)			// 値の横幅
+#define RESULT_SCORE_SHIFT		(90.0f)			// 値のずらす幅
+#define RESULT_SCORE_POS		(D3DXVECTOR3(1000.0f, 560.0f, 0.0f))
+#define RESULT_SCORE_BACK_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 550.0f, 0.0f))
+#define RESULT_SCORE_BACK_SIZE	(D3DXVECTOR3(540.0f, 120.0f, 0.0f))
 
-#define RESULT_WORD_RADIUS_X	(500.0f)		// 言葉の半径(X軸)
-#define RESULT_WORD_RADIUS_Y	(100.0f)		// 言葉の半径(Y軸)
+#define RESULT_WORD_RADIUS		(D3DXVECTOR3(540.0f, 75.0f, 0.0f))						// 言葉の半径
+#define RESULT_WORD_BACK_RADIUS	(D3DXVECTOR3(640.0f, 160.0f, 0.0f))						// 言葉の背景の半径
+#define RESULT_WORD_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 180.0f, 0.0f))		// 言葉の位置
 
 #define RANK_CHANGE_CNT			(450)			// 自動遷移のカウント
 #define RANK_AFTERGLOW_CNT		(60)			// スコア完成後の余韻のカウント
@@ -47,6 +48,8 @@ typedef enum
 {
 	RSL_TEX_GAMECLEAR = 0,		// ゲームクリア
 	RSL_TEX_GAMEOVER,			// ゲームオーバー
+	RSL_TEX_WORD_BACK,			// 言葉の背景
+	RSL_TEX_SCORE_BACK,			// スコアの背景
 	RSL_TEX_MAX					// この列挙型の総数
 }RSLTEXTURE;
 
@@ -73,7 +76,6 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void RslWordUpdateRsl(void);		// 言葉の更新処理
 
 //**********************************************************************************************************************
 // グローバル変数宣言
@@ -100,8 +102,10 @@ RSLWORD g_RslWord;											// 文字の情報
 //**********************************************************************************************************************
 const char *c_apFilenameResult[RSL_TEX_MAX] =
 {
-	"data/TEXTURE/GAMECLEAR.png",							// ゲームクリア
-	"data/TEXTURE/GAMEOVER.png",							// ゲームオーバー
+	"data/TEXTURE/GAMECLEAR.tga",							// ゲームクリア
+	"data/TEXTURE/GAMEOVER.tga",							// ゲームオーバー
+	"data/TEXTURE/ui008.tga",								// 言葉の背景
+	"data/TEXTURE/ui009.tga",								// スコアの背景
 };
 
 //===============================
@@ -132,8 +136,8 @@ void InitResult(void)
 		g_nResultCounter = 0;
 
 		// 言葉の情報を初期化
-		g_RslWord.pos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 150.0f, 0.0f);		// 中心
-		g_RslWord.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
+		g_RslWord.pos = RESULT_WORD_POS;					// 中心
+		g_RslWord.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
 
 		g_bRslFade = false;					// リザルトから遷移するかどうか
 
@@ -163,11 +167,28 @@ void InitResult(void)
 
 		for (int nCntVtx = 0; nCntVtx < RSL_POLI_MAX; nCntVtx++)
 		{
-			//頂点座標の設定
-			pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
-			pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
-			pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
-			pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+			switch (nCntVtx)
+			{
+			case RSL_POLI_WORD:		// 言葉
+
+				//頂点座標の設定
+				pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS.x, g_RslWord.pos.y - RESULT_WORD_RADIUS.y, 0.0f);
+				pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS.x, g_RslWord.pos.y - RESULT_WORD_RADIUS.y, 0.0f);
+				pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS.x, g_RslWord.pos.y + RESULT_WORD_RADIUS.y, 0.0f);
+				pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS.x, g_RslWord.pos.y + RESULT_WORD_RADIUS.y, 0.0f);
+
+				break;
+
+			case RSL_POLI_BACK:		// 背景
+
+				//頂点座標の設定
+				pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_BACK_RADIUS.x, g_RslWord.pos.y - RESULT_WORD_BACK_RADIUS.y, 0.0f);
+				pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_BACK_RADIUS.x, g_RslWord.pos.y - RESULT_WORD_BACK_RADIUS.y, 0.0f);
+				pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_BACK_RADIUS.x, g_RslWord.pos.y + RESULT_WORD_BACK_RADIUS.y, 0.0f);
+				pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_BACK_RADIUS.x, g_RslWord.pos.y + RESULT_WORD_BACK_RADIUS.y, 0.0f);
+
+				break;
+			}
 
 			//rhwの設定
 			pVtx[0].rhw = 1.0f;
@@ -438,6 +459,9 @@ void DrawResult(void)
 			{
 			case RSL_POLI_BACK:			// 背景
 
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureResult[RSL_TEX_WORD_BACK]);
+
 				break;
 
 			case RSL_POLI_WORD:			// 言葉
@@ -475,7 +499,7 @@ void DrawResult(void)
 			sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
 
 		// テクスチャの設定
-		pDevice->SetTexture(0, NULL);
+		pDevice->SetTexture(0, g_apTextureResult[RSL_TEX_SCORE_BACK]);
 
 		//ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
@@ -500,26 +524,4 @@ void DrawResult(void)
 
 	// 数値の描画
 	DrawValue(VAL_SCO_DIGIT, VALUETYPE_NORMAL);
-}
-
-//=======================================
-// 言葉の更新処理
-//=======================================
-void RslWordUpdateRsl(void)
-{
-	VERTEX_2D * pVtx;										//頂点情報へのポインタ
-
-	//g_RslWord.pos.x += 
-
-	//頂点バッファをロックし、頂点情報へのポインタを取得
-	g_pVtxBuffResultWord->Lock(0, 0, (void**)&pVtx, 0);
-
-	//頂点座標の設定
-	pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
-
-	//頂点バッファをアンロックする
-	g_pVtxBuffResultWord->Unlock();
 }
