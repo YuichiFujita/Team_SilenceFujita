@@ -185,6 +185,7 @@
     <ClCompile Include="input.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="junk.cpp" />
+    <ClCompile Include="lastcount.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="Logo.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="input.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="junk.h" />
+    <ClInclude Include="lastcount.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="Logo.h" />
