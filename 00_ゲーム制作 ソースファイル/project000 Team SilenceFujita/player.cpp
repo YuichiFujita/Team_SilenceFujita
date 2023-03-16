@@ -588,18 +588,21 @@ void HitPlayer(Player *pPlayer, int nDamage)
 				8
 			);
 
-			//効果音系BGMの停止
+			// 効果音系BGMの停止
 			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
 			{
-				//風が使用中なら
+				// 風が使用中なら
 				if (g_player.wind.bUseWind == true)
 				{
-					//サウンドを停止
+					// サウンドを停止
 					SetWindSound(false);
 				}
+
+				// エンジン音の停止
+				SetSoundVolume(SOUND_LABEL_BGM_CAR_000,0.0f);
 			}
 
-			//効果音の再生
+			// 効果音の再生
 			if (GetSoundType(SOUND_TYPE_SE) == true)
 			{
 				// サウンド(プレイヤーの死亡音）の再生
