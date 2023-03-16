@@ -659,7 +659,7 @@ void UpdateGame(void)
 
 			// 体力バーの更新
 			UpdateLife();
-#if 0
+#if 1
 			// タイマーの更新
 			UpdateTimer();
 #endif
@@ -695,7 +695,7 @@ void UpdateGame(void)
 
 			// 影の更新
 			UpdateShadow();
-#if 0
+#if 1
 			// 警察の追加処理
 			AddPolice();
 #endif
