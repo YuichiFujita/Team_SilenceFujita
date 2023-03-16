@@ -29,7 +29,7 @@
 #define BONUS_RIGHT_X		(1080.0f)	// 右にボーナスを出す時の座標(X座標)
 #define BONUS_LEFT_X		(40.0f)		// 左にボーナスを出す時の座標(X座標)
 #define BONUS_RIGHT_Y		(400)		// 右にボーナスを出す時の座標(Y座標)
-#define BONUS_RIGHT_SHIFT	(120)		// 右にボーナスを出す時のずらす座標(Y座標)
+#define BONUS_RIGHT_SHIFT	(50)		// 右にボーナスを出す時のずらす座標(Y座標)
 #define BONUS_LEFT_Y		(200)		// 左にボーナスを出す時の座標(Y座標)
 #define BONUS_LEFT_SHIFT	(350)		// 左にボーナスを出す時のずらす座標(Y座標)
 #define BONUS_SCORE_POS		(D3DXVECTOR3( 918.0f, 573.0f, 0.0f))		// スコアの位置
