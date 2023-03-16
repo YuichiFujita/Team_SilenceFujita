@@ -865,6 +865,16 @@ void CollisionExitGate(Gate *pGate)
 		&&  LineOuterProduct(rightPos, rightForwardPos, pPlayer->pos) > 0)
 		{ // ゲートを通った場合
 
+			// 効果音BGMの停止
+			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+			{
+				// 風の送風機
+				SetWindSound(false);
+
+				// エンジン音の停止
+				SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 0.0f);
+			}
+
 			// 脱出ゲートのアドレスを代入
 			g_exit.pGate = pGate;
 
