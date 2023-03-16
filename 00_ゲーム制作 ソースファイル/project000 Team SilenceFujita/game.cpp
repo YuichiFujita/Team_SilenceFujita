@@ -37,6 +37,7 @@
 #include "icon.h"
 #include "item.h"
 #include "junk.h"
+#include "lastcount.h"
 #include "life.h"
 #include "light.h"
 #include "map.h"
@@ -201,6 +202,9 @@ void InitGame(void)
 
 	// タイマーの初期化
 	InitTimer();
+
+	// ラストカウントの初期化
+	InitLastCount();
 
 	// 能力バーの初期化
 	InitAbility();
@@ -403,6 +407,9 @@ void UninitGame(void)
 
 	// タイマーの終了
 	UninitTimer();
+
+	// ラストカウントの終了
+	UninitLastCount();
 
 	// 能力バーの終了
 	UninitAbility();
@@ -663,6 +670,9 @@ void UpdateGame(void)
 			// タイマーの更新
 			UpdateTimer();
 #endif
+			// ラストカウントの更新
+			UpdateLastCount();
+
 			// カウントダウンの更新
 			UpdateCountDown();
 
@@ -898,6 +908,9 @@ void DrawGame(void)
 
 	// カウントダウンの描画
 	DrawCountDown();
+
+	// ラストカウントの描画
+	DrawLastCount();
 
 	if (g_bPause == true)
 	{ // ポーズ状態の場合
