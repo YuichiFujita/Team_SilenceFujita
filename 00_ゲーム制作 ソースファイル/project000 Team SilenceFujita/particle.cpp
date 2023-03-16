@@ -44,6 +44,7 @@ void ParticleBreakArticle(Particle *pParticle);	// 小物を破壊した時のエフェクト
 void ParticleBreakObject(Particle *pParticle);	// オブジェクトを破壊した時のエフェクト
 void ParticlePlayerDeath(Particle *pParticle);	// プレイヤーの死亡爆発のエフェクト
 void ParticleObjectSmash(Particle *pParticle);	// オブジェクトを吹き飛ばした時のエフェクト
+void ParticleExhaustGas(Particle *pParticle);	// 排気ガスのエフェクト
 void ParticleShotBarrier(Particle *pParticle);	// バリア発射エフェクト
 
 //**********************************************************************************************************************
@@ -222,6 +223,13 @@ void SetParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLETYPE type, int nSpawn, 
 
 				break;
 
+			case PARTICLETYPE_EXHAUST_GAS:
+
+				// 排気ガスのエフェクト
+				ParticleExhaustGas(&g_aParticle[nCntParticle]);
+
+				break;
+				
 			case PARTICLETYPE_SHOT_BARRIER:
 
 				// バリア発射エフェクト
@@ -769,6 +777,52 @@ void ParticleObjectSmash(Particle *pParticle)
 			30.0f,			// 半径
 			-3.0f,			// 減算量 (半径)
 			EFFECTTYPE_BREAKOBJECT	// その他
+		);
+	}
+}
+
+//======================================================================================================================
+// 排気ガスのエフェクト
+//======================================================================================================================
+void ParticleExhaustGas(Particle *pParticle)
+{
+	// 変数を宣言
+	D3DXVECTOR3 move;		// エフェクトの移動量の代入用
+	float fRadius;			// エフェクトの半径の代入用
+	int nLife;				// エフェクトの寿命の代入用
+
+	for (int nCntAppear = 0; nCntAppear < pParticle->nSpawn; nCntAppear++)
+	{ // パーティクルの 1Fで生成されるエフェクト数分繰り返す
+
+		//// ベクトルを正規化
+		//D3DXVec3Normalize(&move, &move);
+
+		// 移動量を乗算
+		move.x = sinf(GetPlayer()->rot.y) * (float)((rand() % 4));
+		move.y = (float)((rand() % 5 + 3) * 0.01f);
+		move.z = cosf(GetPlayer()->rot.y) * (float)((rand() % 4));
+
+		// 半径をランダムに設定
+		fRadius = (float)(rand() % 10 + 30);
+
+		// 寿命を設定
+		nLife = (rand() % 10) + 10;
+
+		// エフェクトの設定
+		SetEffect
+		( // 引数
+			D3DXVECTOR3
+			(
+				pParticle->pos.x,
+				pParticle->pos.y,
+				pParticle->pos.z
+			),		// 位置
+			move,				// 移動量
+			pParticle->col,		// 色
+			nLife,				// 寿命
+			fRadius,			// 半径
+			-4.0f,				// 減算量 (半径)
+			EFFECTTYPE_BREAKOBJECT	// 破壊の煙
 		);
 	}
 }

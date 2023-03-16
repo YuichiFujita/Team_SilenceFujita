@@ -16,7 +16,7 @@
 
 #define PRAISE_INIT_POS		(D3DXVECTOR3(	0.0f,	0.0f, 0.0f))	// 褒めの初期位置
 #define PRAISE_POS			(D3DXVECTOR3(1100.0f, 500.0f, 0.0f))	// 褒めの位置
-#define PRAISE_SIZE			(D3DXVECTOR3( 135.0f,  25.0f, 0.0f))	// 褒めのサイズ
+#define PRAISE_SIZE			(D3DXVECTOR3( 162.0f,  30.0f, 0.0f))	// 褒めのサイズ
 #define PRAISE_LAPSE_CNT	(90)									// 褒めを表示しておくカウント
 
 //===========================================
@@ -265,7 +265,7 @@ void SetPraise(void)
 			(
 				0.0f,
 				0.0f,
-				(rand() % 91 - 45) * 0.01f
+				D3DXToRadian((rand() % 35 - 17))
 			);
 			g_aPraise[nCntPra].nNumTex = rand() % PRAISE_TEXTURE_MAX;	// テクスチャの番号
 			g_aPraise[nCntPra].nCount = 0;								// 消滅カウント

@@ -9,6 +9,7 @@
 //**********************************************************************************************************************
 #include "main.h"
 #include "shadow.h"
+#include "calculation.h"
 
 #include "death.h"
 #include "particle.h"
@@ -20,6 +21,7 @@
 #define DEATH_INIT_ROT		(D3DXVECTOR3(0.0f, 0.0f, 0.0f))		// 亡骸の初期向き
 #define DEATH_SMOKE_CNT		(30)								// 黒煙が出るカウント数
 #define DEATH_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))	// 黒煙の色
+#define DEATH_ADD_ROT		(40)								// 向きの追加量
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
@@ -165,6 +167,11 @@ void SetDeath(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 		// 変数を代入
 		g_death.pos = pos;		// 位置
 		g_death.rot = rot;		// 向き
+		g_death.rot.y -= D3DXToRadian(DEATH_ADD_ROT);		// 向きを少し傾ける
+
+		// 向きの正規化
+		RotNormalize(&g_death.rot.y);
+
 		g_death.nSmokeCnt = 0;	// 黒煙カウント
 		g_death.bUse = true;	// 使用している状態にする
 

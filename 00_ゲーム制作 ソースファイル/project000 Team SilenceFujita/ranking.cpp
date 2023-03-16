@@ -95,14 +95,15 @@
 #define RANK_LINE_HEIGHT	(20.0f)		//下線の大きさ（Y）
 #define RANK_LINE_OVER_X	(70.0f)		//下線を伸ばす距離（X）
 #define RANK_LINE_POS_X		(120.0f)	//初期でずらす位置（X）
+#define RANK_LINE_POS_Y		(10.0f)		//初期でずらす位置（Y）
 
 //**********************************
-//* ランキング（下線）の2Dポリゴン関係
+//* ランキング（順位）の2Dポリゴン関係
 //**********************************
 #define RANK_RANK_WIDTH		(60.0f)		//順位の大きさ（X）
 #define RANK_RANK_HEIGHT	(40.0f)		//順位の大きさ（Y）
 #define RANK_RANK_POS_X		(40.0f)		//順位の位置調整（X）
-#define RANK_RANK_POS_Y		(20.0f)		//順位の位置調整（Y）
+#define RANK_RANK_POS_Y		(10.0f)		//順位の位置調整（Y）
 
 //**********************************
 //* 画面遷移中のランキングスコアの数値関係
@@ -255,7 +256,9 @@ void InitRanking(void)
 			//下線
 			for (int nCount = 0; nCount < RANK_SCORE_MAX; nCount++)
 			{
-				g_rank2DLine[nCount].pos = D3DXVECTOR3(RANK_POS_X, RANK_POS_Y + ((nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT), 0.0f);
+				g_rank2DLine[nCount].pos = D3DXVECTOR3(RANK_POS_X,
+													   (RANK_POS_Y - RANK_LINE_POS_Y) + ((nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT), 0.0f);
+
 				g_rank2DLine[nCount].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				g_rank2DLine[nCount].bUse = true;
 			}
@@ -308,7 +311,10 @@ void InitRanking(void)
 			//下線
 			for (int nCount = 0; nCount < RANK_SCORE_MAX; nCount++)
 			{
-				g_rank2DLine[nCount].pos = D3DXVECTOR3(RANK_FADE_POS_X, RANK_FADE_POS_Y + ((nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT), 0.0f);
+
+				g_rank2DLine[nCount].pos = D3DXVECTOR3(RANK_FADE_POS_X, 
+													   (RANK_FADE_POS_Y - RANK_LINE_POS_Y) + ((nCount * RANK_INTERVAL_Y) + RANK_LINE_HEIGHT), 0.0f);
+
 				g_rank2DLine[nCount].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				g_rank2DLine[nCount].bUse = true;
 			}
@@ -316,7 +322,8 @@ void InitRanking(void)
 			//順位
 			for (int nCount = 0; nCount < RANK_SCORE_MAX; nCount++)
 			{
-				g_rank2DRank[nCount].pos = D3DXVECTOR3(((RANK_FADE_POS_X - RANK_RANK_POS_X) - ((RANK_NUM_PLACE * RANK_INTERVAL_X))), (RANK_FADE_POS_Y + RANK_RANK_POS_Y) + ((nCount * RANK_INTERVAL_Y)), 0.0f);
+				g_rank2DRank[nCount].pos = D3DXVECTOR3(((RANK_FADE_POS_X - RANK_RANK_POS_X) - ((RANK_NUM_PLACE * RANK_INTERVAL_X))),
+													   (RANK_FADE_POS_Y + RANK_RANK_POS_Y) + ((nCount * RANK_INTERVAL_Y)), 0.0f);
 				g_rank2DRank[nCount].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				g_rank2DRank[nCount].bUse = true;
 			}

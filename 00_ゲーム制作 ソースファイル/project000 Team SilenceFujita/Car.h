@@ -46,6 +46,7 @@ typedef enum
 {
 	CARSTATE_NORMAL = 0,				// 通常状態
 	CARSTATE_TRAFFIC,					// 交通渋滞状態
+	CARSTATE_OVERLAP,					// 重なり状態
 	CARSTATE_MAX						// この列挙型の総数
 }CARSTATE;
 
@@ -67,7 +68,6 @@ typedef struct
 	MOVETYPE	 typeMove;				// 移動のタイプ
 	int			 nShadowID;				// 影のインデックス
 	int			 nNotaID;				// 強調表示のインデックス
-	int			 nOverlapCounter;		// 重なりカウント
 	int			 nStopCount;			// 停止カウント
 	int			 nBombCount;			// ボム中のカウント
 	bool		 bJump;					// ジャンプしているかどうか
