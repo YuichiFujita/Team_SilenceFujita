@@ -501,12 +501,19 @@ void UpdateBombData(void)
 //======================================================================================================================
 void SetBomb(D3DXVECTOR3 pos, BOMBTYPE type, void *pCarAddress)
 {
+	// 変数を宣言
+	float fRotPlayer = 0.0f;			// プレイヤーの向き設定用
+
 	// ポインタを宣言
 	Player *pPlayer = GetPlayer();		// プレイヤーの情報
 	Car    *pCar    = GetCarData();		// 車の情報
 	Police *pPolice = GetPoliceData();	// 警察の情報
 
-	if (CollisionSector(pPlayer->pos, pos, pPlayer->rot.y, BOMB_VIEW_FAR, BOMB_VIEW_ANGLE) == true)
+	// プレイヤーの向きを設定
+	fRotPlayer = (pPlayer->nCameraState == PLAYCAMESTATE_NORMAL) ? pPlayer->rot.y : pPlayer->rot.y + D3DX_PI;
+	RotNormalize(&fRotPlayer);	// 向きの正規化
+
+	if (CollisionSector(pPlayer->pos, pos, fRotPlayer, BOMB_VIEW_FAR, BOMB_VIEW_ANGLE) == true)
 	{ // プレイヤーの視界内の場合
 
 		for (int nCntBomb = 0; nCntBomb < MAX_BOMB; nCntBomb++)

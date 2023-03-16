@@ -199,7 +199,7 @@ void InitPlayer(void)
 	g_player.bomb.state           = ATTACKSTATE_NONE;	// 攻撃状態
 	g_player.bomb.nCounterState   = BOMB_WAIT_CNT;		// 攻撃管理カウンター
 	g_player.bomb.nCounterControl = 0;					// 操作管理カウンター
-	g_player.bomb.nHeal = 0;							// ゲージの回復量
+	g_player.bomb.nHeal           = 0;					// ゲージの回復量
 	g_player.bomb.bShot           = false;				// 発射待機状況
 
 	// アイコンの情報の初期化
@@ -1587,6 +1587,7 @@ void UpdateSlumBoost(void)
 			// タイヤ痕を出す
 			SetTireMark(D3DXVECTOR3(g_player.pos.x - sinf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f, g_player.pos.y + 0.01f,
 				g_player.pos.z - cosf(g_player.rot.y + D3DX_PI * 0.5f) * 55.0f), g_player.rot);
+
 
 			if (GetWeather() == WEATHERTYPE_RAIN || GetWeather() == WEATHERTYPE_THUNDER)
 			{ // 雨もしくは雷雨の場合

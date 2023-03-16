@@ -1948,7 +1948,7 @@ void ResetPlayer(void)
 	// ブーストの情報の初期化
 	pPlayer->boost.plusMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 追加移動量
 	pPlayer->boost.state    = BOOSTSTATE_NONE;					// 加速状態
-	pPlayer->boost.nCounter = 0;								// 加速管理カウンター
+	pPlayer->boost.nCounter	= 0;								// 加速管理カウンター
 
 	// 風の情報の初期化
 	pPlayer->wind.bUseWind     = false;							// 風の使用状況
@@ -1997,7 +1997,7 @@ void TxtSetLesson(LESSON_SETUP lesson)
 	D3DXMATERIAL aMat[MAX_MATERIAL];	// マテリアルの情報の代入用
 
 	// ポインタを宣言
-	FILE *pFile;				// ファイルポインタ
+	FILE *pFile;// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
 	pFile = fopen(LESSON_SETUP_TXT, "r");
