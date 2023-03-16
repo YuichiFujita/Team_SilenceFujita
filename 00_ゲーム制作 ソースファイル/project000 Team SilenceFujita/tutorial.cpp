@@ -73,7 +73,7 @@
 #define TIPS_HEIGHT		(100.0f)	// チュートリアルの備考の幅 / 2 (高さ)
 
 #define RESET_POS_Z		(-2000.0f)	// プレイヤー再設定時の z座標
-#define LESSON_NUM_COM	(10)		// コンボのレッスンクリアに必要なコンボ数
+#define LESSON_NUM_COM	(8)			// コンボのレッスンクリアに必要なコンボ数
 
 #define TUTO_PAUSE_POS	(D3DXVECTOR3(85.0f, 255.0f, 0.0f))								// ポーズの絶対座標
 #define TUTO_PAUSE_SIZE	(D3DXVECTOR3(70.0f, 70.0f, 0.0f))								// ポーズの大きさ
