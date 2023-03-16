@@ -524,106 +524,136 @@ void HealBarrier(Player *pPlayer, int nHeal)
 //============================================================
 void HitPlayer(Player *pPlayer, int nDamage)
 {
-	if (pPlayer->state == ACTIONSTATE_NORMAL)
-	{ // プレイヤーが通常状態の場合
+	// 変数を宣言
+	bool bHit = false;	// ダメージ受付状態
 
-		// 体力バーの設定
-		SetLife(pPlayer->nLife, -nDamage);
+	switch (GetMode())
+	{ // モードごとの処理
+	case MODE_TUTORIAL:	// チュートリアル画面
 
-		// 引数のダメージ分を体力から減算
-		pPlayer->nLife -= nDamage;
+		// ダメージを受けられる状態にする
+		bHit = true;
 
-		// コンボの倍率処理
-		MagnificCombo(COMBO_INTERRUPTION);
+		// 処理を抜ける
+		break;
 
-		if (pPlayer->nLife > 0)
-		{ // 体力が残っている場合
+	case MODE_GAME:		// ゲーム画面
 
-			// ダメージ状態にする
-			pPlayer->state = ACTIONSTATE_DAMAGE;
+		if (*GetGameState() == GAMESTATE_NORMAL)
+		{ // ゲームが通常状態の場合
 
-			// ダメージ中にする
-			pPlayer->icon.state = ICONSTATE_DAMAGE;
-
-			// パーティクルの設定
-			SetParticle
-			( // 引数
-				pPlayer->pos,						// 位置
-				D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f),	// 色
-				PARTICLETYPE_DAMAGE,				// 種類
-				SPAWN_PARTICLE_DAMAGE,				// エフェクト数
-				2									// 寿命
-			);
-
-			// カウンターを設定
-			pPlayer->nCounterState = DAMAGE_TIME_PLAY;
-
-			//効果音の再生
-			if (GetSoundType(SOUND_TYPE_SE) == true)
-			{
-				// サウンドの再生
-				PlaySound(SOUND_LABEL_SE_DAMAGE_000);			// SE (ダメージ)
-			}
+			// ダメージを受けられる状態にする
+			bHit = true;
 		}
-		else
-		{ // 体力が尽きた場合
 
-			// パーティクルの設定
-			SetParticle
-			( // 引数
-				pPlayer->pos,						// 位置
-				D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f),	// 色
-				PARTICLETYPE_PLAY_DEATH,			// 種類
-				SPAWN_PARTICLE_PLAYERDEATH,			// エフェクト数
-				4									// 寿命
-			);
+		// 処理を抜ける
+		break;
+	}
 
-			// パーティクルの設定処理
-			SetParticle
-			(
-				g_player.pos,
-				PLAYER_SMOKE_COL,
-				PARTICLETYPE_PLAY_SMOKE,
-				SPAWN_PARTICLE_PLAY_SMOKE,
-				8
-			);
+	if (bHit == true)
+	{ // ダメージを受けられる状態の場合
 
-			// 効果音系BGMの停止
-			if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
-			{
-				// 風が使用中なら
-				if (g_player.wind.bUseWind == true)
+		if (pPlayer->state == ACTIONSTATE_NORMAL)
+		{ // プレイヤーが通常状態の場合
+
+			// 体力バーの設定
+			SetLife(pPlayer->nLife, -nDamage);
+
+			// 引数のダメージ分を体力から減算
+			pPlayer->nLife -= nDamage;
+
+			// コンボの倍率処理
+			MagnificCombo(COMBO_INTERRUPTION);
+
+			if (pPlayer->nLife > 0)
+			{ // 体力が残っている場合
+
+				// ダメージ状態にする
+				pPlayer->state = ACTIONSTATE_DAMAGE;
+
+				// ダメージ中にする
+				pPlayer->icon.state = ICONSTATE_DAMAGE;
+
+				// パーティクルの設定
+				SetParticle
+				( // 引数
+					pPlayer->pos,						// 位置
+					D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f),	// 色
+					PARTICLETYPE_DAMAGE,				// 種類
+					SPAWN_PARTICLE_DAMAGE,				// エフェクト数
+					2									// 寿命
+				);
+
+				// カウンターを設定
+				pPlayer->nCounterState = DAMAGE_TIME_PLAY;
+
+				//効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
 				{
-					// サウンドを停止
-					SetWindSound(false);
+					// サウンドの再生
+					PlaySound(SOUND_LABEL_SE_DAMAGE_000);			// SE (ダメージ)
+				}
+			}
+			else
+			{ // 体力が尽きた場合
+
+				// パーティクルの設定
+				SetParticle
+				( // 引数
+					pPlayer->pos,						// 位置
+					D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f),	// 色
+					PARTICLETYPE_PLAY_DEATH,			// 種類
+					SPAWN_PARTICLE_PLAYERDEATH,			// エフェクト数
+					4									// 寿命
+				);
+
+				// パーティクルの設定処理
+				SetParticle
+				(
+					g_player.pos,
+					PLAYER_SMOKE_COL,
+					PARTICLETYPE_PLAY_SMOKE,
+					SPAWN_PARTICLE_PLAY_SMOKE,
+					8
+				);
+
+				// 効果音系BGMの停止
+				if (GetSoundType(SOUND_TYPE_SUB_BGM) == true)
+				{
+					// 風が使用中なら
+					if (g_player.wind.bUseWind == true)
+					{
+						// サウンドを停止
+						SetWindSound(false);
+					}
+
+					// エンジン音の停止
+					SetSoundVolume(SOUND_LABEL_BGM_CAR_000, 0.0f);
 				}
 
-				// エンジン音の停止
-				SetSoundVolume(SOUND_LABEL_BGM_CAR_000,0.0f);
-			}
+				// 効果音の再生
+				if (GetSoundType(SOUND_TYPE_SE) == true)
+				{
+					// サウンド(プレイヤーの死亡音）の再生
+					PlaySound(SOUND_LABEL_SE_LOST_000);
+				}
 
-			// 効果音の再生
-			if (GetSoundType(SOUND_TYPE_SE) == true)
-			{
-				// サウンド(プレイヤーの死亡音）の再生
-				PlaySound(SOUND_LABEL_SE_LOST_000);
-			}
+				// 使用していない状態にする
+				pPlayer->bUse = false;
 
-			// 使用していない状態にする
-			pPlayer->bUse = false;
+				// 亡骸の設定処理
+				SetDeath
+				(
+					g_player.pos,			// 位置
+					g_player.rot			// 向き
+				);
 
-			// 亡骸の設定処理
-			SetDeath
-			(
-				g_player.pos,			// 位置
-				g_player.rot			// 向き
-			);
+				if (GetMode() == MODE_GAME)
+				{ // ゲームモードの場合
 
-			if (GetMode() == MODE_GAME)
-			{ // ゲームモードの場合
-
-				// 矢印の設定処理
-				SetArrow(false);
+					// 矢印の設定処理
+					SetArrow(false);
+				}
 			}
 		}
 	}
