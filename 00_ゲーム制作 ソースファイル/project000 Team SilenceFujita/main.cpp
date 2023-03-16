@@ -197,7 +197,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 	UpdateWindow(hWnd);				// クライアント領域を更新
 
 	// 初期化処理
-	if (FAILED(Init(hInstance, hWnd, FALSE)))
+	if (FAILED(Init(hInstance, hWnd, TRUE)))
 	{ // 初期化処理が失敗した場合
 
 		// 値を返す
