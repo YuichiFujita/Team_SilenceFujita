@@ -8,6 +8,7 @@
 //	インクルードファイル
 //**********************************************************************************************************************
 #include "main.h"
+#include "input.h"
 #include "ability.h"
 #include "player.h"
 #include "wind.h"
@@ -26,6 +27,8 @@
 #define ABI_LOOP_BG			(2)			// 背景時の繰り返し数
 #define ABI_INIT_FRAME		(2)			// 枠時の初期値
 #define ABI_LOOP_FRAME		(3)			// 枠時の繰り返し数
+
+#define DRAW_FRAME_CNT		(2)			// フレーム描画時のカウント
 
 //----------------------------------------------------------------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -64,7 +67,8 @@ const char *apTextureAbility[] =	// テクスチャの相対パス
 {
 	"data\\TEXTURE\\alpha001.png",	// 能力表示の透過型のテクスチャの相対パス
 	"data\\TEXTURE\\ui001.tga",		// 能力表示の背景のテクスチャの相対パス
-	"data\\TEXTURE\\frame001.tga",	// 能力表示の型のテクスチャの相対パス
+	"data\\TEXTURE\\frame001.tga",	// 能力表示の型 (PAD) のテクスチャの相対パス
+	"data\\TEXTURE\\frame002.tga",	// 能力表示の型 (KEY) のテクスチャの相対パス
 };
 
 //**********************************************************************************************************************
@@ -74,7 +78,8 @@ typedef enum
 {
 	TEXTURE_ABI_ALPHA = 0,			// 能力表示の透過型
 	TEXTURE_ABI_BG,					// 能力表示の背景
-	TEXTURE_ABI_FRAME,				// 能力表示の型
+	TEXTURE_ABI_FRAME_PAD,			// 能力表示の型 (PAD)
+	TEXTURE_ABI_FRAME_KEY,			// 能力表示の型 (KEY)
 	TEXTURE_ABI_MAX,				// この列挙型の総数
 } TEXTURE_ABI;
 
@@ -397,17 +402,30 @@ void DrawAbi(bool bBG)
 
 			// 処理を抜ける
 			break;
-
-		case TEXTURE_ABI_FRAME:
-
-			// 無し
-
-			// 処理を抜ける
-			break;
 		}
 
-		// テクスチャの設定
-		pDevice->SetTexture(0, g_apTextureAbility[nCntAbility]);
+		if (nCntAbility < DRAW_FRAME_CNT)
+		{ // フレームの描画ではない場合
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_apTextureAbility[nCntAbility]);
+		}
+		else
+		{ // フレームの描画の場合
+
+			if (GetInputDeviceState() == INPUTSTATE_KEY)
+			{ // 入力デバイスがキーボードの場合
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureAbility[TEXTURE_ABI_FRAME_KEY]);
+			}
+			else if (GetInputDeviceState() == INPUTSTATE_PAD)
+			{ // 入力デバイスがパッドの場合
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_apTextureAbility[TEXTURE_ABI_FRAME_PAD]);
+			}
+		}
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCntAbility * 4, 2);

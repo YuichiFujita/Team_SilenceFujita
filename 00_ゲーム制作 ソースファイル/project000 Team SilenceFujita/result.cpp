@@ -26,11 +26,13 @@
 //**********************************************************************************************************************
 // マクロ定義
 //**********************************************************************************************************************
-#define WHEEL_RADIUS			(300.0f)		// タイヤの半径
 #define RESULT_FINISH_COUNT		(30)			// リザルトが終了するまでのカウント
 #define RESULT_SCORE_WIDTH		(70.0f)			// 値の縦幅
 #define RESULT_SCORE_HEIGHT		(100.0f)		// 値の横幅
 #define RESULT_SCORE_SHIFT		(110.0f)		// 値の横幅
+#define RESULT_SCORE_POS		(D3DXVECTOR3(1080.0f, 500.0f, 0.0f))
+#define RESULT_SCORE_BACK_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 500.0f, 0.0f))
+#define RESULT_SCORE_BACK_SIZE	(D3DXVECTOR3(500.0f, 100.0f, 0.0f))
 
 #define RESULT_WORD_RADIUS_X	(500.0f)		// 言葉の半径(X軸)
 #define RESULT_WORD_RADIUS_Y	(100.0f)		// 言葉の半径(Y軸)
@@ -43,11 +45,20 @@
 //**********************************************************************************************************************
 typedef enum
 {
-	RSL_WHEEL = 0,			// タイヤ
-	RSL_GAMECLEAR,			// ゲームクリア
-	RSL_GAMEOVER,			// ゲームオーバー
-	RSL_MAX					// この列挙型の総数
+	RSL_TEX_GAMECLEAR = 0,		// ゲームクリア
+	RSL_TEX_GAMEOVER,			// ゲームオーバー
+	RSL_TEX_MAX					// この列挙型の総数
 }RSLTEXTURE;
+
+//**********************************************************************************************************************
+// リザルト表示のポリゴン数
+//**********************************************************************************************************************
+typedef enum
+{
+	RSL_POLI_BACK = 0,		// 背景のポリゴン
+	RSL_POLI_WORD,			// 言葉のポリゴン
+	RSL_POLI_MAX			// この列挙型の総数
+}RSLPOLIGON;
 
 //**********************************************************************************************************************
 //	構造体定義 (WORD)
@@ -67,8 +78,9 @@ void RslWordUpdateRsl(void);		// 言葉の更新処理
 //**********************************************************************************************************************
 // グローバル変数宣言
 //**********************************************************************************************************************
-LPDIRECT3DTEXTURE9 g_apTextureResult[RSL_MAX] = {};			// テクスチャ(2枚分)へのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWord = NULL;		// 画面の頂点バッファへのポインタ(タイヤ)
+LPDIRECT3DTEXTURE9 g_apTextureResult[RSL_TEX_MAX] = {};		// テクスチャ(2枚分)へのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWord = NULL;		// 画面の頂点バッファへのポインタ(リザルト表示関係)
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultNumBack = NULL;		// 画面の頂点バッファへのポインタ(数値の背景)
 
 int g_nFadeTitleCounter;									// タイトル遷移カウンター
 int g_nResultCounter;										// リザルトカウンター
@@ -86,9 +98,8 @@ RSLWORD g_RslWord;											// 文字の情報
 //**********************************************************************************************************************
 // テクスチャファイル名
 //**********************************************************************************************************************
-const char *c_apFilenameResult[RSL_MAX] =
+const char *c_apFilenameResult[RSL_TEX_MAX] =
 {
-	"data/TEXTURE/ResultWheel.png",							// タイヤ
 	"data/TEXTURE/GAMECLEAR.png",							// ゲームクリア
 	"data/TEXTURE/GAMEOVER.png",							// ゲームオーバー
 };
@@ -104,7 +115,7 @@ void InitResult(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
-	for (int nCntTex = 0; nCntTex < RSL_MAX; nCntTex++)
+	for (int nCntTex = 0; nCntTex < RSL_TEX_MAX; nCntTex++)
 	{
 		//テクスチャの読み込み
 		D3DXCreateTextureFromFile(pDevice,
@@ -129,9 +140,18 @@ void InitResult(void)
 		g_ResultState = GetResultState();	// ゲームの状態
 	}
 
-	{ // 言葉
+	if (g_ResultState == RESULTSTATE_TIMEOVER
+	 || g_ResultState == RESULTSTATE_LIFEOVER)
+	{ // タイムオーバー・ライフオーバー状態だった場合
+
+		// スコアの加算処理
+		AddScore(-(int)(GetScore() * 0.5f));
+	}
+
+	{ // リザルト表示系(ResultWord)
+
 		// 頂点バッファの生成
-		pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4,
+		pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4 * RSL_POLI_MAX,
 			D3DUSAGE_WRITEONLY,
 			FVF_VERTEX_2D,
 			D3DPOOL_MANAGED,
@@ -141,11 +161,57 @@ void InitResult(void)
 		//頂点バッファをロックし、頂点情報へのポインタを取得
 		g_pVtxBuffResultWord->Lock(0, 0, (void**)&pVtx, 0);
 
+		for (int nCntVtx = 0; nCntVtx < RSL_POLI_MAX; nCntVtx++)
+		{
+			//頂点座標の設定
+			pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
+			pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
+			pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+			pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+
+			//rhwの設定
+			pVtx[0].rhw = 1.0f;
+			pVtx[1].rhw = 1.0f;
+			pVtx[2].rhw = 1.0f;
+			pVtx[3].rhw = 1.0f;
+
+			//頂点カラーの設定
+			pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+			//テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+			pVtx += 4;			// 頂点データを4つ分進める
+		}
+
+		//頂点バッファをアンロックする
+		g_pVtxBuffResultWord->Unlock();
+	}
+
+	{ // 数値の背景(NumBack)
+
+		// 頂点バッファの生成
+		pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4,
+			D3DUSAGE_WRITEONLY,
+			FVF_VERTEX_2D,
+			D3DPOOL_MANAGED,
+			&g_pVtxBuffResultNumBack,
+			NULL);
+
+		//頂点バッファをロックし、頂点情報へのポインタを取得
+		g_pVtxBuffResultNumBack->Lock(0, 0, (void**)&pVtx, 0);
+
 		//頂点座標の設定
-		pVtx[0].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
-		pVtx[1].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y - RESULT_WORD_RADIUS_Y, 0.0f);
-		pVtx[2].pos = D3DXVECTOR3(g_RslWord.pos.x - RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
-		pVtx[3].pos = D3DXVECTOR3(g_RslWord.pos.x + RESULT_WORD_RADIUS_X, g_RslWord.pos.y + RESULT_WORD_RADIUS_Y, 0.0f);
+		pVtx[0].pos = D3DXVECTOR3(RESULT_SCORE_BACK_POS.x - RESULT_SCORE_BACK_SIZE.x, RESULT_SCORE_BACK_POS.y - RESULT_SCORE_BACK_SIZE.y, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(RESULT_SCORE_BACK_POS.x + RESULT_SCORE_BACK_SIZE.x, RESULT_SCORE_BACK_POS.y - RESULT_SCORE_BACK_SIZE.y, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(RESULT_SCORE_BACK_POS.x - RESULT_SCORE_BACK_SIZE.x, RESULT_SCORE_BACK_POS.y + RESULT_SCORE_BACK_SIZE.y, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(RESULT_SCORE_BACK_POS.x + RESULT_SCORE_BACK_SIZE.x, RESULT_SCORE_BACK_POS.y + RESULT_SCORE_BACK_SIZE.y, 0.0f);
 
 		//rhwの設定
 		pVtx[0].rhw = 1.0f;
@@ -153,28 +219,11 @@ void InitResult(void)
 		pVtx[2].rhw = 1.0f;
 		pVtx[3].rhw = 1.0f;
 
-		if (g_ResultState == RESULTSTATE_CLEAR)
-		{ // ゲームクリア状態の場合
-
-			//頂点カラーの設定
-			pVtx[0].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-			pVtx[1].col = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-			pVtx[2].col = D3DXCOLOR(0.8f, 0.0f, 0.0f, 1.0f);
-			pVtx[3].col = D3DXCOLOR(0.8f, 0.0f, 0.0f, 1.0f);
-		}
-		else if (g_ResultState == RESULTSTATE_TIMEOVER
-			|| g_ResultState == RESULTSTATE_LIFEOVER)
-		{ // ゲームオーバー状態の場合
-
-			//頂点カラーの設定
-			pVtx[0].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
-			pVtx[1].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
-			pVtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
-			pVtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.7f, 1.0f);
-
-			// スコアの加算処理
-			AddScore(-(int)(GetScore() * 0.5f));
-		}
+		//頂点カラーの設定
+		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 		//テクスチャ座標の設定
 		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -183,7 +232,7 @@ void InitResult(void)
 		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 		//頂点バッファをアンロックする
-		g_pVtxBuffResultWord->Unlock();
+		g_pVtxBuffResultNumBack->Unlock();
 	}
 
 	// リザルトの初期化全体処理
@@ -247,7 +296,7 @@ void UninitResult(void)
 	// リザルトの終了全体処理
 	UninitResultChunk();
 
-	for (int nReslCount = 0; nReslCount < RSL_MAX; nReslCount++)
+	for (int nReslCount = 0; nReslCount < RSL_TEX_MAX; nReslCount++)
 	{//破棄
 		//テクスチャの破棄
 		if (g_apTextureResult[nReslCount] != NULL)
@@ -257,10 +306,21 @@ void UninitResult(void)
 		}
 	}
 
-	if (g_pVtxBuffResultWord != NULL)
-	{
-		g_pVtxBuffResultWord->Release();
-		g_pVtxBuffResultWord = NULL;
+	{ // バッファの破棄
+
+		// バッファの破棄(ResultWord)
+		if (g_pVtxBuffResultWord != NULL)
+		{
+			g_pVtxBuffResultWord->Release();
+			g_pVtxBuffResultWord = NULL;
+		}
+
+		// バッファの破棄(NumBack)
+		if (g_pVtxBuffResultNumBack != NULL)
+		{
+			g_pVtxBuffResultNumBack->Release();
+			g_pVtxBuffResultNumBack = NULL;
+		}
 	}
 }
 
@@ -364,7 +424,7 @@ void DrawResult(void)
 	//頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	{ // 言葉
+	{ // リザルト表示系(ResultWord)
 
 		//頂点バッファをデータストリームに設定
 		pDevice->SetStreamSource(0,
@@ -372,20 +432,50 @@ void DrawResult(void)
 			0,
 			sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
 
+		for (int nCntDraw = 0; nCntDraw < RSL_POLI_MAX; nCntDraw++)
+		{
+			switch (nCntDraw)
+			{
+			case RSL_POLI_BACK:			// 背景
 
-		if (g_ResultState == RESULTSTATE_CLEAR)
-		{ // ゲームクリア状態の場合
-	
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureResult[RSL_GAMECLEAR]);
+				break;
+
+			case RSL_POLI_WORD:			// 言葉
+
+				if (g_ResultState == RESULTSTATE_CLEAR)
+				{ // ゲームクリア状態の場合
+
+					// テクスチャの設定
+					pDevice->SetTexture(0, g_apTextureResult[RSL_TEX_GAMECLEAR]);
+				}
+				else if (g_ResultState == RESULTSTATE_TIMEOVER
+					|| g_ResultState == RESULTSTATE_LIFEOVER)
+				{ // ゲームオーバー状態の場合
+
+					// テクスチャの設定
+					pDevice->SetTexture(0, g_apTextureResult[RSL_TEX_GAMEOVER]);
+				}
+
+				break;
+			}
+
+			//ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,	//プリミティブの種類
+				4 * nCntDraw,							//描画する最初の頂点インデックス
+				2);										//描画するプリミティブ数
 		}
-		else if (g_ResultState == RESULTSTATE_TIMEOVER
-			 ||  g_ResultState == RESULTSTATE_LIFEOVER)
-		{ // ゲームオーバー状態の場合
-	
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_apTextureResult[RSL_GAMEOVER]);
-		}
+	}
+
+	{ // スコアの背景(NumBack)
+
+		//頂点バッファをデータストリームに設定
+		pDevice->SetStreamSource(0,
+			g_pVtxBuffResultNumBack,					//頂点バッファへのポインタ
+			0,
+			sizeof(VERTEX_2D));							//頂点情報構造体のサイズ
+
+		// テクスチャの設定
+		pDevice->SetTexture(0, NULL);
 
 		//ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
@@ -399,12 +489,7 @@ void DrawResult(void)
 	// 数値の設定
 	SetValue
 	( // 引数
-		D3DXVECTOR3
-		( // 引数
-			1100.0f,				// 位置 (x)
-			500.0f,					// 位置 (y)
-			0.0f					// 位置 (z)
-		),
+		RESULT_SCORE_POS,			// 位置
 		g_nDispRslScore,			// 値
 		VAL_MAX_SCORE,				// 値の最大値
 		RESULT_SCORE_WIDTH,			// 横幅

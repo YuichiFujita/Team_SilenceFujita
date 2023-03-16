@@ -440,7 +440,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//	変数の初期化
 	//--------------------------------------------------------
 #ifdef _DEBUG	// デバッグ処理
-	g_mode = MODE_RESULT;			// モードをチュートリアルに初期化
+	g_mode = MODE_GAME;			// モードをチュートリアルに初期化
 #else
 	g_mode = MODE_LOGO;				// モードをロゴに初期化
 #endif
@@ -1992,19 +1992,20 @@ void DrawDebug(void)
 		SCREEN_HEIGHT		// ウインドウの高さ
 	};
 
-	D3DXVECTOR3 cameraPosV   = GetCameraPosV();		// カメラの視点
-	D3DXVECTOR3 cameraPosR   = GetCameraPosR();		// カメラの注視点
-	D3DXVECTOR3 cameraRot    = GetCameraRot();		// カメラの向き
-	float       cameraDis    = GetCameraDis();		// カメラの距離
-	int         nNumEffect   = GetNumEffect();		// エフェクトの総数
-	int         nNumParticle = GetNumParticle();	// パーティクルの総数
-	int			nNumObject = GetNumObject();		// オブジェクトの数
-	Car *pCar = GetCarData();						// 車の情報を取得する
-	Police *pPolice = GetPoliceData();
-	D3DXVECTOR3 HumanPos = GetHumanData()->pos;
-	int nNumWeather = GetNumWeather();				// 降っている物の総数を取得する
-	int nNumBuild = GetNumBuildTimer();				// 再建築タイマーの総数取得処理
-	float fRevPlayerRot = (((fabsf(GetPlayer()->move.x + GetPlayer()->boost.plusMove.x) - MAX_REAL_SPEED) * -1.0f) * ((1.0f - PLAY_REV_ROT_MIN) / MAX_REAL_SPEED)) + PLAY_REV_ROT_MIN;	// プレイヤーの向き変更量の減速係数
+	D3DXVECTOR3 cameraPosV    = GetCameraPosV();		// カメラの視点
+	D3DXVECTOR3 cameraPosR    = GetCameraPosR();		// カメラの注視点
+	D3DXVECTOR3 cameraRot     = GetCameraRot();			// カメラの向き
+	float       cameraDis     = GetCameraDis();			// カメラの距離
+	int         nNumEffect    = GetNumEffect();			// エフェクトの総数
+	int         nNumParticle  = GetNumParticle();		// パーティクルの総数
+	int         nNumObject    = GetNumObject();			// オブジェクトの数
+	Car        *pCar          = GetCarData();			// 車の情報を取得する
+	Police     *pPolice       = GetPoliceData();		// 警察の情報
+	D3DXVECTOR3 HumanPos      = GetHumanData()->pos;	// 人間の位置
+	int         nNumWeather   = GetNumWeather();		// 降っている物の総数を取得する
+	int         nNumBuild     = GetNumBuildTimer();		// 再建築タイマーの総数取得処理
+	float       fRevPlayerRot = (((fabsf(GetPlayer()->move.x + GetPlayer()->boost.plusMove.x) - MAX_REAL_SPEED) * -1.0f) * ((1.0f - PLAY_REV_ROT_MIN) / MAX_REAL_SPEED)) + PLAY_REV_ROT_MIN;	// プレイヤーの向き変更量の減速係数
+	INPUTSTATE  inputState    = GetInputDeviceState();	// 入力検知を取得
 
 	// 変数配列を宣言
 	char aDeb[DEBUG_PRINT];	// デバッグ情報の表示用
@@ -2050,7 +2051,8 @@ void DrawDebug(void)
 		" 　警察のタックル状態：%d\n"
 		" 　向き変更量：%.2f\n"
 		" 　向き変更量の減衰量：%.2f\n"
-		" 　走行音の音量：%.2f\n",
+		" 　走行音の音量：%.2f\n"
+		" 　入力検知：%d (0:Key, 1:Pad)\n",
 		g_nCountFPS,		// FPS
 		cameraPosV.x,		// カメラの視点の位置 (x)
 		cameraPosV.y,		// カメラの視点の位置 (y)
@@ -2079,7 +2081,8 @@ void DrawDebug(void)
 		pPolice->tackle.tackleState,
 		GetPlayer()->moveRot.y,
 		fRevPlayerRot,
-		GetSoundVolume(SOUND_LABEL_BGM_CAR_000)
+		GetSoundVolume(SOUND_LABEL_BGM_CAR_000),
+		(int)inputState
 	);
 
 	//--------------------------------------------------------

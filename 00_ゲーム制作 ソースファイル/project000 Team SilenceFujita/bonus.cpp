@@ -18,36 +18,42 @@
 //**********************************************************************************************************************
 // マクロ定義
 //**********************************************************************************************************************
-#define BONUS_MAX_VALUE		(9999)		// ボーナスの最大値
-#define BONUS_WIDTH			(26.0f)		// ボーナスの幅
-#define BONUS_HEIGHT		(26.0f)		// ボーナスの高さ
-#define BONUS_SHIFT			(37.0f)		// ボーナスのずらす幅
-#define BONUS_ALPHA			(1.0f)		// ボーナスの透明度
-#define PLUS_WIDTH			(30.0f)		// プラスの幅
-#define PLUS_HEIGHT			(30.0f)		// プラスの高さ
-#define PLUS_SHIFT			(40.0f)		// プラスのずらす幅
-#define BONUS_RIGHT_X		(1080.0f)	// 右にボーナスを出す時の座標(X座標)
-#define BONUS_LEFT_X		(40.0f)		// 左にボーナスを出す時の座標(X座標)
-#define BONUS_RIGHT_Y		(400)		// 右にボーナスを出す時の座標(Y座標)
-#define BONUS_RIGHT_SHIFT	(120)		// 右にボーナスを出す時のずらす座標(Y座標)
-#define BONUS_LEFT_Y		(200)		// 左にボーナスを出す時の座標(Y座標)
-#define BONUS_LEFT_SHIFT	(350)		// 左にボーナスを出す時のずらす座標(Y座標)
-#define BONUS_SCORE_POS		(D3DXVECTOR3( 918.0f, 573.0f, 0.0f))		// スコアの位置
+#define BONUS_MAX_VALUE			(9999)		// ボーナスの最大値
+#define BONUS_WIDTH				(26.0f)		// ボーナスの幅
+#define BONUS_HEIGHT			(26.0f)		// ボーナスの高さ
+#define BONUS_SHIFT				(37.0f)		// ボーナスのずらす幅
+#define BONUS_ALPHA				(1.0f)		// ボーナスの透明度
+#define PLUS_WIDTH				(30.0f)		// プラスの幅
+#define PLUS_HEIGHT				(30.0f)		// プラスの高さ
+#define PLUS_SHIFT				(40.0f)		// プラスのずらす幅
+#define BONUS_RIGHT_X			(1080.0f)	// 右にボーナスを出す時の座標(X座標)
+#define BONUS_LEFT_X			(40.0f)		// 左にボーナスを出す時の座標(X座標)
+#define BONUS_RIGHT_Y			(400)		// 右にボーナスを出す時の座標(Y座標)
+#define BONUS_RIGHT_SHIFT		(50)		// 右にボーナスを出す時のずらす座標(Y座標)
+#define BONUS_LEFT_Y			(200)		// 左にボーナスを出す時の座標(Y座標)
+#define BONUS_LEFT_SHIFT		(350)		// 左にボーナスを出す時のずらす座標(Y座標)
+#define BONUS_SCORE_POS			(D3DXVECTOR3( 918.0f, 573.0f, 0.0f))		// スコアの位置
 
-#define BONUS_MOVE_MAGNI	(0.02f)		// プラスの移動量の倍率
-#define BONUS_STATE_CNT		(120)		// 加算状態になるまでのカウント
-#define BONUS_ADD_ALPHA		(0.02f)		// ボーナスの透明度に加算する値
-#define BONUS_SUB_ALPHA		(0.05f)		// ボーナスの透明度に減算する値
+#define BONUS_MOVE_MAGNI		(0.02f)		// プラスの移動量の倍率
+#define BONUS_STATE_CNT			(120)		// 加算状態になるまでのカウント
+#define BONUS_ADD_ALPHA			(0.02f)		// ボーナスの透明度に加算する値
+#define BONUS_SUB_ALPHA			(0.05f)		// ボーナスの透明度に減算する値
 
-#define BONUS_EFFECT_LIFE	(8)			// ボーナスのエフェクトの寿命
-#define BONUS_EFFECT_RADIUS	(40.0f)		// ボーナスのエフェクトの半径
-#define BONUS_EFFECT_SUB	(4.0f)		// ボーナスのエフェクトの減衰係数
+#define BONUS_EFFECT_LIFE		(8)			// ボーナスのエフェクトの寿命
+#define BONUS_EFFECT_RADIUS		(40.0f)		// ボーナスのエフェクトの半径
+#define BONUS_EFFECT_SUB		(4.0f)		// ボーナスのエフェクトの減衰係数
+#define BONUS_EFFECT_COL		(D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f))			// ボーナスのエフェクトの色
 
-#define BONUS_DIGIT_ONE		(9)			// 1桁の境界
-#define BONUS_DIGIT_TWO		(99)		// 2桁の境界
-#define BONUS_DIGIT_THREE	(999)		// 3桁の境界
-#define BONUS_DIGIT_FOUR	(9999)		// 4桁の境界
-#define BONUS_DIGIT_FIVE	(99999)		// 5桁の境界
+#define JUSBONUS_EFFECT_LIFE	(8)			// 正義のボーナスのエフェクトの寿命
+#define JUSBONUS_EFFECT_RADIUS	(25.0f)		// 正義のボーナスのエフェクトの半径
+#define JUSBONUS_EFFECT_SUB		(3.0f)		// 正義のボーナスのエフェクトの減衰係数
+#define JUSBONUS_EFFECT_COL		(D3DXCOLOR(0.0f, 0.4f, 0.8f, 1.0f))			// 正義のボーナスのエフェクトの色
+
+#define BONUS_DIGIT_ONE			(9)			// 1桁の境界
+#define BONUS_DIGIT_TWO			(99)		// 2桁の境界
+#define BONUS_DIGIT_THREE		(999)		// 3桁の境界
+#define BONUS_DIGIT_FOUR		(9999)		// 4桁の境界
+#define BONUS_DIGIT_FIVE		(99999)		// 5桁の境界
 
 //**********************************************************************************************************************
 //	ボーナステクスチャ(BONUSTEX)
@@ -261,15 +267,32 @@ void UpdateBonus(void)
 						// コンボのスコアの加算処理
 						AddComboScore(g_aBonus[nCntBonus].nScore);
 
-						// 2Dパーティクルの発生
-						Set2DParticle
-						( // 引数
-							g_aBonus[nCntBonus].pos,			// 位置
-							D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
-							PARTICLE2DTYPE_SCORE_FIRE,			// 花火
-							20,									// 発生数
-							1									// 寿命
-						);
+						if (SCORE_ITEM <= g_aBonus[nCntBonus].nScore)
+						{ // スコアが高かった場合
+
+							// 2Dパーティクルの発生
+							Set2DParticle
+							( // 引数
+								g_aBonus[nCntBonus].pos,			// 位置
+								BONUS_EFFECT_COL,					// 色
+								PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+								20,									// 発生数
+								1									// 寿命
+							);
+						}
+						else
+						{ // スコアが低かった場合
+
+							// 2Dパーティクルの発生
+							Set2DParticle
+							( // 引数
+								g_aBonus[nCntBonus].pos,			// 位置
+								JUSBONUS_EFFECT_COL,				// 色
+								PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+								15,									// 発生数
+								1									// 寿命
+							);
+						}
 					}
 				}
 				else
@@ -290,28 +313,63 @@ void UpdateBonus(void)
 						// コンボのスコアの加算処理
 						AddComboScore(g_aBonus[nCntBonus].nScore);
 
-						// 2Dパーティクルの発生
-						Set2DParticle
-						( // 引数
-							g_aBonus[nCntBonus].pos,			// 位置
-							D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
-							PARTICLE2DTYPE_SCORE_FIRE,			// 花火
-							20,									// 発生数
-							1									// 寿命
-						);
+						if (SCORE_ITEM <= g_aBonus[nCntBonus].nScore)
+						{ // スコアが高かった場合
+
+							// 2Dパーティクルの発生
+							Set2DParticle
+							( // 引数
+								g_aBonus[nCntBonus].pos,			// 位置
+								BONUS_EFFECT_COL,					// 色
+								PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+								20,									// 発生数
+								1									// 寿命
+							);
+						}
+						else
+						{ // スコアが低かった場合
+
+							// 2Dパーティクルの発生
+							Set2DParticle
+							( // 引数
+								g_aBonus[nCntBonus].pos,			// 位置
+								JUSBONUS_EFFECT_COL,				// 色
+								PARTICLE2DTYPE_SCORE_FIRE,			// 花火
+								15,									// 発生数
+								1									// 寿命
+							);
+						}
 					}
 				}
 
-				// 2Dパーティクルを発生させる
-				Set2DEffect
-				(
-					g_aBonus[nCntBonus].pos,
-					D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-					D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),
-					BONUS_EFFECT_LIFE,
-					BONUS_EFFECT_RADIUS,
-					BONUS_EFFECT_SUB
-				);
+				if (SCORE_ITEM <= g_aBonus[nCntBonus].nScore)
+				{ // スコアが高かった場合
+
+					// 2Dパーティクルを発生させる
+					Set2DEffect
+					(
+						g_aBonus[nCntBonus].pos,
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						BONUS_EFFECT_COL,
+						BONUS_EFFECT_LIFE,
+						BONUS_EFFECT_RADIUS,
+						BONUS_EFFECT_SUB
+					);
+				}
+				else
+				{ // スコアが低かった場合
+
+					// 2Dパーティクルを発生させる
+					Set2DEffect
+					(
+						g_aBonus[nCntBonus].pos,
+						D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						JUSBONUS_EFFECT_COL,
+						JUSBONUS_EFFECT_LIFE,
+						JUSBONUS_EFFECT_RADIUS,
+						JUSBONUS_EFFECT_SUB
+					);
+				}
 
 				break;					// 抜け出す
 			}
@@ -528,15 +586,32 @@ void SetBonus(int nBonus)
 				//使用している状態にする
 				g_aBonus[nCntBonus].bUse = true;
 
-				// 2Dパーティクルの発生
-				Set2DParticle
-				( // 引数
-					g_aBonus[nCntBonus].pos,			// 位置
-					D3DXCOLOR(0.8f, 0.5f, 0.0f, 1.0f),	// 色
-					PARTICLE2DTYPE_BONUS_FIRE,			// 花火
-					20,									// 発生数
-					1									// 寿命
-				);
+				if (SCORE_ITEM <= g_aBonus[nCntBonus].nScore)
+				{ // スコアが高かった場合
+
+					// 2Dパーティクルの発生
+					Set2DParticle
+					( // 引数
+						g_aBonus[nCntBonus].pos,			// 位置
+						BONUS_EFFECT_COL,					// 色
+						PARTICLE2DTYPE_BONUS_FIRE,			// 花火
+						20,									// 発生数
+						1									// 寿命
+					);
+				}
+				else
+				{ // スコアが低かった場合
+
+					// 2Dパーティクルの発生
+					Set2DParticle
+					( // 引数
+						g_aBonus[nCntBonus].pos,			// 位置
+						JUSBONUS_EFFECT_COL,				// 色
+						PARTICLE2DTYPE_BONUS_FIRE,			// 花火
+						15,									// 発生数
+						1									// 寿命
+					);
+				}
 
 				//抜け出す
 				break;
