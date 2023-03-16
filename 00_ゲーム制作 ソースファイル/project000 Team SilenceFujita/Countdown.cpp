@@ -19,14 +19,20 @@
 #define COUNTDOWN_INIT_TEXU		(0.0f)											// カウントダウンのテクスチャの初期値
 #define COUNTDOWN_INIT_ALPHA	(0.0f)											// カウントダウンの透明度の初期値
 #define COUNTDOWN_ALPHA			(0.5f)											// カウントダウンの透明度
-#define COUNTDOWN_TEXTURE		"data/TEXTURE/Countdown.png"					// カウントダウンのテクスチャ
 
 #define COUNTDOWN_ALPHA_SUB		(0.05f)											// カウントダウンの透明度の減少量
 
 //グローバル変数
-LPDIRECT3DTEXTURE9 g_pTextureCountDown = NULL;			//テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffCountDown = NULL;		//頂点バッファへのポインタ
-CountDown g_CountDown;									//カウントダウンの情報
+LPDIRECT3DTEXTURE9 g_pTextureCountDown[CNTDOWNTYPE_MAX] = {};	//テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffCountDown = NULL;				//頂点バッファへのポインタ
+CountDown g_CountDown;											//カウントダウンの情報
+
+// コンスト定義
+const char *c_apCountdownTextureFilename[CNTDOWNTYPE_MAX] = 
+{
+	"data/TEXTURE/",
+	"data/TEXTURE/",
+};
 
 //==========================================
 //カウントダウンの初期化処理
@@ -38,16 +44,20 @@ void InitCountDown(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
-	//テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,
-		COUNTDOWN_TEXTURE,
-		&g_pTextureCountDown);
+	for (int nCntTex = 0; nCntTex < CNTDOWNTYPE_MAX; nCntTex++)
+	{
+		//テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice,
+			c_apCountdownTextureFilename[nCntTex],
+			&g_pTextureCountDown[nCntTex]);
+	}
 
 	// カウントダウンの情報の設定
 	g_CountDown.pos		= COUNTDOWN_POS;				// 位置
 	g_CountDown.length  = COUNTDOWN_INIT_RADIUS;		// 長さ
 	g_CountDown.fAlpha	= COUNTDOWN_INIT_ALPHA;			// 透明度
 	g_CountDown.fTexU	= COUNTDOWN_INIT_TEXU;			// テクスチャのU軸の値
+	g_CountDown.type	= CNTDOWNTYPE_1MIN;				// 種類
 	g_CountDown.bUse	= false;						// 使用状況
 
 	// 状態関係の設定
@@ -100,11 +110,14 @@ void InitCountDown(void)
 //========================================
 void UninitCountDown(void)
 {
-	//テクスチャの破棄
-	if (g_pTextureCountDown != NULL)
+	for (int nCnt = 0; nCnt < CNTDOWNTYPE_MAX; nCnt++)
 	{
-		g_pTextureCountDown->Release();
-		g_pTextureCountDown = NULL;
+		//テクスチャの破棄
+		if (g_pTextureCountDown[nCnt] != NULL)
+		{
+			g_pTextureCountDown[nCnt]->Release();
+			g_pTextureCountDown[nCnt] = NULL;
+		}
 	}
 
 	//頂点バッファの破棄
@@ -240,7 +253,7 @@ void DrawCountDown(void)
 	{//使用されていた場合
 
 		//テクスチャの設定
-		pDevice->SetTexture(0, g_pTextureCountDown);
+		pDevice->SetTexture(0, g_pTextureCountDown[g_CountDown.type]);
 
 		//ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
@@ -252,7 +265,7 @@ void DrawCountDown(void)
 //=====================================
 // カウントダウンの設定処理
 //=====================================
-void SetCountDown(void)
+void SetCountDown(CNTDOWNTYPE type)
 {
 	VERTEX_2D *pVtx;
 
@@ -264,6 +277,7 @@ void SetCountDown(void)
 		g_CountDown.length	= COUNTDOWN_INIT_RADIUS;	// 長さ
 		g_CountDown.fAlpha	= COUNTDOWN_ALPHA;			// 透明度
 		g_CountDown.fTexU	= COUNTDOWN_INIT_TEXU;		// テクスチャのU軸の値
+		g_CountDown.type	= type;						// 種類
 
 		// 状態関係の情報の設定
 		g_CountDown.stateInfo.state			= CNTDOWNSTATE_APPEAR;		// 状態

@@ -178,7 +178,14 @@ void UpdateTimer(void)
 				{ // 残り1分になった場合
 
 					// カウントダウンの設定処理
-					SetCountDown();
+					SetCountDown(CNTDOWNTYPE_1MIN);
+				}
+
+				if(g_nTime == 1800)
+				{ // 残り30秒になった場合
+
+					// カウントダウンの設定処理
+					SetCountDown(CNTDOWNTYPE_30SEC);
 				}
 			}
 			else
