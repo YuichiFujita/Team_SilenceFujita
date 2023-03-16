@@ -13,6 +13,16 @@
 #include "main.h"
 
 //**********************************************************************************************************************
+//	列挙型定義 (INPUTSTATE)
+//**********************************************************************************************************************
+typedef enum
+{
+	INPUTSTATE_KEY = 0,		// キーボード入力
+	INPUTSTATE_PAD,			// パッド入力
+	INPUTSTATE_MAX			// この列挙型の総数
+}INPUTSTATE;
+
+//**********************************************************************************************************************
 //	列挙型定義 (MOUKEY)
 //**********************************************************************************************************************
 typedef enum
@@ -72,15 +82,15 @@ void UninitInput(void);									// 入力デバイスの終了処理
 void UpdateInput(void);									// 入力デバイスの更新処理
 
 // キーボード
-bool GetKeyboardPress(int nKey);						// キーボードのプレスの取得処理
-bool GetKeyboardTrigger(int nKey);						// キーボードのトリガーの取得処理
-bool GetKeyboardRelease(int nKey);						// キーボードのリリースの取得処理
+bool GetKeyboardPress(int nKey);		// キーボードのプレスの取得処理
+bool GetKeyboardTrigger(int nKey);		// キーボードのトリガーの取得処理
+bool GetKeyboardRelease(int nKey);		// キーボードのリリースの取得処理
 
 // マウス
-bool GetMousePress(int nMouKey);						// マウスのプレスの取得処理
-bool GetMouseTrigger(int nMouKey);						// マウスのトリガーの取得処理
-bool GetMouseRelease(int nMouKey);						// マウスのリリースの取得処理
-D3DXVECTOR3 GetMouseMove(void);							// マウスの移動量の取得処理
+bool GetMousePress(int nMouKey);		// マウスのプレスの取得処理
+bool GetMouseTrigger(int nMouKey);		// マウスのトリガーの取得処理
+bool GetMouseRelease(int nMouKey);		// マウスのリリースの取得処理
+D3DXVECTOR3 GetMouseMove(void);			// マウスの移動量の取得処理
 
 // パッド
 void  SetVibration(VIBSTATE state, int nPlayer);		// パッドのバイブの設定処理
@@ -96,5 +106,8 @@ bool GetJoyKeyTrigger(JOYKEY nJoyKey, int nPlayer);		// パッドのトリガーの取得処
 bool GetJoyKeyL2Trigger(int nPlayer);					// パッドのトリガーの取得処理 (L2)
 bool GetJoyKeyR2Trigger(int nPlayer);					// パッドのトリガーの取得処理 (R2)
 bool GetJoyKeyRelease(JOYKEY nJoyKey, int nPlayer);		// パッドのリリースの取得処理 (ボタン)
+
+// 入力検知
+INPUTSTATE GetInputDeviceState(void);	// 入力デバイスの取得処理
 
 #endif
