@@ -78,7 +78,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 右に走っている場合
 
 			// 位置を補正する
-			pPos->x = pCurve->curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->x = pCurve->curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = 0.0f;
@@ -106,7 +106,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 左に走っている場合
 
 			// 位置を補正する
-			pPos->x = pCurve->curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->x = pCurve->curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = -D3DX_PI;
@@ -134,7 +134,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 奥に走っている場合
 
 			// 位置を補正する
-			pPos->z = pCurve->curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->z = pCurve->curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = -D3DX_PI * 0.5f;
@@ -162,7 +162,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 手前に走っている場合
 
 			// 位置を補正する
-			pPos->z = pCurve->curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->z = pCurve->curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = D3DX_PI * 0.5f;
@@ -196,7 +196,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 右に走っている場合
 
 			// 位置を補正する
-			pPos->x = pCurve->curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->x = pCurve->curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = D3DX_PI;
@@ -224,7 +224,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 左に走っている場合
 
 			// 位置を補正する
-			pPos->x = pCurve->curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->x = pCurve->curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = 0.0f;
@@ -252,7 +252,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 奥に走っている場合
 
 			// 位置を補正する
-			pPos->z = pCurve->curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->z = pCurve->curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = D3DX_PI * 0.5f;
@@ -280,7 +280,7 @@ void CurveInfoRotCar(CARCURVE *pCurve, D3DXVECTOR3 *rot, D3DXVECTOR3 *move, D3DX
 		{ // 手前に走っている場合
 
 			// 位置を補正する
-			pPos->z = pCurve->curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pPos->z = pCurve->curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			// 目標の向きを設定する
 			pCurve->rotDest.y = -D3DX_PI * 0.5f;

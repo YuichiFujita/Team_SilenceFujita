@@ -870,12 +870,12 @@ void DashCarAction(Car *pCar)
 		case DASH_RIGHT:		//右に走っている場合
 
 			//這わせる
-			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
-			if (pCar->pos.z == GetCurveInfo(nCnt).pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			if (pCar->pos.z == GetCurveInfo(nCnt).pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 			{ // 同じZ軸上を走っている場合
-				if (pCar->pos.x >= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2) &&
-					pCar->posOld.x <= GetCurveInfo(nCnt).pos.x - (CAR_WIDTH * 2))
+				if (pCar->pos.x >= GetCurveInfo(nCnt).pos.x - (SHIFT_CAR_CURVE * 2) &&
+					pCar->posOld.x <= GetCurveInfo(nCnt).pos.x - (SHIFT_CAR_CURVE * 2))
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_RIGHT)
 					{ // 右に走る場合のみ
@@ -899,12 +899,12 @@ void DashCarAction(Car *pCar)
 		case DASH_LEFT:			//左を走っている場合
 
 			//這わせる
-			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
-			if (pCar->pos.z == GetCurveInfo(nCnt).pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			if (pCar->pos.z == GetCurveInfo(nCnt).pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 			{ // 同じZ軸上を走っている場合
-				if (pCar->pos.x <= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2) &&
-					pCar->posOld.x >= GetCurveInfo(nCnt).pos.x + (CAR_WIDTH * 2))
+				if (pCar->pos.x <= GetCurveInfo(nCnt).pos.x + (SHIFT_CAR_CURVE * 2) &&
+					pCar->posOld.x >= GetCurveInfo(nCnt).pos.x + (SHIFT_CAR_CURVE * 2))
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_LEFT)
 					{ // 左に走る場合のみ
@@ -928,12 +928,12 @@ void DashCarAction(Car *pCar)
 		case DASH_FAR:			//奥に走っている場合
 
 			//這わせる
-			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
-			if (pCar->pos.x == GetCurveInfo(nCnt).pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			if (pCar->pos.x == GetCurveInfo(nCnt).pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 			{ // 同じZ軸上を走っている場合
-				if (pCar->pos.z >= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2) &&
-					pCar->posOld.z <= GetCurveInfo(nCnt).pos.z - (CAR_WIDTH * 2))
+				if (pCar->pos.z >= GetCurveInfo(nCnt).pos.z - (SHIFT_CAR_CURVE * 2) &&
+					pCar->posOld.z <= GetCurveInfo(nCnt).pos.z - (SHIFT_CAR_CURVE * 2))
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_FAR)
 					{ // 奥に走る場合のみ
@@ -957,12 +957,12 @@ void DashCarAction(Car *pCar)
 		case DASH_NEAR:			//奥に走っている場合
 
 			//這わせる
-			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
-			if (pCar->pos.x == GetCurveInfo(nCnt).pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+			if (pCar->pos.x == GetCurveInfo(nCnt).pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 			{ // 同じZ軸上を走っている場合
-				if (pCar->pos.z <= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2) &&
-					pCar->posOld.z >= GetCurveInfo(nCnt).pos.z + (CAR_WIDTH * 2))
+				if (pCar->pos.z <= GetCurveInfo(nCnt).pos.z + (SHIFT_CAR_CURVE * 2) &&
+					pCar->posOld.z >= GetCurveInfo(nCnt).pos.z + (SHIFT_CAR_CURVE * 2))
 				{ // 位置が一致した場合
 					if (GetCurveInfo(nCnt).dashAngle == DASH_NEAR)
 					{ // 手前に走る場合のみ
@@ -1003,14 +1003,14 @@ void DashCarAction(Car *pCar)
 		case DASH_RIGHT:			//右に走っている
 
 			//這わせる
-			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
 			{ // 右に曲がる場合
-				if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
@@ -1018,10 +1018,10 @@ void DashCarAction(Car *pCar)
 			}
 			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
 			{ // 左に曲がる場合
-				if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.x >= pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
@@ -1033,14 +1033,14 @@ void DashCarAction(Car *pCar)
 		case DASH_LEFT:				//左に走っている
 
 			//這わせる
-			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
 			{ // 右に曲がる場合
-				if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
@@ -1048,10 +1048,10 @@ void DashCarAction(Car *pCar)
 			}
 			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
 			{ // 左に曲がる場合
-				if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.x <= pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
@@ -1063,14 +1063,14 @@ void DashCarAction(Car *pCar)
 		case DASH_FAR:				//奥に走っている
 
 			//這わせる
-			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
 			{ // 右に曲がる場合
-				if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
@@ -1078,10 +1078,10 @@ void DashCarAction(Car *pCar)
 			}
 			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
 			{ // 左に曲がる場合
-				if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.z >= pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
@@ -1093,14 +1093,14 @@ void DashCarAction(Car *pCar)
 		case DASH_NEAR:				//手前に走っている
 
 			//這わせる
-			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+			pCar->pos.x = pCar->carCurveInfo.curveInfo.pos.x - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 			if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_RIGHT)
 			{ // 右に曲がる場合
-				if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z + (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
@@ -1108,10 +1108,10 @@ void DashCarAction(Car *pCar)
 			}
 			else if (pCar->carCurveInfo.curveInfo.curveAngle == CURVE_LEFT)
 			{ // 左に曲がる場合
-				if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2)))
+				if (pCar->pos.z <= pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2)))
 				{ // 車の位置が曲がる位置に達した場合
 					// 位置を補正する
-					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (CAR_WIDTH * 2));
+					pCar->pos.z = pCar->carCurveInfo.curveInfo.pos.z - (SHIFT_CAR_CURVE + (SHIFT_CAR_CURVE * 2));
 
 					// カーブ状態にする
 					pCar->carCurveInfo.actionState = CARACT_CURVE;
