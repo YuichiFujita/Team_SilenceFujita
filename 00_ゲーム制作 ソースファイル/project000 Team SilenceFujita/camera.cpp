@@ -130,7 +130,7 @@ typedef struct
 void InitMapCamera(void);			// マップカメラの初期化処理
 void InitUiCamera(void);			// UIカメラの初期化処理
 
-void SetTitleCamera(ROADTYPE);		// 特定のタイトルカメラの初期化処理
+void SetTitleCamera(ROADTYPE type);	// 特定のタイトルカメラの初期化処理
 
 void UpdateResultCamera(void);		// リザルト時のカメラの更新処理
 void UpdateTitleCamera(void);		// タイトル時のカメラの更新処理
@@ -152,10 +152,8 @@ void RevRotYCamera(void);			// カメラの向きの補正処理 (y)
 //	グローバル変数
 //************************************************************
 Camera g_aCamera[CAMERATYPE_MAX];	// カメラの情報
-CAMERASTATE g_CameraState;			// カメラの状態
 
 Road g_road;						// 道路の情報
-
 
 //============================================================
 //	カメラの初期化処理
@@ -163,9 +161,6 @@ Road g_road;						// 道路の情報
 void InitCamera(void)
 {
 	MODE mode  = GetMode();			// モードの状態
-
-	// カメラの状態を初期化
-	g_CameraState = CAMERASTATE_NORMAL;
 
 	// 道路の情報の初期化
 	g_road.type = ROAD_TYPE_ONE;
@@ -1438,15 +1433,6 @@ Camera *GetCamera(int nID)
 {
 	// カメラの情報の引数の要素のアドレスを返す
 	return &g_aCamera[nID];
-}
-
-//============================================================
-// カメラの状態の取得処理
-//============================================================
-CAMERASTATE *GetCameraState(void)
-{
-	// カメラの状態を返す
-	return &g_CameraState;
 }
 
 //============================================================
