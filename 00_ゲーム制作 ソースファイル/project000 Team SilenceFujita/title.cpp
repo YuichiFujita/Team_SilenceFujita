@@ -162,6 +162,7 @@ void InitTitle(void)
 	g_fAlphaTitle  = TIT_FIRST_ALPHA;						// 背景の透明度を初期化
 	g_fChangeTitle = TIT_CHANGE_ALPHA;						// 透明度の変更値を初期化
 	g_nTransCount  = 0;										// 自動遷移するまでのカウント
+	g_bTitleSound = false;									// タイトルでのサウンドの使用状況をなしに変更
 
 	//グローバル変数（タイトルの選択）の初期化
 	for (int nCount = 0; nCount < TITLE_SELECT_TYPE_MAX; nCount++)
