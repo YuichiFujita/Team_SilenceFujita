@@ -7030,7 +7030,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\WhiteCloth001.png";
+    "data\\TEXTURE\\WhiteCloth.png";
    }
   }
   Material {
@@ -7039,7 +7039,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\WhiteCloth001.png";
+    "data\\TEXTURE\\WhiteCloth.png";
    }
   }
   Material {
@@ -7048,7 +7048,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\WhiteCloth001.png";
+    "data\\TEXTURE\\WhiteCloth.png";
    }
   }
   Material {

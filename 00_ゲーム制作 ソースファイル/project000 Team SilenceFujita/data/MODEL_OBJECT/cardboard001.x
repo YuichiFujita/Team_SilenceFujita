@@ -359,7 +359,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\cardboard001.png";
+    "data\\TEXTURE\\danbo001.png";
    }
   }
  }

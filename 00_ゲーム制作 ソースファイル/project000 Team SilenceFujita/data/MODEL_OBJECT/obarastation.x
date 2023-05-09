@@ -524,7 +524,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\ObaraStation002.png";
+    "data\\TEXTURE\\OStation002.png";
    }
   }
   Material {
@@ -533,7 +533,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\ObaraStation003.png";
+    "data\\TEXTURE\\OStation003.png";
    }
   }
   Material {
@@ -551,7 +551,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\ObaraStation000.png";
+    "data\\TEXTURE\\OStation000.png";
    }
   }
   Material {
@@ -560,7 +560,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\ObaraStation001.png";
+    "data\\TEXTURE\\OStation001.png";
    }
   }
   Material {

@@ -30,8 +30,8 @@ CountDown g_CountDown;											//カウントダウンの情報
 // コンスト定義
 const char *c_apCountdownTextureFilename[CNTDOWNTYPE_MAX] = 
 {
-	"data/TEXTURE/countdown000.png",			// 1分
-	"data/TEXTURE/countdown001.png",			// 30秒
+	"data/TEXTURE/CD000.png",			// 1分
+	"data/TEXTURE/CD001.png",			// 30秒
 };
 
 //==========================================

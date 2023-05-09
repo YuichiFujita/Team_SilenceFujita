@@ -490,7 +490,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\No_vehicle_entry.png";
+    "data\\TEXTURE\\NoEntry.png";
    }
   }
  }

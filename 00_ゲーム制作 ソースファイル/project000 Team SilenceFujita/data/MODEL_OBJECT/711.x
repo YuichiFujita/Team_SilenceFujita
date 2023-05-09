@@ -357,7 +357,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\gomibakomen.png";
+    "data\\TEXTURE\\gomibako.png";
    }
   }
   Material {

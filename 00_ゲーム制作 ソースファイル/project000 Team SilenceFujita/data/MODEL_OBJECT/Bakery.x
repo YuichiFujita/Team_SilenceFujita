@@ -306,7 +306,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\BakerySignboard.png";
+    "data\\TEXTURE\\BakerySign.png";
    }
   }
   Material {

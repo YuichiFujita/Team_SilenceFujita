@@ -55,8 +55,8 @@
 const char *apTextureTitle[] =			// テクスチャの相対パス
 {
 	"data\\TEXTURE\\title000.tga",				// タイトルのテクスチャ相対パス
-	"data\\TEXTURE\\title_select_start.tga",	// タイトル選択（スタート）
-	"data\\TEXTURE\\title_select_tutorial.tga",	// タイトル選択（チュートリアル）
+	"data\\TEXTURE\\TitleStart.tga",			// タイトル選択（スタート）
+	"data\\TEXTURE\\TitleTutorial.tga",			// タイトル選択（チュートリアル）
 };
 
 //**********************************************************************************************************************

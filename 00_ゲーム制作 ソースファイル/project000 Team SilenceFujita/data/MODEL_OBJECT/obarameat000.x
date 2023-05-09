@@ -422,7 +422,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarameat000.png";
+    "data\\TEXTURE\\Omeat000.png";
    }
   }
   Material {

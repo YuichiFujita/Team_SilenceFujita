@@ -774,7 +774,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FujiCamerayoko.png";
+    "data\\TEXTURE\\FujiCame002.png";
    }
   }
   Material {
@@ -783,7 +783,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FujiCamerayoko.png";
+    "data\\TEXTURE\\FujiCame002.png";
    }
   }
   Material {
@@ -792,7 +792,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FujiCameraSolo.png";
+    "data\\TEXTURE\\FujiCame001.png";
    }
   }
   Material {

@@ -352,7 +352,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FoodTicketMachine.png";
+    "data\\TEXTURE\\FoodMachine.png";
    }
   }
   Material {
@@ -370,7 +370,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FoodShowcase.jpg";
+    "data\\TEXTURE\\FoodShow.jpg";
    }
   }
   Material {
@@ -385,7 +385,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarasyokudou000.png";
+    "data\\TEXTURE\\OShoku000.png";
    }
   }
   Material {

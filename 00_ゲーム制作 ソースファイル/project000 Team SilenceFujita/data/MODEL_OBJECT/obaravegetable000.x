@@ -1926,7 +1926,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\greengrocery000.png";
+    "data\\TEXTURE\\Gshow000.png";
    }
   }
   Material {
@@ -1935,7 +1935,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obaravegetable000.png";
+    "data\\TEXTURE\\Ovege000.png";
    }
   }
   Material {

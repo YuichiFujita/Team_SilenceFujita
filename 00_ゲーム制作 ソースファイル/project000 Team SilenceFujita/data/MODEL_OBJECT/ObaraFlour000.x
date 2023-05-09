@@ -2810,7 +2810,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obaraflour000.png";
+    "data\\TEXTURE\\Oflour000.png";
    }
   }
   Material {

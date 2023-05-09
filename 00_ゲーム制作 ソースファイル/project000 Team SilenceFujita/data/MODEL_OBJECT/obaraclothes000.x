@@ -1201,7 +1201,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obaraclothes000.png";
+    "data\\TEXTURE\\Oclothes000.png";
    }
   }
   Material {
@@ -1216,7 +1216,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarakurabu000.png";
+    "data\\TEXTURE\\Okurabu000.png";
    }
   }
   Material {
@@ -1225,7 +1225,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarakurabu001.png";
+    "data\\TEXTURE\\Okurabu001.png";
    }
   }
   Material {
@@ -1258,7 +1258,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obaraclothes001.png";
+    "data\\TEXTURE\\Oclothes001.png";
    }
   }
   Material {

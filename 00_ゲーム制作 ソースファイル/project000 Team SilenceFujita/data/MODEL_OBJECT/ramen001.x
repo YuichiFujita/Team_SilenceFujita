@@ -800,7 +800,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\ramenLogo002.png";
+    "data\\TEXTURE\\ramen002.png";
    }
   }
   Material {
@@ -809,7 +809,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\ramenLogo002.png";
+    "data\\TEXTURE\\ramen002.png";
    }
   }
   Material {
@@ -818,7 +818,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\tonkoturamen.png";
+    "data\\TEXTURE\\tonkotu.png";
    }
   }
   Material {

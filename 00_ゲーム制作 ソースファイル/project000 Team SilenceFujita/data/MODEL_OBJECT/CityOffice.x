@@ -457,7 +457,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\CityOfficeFront.png";
+    "data\\texture\\CityOffFront.png";
    }
   }
   Material {

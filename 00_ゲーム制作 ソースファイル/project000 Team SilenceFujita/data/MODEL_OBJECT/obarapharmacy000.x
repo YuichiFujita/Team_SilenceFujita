@@ -247,7 +247,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarapharmacy000.png";
+    "data\\TEXTURE\\OKusuri000.png";
    }
   }
   Material {

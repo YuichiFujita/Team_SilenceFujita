@@ -349,7 +349,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarakurabu000.png";
+    "data\\TEXTURE\\Okurabu000.png";
    }
   }
   Material {
@@ -358,7 +358,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarakurabu001.png";
+    "data\\TEXTURE\\Okurabu001.png";
    }
   }
   Material {

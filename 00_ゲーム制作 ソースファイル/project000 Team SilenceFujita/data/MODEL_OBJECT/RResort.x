@@ -1494,7 +1494,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FuzokuSign001.png";
+    "data\\TEXTURE\\Fuzoku001.png";
    }
   }
   Material {
@@ -1503,7 +1503,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FuzokuSign002.png";
+    "data\\TEXTURE\\Fuzoku002.png";
    }
   }
   Material {
@@ -1512,7 +1512,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FuzokuSign003.png";
+    "data\\TEXTURE\\Fuzoku003.png";
    }
   }
   Material {
@@ -1521,7 +1521,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\FuzokuSign004.png";
+    "data\\TEXTURE\\Fuzoku004.png";
    }
   }
   Material {

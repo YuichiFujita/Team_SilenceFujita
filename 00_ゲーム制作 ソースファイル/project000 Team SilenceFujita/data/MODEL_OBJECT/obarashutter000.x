@@ -215,7 +215,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\obarashutter000.png";
+    "data\\TEXTURE\\Oshutter000.png";
    }
   }
   Material {

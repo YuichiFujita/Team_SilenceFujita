@@ -1893,7 +1893,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\KaiKanCLUB_Front.png";
+    "data\\texture\\KKCLUBFront.png";
    }
   }
   Material {
@@ -1932,7 +1932,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\KaiKanCLUB_Front.png";
+    "data\\texture\\KKCLUBFront.png";
    }
   }
   Material {
@@ -1941,7 +1941,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\KaiKanCLUB_Front.png";
+    "data\\texture\\KKCLUBFront.png";
    }
   }
   Material {

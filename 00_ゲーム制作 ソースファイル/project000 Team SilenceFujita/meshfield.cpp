@@ -31,7 +31,7 @@ const char *apTextureMeshField[] =		// テクスチャの相対パス
 	"data\\TEXTURE\\road003.png",			// 丁字路のテクスチャの相対パス
 	"data\\TEXTURE\\sidewalk000.png",		// 地面のテクスチャの相対パス
 	"data\\TEXTURE\\Tile.jpg",				// タイルのテクスチャの相対パス
-	"data\\TEXTURE\\shopping_street.jpg",	// 商店街の道のテクスチャの相対パス
+	"data\\TEXTURE\\ShopStreet.jpg",		// 商店街の道のテクスチャの相対パス
 	"data\\TEXTURE\\red_sidewalk.jpg",		// 歩道のテクスチャの相対パス
 	"data\\TEXTURE\\sidewalk002.png",		// 地面のテクスチャの相対パス
 };

@@ -3808,7 +3808,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\gymnasiumdoor000.jpeg";
+    "data\\texture\\gymdoor.jpeg";
    }
   }
   Material {
@@ -3817,7 +3817,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\texture\\gymnasiumWall000.jpeg";
+    "data\\texture\\gymWall.jpeg";
    }
   }
   Material {
