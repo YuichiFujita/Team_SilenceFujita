@@ -116,12 +116,6 @@ void UpdateArrow(void)
 {
 	Player *pPlayer = GetPlayer();
 
-	// 頂点情報へのポインタ
-	VERTEX_3D *pVtx;
-
-	// 頂点バッファをロック
-	g_pVtxBuffArrow->Lock(0, 0, (void**)&pVtx, 0);
-
 	if (g_arrow.bUse == true)
 	{ // 使用されていた場合
 
@@ -132,9 +126,6 @@ void UpdateArrow(void)
 		g_arrow.pos.x = pPlayer->pos.x + sinf(pPlayer->rot.y) * ARROW_SHIFT;
 		g_arrow.pos.z = pPlayer->pos.z + cosf(pPlayer->rot.y) * ARROW_SHIFT;
 	}
-
-	// 頂点バッファをアンロックする
-	g_pVtxBuffArrow->Unlock();
 }
 
 //=====================================
@@ -200,12 +191,6 @@ void DrawArrow(void)
 //======================================
 void SetArrow(bool bUse)
 {
-	//頂点情報へのポインタ
-	VERTEX_3D *pVtx;
-
-	//頂点バッファをロック
-	g_pVtxBuffArrow->Lock(0, 0, (void**)&pVtx, 0);
-
 	if (bUse == true)
 	{ // 使用する場合
 
@@ -224,7 +209,4 @@ void SetArrow(bool bUse)
 			g_arrow.bUse = false;
 		}
 	}
-
-	//頂点バッファをアンロックする
-	g_pVtxBuffArrow->Unlock();
 }

@@ -73,8 +73,8 @@ void InitJunk(void)
 		g_aJunk[nCntJunk].modelData.size = INIT_SIZE;				// 大きさ
 		g_aJunk[nCntJunk].modelData.fRadius = 0.0f;					// 半径
 
-		// マテリアルのコピーを初期化
-		g_aJunk[nCntJunk].matCopy[MAX_MATERIAL] = {};
+		// 構造体の要素をクリア
+		ZeroMemory(&g_aJunk[nCntJunk].matCopy[0], sizeof(D3DXMATERIAL) * MAX_MATERIAL);
 	}
 
 	//// 当たり判定のセットアップ

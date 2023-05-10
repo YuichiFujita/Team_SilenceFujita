@@ -133,8 +133,8 @@ void InitObject(void)
 		g_aObject[nCntObject].modelData.size     = INIT_SIZE;						// 大きさ
 		g_aObject[nCntObject].modelData.fRadius  = 0.0f;							// 半径
 
-		// マテリアルのコピーを初期化
-		g_aObject[nCntObject].matCopy[MAX_MATERIAL] = {};
+		// 構造体の要素をクリア
+		ZeroMemory(&g_aObject[nCntObject].matCopy[0], sizeof(D3DXMATERIAL) * MAX_MATERIAL);
 
 		// 出現関係の初期化
 		g_aObject[nCntObject].appear.scaleCopy = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
@@ -741,7 +741,7 @@ void SetObject(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, D3DXMATERIAL
 			{ // 丸影の場合
 
 				// 拡大率の平均を求める
-				fAverageScale = (g_aObject[nCntObject].scale.x + g_aObject[nCntObject].scale.z) * 0.5f;
+				fAverageScale = (g_aObject[nCntObject].appear.scaleCopy.x + g_aObject[nCntObject].appear.scaleCopy.z) * 0.5f;
 
 				// 影のインデックスを設定
 				g_aObject[nCntObject].nShadowID = SetCircleShadow

@@ -100,8 +100,8 @@ void CollisionCarHuman(Human *pHuman);		// 人間と車の当たり判定
 void CurveRotHuman(Human *pHuman);			// 人間の角度更新処理
 void WalkHuman(Human *pHuman);				// 人間の歩く処理
 void PassingHuman(Human *pHuman);			// 人間のすれ違い処理
-void SetResurrection(Human human);			// 復活情報の設定処理
-void ResurrectionHuman(Human human);		// 人間の復活処理
+void SetResurrection(Human *pHuman);			// 復活情報の設定処理
+void ResurrectionHuman(Human *pHuman);		// 人間の復活処理
 void CorrectCurveHuman(Human *human);		// 人間の初期位置の設定処理
 bool OverlapHuman(Human *pHuman);			// 人間の重なり防止処理
 
@@ -339,7 +339,7 @@ void UpdateHuman(void)
 					{ // 復活する場合
 
 						// 復活情報の設定処理
-						SetResurrection(g_aHuman[nCntHuman]);
+						SetResurrection(&g_aHuman[nCntHuman]);
 					}
 
 					// 使用していない
@@ -438,7 +438,7 @@ void UpdateHuman(void)
 				g_aResurrect[nCntHuman].bUse = false;
 
 				// 人間の復活処理
-				ResurrectionHuman(g_aResurrect[nCntHuman].humanDate);
+				ResurrectionHuman(&g_aResurrect[nCntHuman].humanDate);
 			}
 		}
 	}
@@ -1804,7 +1804,7 @@ void SetMotionHuman(Human *pHuman, MOTIONTYPE type)
 //======================================================================================================================
 // 復活情報の設定処理
 //======================================================================================================================
-void SetResurrection(Human human)
+void SetResurrection(Human *pHuman)
 {
 	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
 	{
@@ -1812,7 +1812,7 @@ void SetResurrection(Human human)
 		{ // 復活の情報を使用していない場合
 			
 			// 復活関係の情報の設定
-			g_aResurrect[nCnt].humanDate = human;		// 人間のデータを代入する
+			g_aResurrect[nCnt].humanDate = *pHuman;		// 人間のデータを代入する
 			g_aResurrect[nCnt].nResurCount = 0;			// 復活カウント
 			g_aResurrect[nCnt].bUse = true;				// 使用状況
 
@@ -1825,7 +1825,7 @@ void SetResurrection(Human human)
 //======================================================================================================================
 // 人間の復活処理
 //======================================================================================================================
-void ResurrectionHuman(Human human)
+void ResurrectionHuman(Human *pHuman)
 {
 	for (int nCnt = 0; nCnt < MAX_HUMAN; nCnt++)
 	{
@@ -1833,9 +1833,9 @@ void ResurrectionHuman(Human human)
 		{ // 人間を使用していない場合
 
 			// 引数の位置を代入
-			g_aHuman[nCnt].pos    = human.pos;		// 現在の位置
-			g_aHuman[nCnt].posOld = human.pos;		// 前回の位置	
-			g_aHuman[nCnt].type   = human.type;		// 種類
+			g_aHuman[nCnt].pos    = pHuman->pos;		// 現在の位置
+			g_aHuman[nCnt].posOld = pHuman->pos;		// 前回の位置	
+			g_aHuman[nCnt].type   = pHuman->type;		// 種類
 
 			// 情報を初期化
 			g_aHuman[nCnt].move    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
@@ -1890,7 +1890,7 @@ void ResurrectionHuman(Human human)
 			// ジャッジの情報の設定
 			g_aHuman[nCnt].judge.col = JUDGE_WHITE;			// ピカピカの色
 
-			g_aHuman[nCnt].judge.state    = human.judge.state;		// 善悪
+			g_aHuman[nCnt].judge.state    = pHuman->judge.state;		// 善悪
 			g_aHuman[nCnt].judge.ticatica = CHICASTATE_BLACKOUT;	// チカチカ状態
 
 			if (g_aHuman[nCnt].judge.state == JUDGESTATE_EVIL)

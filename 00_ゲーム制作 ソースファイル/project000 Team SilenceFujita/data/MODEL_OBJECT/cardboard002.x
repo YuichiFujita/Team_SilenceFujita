@@ -222,7 +222,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\cardboard003.png";
+    "data\\TEXTURE\\danbo003.png";
    }
   }
   Material {
@@ -231,7 +231,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\cardboard003.png";
+    "data\\TEXTURE\\danbo003.png";
    }
   }
  }

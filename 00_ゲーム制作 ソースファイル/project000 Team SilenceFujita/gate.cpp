@@ -660,8 +660,18 @@ void CollisionGate(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pOldPos, D3DXVECTOR3 *pMove, 
 		if (g_aGate[nCntGate].bUse == true)
 		{ // オブジェクトが使用されている場合
 
-			// 繰り返し数を設定
-			nNumLoop = (g_aGate[nCntGate].state != GATESTATE_FLY || g_aGate[nCntGate].state != GATESTATE_OPEN) ? MODEL_GATE_MAX : 1;
+			if (g_aGate[nCntGate].state == GATESTATE_FLY || g_aGate[nCntGate].state == GATESTATE_OPEN)
+			{ // 通り抜けが可能なゲート状態の場合、ゲート本体の判定のみ確認する
+
+				// 繰り返し数を設定
+				nNumLoop = 1;
+			}
+			else
+			{ // 通り抜けが不可能なゲート状態の場合、鉄板部分の判定も確認する
+
+				// 繰り返し数を設定
+				nNumLoop = MODEL_GATE_MAX;
+			}
 
 			for (int nCntCollGate = 0; nCntCollGate < nNumLoop; nCntCollGate++)
 			{ // 設定された繰り返し数分ループ
