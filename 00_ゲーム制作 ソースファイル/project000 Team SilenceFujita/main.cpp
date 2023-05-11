@@ -93,13 +93,12 @@ void DrawDebugControlBillboard(void);	// エディットビルボード操作説明
 //************************************************************
 //	グローバル変数
 //************************************************************
-LPDIRECT3D9       g_pD3D = NULL;		// Direct3D オブジェクトへのポインタ
+LPDIRECT3D9       g_pD3D       = NULL;	// Direct3D オブジェクトへのポインタ
 LPDIRECT3DDEVICE9 g_pD3DDevice = NULL;	// Direct3D デバイスへのポインタ
 
 MODE       g_mode;			// モード切り替え用
 StageLimit g_stageLimit;	// ステージの移動範囲
-
-int g_nNumGate;				// ゲートの数
+int        g_nNumGate;		// ゲートの数
 
 #ifdef _DEBUG	// デバッグ処理
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffDebug = NULL;	// 頂点バッファへのポインタ
@@ -452,6 +451,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_stageLimit.fLeft  = 0.0f;		// 移動の制限位置 (左)
 	g_stageLimit.fField = 0.0f;		// 移動の制限位置 (地面)
 
+	// ゲートの数を初期化
+	g_nNumGate = 0;
+
 	//--------------------------------------------------------
 	//	初期化処理
 	//--------------------------------------------------------
@@ -484,7 +486,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	ResetRanking();
 
 #ifdef _DEBUG	// デバッグ処理
-
 	// デバッグの初期化
 	InitDebug();
 #endif
@@ -513,7 +514,7 @@ void Uninit(void)
 	// フェードの終了
 	UninitFade();
 
-	// ロゴの終了処理
+	// ロゴ画面の終了
 	UninitLogo();
 
 	// タイトル画面の終了
@@ -554,7 +555,6 @@ void Uninit(void)
 	}
 
 #ifdef _DEBUG	// デバッグ処理
-
 	// デバッグの終了
 	UninitDebug();
 #endif
@@ -648,12 +648,7 @@ void Draw(void)
 		1.0f,
 		0
 	);
-
-	if (hr == E_FAIL)
-	{ // 画面クリアに失敗した場合
-
-		assert(false);
-	}
+	if (FAILED(hr)) { assert(false); }
 
 	// 描画開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
@@ -713,9 +708,6 @@ void Draw(void)
 			break;
 		}
 
-		// ビューポートを元に戻す
-		g_pD3DDevice->SetViewport(&viewportDef);
-
 		// フェードの描画
 		DrawFade();
 
@@ -724,12 +716,17 @@ void Draw(void)
 		DrawDebug();
 #endif
 
+		// ビューポートを元に戻す
+		g_pD3DDevice->SetViewport(&viewportDef);
+
 		// 描画終了
-		g_pD3DDevice->EndScene();
+		hr = g_pD3DDevice->EndScene();
+		if (FAILED(hr)) { assert(false); }
 	}
 
 	// バックバッファとフロントバッファの入れ替え
-	g_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+	hr = g_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+	if (FAILED(hr)) { assert(false); }
 }
 
 //============================================================
