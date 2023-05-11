@@ -294,6 +294,10 @@ void InitCamera(void)
 			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, ROAD_ROT_FIVE, 0.0f);											// 向き
 
 			break;
+
+		default:	// 例外処理
+			assert(false);
+			break;
 		}
 
 		// ビューポート情報を初期化
@@ -381,6 +385,10 @@ void InitCamera(void)
 			g_aCamera[CAMERATYPE_MAIN].vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);													// 上方向ベクトル
 			g_aCamera[CAMERATYPE_MAIN].rot = D3DXVECTOR3(0.0f, ROAD_ROT_FIVE, 0.0f);											// 向き
 
+			break;
+
+		default:	// 例外処理
+			assert(false);
 			break;
 		}
 
@@ -946,6 +954,10 @@ void UpdateTitleCamera(void)
 		}
 
 		break;
+
+	default:	// 例外処理
+		assert(false);
+		break;
 	}
 
 	// 前回の位置を記録する
@@ -1081,6 +1093,10 @@ void UpdateRankingCamera(void)
 			SetRankingRoadTrance();
 		}
 
+		break;
+
+	default:	// 例外処理
+		assert(false);
 		break;
 	}
 

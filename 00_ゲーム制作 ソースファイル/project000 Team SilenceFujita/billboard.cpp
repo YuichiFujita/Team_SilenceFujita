@@ -46,56 +46,30 @@ void InitBillboard(void)
 	
 	for (int nCntSet = 0; nCntSet < MAX_BILLBOARD; nCntSet++)
 	{
-		//位置の初期化
-		g_aBillboard[nCntSet].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-		//向きの初期化
-		g_aBillboard[nCntSet].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		// 基本情報の初期化
+		g_aBillboard[nCntSet].pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		//位置の初期化
+		g_aBillboard[nCntSet].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		//向きの初期化
+		g_aBillboard[nCntSet].Radius	= D3DXVECTOR2(30.0f, 30.0f);			//半径を初期化する
+		g_aBillboard[nCntSet].col		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	//色を初期化する
+		g_aBillboard[nCntSet].colCopy	= g_aBillboard[nCntSet].col;			//色のコピーを初期化する
+		g_aBillboard[nCntSet].State		= BILLBOARDSTATE_NONE;					//状態を初期化する
+		g_aBillboard[nCntSet].Type		= BILLBOARD_EXPL;						//種類を初期化する
 
-		//半径を初期化する
-		g_aBillboard[nCntSet].Radius = D3DXVECTOR2(30.0f, 30.0f);
+		g_aBillboard[nCntSet].nShadow		= -1;		//影の番号を初期化する
+		g_aBillboard[nCntSet].nLife			= 0;		//体力を初期化する
+		g_aBillboard[nCntSet].nAnimCounter	= 0;		//アニメカウンターを初期化する
+		g_aBillboard[nCntSet].nAnimPattern	= 0;		//アニメパターンNo.を初期化する
+		g_aBillboard[nCntSet].bShadow		= false;	//使用していない
+		g_aBillboard[nCntSet].bUse			= false;	//使用していない
 
-		//影の番号を初期化する
-		g_aBillboard[nCntSet].nShadow = -1;
-
-		//アニメカウンターを初期化する
-		g_aBillboard[nCntSet].nAnimCounter = 0;
-
-		//アニメパターンNo.を初期化する
-		g_aBillboard[nCntSet].nAnimPattern = 0;
-
-		//使用していない
-		g_aBillboard[nCntSet].bShadow = false;
-
-		//使用していない
-		g_aBillboard[nCntSet].bUse = false;
-
-		//色を初期化する
-		g_aBillboard[nCntSet].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-		//色のコピーを初期化する
-		g_aBillboard[nCntSet].colCopy = g_aBillboard[nCntSet].col;
-
-		//状態を初期化する
-		g_aBillboard[nCntSet].State = BILLBOARDSTATE_NONE;
-
-		//アニメーションしない
-		g_aBillboard[nCntSet].Anim.bAnim = false;
-
-		//アニメカウントを初期化する
-		g_aBillboard[nCntSet].Anim.nAnimCounter = 1;
-
-		//アニメパターンを初期化する
-		g_aBillboard[nCntSet].Anim.nAnimPattern = 1;
-
-		//再生カウントを初期化する
-		g_aBillboard[nCntSet].Anim.nReplayCount = 0;
-
-		//再生パターンを初期化する
-		g_aBillboard[nCntSet].Anim.nReplayPattern = 0;
-
-		//テクスチャのパターンを初期化する
-		g_aBillboard[nCntSet].Anim.TexPattern = 1.0f;
+		// アニメーション情報の初期化
+		g_aBillboard[nCntSet].Anim.bAnim			= false;	//アニメーションしない
+		g_aBillboard[nCntSet].Anim.nAnimCounter		= 1;		//アニメカウントを初期化する
+		g_aBillboard[nCntSet].Anim.nAnimPattern		= 1;		//アニメパターンを初期化する
+		g_aBillboard[nCntSet].Anim.nReplayCount		= 0;		//再生カウントを初期化する
+		g_aBillboard[nCntSet].Anim.nReplayPattern	= 0;		//再生パターンを初期化する
+		g_aBillboard[nCntSet].Anim.TexPattern		= 1.0f;		//テクスチャのパターンを初期化する
 	}
 
 	//頂点バッファの生成

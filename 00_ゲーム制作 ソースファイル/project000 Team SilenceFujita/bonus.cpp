@@ -100,6 +100,7 @@ void InitBonus(void)
 	//“¾“_‚Ìî•ñ‚Ì‰Šú‰»
 	for (int nCntBonus = 0; nCntBonus < MAX_BONUS; nCntBonus++)
 	{
+
 		// î•ñ‚Ì‰Šú‰»
 		g_aBonus[nCntBonus].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ˆÊ’u
 		g_aBonus[nCntBonus].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ˆÚ“®—Ê

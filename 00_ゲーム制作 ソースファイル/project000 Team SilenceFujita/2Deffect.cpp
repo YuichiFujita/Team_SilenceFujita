@@ -38,7 +38,6 @@ typedef struct
 {
 	D3DXVECTOR3 pos;				// 位置
 	D3DXVECTOR3 move;				// 移動量
-	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
 	D3DXCOLOR   col;				// 色
 	int         nLife;				// 寿命
 	float       fRadius;			// 半径
