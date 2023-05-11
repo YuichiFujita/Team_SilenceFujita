@@ -9,23 +9,26 @@
 #include "escape.h"
 
 //マクロ定義
-#define COUNTDOWN_APPEAR_CNT	(100)											// カウントダウンの出現からの遷移カウント
-#define COUNTDOWN_LENGTH_CNT	(40)											// カウントダウンの出現からの遷移カウント
+#define COUNTDOWN_APPEAR_CNT	(100)	// カウントダウンの出現からの遷移カウント
+#define COUNTDOWN_LENGTH_CNT	(40)	// カウントダウンの出現からの遷移カウント
 
-#define COUNTDOWN_RADIUS		(D3DXVECTOR3(600.0f, 100.0f, 0.0f))														// カウントダウン半径
-#define COUNTDOWN_INIT_RADIUS	(D3DXVECTOR3(0.0f, 100.0f, 0.0f))														// カウントダウン半径
-#define COUNTDOWN_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - (COUNTDOWN_RADIUS.x * 0.5f), SCREEN_HEIGHT * 0.5f, 0.0f))		// カウントダウンの位置
+#define COUNTDOWN_RADIUS		(D3DXVECTOR3(600.0f, 100.0f, 0.0f))		// カウントダウン半径
+#define COUNTDOWN_INIT_RADIUS	(D3DXVECTOR3(0.0f, 100.0f, 0.0f))		// カウントダウン半径
+
+#define COUNTDOWN_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - (COUNTDOWN_RADIUS.x * 0.5f), SCREEN_HEIGHT * 0.5f, 0.0f))	// カウントダウンの位置
+
 #define COUNTDOWN_LENGTH_MOVE	(COUNTDOWN_RADIUS.x / COUNTDOWN_LENGTH_CNT)		// カウントダウンの長さの移動量
-#define COUNTDOWN_INIT_TEXU		(0.0f)											// カウントダウンのテクスチャの初期値
-#define COUNTDOWN_INIT_ALPHA	(0.0f)											// カウントダウンの透明度の初期値
-#define COUNTDOWN_ALPHA			(0.5f)											// カウントダウンの透明度
 
-#define COUNTDOWN_ALPHA_SUB		(0.05f)											// カウントダウンの透明度の減少量
+#define COUNTDOWN_INIT_TEXU		(0.0f)	// カウントダウンのテクスチャの初期値
+#define COUNTDOWN_INIT_ALPHA	(0.0f)	// カウントダウンの透明度の初期値
+#define COUNTDOWN_ALPHA			(0.5f)	// カウントダウンの透明度
+#define COUNTDOWN_ALPHA_SUB		(0.05f)	// カウントダウンの透明度の減少量
 
 //グローバル変数
 LPDIRECT3DTEXTURE9 g_pTextureCountDown[CNTDOWNTYPE_MAX] = {};	//テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffCountDown = NULL;				//頂点バッファへのポインタ
-CountDown g_CountDown;											//カウントダウンの情報
+
+CountDown g_CountDown;	//カウントダウンの情報
 
 // コンスト定義
 const char *c_apCountdownTextureFilename[CNTDOWNTYPE_MAX] = 
@@ -53,12 +56,12 @@ void InitCountDown(void)
 	}
 
 	// カウントダウンの情報の設定
-	g_CountDown.pos		= COUNTDOWN_POS;				// 位置
-	g_CountDown.length  = COUNTDOWN_INIT_RADIUS;		// 長さ
-	g_CountDown.fAlpha	= COUNTDOWN_INIT_ALPHA;			// 透明度
-	g_CountDown.fTexU	= COUNTDOWN_INIT_TEXU;			// テクスチャのU軸の値
-	g_CountDown.type	= CNTDOWNTYPE_1MIN;				// 種類
-	g_CountDown.bUse	= false;						// 使用状況
+	g_CountDown.pos		= COUNTDOWN_POS;			// 位置
+	g_CountDown.length	= COUNTDOWN_INIT_RADIUS;	// 長さ
+	g_CountDown.fAlpha	= COUNTDOWN_INIT_ALPHA;		// 透明度
+	g_CountDown.fTexU	= COUNTDOWN_INIT_TEXU;		// テクスチャのU軸の値
+	g_CountDown.type	= CNTDOWNTYPE_1MIN;			// 種類
+	g_CountDown.bUse	= false;					// 使用状況
 
 	// 状態関係の設定
 	g_CountDown.stateInfo.state			= CNTDOWNSTATE_NONE;	// 状態

@@ -21,20 +21,17 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define CURVE_MOVE_SLOW_MAGNI			(0.3f)				// カーブするときの減速係数
-#define CURVE_ADD						(0.03f)				// カーブするときの向きの追加量
-#define CURVE_TXT						"data\\TXT\\Curve.txt"		// カーブ設定用のテキストファイルの相対パス
-#define HUMAN_CURVE_TXT					"data\\TXT\\HumanCurve.txt"	// 人間の曲がり角(ルート)の保存用テキストファイルの相対パス
+#define CURVE_MOVE_SLOW_MAGNI	(0.3f)	// カーブするときの減速係数
+#define CURVE_ADD				(0.03f)	// カーブするときの向きの追加量
 
-//**********************************************************************************************************************
-//	プロトタイプ宣言
-//**********************************************************************************************************************
+#define CURVE_TXT		"data\\TXT\\Curve.txt"		// カーブ設定用のテキストファイルの相対パス
+#define HUMAN_CURVE_TXT	"data\\TXT\\HumanCurve.txt"	// 人間の曲がり角(ルート)の保存用テキストファイルの相対パス
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-CURVEINFO g_aCurveInfo[MAX_CURVEPOINT];						// 車のカーブの情報
-HUMANCURVEINFO g_aCurveHuman[MAX_HUMAN_ROUTE];				// 人間のカーブの情報
+CURVEINFO g_aCurveInfo[MAX_CURVEPOINT];			// 車のカーブの情報
+HUMANCURVEINFO g_aCurveHuman[MAX_HUMAN_ROUTE];	// 人間のカーブの情報
 
 //======================================================================================================================
 // カーブの情報の初期化処理
@@ -43,25 +40,28 @@ void InitCurveInfo(void)
 {
 	for (int nCnt = 0; nCnt < MAX_CURVEPOINT; nCnt++)
 	{ // 車の曲がり角の情報の初期化
-		g_aCurveInfo[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aCurveInfo[nCnt].nCurveNumber = nCnt;						// 番号
-		g_aCurveInfo[nCnt].curveAngle = CURVE_RIGHT;				// 曲がる方向
-		g_aCurveInfo[nCnt].dashAngle = DASH_RIGHT;					// 曲がり角にたどり着くまでの走っている方向
-		g_aCurveInfo[nCnt].bDeadEnd = false;						// 行き止まりかどうか
+
+		g_aCurveInfo[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCurveInfo[nCnt].nCurveNumber = nCnt;					// 番号
+		g_aCurveInfo[nCnt].curveAngle = CURVE_RIGHT;			// 曲がる方向
+		g_aCurveInfo[nCnt].dashAngle = DASH_RIGHT;				// 曲がり角にたどり着くまでの走っている方向
+		g_aCurveInfo[nCnt].bDeadEnd = false;					// 行き止まりかどうか
 	}
 
 	for (int nCnt = 0; nCnt < MAX_HUMAN_ROUTE; nCnt++)
 	{ // 人間のルートの情報の初期化
+
 		for (int nCntCur = 0; nCntCur < MAX_HUMAN_CURVE; nCntCur++)
 		{
+
 			g_aCurveHuman[nCnt].curvePoint[nCntCur] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 			g_aCurveHuman[nCnt].curveAngle[nCntCur] = CURVE_LEFT;						// 曲がる方向
 			g_aCurveHuman[nCnt].dashAngle[nCntCur] = DASH_RIGHT;						// 走っている方向
 			g_aCurveHuman[nCnt].roadPos[nCntCur] = ROADPOS_RIGHT;						// 曲がり角よりどっち側に歩いているか
 		}
 
-		g_aCurveHuman[nCnt].nNowCurve = 0;											// 現在の曲がり角の番号
-		g_aCurveHuman[nCnt].nCurveTime = 1;											// 曲がる回数
+		g_aCurveHuman[nCnt].nNowCurve = 0;	// 現在の曲がり角の番号
+		g_aCurveHuman[nCnt].nCurveTime = 1;	// 曲がる回数
 	}
 }
 

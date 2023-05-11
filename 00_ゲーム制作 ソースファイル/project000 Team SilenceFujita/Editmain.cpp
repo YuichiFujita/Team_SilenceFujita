@@ -1,10 +1,11 @@
-#ifdef _DEBUG	// デバッグ処理
 //========================================
 //
 //エディットメインのメイン処理[Editmain.cpp]
 //Author 小原立暉
 //
 //========================================
+#ifdef _DEBUG	// デバッグ処理
+
 #include "main.h"
 #include "game.h"
 #include "EditObject.h"
@@ -15,37 +16,37 @@
 #include "object.h"
 #include "gate.h"
 
-//マクロ定義
-#define SAVE_OBJECT_TXT		"data\\TXT\\save_object.txt"		// ステージ保存の外部ファイルの相対パス
+// マクロ定義
+#define SAVE_OBJECT_TXT		"data\\TXT\\save_object.txt"	// ステージ保存の外部ファイルの相対パス
 
-//プロトタイプ宣言
-void DrawDebugEditObject(void);			//エディットオブジェクトモードのデバッグ表示
-void DrawDebugEditBillboard(void);		//エディットビルボードモードのデバッグ表示
-void DrawDebugControlObject(void);		//エディットオブジェクト操作説明
-void DrawDebugControlBillboard(void);	//エディットビルボード操作説明
+// プロトタイプ宣言
+void DrawDebugEditObject(void);			// エディットオブジェクトモードのデバッグ表示
+void DrawDebugEditBillboard(void);		// エディットビルボードモードのデバッグ表示
+void DrawDebugControlObject(void);		// エディットオブジェクト操作説明
+void DrawDebugControlBillboard(void);	// エディットビルボード操作説明
 
-//グローバル変数
-int g_EditStyle;						//スタイル
-int g_CollisionStyle;					//当たり判定スタイル
+// グローバル変数
+int g_EditStyle;		// スタイル
+int g_CollisionStyle;	// 当たり判定スタイル
 
 //======================
 //初期化
 //======================
 void InitEditmain()
 {
-	//エディットオブジェクトの初期化処理
+	// エディットオブジェクトの初期化
 	InitEditObject();
 
-	//エディット当たり判定の初期化処理
+	// エディット当たり判定の初期化
 	InitEditCollision();
 
-	//エディットビルボードの初期化処理
+	// エディットビルボードの初期化
 	InitEditBillboard();
 
-	//エディットオブジェクトスタイルにする
+	// エディットオブジェクトスタイルにする
 	g_EditStyle = EDITSTYLE_OBJECT;
 
-	//当たり判定スタイル
+	// 当たり判定スタイル
 	g_CollisionStyle = COLLISIONSTYLE_OBJECT;
 }
 
@@ -54,13 +55,13 @@ void InitEditmain()
 //============================
 void UninitEditmain(void)
 {
-	//エディットオブジェクトの終了処理
+	// エディットオブジェクトの終了
 	UninitEditObject();
 
-	//エディット当たり判定の終了処理
+	// エディット当たり判定の終了
 	UninitEditCollision();
 
-	//エディットビルボードの終了処理
+	// エディットビルボードの終了
 	UninitEditBillboard();
 }
 

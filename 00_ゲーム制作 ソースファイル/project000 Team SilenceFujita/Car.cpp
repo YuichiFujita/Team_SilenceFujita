@@ -94,22 +94,24 @@ void InitCar(void)
 	for (int nCntCar = 0; nCntCar < MAX_CAR; nCntCar++)
 	{ // オブジェクトの最大表示数分繰り返す
 
-		g_aCar[nCntCar].pos				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aCar[nCntCar].posOld			= g_aCar[nCntCar].pos;				// 前回の位置
-		g_aCar[nCntCar].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aCar[nCntCar].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aCar[nCntCar].nShadowID		= NONE_SHADOW;						// 影のインデックス
-		g_aCar[nCntCar].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
-		g_aCar[nCntCar].type			= CARTYPE_CAR001;					// 種類
-		g_aCar[nCntCar].bombState		= BOMBSTATE_NONE;					// ボムの状態
-		g_aCar[nCntCar].typeMove		= MOVETYPE_MOVE;					// 移動のタイプ
-		g_aCar[nCntCar].nBombCount		= 0;								// ボム中のカウント
-		g_aCar[nCntCar].bJump			= false;							// ジャンプしているかどうか
-		g_aCar[nCntCar].bMove			= false;							// 移動しているか
-		g_aCar[nCntCar].nTrafficCnt		= 0;								// 渋滞カウント
-		g_aCar[nCntCar].nStopCount		= 0;								// 停止カウント
-		g_aCar[nCntCar].state			= CARSTATE_NORMAL;					// 状態
-		g_aCar[nCntCar].bUse			= false;							// 使用状況
+		// 基本情報の初期化
+		g_aCar[nCntCar].pos			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aCar[nCntCar].posOld		= g_aCar[nCntCar].pos;				// 前回の位置
+		g_aCar[nCntCar].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aCar[nCntCar].rot			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+
+		g_aCar[nCntCar].nShadowID	= NONE_SHADOW;		// 影のインデックス
+		g_aCar[nCntCar].nNotaID		= NONE_3D_NOTATION;	// 強調表示のインデックス
+		g_aCar[nCntCar].type		= CARTYPE_CAR001;	// 種類
+		g_aCar[nCntCar].bombState	= BOMBSTATE_NONE;	// ボムの状態
+		g_aCar[nCntCar].typeMove	= MOVETYPE_MOVE;	// 移動のタイプ
+		g_aCar[nCntCar].nBombCount	= 0;				// ボム中のカウント
+		g_aCar[nCntCar].bJump		= false;			// ジャンプしているかどうか
+		g_aCar[nCntCar].bMove		= false;			// 移動しているか
+		g_aCar[nCntCar].nTrafficCnt	= 0;				// 渋滞カウント
+		g_aCar[nCntCar].nStopCount	= 0;				// 停止カウント
+		g_aCar[nCntCar].state		= CARSTATE_NORMAL;	// 状態
+		g_aCar[nCntCar].bUse		= false;			// 使用状況
 
 		// 曲がり角の情報の初期化
 		g_aCar[nCntCar].carCurveInfo.curveInfo.curveAngle   = CURVE_LEFT;	// 左に曲がる
@@ -136,6 +138,9 @@ void InitCar(void)
 		// アイコンの情報の初期化
 		g_aCar[nCntCar].icon.nIconID = NONE_ICON;					// アイコンのインデックス
 		g_aCar[nCntCar].icon.state = ICONSTATE_NONE;				// アイコンの状態
+
+		// マテリアルコピー情報の初期化
+		ZeroMemory(&g_aCar[nCntCar].MatCopy[0], sizeof(g_aCar[nCntCar].MatCopy));
 	}
 }
 
