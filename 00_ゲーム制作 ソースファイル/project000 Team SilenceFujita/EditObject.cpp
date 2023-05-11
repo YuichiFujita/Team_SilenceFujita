@@ -1,10 +1,11 @@
-#ifdef _DEBUG	// デバッグ処理
 //===========================================
 //
 //オブジェクトのメイン処理[EditObject.cpp]
 //Author 小原立暉
 //
 //===========================================
+#ifdef _DEBUG	// デバッグ処理
+
 #include "main.h"
 #include "model.h"
 #include "EditObject.h"
@@ -17,7 +18,7 @@
 #include "EditBillboard.h"
 #include "player.h"
 
-//マクロ定義
+// マクロ定義
 #define EDITOBJ_SELECT_MATERIAL_ALPHA	(1.0f)		// 選択中のマテリアルの透明度
 #define EDITOBJ_NORMAL_MATERIAL_ALPHA	(0.5f)		// 選択していないマテリアルの透明度
 #define EDITOBJ_DELETE_OBJECT_RANGE		(70.0f)		// オブジェクト消去の範囲
@@ -31,29 +32,29 @@
 #define EDITOBJ_UPDOWN_ADJUSTMENT_MOVE	(2.0f)		// 調整用の上下移動の移動量
 #define EDITOBJ_ADJUSTMENT_ROT_MOVE		(15)		// 調整用の向きの移動量
 
-//プロトタイプ宣言
-void SaveCurrentEdit(void);			//エディット状況の一時保存処理
-void TypeChangeEdit(void);			//種類変更処理
-void MoveEdit(void);				//移動処理
-void RotationEdit(void);			//回転処理
-void SetEdit(void);					//オブジェクトの設定処理
-void DeleteEditObject(void);		//オブジェクトの消去
-void ScaleObjectX(void);			//オブジェクトの拡大縮小処理(X軸)
-void ScaleObjectY(void);			//オブジェクトの拡大縮小処理(Y軸)
-void ScaleObjectZ(void);			//オブジェクトの拡大縮小処理(Z軸)
-void ScaleObject(void);				//オブジェクトの拡大縮小処理
-void ResetEdit(void);				//オブジェクトの情報リセット処理
-void EditMaterialCustom(void);		//マテリアルのエディット処理
-void BreakEdit(void);				//オブジェクトの破壊エディット処理
-void ShadowEdit(void);				//オブジェクトの影のエディット処理
-void CollisionEdit(void);			//オブジェクトの当たり判定のエディット処理
-void UpDownEditObject(void);		//オブジェクトの上下移動処理
-void RightAngleEditObject(void);	//オブジェクトの直角処理
-void CollisionRotationEdit(void);	//当たり判定の回転処理
-void PlayerPosSetEditObject(void);	//オブジェクトのプレイヤー位置移動
-void JudgeEditObject(void);			//オブジェクトの善悪処理
+// プロトタイプ宣言
+void SaveCurrentEdit(void);			// エディット状況の一時保存処理
+void TypeChangeEdit(void);			// 種類変更処理
+void MoveEdit(void);				// 移動処理
+void RotationEdit(void);			// 回転処理
+void SetEdit(void);					// オブジェクトの設定処理
+void DeleteEditObject(void);		// オブジェクトの消去
+void ScaleObjectX(void);			// オブジェクトの拡大縮小処理(X軸)
+void ScaleObjectY(void);			// オブジェクトの拡大縮小処理(Y軸)
+void ScaleObjectZ(void);			// オブジェクトの拡大縮小処理(Z軸)
+void ScaleObject(void);				// オブジェクトの拡大縮小処理
+void ResetEdit(void);				// オブジェクトの情報リセット処理
+void EditMaterialCustom(void);		// マテリアルのエディット処理
+void BreakEdit(void);				// オブジェクトの破壊エディット処理
+void ShadowEdit(void);				// オブジェクトの影のエディット処理
+void CollisionEdit(void);			// オブジェクトの当たり判定のエディット処理
+void UpDownEditObject(void);		// オブジェクトの上下移動処理
+void RightAngleEditObject(void);	// オブジェクトの直角処理
+void CollisionRotationEdit(void);	// 当たり判定の回転処理
+void PlayerPosSetEditObject(void);	// オブジェクトのプレイヤー位置移動
+void JudgeEditObject(void);			// オブジェクトの善悪処理
 
-//破壊モードの表記
+// 破壊モードの表記
 const char *c_apBreakmodename[BREAKTYPE_MAX] =
 {
 	"破壊不可",
@@ -61,7 +62,7 @@ const char *c_apBreakmodename[BREAKTYPE_MAX] =
 	"吹き飛ぶ",
 };
 
-//影モードの表記
+// 影モードの表記
 const char *c_apShadowmodename[SHADOWTYPE_MAX] =
 {
 	"影無し",
@@ -69,7 +70,7 @@ const char *c_apShadowmodename[SHADOWTYPE_MAX] =
 	"リアル影",
 };
 
-//当たり判定モードの表記
+// 当たり判定モードの表記
 const char *c_apCollisionmodename[COLLISIONTYPE_MAX] =
 {
 	"当たり判定無し",
@@ -78,18 +79,18 @@ const char *c_apCollisionmodename[COLLISIONTYPE_MAX] =
 	//"作成したそれぞれの当たり判定",
 };
 
-//善悪状態の表記
+// 善悪状態の表記
 const char *c_apJudgemodename[JUDGESTATE_MAX] = 
 {
 	"良い建物",
 	"悪い建物",
 };
 
-//グローバル変数
-EditObject  g_EditObject;								//オブジェクトの情報
-D3DXVECTOR3 g_aRotObject[MODEL_OBJ_MAX];				//オブジェクトの向きの情報
-D3DXVECTOR3 g_aScaleObject[MODEL_OBJ_MAX];				//オブジェクトの拡大率の情報
-int g_nStyleObject;										//スタイルの変数
+// グローバル変数
+EditObject  g_EditObject;					// オブジェクトの情報
+D3DXVECTOR3 g_aRotObject[MODEL_OBJ_MAX];	// オブジェクトの向きの情報
+D3DXVECTOR3 g_aScaleObject[MODEL_OBJ_MAX];	// オブジェクトの拡大率の情報
+int g_nStyleObject;							// スタイルの変数
 
 //==========================================
 //モデルの初期化処理
@@ -100,6 +101,7 @@ void InitEditObject(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	{//エディットオブジェクトの初期化
+
 		//エディットオブジェクトの位置を初期化する
 		g_EditObject.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 

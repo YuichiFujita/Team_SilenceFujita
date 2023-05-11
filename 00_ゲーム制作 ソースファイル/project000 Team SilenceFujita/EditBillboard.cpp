@@ -1,10 +1,11 @@
-#ifdef _DEBUG	// デバッグ処理
 //===========================================
 //
-//オブジェクトのメイン処理[Object.cpp]
+//オブジェクトのメイン処理[EditBillboard.cpp]
 //Author 小原立暉
 //
 //===========================================
+#ifdef _DEBUG	// デバッグ処理
+
 #include "main.h"
 #include "EditBillboard.h"
 #include "input.h"
@@ -15,42 +16,42 @@
 #include "Editmain.h"
 #include "player.h"
 
-//マクロ定義
-#define INIT_RADIUS							(30.0f)					// 半径の初期値
-#define EDITBB_DELETE_RANGE					(30.0f)					// ビルボード消去の範囲
-#define EDITBB_MOVE							(16.0f)					// 通常の移動量
-#define EDITBB_ADJUSTMENT_MOVE				(4.0f)					// 調整用の移動量
-#define EDITBB_SCALING						(1.0f)					// 拡大縮小率
-#define EDITBB_COL_CHANGE_CNT				(5)						// 色が変わるカウント
-#define EDITBB_COL_CONVERSION				(0.01f)					// 色の変化量
-#define EDITBB_UPDOWN_MOVE					(6.0f)					// 上下移動の移動量
-#define EDITBB_UPDOWN_ADJUSTMENT_MOVE		(2.0f)					// 調整用の上下移動の移動量
+// マクロ定義
+#define INIT_RADIUS						(30.0f)		// 半径の初期値
+#define EDITBB_DELETE_RANGE				(30.0f)		// ビルボード消去の範囲
+#define EDITBB_MOVE						(16.0f)		// 通常の移動量
+#define EDITBB_ADJUSTMENT_MOVE			(4.0f)		// 調整用の移動量
+#define EDITBB_SCALING					(1.0f)		// 拡大縮小率
+#define EDITBB_COL_CHANGE_CNT			(5)			// 色が変わるカウント
+#define EDITBB_COL_CONVERSION			(0.01f)		// 色の変化量
+#define EDITBB_UPDOWN_MOVE				(6.0f)		// 上下移動の移動量
+#define EDITBB_UPDOWN_ADJUSTMENT_MOVE	(2.0f)		// 調整用の上下移動の移動量
 
-//プロトタイプ宣言
-void TypeChangeEditBillboard(void);						//種類変更処理
-void MoveEditBillboard(void);							//移動処理
-void SetEditBillboard(D3DXVECTOR3 rot);					//ビルボードの設定処理
-void DeleteEditBillboard(void);							//ビルボードの削除処理
-void ScaleBillboardX(void);								//ビルボードの拡大縮小処理(X軸)
-void ScaleBillboardY(void);								//ビルボードの拡大縮小処理(Y軸)
-void ScaleBillboard(void);								//ビルボードの拡大縮小処理
-void ResetEditBillboard(void);							//ビルボードの情報リセット処理
-void CustomBillboardColor(void);						//ビルボードの色のエディット処理
-void CustomBillboardAnim(void);							//ビルボードのアニメーションカスタム処理
-void ReplayBillboard(void);								//ビルボードのアニメーション再生処理
-void UpDownEditBillboard(void);							//ビルボードの上下移動処理
-void CustomShadowBillboard(void);						//影のカスタム処理
-void PlayerPosSetEditBillboard(void);					//ビルボードのプレイヤー位置移動
+// プロトタイプ宣言
+void TypeChangeEditBillboard(void);		// 種類変更処理
+void MoveEditBillboard(void);			// 移動処理
+void SetEditBillboard(D3DXVECTOR3 rot);	// ビルボードの設定処理
+void DeleteEditBillboard(void);			// ビルボードの削除処理
+void ScaleBillboardX(void);				// ビルボードの拡大縮小処理(X軸)
+void ScaleBillboardY(void);				// ビルボードの拡大縮小処理(Y軸)
+void ScaleBillboard(void);				// ビルボードの拡大縮小処理
+void ResetEditBillboard(void);			// ビルボードの情報リセット処理
+void CustomBillboardColor(void);		// ビルボードの色のエディット処理
+void CustomBillboardAnim(void);			// ビルボードのアニメーションカスタム処理
+void ReplayBillboard(void);				// ビルボードのアニメーション再生処理
+void UpDownEditBillboard(void);			// ビルボードの上下移動処理
+void CustomShadowBillboard(void);		// 影のカスタム処理
+void PlayerPosSetEditBillboard(void);	// ビルボードのプレイヤー位置移動
 
-//グローバル変数
-EditBillboard g_EditBillboard;							//ビルボードの情報
-int g_nStyleBillboard;									//スタイルの変数
+// グローバル変数
+EditBillboard g_EditBillboard;	// ビルボードの情報
+int g_nStyleBillboard;			// スタイルの変数
 
-//テクスチャファイル名
+// テクスチャファイル名
 const char *c_apTexturenameEditBillboard[BILLBOARD_MAX] =
 {
-	"data/TEXTURE/explosion000.png",					//爆発
-	"data/TEXTURE/bullet000.png",						//弾
+	"data/TEXTURE/explosion000.png",	// 爆発
+	"data/TEXTURE/bullet000.png",		// 弾
 };
 
 //========================================
@@ -58,77 +59,50 @@ const char *c_apTexturenameEditBillboard[BILLBOARD_MAX] =
 //========================================
 void InitEditBillboard(void)
 {
-	//スタイルを初期化する
-	g_nStyleBillboard = EDITSTYLE_BILLBOARD;
-
-	//デバイスの取得
+	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	{//エディットビルボードの初期化
-		//位置を初期化する
-		g_EditBillboard.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	{ // エディットビルボードの初期化
 
-		//番号を初期化する
-		g_EditBillboard.nSetNumber = -1;
+		// スタイルを初期化する
+		g_nStyleBillboard = EDITSTYLE_BILLBOARD;
 
-		//種類を初期化する
-		g_EditBillboard.nType = BILLBOARD_EXPL;
+		// 基本情報を初期化
+		g_EditBillboard.pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置を初期化する
+		g_EditBillboard.col		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// 色を初期化する
+		g_EditBillboard.Radius	= D3DXVECTOR2(INIT_RADIUS, INIT_RADIUS);	// 幅を初期化する
 
-		//使用しない
-		g_EditBillboard.bUse = false;
+		g_EditBillboard.nSetNumber	= -1;				// 番号を初期化する
+		g_EditBillboard.nType		= BILLBOARD_EXPL;	// 種類を初期化する
+		g_EditBillboard.nColorCount = 0;				// 色変えカウンターを初期化する
+		g_EditBillboard.bUse		= false;			// 使用しない
+		g_EditBillboard.bAnimReplay	= false;			// アニメーションを再生しない
+		g_EditBillboard.bShadow		= true;				// 影を付ける
 
-		//幅を初期化する
-		g_EditBillboard.Radius = D3DXVECTOR2(INIT_RADIUS, INIT_RADIUS);
+		// アニメーション情報を初期化
+		g_EditBillboard.EditAnim.bAnim			= false;	// アニメーションしない
+		g_EditBillboard.EditAnim.nAnimCounter	= 1;		// アニメーションカウンターを初期化する
+		g_EditBillboard.EditAnim.nAnimPattern	= 1;		// アニメーションパターンを初期化する
+		g_EditBillboard.EditAnim.nReplayCount	= 0;		// 再生カウントを初期化する
+		g_EditBillboard.EditAnim.nReplayPattern	= 0;		// 再生パターンを初期化する
+		g_EditBillboard.EditAnim.TexPattern		= 1.0f;		// テクスチャパターンを初期化する
 
-		//アニメーションしない
-		g_EditBillboard.EditAnim.bAnim = false;
-
-		//アニメーションカウンターを初期化する
-		g_EditBillboard.EditAnim.nAnimCounter = 1;
-
-		//アニメーションパターンを初期化する
-		g_EditBillboard.EditAnim.nAnimPattern = 1;
-
-		//アニメーションを再生しない
-		g_EditBillboard.bAnimReplay = false;
-
-		//色変えカウンターを初期化する
-		g_EditBillboard.nColorCount = 0;
-
-		//色を初期化する
-		g_EditBillboard.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-		//再生カウントを初期化する
-		g_EditBillboard.EditAnim.nReplayCount = 0;
-
-		//再生パターンを初期化する
-		g_EditBillboard.EditAnim.nReplayPattern = 0;
-
-		//テクスチャパターンを初期化する
-		g_EditBillboard.EditAnim.TexPattern = 1.0f;
-
-		//影を付ける
-		g_EditBillboard.bShadow = true;
-
-		//バッファをNULLにする
-		g_EditBillboard.VtxBuff = NULL;
+		// ポリゴン情報を初期化
+		g_EditBillboard.VtxBuff = NULL;	// バッファをNULLにする
 
 		for (int nCntBill = 0; nCntBill < BILLBOARD_MAX; nCntBill++)
 		{
-			//テクスチャを初期化する
+			// テクスチャを初期化する
 			g_EditBillboard.Texture[nCntBill] = NULL;
+
+			// 下地のテクスチャの読み込み
+			D3DXCreateTextureFromFile(pDevice,
+				c_apTexturenameEditBillboard[nCntBill],
+				&g_EditBillboard.Texture[nCntBill]);
 		}
 	}
 
-	for (int nCntTexture = 0; nCntTexture < BILLBOARD_MAX; nCntTexture++)
-	{//テクスチャの設定
-		//下地のテクスチャの読み込み
-		D3DXCreateTextureFromFile(pDevice,
-			c_apTexturenameEditBillboard[nCntTexture],
-			&g_EditBillboard.Texture[nCntTexture]);
-	}
-
-	//頂点バッファの生成
+	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4,
 		D3DUSAGE_WRITEONLY,
 		FVF_VERTEX_3D,
@@ -136,37 +110,37 @@ void InitEditBillboard(void)
 		&g_EditBillboard.VtxBuff,
 		NULL);
 
-	//頂点情報へのポインタ
+	// 頂点情報へのポインタ
 	VERTEX_3D *pVtx;
 
-	//頂点バッファをロック
+	// 頂点バッファをロック
 	g_EditBillboard.VtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	//頂点座標の設定
+	// 頂点座標の設定
 	pVtx[0].pos = D3DXVECTOR3(-g_EditBillboard.Radius.x, +g_EditBillboard.Radius.y, 0.0f);
 	pVtx[1].pos = D3DXVECTOR3(+g_EditBillboard.Radius.x, +g_EditBillboard.Radius.y, 0.0f);
 	pVtx[2].pos = D3DXVECTOR3(-g_EditBillboard.Radius.x, -g_EditBillboard.Radius.y, 0.0f);
 	pVtx[3].pos = D3DXVECTOR3(+g_EditBillboard.Radius.x, -g_EditBillboard.Radius.y, 0.0f);
 
-	//法線ベクトルの設定
+	// 法線ベクトルの設定
 	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
-	//頂点カラーの設定
+	// 頂点カラーの設定
 	pVtx[0].col = g_EditBillboard.col;
 	pVtx[1].col = g_EditBillboard.col;
 	pVtx[2].col = g_EditBillboard.col;
 	pVtx[3].col = g_EditBillboard.col;
 
-	//テクスチャ座標の設定
+	// テクスチャ座標の設定
 	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-	//頂点バッファをアンロックする
+	// 頂点バッファをアンロックする
 	g_EditBillboard.VtxBuff->Unlock();
 }
 
@@ -177,7 +151,7 @@ void UninitEditBillboard(void)
 {
 	for (int nCntBill = 0; nCntBill < BILLBOARD_MAX; nCntBill++)
 	{
-		//テクスチャの破棄
+		// テクスチャの破棄
 		if (g_EditBillboard.Texture[nCntBill] != NULL)
 		{
 			g_EditBillboard.Texture[nCntBill]->Release();
@@ -185,7 +159,7 @@ void UninitEditBillboard(void)
 		}
 	}
 
-	//頂点バッファの破棄
+	// 頂点バッファの破棄
 	if (g_EditBillboard.VtxBuff != NULL)
 	{
 		g_EditBillboard.VtxBuff->Release();

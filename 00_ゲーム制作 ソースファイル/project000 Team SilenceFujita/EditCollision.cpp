@@ -1,17 +1,18 @@
-#ifdef _DEBUG	// デバッグ処理
 //===========================================
 //
 //オブジェクトのメイン処理[EditCollision.cpp]
 //Author 小原立暉
 //
 //===========================================
+#ifdef _DEBUG	// デバッグ処理
+
 #include "EditCollision.h"
 #include "EditObject.h"
 #include "Editmain.h"
 #include "input.h"
 #include "object.h"
 
-//プロトタイプ宣言
+// プロトタイプ宣言
 void SelectChangeEdit(void);		// 選択変更処理
 void NumChangeEdit(void);			// 判定数変更処理
 void CollisionMoveEdit(void);		// 移動処理
@@ -22,7 +23,7 @@ void CollisionScaleObject(void);	// オブジェクトの拡大縮小処理
 void CollisionResetEdit(void);		// オブジェクトの情報リセット処理
 void CollisionUpDownEdit(void);		// オブジェクトの上下移動処理
 
-//グローバル変数
+// グローバル変数
 EditCollision g_EditCollision;		// エディット当たり判定の情報
 
 //==========================================
