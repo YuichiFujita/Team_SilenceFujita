@@ -2112,8 +2112,6 @@ void CameraChange(void)
 //============================================================
 void UpdateGameStartPlayer(void)
 {
-	Gate *pGate = GetGateData();		// ゲートの情報
-
 	// 前回位置の更新
 	g_player.oldPos = g_player.pos;
 

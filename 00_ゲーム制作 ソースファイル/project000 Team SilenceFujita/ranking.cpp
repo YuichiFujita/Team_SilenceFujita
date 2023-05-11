@@ -796,8 +796,13 @@ void ResetRanking(void)
 	//ファイルの入出力モードの設定
 	g_fileMode = RANK_FILE_MODE;
 
+	for (int nCntScore = 0; nCntScore < RANK_SCORE_MAX; nCntScore++)
+	{
+		// スコアを初期化する
+		g_aRankScore[nCntScore].nScore = 0;
+	}
+
 	//ランキングのスコアの値をファイルから読み込み
-	g_aRankScore[0].nScore = {};
 	LoadRanking();
 
 	//ニュースコアのリセット
