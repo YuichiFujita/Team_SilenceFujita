@@ -18,22 +18,22 @@
 #include "player.h"
 #include "shadow.h"
 #include "sound.h"
-//#include "tutorial.h"
 #include "timer.h"
 
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define ITEM_SCALE				(D3DXVECTOR3(0.5f, 0.5f, 0.5f))		// アイテムの拡大率
-#define ITEM_HEAL				(5)		// アイテムの回復量
-#define EFFECT_TIME_ITEM		(160)	// パーティクルを出す間隔
-#define MOVE_ROT_ITEM			(0.03f)	// アイテムの回転量
-#define ITEM_LOST_COUNT			(600)	// アイテムが消えるカウント数
-#define ITEM_HOMING_DIST		(700000.0f)		// ホーミング判定に入る距離
-#define ITEM_HOMING_SPEED		(10.0f)			// ホーミング時の速度
+#define ITEM_SCALE	(D3DXVECTOR3(0.5f, 0.5f, 0.5f))	// アイテムの拡大率
 
-#define ITEM_POS_DEST_UP		(100.0f)	// アイテムの目標の位置(上昇状態)
-#define ITEM_POS_DEST_DOWN		(50.0f)		// アイテムの目標の位置(下降状態)
+#define ITEM_HEAL			(5)			// アイテムの回復量
+#define EFFECT_TIME_ITEM	(160)		// パーティクルを出す間隔
+#define MOVE_ROT_ITEM		(0.03f)		// アイテムの回転量
+#define ITEM_LOST_COUNT		(600)		// アイテムが消えるカウント数
+#define ITEM_HOMING_DIST	(700000.0f)	// ホーミング判定に入る距離
+#define ITEM_HOMING_SPEED	(10.0f)		// ホーミング時の速度
+
+#define ITEM_POS_DEST_UP	(100.0f)	// アイテムの目標の位置(上昇状態)
+#define ITEM_POS_DEST_DOWN	(50.0f)		// アイテムの目標の位置(下降状態)
 
 #define ITEM_LOST_EFFECT_COL	(D3DXCOLOR(0.1f,0.1f,1.0f,1.0f))	// アイテム消失のエフェクトの色
 #define ITEM_GET_EFFECT_COL		(D3DXCOLOR(0.1f,0.1f,1.0f,1.0f))	// アイテム取得のエフェクトの色
@@ -42,8 +42,8 @@
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void TutorialItem(void);			// チュートリアルのアイテムの更新処理
-void GameItem(void);				// ゲームのアイテムの更新処理
+void TutorialItem(void);	// チュートリアルのアイテムの更新処理
+void GameItem(void);		// ゲームのアイテムの更新処理
 
 void HomingPlayer(Item *pItem);		// アイテムのホーミング判定
 void CollisionPlayer(Item *pItem);	// アイテムとプレイヤーの当たり判定
@@ -51,7 +51,7 @@ void CollisionPlayer(Item *pItem);	// アイテムとプレイヤーの当たり判定
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Item  g_aItem[MAX_ITEM];			// アイテムの情報
+Item g_aItem[MAX_ITEM];	// アイテムの情報
 
 //======================================================================================================================
 //	アイテムの初期化処理
@@ -63,34 +63,35 @@ void InitItem(void)
 	{ // アイテムの最大表示数分繰り返す
 
 		// 情報の初期化
-		g_aItem[nCntItem].pos            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aItem[nCntItem].move			 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aItem[nCntItem].rot            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aItem[nCntItem].nType          = 0;								// 種類
-		g_aItem[nCntItem].nCounterEffect = 0;								// エフェクト管理カウンター
-		g_aItem[nCntItem].nShadowID      = NONE_SHADOW;						// 影のインデックス
-		g_aItem[nCntItem].nLostCounter	 = 0;								// 消失カウンター
-		g_aItem[nCntItem].bUse           = false;							// 使用状況
+		g_aItem[nCntItem].pos	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aItem[nCntItem].move	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aItem[nCntItem].rot	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+
+		g_aItem[nCntItem].nType				= 0;			// 種類
+		g_aItem[nCntItem].nCounterEffect	= 0;			// エフェクト管理カウンター
+		g_aItem[nCntItem].nShadowID			= NONE_SHADOW;	// 影のインデックス
+		g_aItem[nCntItem].nLostCounter		= 0;			// 消失カウンター
+		g_aItem[nCntItem].bUse				= false;		// 使用状況
 
 		// 状態関係の初期化
-		g_aItem[nCntItem].stateInfo.fPosDest = 0.0f;						// 目標の位置
-		g_aItem[nCntItem].stateInfo.state	 = ITEMSTATE_UP;				// 状態
-		g_aItem[nCntItem].stateInfo.nCounter = 0;							// カウンター
+		g_aItem[nCntItem].stateInfo.fPosDest	= 0.0f;			// 目標の位置
+		g_aItem[nCntItem].stateInfo.state		= ITEMSTATE_UP;	// 状態
+		g_aItem[nCntItem].stateInfo.nCounter	= 0;			// カウンター
 
 		// アイコン関係の初期化
-		g_aItem[nCntItem].icon.nIconID = NONE_ICON;							// アイコンのインデックス
-		g_aItem[nCntItem].icon.state   = ICONSTATE_NONE;					// 状態
+		g_aItem[nCntItem].icon.nIconID	= NONE_ICON;			// アイコンのインデックス
+		g_aItem[nCntItem].icon.state	= ICONSTATE_NONE;		// 状態
 
 		// モデル情報の初期化
-		g_aItem[nCntItem].modelData.dwNumMat = 0;							// マテリアルの数
-		g_aItem[nCntItem].modelData.pTexture = NULL;						// テクスチャへのポインタ
-		g_aItem[nCntItem].modelData.pMesh	 = NULL;						// メッシュ (頂点情報) へのポインタ
-		g_aItem[nCntItem].modelData.pBuffMat = NULL;						// マテリアルへのポインタ
-		g_aItem[nCntItem].modelData.dwNumMat = 0;							// マテリアルの数
-		g_aItem[nCntItem].modelData.vtxMin	 = INIT_VTX_MIN;				// 最小の頂点座標
-		g_aItem[nCntItem].modelData.vtxMax	 = INIT_VTX_MAX;				// 最大の頂点座標
-		g_aItem[nCntItem].modelData.size	 = INIT_SIZE;					// 大きさ
-		g_aItem[nCntItem].modelData.fRadius	 = 0.0f;						// 半径
+		g_aItem[nCntItem].modelData.dwNumMat = 0;				// マテリアルの数
+		g_aItem[nCntItem].modelData.pTexture = NULL;			// テクスチャへのポインタ
+		g_aItem[nCntItem].modelData.pMesh	 = NULL;			// メッシュ (頂点情報) へのポインタ
+		g_aItem[nCntItem].modelData.pBuffMat = NULL;			// マテリアルへのポインタ
+		g_aItem[nCntItem].modelData.dwNumMat = 0;				// マテリアルの数
+		g_aItem[nCntItem].modelData.vtxMin	 = INIT_VTX_MIN;	// 最小の頂点座標
+		g_aItem[nCntItem].modelData.vtxMax	 = INIT_VTX_MAX;	// 最大の頂点座標
+		g_aItem[nCntItem].modelData.size	 = INIT_SIZE;		// 大きさ
+		g_aItem[nCntItem].modelData.fRadius	 = 0.0f;			// 半径
 	}
 }
 

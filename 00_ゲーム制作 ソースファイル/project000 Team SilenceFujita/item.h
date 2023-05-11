@@ -40,7 +40,7 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	float fPosDest;					// 目標の位置
+	float		fPosDest;			// 目標の位置
 	ITEMSTATE	state;				// 状態
 	int			nCounter;			// カウンター
 }ItemState;

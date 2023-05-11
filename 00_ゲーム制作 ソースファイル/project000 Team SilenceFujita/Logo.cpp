@@ -9,25 +9,25 @@
 #include "input.h"
 #include "Fade.h"
 
-//マクロ定義
-#define AUTO_LOGO						(90)				//自動で画面が進む時間
-#define LOGO_X							(450.0f)			//ロゴの半径(X軸)
-#define LOGO_Y							(250.0f)			//ロゴの半径(Y軸)
+// マクロ定義
+#define AUTO_LOGO	(90)		// 自動で画面が進む時間
+#define LOGO_X		(450.0f)	// ロゴの半径(X軸)
+#define LOGO_Y		(250.0f)	// ロゴの半径(Y軸)
 
-//プロジェクト画面のテクスチャ
+// プロジェクト画面のテクスチャ
 typedef enum
 {
-	LOGO_SCREEN = 0,		//背景
-	LOGO_PROJECT,			//ロゴ
+	LOGO_SCREEN = 0,	// 背景
+	LOGO_PROJECT,		// ロゴ
 	LOGO_MAX
 }LOGO;
 
 //グローバル変数宣言
-LPDIRECT3DTEXTURE9 g_apTextureLogo[LOGO_MAX] = {};		//テクスチャ(2枚分)へのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffLogo		 = NULL;	//頂点バッファへのポインタ
+LPDIRECT3DTEXTURE9 g_apTextureLogo[LOGO_MAX] = {};		// テクスチャ(2枚分)へのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffLogo		 = NULL;	// 頂点バッファへのポインタ
 
-int g_nLogoCounter = 0;									//タイトルに移行する間でのカウンター
-D3DXVECTOR3 LogoPos;									// ロゴの中心
+int g_nLogoCounter = 0;	// タイトルに移行する間でのカウンター
+D3DXVECTOR3 LogoPos;	// ロゴの中心
 
 // テクスチャファイル名
 const char *c_apFilenameLogo[LOGO_MAX] = 
@@ -41,10 +41,8 @@ const char *c_apFilenameLogo[LOGO_MAX] =
 //===============================
 void InitLogo(void)
 {
-	LPDIRECT3DDEVICE9 pDevice;								//デバイスへのポインタ
-
-	//デバイスの取得
-	pDevice = GetDevice();
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
 	for (int nCnt = 0; nCnt < LOGO_MAX; nCnt++)
 	{
@@ -54,13 +52,13 @@ void InitLogo(void)
 			&g_apTextureLogo[nCnt]);
 	}
 
-	//カウンターを初期化する
+	// カウンターを初期化する
 	g_nLogoCounter = 0;
 
 	// ロゴマークの中心の設定
 	LogoPos = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f);
 
-	//頂点バッファの生成
+	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4 * LOGO_MAX,
 		D3DUSAGE_WRITEONLY,
 		FVF_VERTEX_2D,
@@ -68,9 +66,9 @@ void InitLogo(void)
 		&g_pVtxBuffLogo,
 		NULL);
 
-	VERTEX_2D * pVtx;										//頂点情報へのポインタ
+	VERTEX_2D * pVtx;	// 頂点情報へのポインタ
 
-	//頂点バッファをロックし、頂点情報へのポインタを取得
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuffLogo->Lock(0, 0, (void**)&pVtx, 0);
 
 	for (int nCntLogo = 0; nCntLogo < LOGO_MAX; nCntLogo++)
@@ -98,28 +96,28 @@ void InitLogo(void)
 			break;				// 抜け出す
 		}
 
-		//rhwの設定
+		// rhwの設定
 		pVtx[0].rhw = 1.0f;
 		pVtx[1].rhw = 1.0f;
 		pVtx[2].rhw = 1.0f;
 		pVtx[3].rhw = 1.0f;
 
-		//頂点カラーの設定
+		// 頂点カラーの設定
 		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-		//テクスチャ座標の設定
+		// テクスチャ座標の設定
 		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
 		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-		pVtx += 4;			// 頂点データを4つ分進める
+		pVtx += 4;	// 頂点データを4つ分進める
 	}
 
-	//頂点バッファをアンロックする
+	// 頂点バッファをアンロックする
 	g_pVtxBuffLogo->Unlock();
 }
 
@@ -128,11 +126,10 @@ void InitLogo(void)
 //======================================
 void UninitLogo(void)
 {
-	int nLogoCnt;					//回数の変数を宣言する
-
-	for (nLogoCnt = 0; nLogoCnt < LOGO_MAX; nLogoCnt++)
+	// テクスチャの破棄
+	for (int nLogoCnt = 0; nLogoCnt < LOGO_MAX; nLogoCnt++)
 	{
-		//テクスチャの破棄
+		// テクスチャの破棄
 		if (g_apTextureLogo[nLogoCnt] != NULL)
 		{
 			g_apTextureLogo[nLogoCnt]->Release();
@@ -140,7 +137,7 @@ void UninitLogo(void)
 		}
 	}
 
-	//頂点バッファの破棄
+	// 頂点バッファの破棄
 	if (g_pVtxBuffLogo != NULL)
 	{
 		g_pVtxBuffLogo->Release();

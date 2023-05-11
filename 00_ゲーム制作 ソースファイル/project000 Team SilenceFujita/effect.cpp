@@ -109,15 +109,16 @@ void InitEffect(void)
 	for (int nCntEffect = 0; nCntEffect < MAX_EFFECT; nCntEffect++)
 	{ // エフェクトの最大表示数分繰り返す
 
-		g_aEffect[nCntEffect].pos     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aEffect[nCntEffect].move    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
-		g_aEffect[nCntEffect].col     = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);	// 色
-		g_aEffect[nCntEffect].nLife   = 0;									// 寿命
-		g_aEffect[nCntEffect].fRadius = 0.0f;								// 半径
-		g_aEffect[nCntEffect].fSub    = 0.0f;								// 減算量 (半径)
-		g_aEffect[nCntEffect].fAlpha  = 0.0f;								// 1Fごとの薄くなる量
-		g_aEffect[nCntEffect].effectType = EFFECTTYPE_NONE;					// エフェクトの種類
-		g_aEffect[nCntEffect].bUse    = false;								// 使用状況
+		g_aEffect[nCntEffect].pos        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+		g_aEffect[nCntEffect].move       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+		g_aEffect[nCntEffect].col        = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);	// 色
+
+		g_aEffect[nCntEffect].nLife      = 0;				// 寿命
+		g_aEffect[nCntEffect].fRadius    = 0.0f;			// 半径
+		g_aEffect[nCntEffect].fSub       = 0.0f;			// 減算量 (半径)
+		g_aEffect[nCntEffect].fAlpha     = 0.0f;			// 1Fごとの薄くなる量
+		g_aEffect[nCntEffect].effectType = EFFECTTYPE_NONE;	// エフェクトの種類
+		g_aEffect[nCntEffect].bUse       = false;			// 使用状況
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

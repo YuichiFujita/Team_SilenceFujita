@@ -15,7 +15,7 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MAX_ICON			(1500)		// 使用するポリゴン数 (アイコンの最大数)
+#define MAX_ICON	(1500)		// 使用するポリゴン数 (アイコンの最大数)
 
 #define PLAY_ICON_RADIUS	(350.0f)								// プレイヤーのアイコンの半径
 #define PLAY_ICON_COL		(D3DXCOLOR(1.0f, 1.0f, 0.2f, 1.0f))		// プレイヤーのアイコンの色
@@ -45,16 +45,17 @@
 
 #define ICON_ALPHA_CHANGE	(0.005f)	// アイコンの透明度の変化量
 #define ICON_REVIVAL_CNT	(20)		// 復活中のカウント
-#define ICON_DAMAGE_COL		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))		// ダメージ時の色
-#define ICON_EMPHASIS_COL	(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))
 #define ICON_UNRIVALED_CNT	(10)		// 無敵状態のカウント
 #define ICON_SCALE_CHANGE	(50.0f);	// 拡大縮小時の半径の拡大率
+
+#define ICON_DAMAGE_COL		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))		// ダメージ時の色
+#define ICON_EMPHASIS_COL	(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))
 
 //************************************************************
 //	グローバル変数
 //************************************************************
 LPDIRECT3DTEXTURE9      g_pTextureIcon[ICONTYPE_MAX] = {};	// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffIcon = NULL;	// 頂点バッファへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffIcon = NULL;				// 頂点バッファへのポインタ
 
 Icon g_aIcon[MAX_ICON];		// アイコンの情報
 
@@ -103,16 +104,18 @@ void InitIcon(void)
 	for (int nCntIcon = 0; nCntIcon < MAX_ICON; nCntIcon++)
 	{ // アイコンの最大表示数分繰り返す
 
-		g_aIcon[nCntIcon].pos			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aIcon[nCntIcon].type			= ICONTYPE_PLAY;						// アイコン
-		g_aIcon[nCntIcon].col			= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
-		g_aIcon[nCntIcon].colCopy		= g_aIcon[nCntIcon].col;				// 色のコピー
-		g_aIcon[nCntIcon].nCounter		= 0;									// カウンター
-		g_aIcon[nCntIcon].radius		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 半径
-		g_aIcon[nCntIcon].alpha			= ICONALPHA_NONE;						// 透明度の状態
-		g_aIcon[nCntIcon].pIconIDParent = NULL;									// アイコンの親のアイコンインデックス
-		g_aIcon[nCntIcon].pUseParent	= NULL;									// アイコンの親の使用状況
-		g_aIcon[nCntIcon].bUse			= false;								// 使用状況
+		g_aIcon[nCntIcon].pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+		g_aIcon[nCntIcon].col		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
+		g_aIcon[nCntIcon].colCopy	= g_aIcon[nCntIcon].col;				// 色のコピー
+		g_aIcon[nCntIcon].radius	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 半径
+
+		g_aIcon[nCntIcon].type			= ICONTYPE_PLAY;	// アイコン
+		g_aIcon[nCntIcon].nCounter		= 0;				// カウンター
+		g_aIcon[nCntIcon].alpha			= ICONALPHA_NONE;	// 透明度の状態
+		g_aIcon[nCntIcon].pIconIDParent	= NULL;				// アイコンの親のアイコンインデックス
+		g_aIcon[nCntIcon].pUseParent	= NULL;				// アイコンの親の使用状況
+		g_aIcon[nCntIcon].pState		= NULL;				// アイコンの状態
+		g_aIcon[nCntIcon].bUse			= false;			// 使用状況
 	}
 
 	//--------------------------------------------------------

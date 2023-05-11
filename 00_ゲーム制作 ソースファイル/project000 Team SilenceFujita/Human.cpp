@@ -144,9 +144,9 @@ void InitHuman(void)
 	}
 
 	// 人間のパーツの初期化
-	ZeroMemory(&g_aSetPartsNormal[0],  sizeof(HumanParts) * MAX_PARTS);
-	ZeroMemory(&g_aSetPartsCigaret[0], sizeof(HumanParts) * MAX_PARTS);
-	ZeroMemory(&g_aSetPartsPhone[0],   sizeof(HumanParts) * MAX_PARTS);
+	ZeroMemory(&g_aSetPartsNormal[0],  sizeof(g_aSetPartsNormal));
+	ZeroMemory(&g_aSetPartsCigaret[0], sizeof(g_aSetPartsCigaret));
+	ZeroMemory(&g_aSetPartsPhone[0],   sizeof(g_aSetPartsPhone));
 
 	// 人間のセットアップ処理
 	TxtSetHuman(HUMAN_NORMAL_SETUP_TXT,  &g_aSetPartsNormal[0],  &g_setMotionNormal);	// 通常
@@ -163,15 +163,24 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].move			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
 		g_aHuman[nCntHuman].fMaxMove		= 0.0f;								// 移動量の最大数
 		g_aHuman[nCntHuman].rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;						// 影のインデックス
-		g_aHuman[nCntHuman].nNotaID			= NONE_3D_NOTATION;					// 強調表示のインデックス
-		g_aHuman[nCntHuman].nOverlapCounter = 0;								// 重なり防止カウント
-		g_aHuman[nCntHuman].nStopCount		= 0;								// 停止カウント
-		g_aHuman[nCntHuman].fAlpha			= 1.0f;								// 透明度
-		g_aHuman[nCntHuman].bMove			= false;							// 移動しているか
-		g_aHuman[nCntHuman].bRecur			= false;							// 復活状況
-		g_aHuman[nCntHuman].bUse			= false;							// 使用状況
-		g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;					// 状態
+
+		g_aHuman[nCntHuman].nShadowID		= NONE_SHADOW;		// 影のインデックス
+		g_aHuman[nCntHuman].nNotaID			= NONE_3D_NOTATION;	// 強調表示のインデックス
+		g_aHuman[nCntHuman].nOverlapCounter = 0;				// 重なり防止カウント
+		g_aHuman[nCntHuman].nStopCount		= 0;				// 停止カウント
+		g_aHuman[nCntHuman].fAlpha			= 1.0f;				// 透明度
+		g_aHuman[nCntHuman].bMove			= false;			// 移動しているか
+		g_aHuman[nCntHuman].bRecur			= false;			// 復活状況
+		g_aHuman[nCntHuman].bUse			= false;			// 使用状況
+		g_aHuman[nCntHuman].state			= HUMANSTATE_WALK;	// 状態
+		g_aHuman[nCntHuman].typeMove		= MOVETYPE_STOP;	// 移動の種類
+		g_aHuman[nCntHuman].type			= HUMANTYPE_001;	// 種類
+
+		// モーション情報の初期化
+		ZeroMemory(&g_aHuman[nCntHuman].motion, sizeof(g_aHuman[nCntHuman].motion));
+
+		// パーツ情報の初期化
+		ZeroMemory(&g_aHuman[nCntHuman].aParts[0], sizeof(g_aHuman[nCntHuman].aParts));
 
 		// ジャッジの情報の初期化
 		g_aHuman[nCntHuman].judge.col      = JUDGE_WHITE;			// ピカピカの色
@@ -189,19 +198,17 @@ void InitHuman(void)
 		g_aHuman[nCntHuman].icon.nIconID = NONE_ICON;		// アイコンのインデックス
 		g_aHuman[nCntHuman].icon.state   = ICONSTATE_NONE;	// アイコンの状態
 
-		// 移動の種類
-		g_aHuman[nCntHuman].typeMove = MOVETYPE_STOP;
-
 		for (int nCntCur = 0; nCntCur < MAX_HUMAN_CURVE; nCntCur++)
 		{
 			g_aHuman[nCntHuman].curveInfo.curveInfo.curvePoint[nCntCur] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 曲がり角の位置
-			g_aHuman[nCntHuman].curveInfo.curveInfo.curveAngle[nCntCur] = CURVE_RIGHT;						// 右に曲がる
-			g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[nCntCur]  = DASH_RIGHT;						// 右に向かって走っている
+
+			g_aHuman[nCntHuman].curveInfo.curveInfo.curveAngle[nCntCur] = CURVE_RIGHT;	// 右に曲がる
+			g_aHuman[nCntHuman].curveInfo.curveInfo.dashAngle[nCntCur]  = DASH_RIGHT;	// 右に向かって走っている
 		}
 
 		// 復活関係の情報の初期化
-		g_aResurrect[nCntHuman].nResurCount = 0;			// カウント
-		g_aResurrect[nCntHuman].bUse = false;				// 使用していない
+		g_aResurrect[nCntHuman].nResurCount = 0;	// カウント
+		g_aResurrect[nCntHuman].bUse = false;		// 使用していない
 	}
 }
 

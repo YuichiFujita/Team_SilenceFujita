@@ -45,12 +45,12 @@ const char *apTextureLife[] =		// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_LIFE_ALPHA = 0,			// ライフの透過型
-	TEXTURE_LIFE_NULL_00,			// NULL
-	TEXTURE_LIFE_NULL_01,			// NULL
-	TEXTURE_LIFE_BG,				// ライフの背景
-	TEXTURE_LIFE_FRAME,				// ライフの型
-	TEXTURE_LIFE_MAX,				// この列挙型の総数
+	TEXTURE_LIFE_ALPHA = 0,	// ライフの透過型
+	TEXTURE_LIFE_NULL_00,	// NULL
+	TEXTURE_LIFE_NULL_01,	// NULL
+	TEXTURE_LIFE_BG,		// ライフの背景
+	TEXTURE_LIFE_FRAME,		// ライフの型
+	TEXTURE_LIFE_MAX,		// この列挙型の総数
 } TEXTURE_LIFE;
 
 //**********************************************************************************************************************
@@ -58,10 +58,10 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	LIFESTATE state;				// 状態
-	float     fChange;				// 1フレームの体力変動量
-	float     fNowLife;				// 現在の体力
-	int       nCounterState;		// 状態管理カウンター
+	LIFESTATE state;			// 状態
+	float     fChange;			// 1フレームの体力変動量
+	float     fNowLife;			// 現在の体力
+	int       nCounterState;	// 状態管理カウンター
 } Life;
 
 //**********************************************************************************************************************

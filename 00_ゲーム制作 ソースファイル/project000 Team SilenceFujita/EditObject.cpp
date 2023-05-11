@@ -97,102 +97,87 @@ int g_nStyleObject;							// スタイルの変数
 //==========================================
 void InitEditObject(void)
 {
-	//デバイスの取得
+	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	{//エディットオブジェクトの初期化
+	{ // エディットオブジェクトの初期化
 
-		//エディットオブジェクトの位置を初期化する
-		g_EditObject.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		// 基本情報の初期化
+		g_EditObject.pos			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// エディットオブジェクトの位置を初期化する
+		g_EditObject.rot			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// エディットオブジェクトの向きを初期化する
+		g_EditObject.scale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// エディットオブジェクトの拡大率を初期化する
+		g_EditObject.nSetNumber		= -1;								// エディットオブジェクトの番号を初期化する
+		g_EditObject.bUse			= false;							// 使用しない
+		g_EditObject.nType			= MODELTYPE_OBJECT_TREE;			// エディットオブジェクトの種類を初期化する
+		g_EditObject.modelData		= GetModelData(g_EditObject.nType + FROM_OBJECT);	// モデルの基本情報
+		g_EditObject.nCntMaterial	= 0;	// 選択中のマテリアルの番号を初期化する
+		g_EditObject.nColorCount	= 0;	// 色を変えるカウントを初期化する
 
-		//エディットオブジェクトの向きを初期化する
-		g_EditObject.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		// 破壊情報の初期化
+		g_EditObject.Break.Breaktype = BREAKTYPE_NONE;	// 壊れない
 
-		//エディットオブジェクトの拡大率を初期化する
-		g_EditObject.scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-
-		//エディットオブジェクトの番号を初期化する
-		g_EditObject.nSetNumber = -1;
-
-		//使用しない
-		g_EditObject.bUse = false;
-
-		//エディットオブジェクトの種類を初期化する
-		g_EditObject.nType = MODELTYPE_OBJECT_TREE;
-
-		//モデルの基本情報
-		g_EditObject.modelData = GetModelData(g_EditObject.nType + FROM_OBJECT);
-
-		//選択中のマテリアルの番号を初期化する
-		g_EditObject.nCntMaterial = 0;
-
-		//色を変えるカウントを初期化する
-		g_EditObject.nColorCount = 0;
-
-		//壊れない
-		g_EditObject.Break.Breaktype = BREAKTYPE_NONE;
-
-		//影無し
-		g_EditObject.Shadowtype.Shadowtype = SHADOWTYPE_NONE;
-
-		//当たり判定あり
-		g_EditObject.Collisiontype.Collisiontype = COLLISIONTYPE_MODEL;
-
-		//良い建物
-		g_EditObject.Judge.Judgetype = JUDGESTATE_JUSTICE;
-	}
-
-	for (int nCntBreak = 0; nCntBreak < BREAKTYPE_MAX; nCntBreak++)
-	{
-		//壊れ方のデバッグ表記を設定
-		g_EditObject.Break.pBreakMode[nCntBreak] = (char*)c_apBreakmodename[nCntBreak];
-	}
-
-	for (int nCntShadow = 0; nCntShadow < SHADOWTYPE_MAX; nCntShadow++)
-	{
-		//影のデバッグ表記を設定
-		g_EditObject.Shadowtype.pShadowMode[nCntShadow] = (char*)c_apShadowmodename[nCntShadow];
-	}
-
-	for (int nCntCollision = 0; nCntCollision < COLLISIONTYPE_MAX; nCntCollision++)
-	{
-		//当たり判定のデバッグ表記を設定
-		g_EditObject.Collisiontype.pCollisionMode[nCntCollision] = (char*)c_apCollisionmodename[nCntCollision];
-	}
-
-	for (int nCntJudge = 0; nCntJudge < JUDGESTATE_MAX; nCntJudge++)
-	{
-		//善悪のデバッグ正気を設定
-		g_EditObject.Judge.pJudgeMode[nCntJudge] = (char*)c_apJudgemodename[nCntJudge];
-	}
-
-	//当たり判定の向き変数
-	g_EditObject.CollInfo.rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	//向き
-	g_EditObject.CollInfo.stateRot = ROTSTATE_0;					//向き状態
-
-	//スタイルを設定する
-	g_nStyleObject = EDITSTYLE_OBJECT;
-
-	//カスタム用のマテリアル情報
-	for (int nCntModel = 0; nCntModel < MODEL_OBJ_MAX; nCntModel++)
-	{ // モデルの初期化
-		//マテリアルの色を取得する
-		D3DXMATERIAL *pMat = (D3DXMATERIAL*)GetModelData(nCntModel + FROM_OBJECT).pBuffMat->GetBufferPointer();
-
-		for (int nCntMat = 0; nCntMat < (int)GetModelData(nCntModel + FROM_OBJECT).dwNumMat; nCntMat++)
+		for (int nCntBreak = 0; nCntBreak < BREAKTYPE_MAX; nCntBreak++)
 		{
-			//マテリアルをコピーする
-			g_EditObject.MatCopy[nCntModel][nCntMat] = pMat[nCntMat];
-			g_EditObject.EditMaterial[nCntModel][nCntMat] = pMat[nCntMat];
+			// 壊れ方のデバッグ表記を設定
+			g_EditObject.Break.pBreakMode[nCntBreak] = (char*)c_apBreakmodename[nCntBreak];
 		}
-	}
 
-	// オブジェクトの拡大率の情報の初期化
-	for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
-	{ // オブジェクトの種類の総数分繰り返す
+		// 影情報の初期化
+		g_EditObject.Shadowtype.Shadowtype = SHADOWTYPE_NONE;	// 影無し
 
-		g_aRotObject[nCntObject]   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		//オブジェクトの向きの情報
-		g_aScaleObject[nCntObject] = D3DXVECTOR3(1.0f, 1.0f, 1.0f);		//オブジェクトの拡大率情報
+		for (int nCntShadow = 0; nCntShadow < SHADOWTYPE_MAX; nCntShadow++)
+		{
+			// 影のデバッグ表記を設定
+			g_EditObject.Shadowtype.pShadowMode[nCntShadow] = (char*)c_apShadowmodename[nCntShadow];
+		}
+
+		// 判定情報の初期化
+		g_EditObject.Collisiontype.Collisiontype = COLLISIONTYPE_MODEL;	// 当たり判定あり
+
+		for (int nCntCollision = 0; nCntCollision < COLLISIONTYPE_MAX; nCntCollision++)
+		{
+			// 当たり判定のデバッグ表記を設定
+			g_EditObject.Collisiontype.pCollisionMode[nCntCollision] = (char*)c_apCollisionmodename[nCntCollision];
+		}
+
+		// 善悪情報の初期化
+		g_EditObject.Judge.Judgetype = JUDGESTATE_JUSTICE;	// 良い建物
+
+		for (int nCntJudge = 0; nCntJudge < JUDGESTATE_MAX; nCntJudge++)
+		{
+			// 善悪のデバッグ正気を設定
+			g_EditObject.Judge.pJudgeMode[nCntJudge] = (char*)c_apJudgemodename[nCntJudge];
+		}
+
+		// 当たり判定の向き変数
+		g_EditObject.CollInfo.rot      = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_EditObject.CollInfo.stateRot = ROTSTATE_0;					// 向き状態
+
+		// スタイルを設定する
+		g_nStyleObject = EDITSTYLE_OBJECT;
+
+		// カスタム用のマテリアル情報
+		for (int nCntModel = 0; nCntModel < MODEL_OBJ_MAX; nCntModel++)
+		{ // モデルの初期化
+
+			// マテリアルの色を取得する
+			D3DXMATERIAL *pMat = (D3DXMATERIAL*)GetModelData(nCntModel + FROM_OBJECT).pBuffMat->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)GetModelData(nCntModel + FROM_OBJECT).dwNumMat; nCntMat++)
+			{
+				// マテリアルをコピーする
+				g_EditObject.MatCopy[nCntModel][nCntMat] = pMat[nCntMat];
+				g_EditObject.EditMaterial[nCntModel][nCntMat] = pMat[nCntMat];
+			}
+		}
+
+		// オブジェクトの拡大率の情報の初期化
+		for (int nCntObject = 0; nCntObject < MODEL_OBJ_MAX; nCntObject++)
+		{ // オブジェクトの種類の総数分繰り返す
+
+			g_aRotObject[nCntObject]   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// オブジェクトの向きの情報
+			g_aScaleObject[nCntObject] = D3DXVECTOR3(1.0f, 1.0f, 1.0f);		// オブジェクトの拡大率情報
+		}
 	}
 }
 

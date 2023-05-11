@@ -9,20 +9,22 @@
 #include "timer.h"
 #include "value.h"
 
-//マクロ定義
-#define LASTCOUNT_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))			// ラストカウントの位置
-#define LASTCOUNT_INIT_SIZE			(D3DXVECTOR3(10.0f, 10.0f, 0.0f))										// ラストカウントの半径
-#define LASTCOUNT_SIZE				(D3DXVECTOR3(100.0f, 100.0f, 0.0f))										// ラストカウントの半径
-#define LASTCOUNT_ALPHA				(0.7f)				// ラストカウントの透明度
-#define LASTCOUNT_ADD_SIZE			(5.0f)				// ラストカウントの追加サイズ
-#define LASTCOUNT_TIME				(10)				// ラストカウントが使われるようになる時間
-#define LASTCOUNT_CLEAR_ADDITION	(0.05f)				// ラストカウントの透明度の加算
-#define LASTCOUNT_CLEAR_INTERVAL	(5)					// ラストカウントが薄くなる間隔
-#define LASTCOUNT_INIT_ALPHA		(0.0f)				// ラストカウントの初期数値
-#define LASTCOUNT_SHIFT				(130.0f)			// ラストカウントのずらす幅
+// マクロ定義
+#define LASTCOUNT_POS		(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))	// ラストカウントの位置
 
-//グローバル変数
-LASTCOUNT g_LastCount;									//ラストカウントの情報
+#define LASTCOUNT_INIT_SIZE	(D3DXVECTOR3(10.0f, 10.0f, 0.0f))	// ラストカウントの半径
+#define LASTCOUNT_SIZE		(D3DXVECTOR3(100.0f, 100.0f, 0.0f))	// ラストカウントの半径
+
+#define LASTCOUNT_ALPHA				(0.7f)		// ラストカウントの透明度
+#define LASTCOUNT_ADD_SIZE			(5.0f)		// ラストカウントの追加サイズ
+#define LASTCOUNT_TIME				(10)		// ラストカウントが使われるようになる時間
+#define LASTCOUNT_CLEAR_ADDITION	(0.05f)		// ラストカウントの透明度の加算
+#define LASTCOUNT_CLEAR_INTERVAL	(5)			// ラストカウントが薄くなる間隔
+#define LASTCOUNT_INIT_ALPHA		(0.0f)		// ラストカウントの初期数値
+#define LASTCOUNT_SHIFT				(130.0f)	// ラストカウントのずらす幅
+
+// グローバル変数
+LASTCOUNT g_LastCount;	// ラストカウントの情報
 
 //==========================================
 // ラストカウントの初期化処理
@@ -30,14 +32,15 @@ LASTCOUNT g_LastCount;									//ラストカウントの情報
 void InitLastCount(void)
 {
 	// 情報を初期化する
-	g_LastCount.pos = LASTCOUNT_POS;				// 位置
-	g_LastCount.size = LASTCOUNT_INIT_SIZE;			// 半径
-	g_LastCount.nCount = 0;							// カウント
-	g_LastCount.nTime = 0;							// 時間
-	g_LastCount.nTimeOld = -1;						// 前回の時間
-	g_LastCount.nDigit = 2;							// 桁数
-	g_LastCount.fClear = LASTCOUNT_INIT_ALPHA;		// 透明度
-	g_LastCount.bUse = false;						// 使用状況
+	g_LastCount.pos		= LASTCOUNT_POS;		// 位置
+	g_LastCount.size	= LASTCOUNT_INIT_SIZE;	// 半径
+	g_LastCount.fClear	= LASTCOUNT_INIT_ALPHA;	// 透明度
+
+	g_LastCount.nCount		= 0;		// カウント
+	g_LastCount.nTime		= 0;		// 時間
+	g_LastCount.nTimeOld	= -1;		// 前回の時間
+	g_LastCount.nDigit		= 2;		// 桁数
+	g_LastCount.bUse		= false;	// 使用状況
 }
 
 //========================================

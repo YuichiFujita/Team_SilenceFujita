@@ -44,11 +44,11 @@ void InitFlash(void)
 	);
 
 	// フラッシュの情報の初期化
-	g_Flash.col		   = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);		// 色
-	g_Flash.fDestAlpha = 0.0f;									// 目標の透明度
-	g_Flash.fDiffAlpha = 0.0f;									// 透明度の差分
-	g_Flash.fRevAlpha  = 0.0f;									// 透明度の補正係数
-	g_Flash.bUse	   = false;									// 使用状況
+	g_Flash.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);	// 色
+	g_Flash.fDestAlpha = 0.0f;	// 目標の透明度
+	g_Flash.fDiffAlpha = 0.0f;	// 透明度の差分
+	g_Flash.fRevAlpha  = 0.0f;	// 透明度の補正係数
+	g_Flash.bUse	   = false;	// 使用状況
 
 	//----------------------------------------------------------------------------------------------------------------------
 	//	頂点情報の初期化

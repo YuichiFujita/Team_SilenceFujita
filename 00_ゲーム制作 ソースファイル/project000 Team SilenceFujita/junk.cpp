@@ -26,19 +26,16 @@
 #define JUNK_SCALE_MAGNI	(0.05f)		// がれきの拡大率の倍率
 #define JUNK_COL_MAGNI		(0.05f)		// がれきの色の減衰倍率
 #define JUNK_POS_Y_ADD		(40.0f)		// がれきの位置の加算数(Y軸)
+
 #define JUNK_EMERGENCY_COL	(D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f))
 #define JUNK_BIG_SCALE		(D3DXVECTOR3(1.5f, 1.5f, 1.5f))
 #define JUNK_NORMAL_SCALE	(D3DXVECTOR3(1.0f, 1.0f, 1.0f))
 #define JUNK_SMALL_SCALE	(D3DXVECTOR3(0.5f, 0.5f, 0.5f))
 
 //**********************************************************************************************************************
-//	プロトタイプ宣言
-//**********************************************************************************************************************
-
-//**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Junk g_aJunk[MAX_JUNK];			// がれきの情報
+Junk g_aJunk[MAX_JUNK];	// がれきの情報
 
 //======================================================================================================================
 //	がれきの初期化処理
@@ -48,7 +45,7 @@ void InitJunk(void)
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
-												// がれきの情報の初期化
+	// がれきの情報の初期化
 	for (int nCntJunk = 0; nCntJunk < MAX_JUNK; nCntJunk++)
 	{ // がれきの最大表示数分繰り返す
 
@@ -59,29 +56,24 @@ void InitJunk(void)
 		g_aJunk[nCntJunk].scaleMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の移動量
 		g_aJunk[nCntJunk].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 		g_aJunk[nCntJunk].rotMove	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向きの移動量
-		g_aJunk[nCntJunk].state		= JUNKSTATE_NONE;					// がれきの状態
-		g_aJunk[nCntJunk].nShadowID = NONE_SHADOW;						// 影のインデックス
-		g_aJunk[nCntJunk].bUse		= false;							// 使用状況
+
+		g_aJunk[nCntJunk].state		= JUNKSTATE_NONE;	// がれきの状態
+		g_aJunk[nCntJunk].nShadowID = NONE_SHADOW;		// 影のインデックス
+		g_aJunk[nCntJunk].bUse		= false;			// 使用状況
 
 		// モデル情報の初期化
-		g_aJunk[nCntJunk].modelData.dwNumMat = 0;					// マテリアルの数
-		g_aJunk[nCntJunk].modelData.pTexture = NULL;				// テクスチャへのポインタ
-		g_aJunk[nCntJunk].modelData.pMesh = NULL;					// メッシュ (頂点情報) へのポインタ
-		g_aJunk[nCntJunk].modelData.pBuffMat = NULL;				// マテリアルへのポインタ
-		g_aJunk[nCntJunk].modelData.vtxMin = INIT_VTX_MIN;			// 最小の頂点座標
-		g_aJunk[nCntJunk].modelData.vtxMax = INIT_VTX_MAX;			// 最大の頂点座標
-		g_aJunk[nCntJunk].modelData.size = INIT_SIZE;				// 大きさ
-		g_aJunk[nCntJunk].modelData.fRadius = 0.0f;					// 半径
+		g_aJunk[nCntJunk].modelData.dwNumMat	= 0;			// マテリアルの数
+		g_aJunk[nCntJunk].modelData.pTexture	= NULL;			// テクスチャへのポインタ
+		g_aJunk[nCntJunk].modelData.pMesh		= NULL;			// メッシュ (頂点情報) へのポインタ
+		g_aJunk[nCntJunk].modelData.pBuffMat	= NULL;			// マテリアルへのポインタ
+		g_aJunk[nCntJunk].modelData.vtxMin		= INIT_VTX_MIN;	// 最小の頂点座標
+		g_aJunk[nCntJunk].modelData.vtxMax		= INIT_VTX_MAX;	// 最大の頂点座標
+		g_aJunk[nCntJunk].modelData.size		= INIT_SIZE;	// 大きさ
+		g_aJunk[nCntJunk].modelData.fRadius		= 0.0f;			// 半径
 
 		// 構造体の要素をクリア
-		ZeroMemory(&g_aJunk[nCntJunk].matCopy[0], sizeof(D3DXMATERIAL) * MAX_MATERIAL);
+		ZeroMemory(&g_aJunk[nCntJunk].matCopy[0], sizeof(g_aJunk[nCntJunk].matCopy));
 	}
-
-	//// 当たり判定のセットアップ
-	//TxtSetCollision();
-
-	//// 影の半径のセットアップ
-	//TxtSetShadow();
 }
 
 //======================================================================================================================
