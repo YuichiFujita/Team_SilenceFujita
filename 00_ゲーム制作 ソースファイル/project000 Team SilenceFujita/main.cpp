@@ -635,10 +635,11 @@ void Update(void)
 void Draw(void)
 {
 	// 変数を宣言
+	HRESULT      hr;			// 異常終了の確認用
 	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
 
 	// 画面クリア (バックバッファと Zバッファのクリア)
-	g_pD3DDevice->Clear
+	hr = g_pD3DDevice->Clear
 	( // 引数
 		0,
 		NULL,
@@ -647,6 +648,12 @@ void Draw(void)
 		1.0f,
 		0
 	);
+
+	if (hr == E_FAIL)
+	{ // 画面クリアに失敗した場合
+
+		assert(false);
+	}
 
 	// 描画開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))

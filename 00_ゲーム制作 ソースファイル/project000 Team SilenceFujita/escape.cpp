@@ -11,41 +11,44 @@
 //-----------------------------------------------------
 //マクロ定義
 //-----------------------------------------------------
-#define ESCAPE_APPEAR_CNT			(100)										// 脱出通知の出現からの遷移カウント
-#define ESCAPE_LENGTH_CNT			(40)										// 脱出通知の出現からの遷移カウント
+#define ESCAPE_APPEAR_CNT			(100)	// 脱出通知の出現からの遷移カウント
+#define ESCAPE_LENGTH_CNT			(40)	// 脱出通知の出現からの遷移カウント
+#define ESCAPE_ADD_ALPHA			(0.01f)	// 脱出通知の透明度の加算数
+#define ESCAPE_EMPHASIS_TIME		(30)	// 脱出通知が強調状態になる時間
+#define ESCAPE_EMPHASIS_WAIT_CNT	(20)	// 脱出通知の強調時の待機カウント数
 
-#define ESCAPE_POS					(D3DXVECTOR3(1150.0f, 40.0f, 0.0f))			// 脱出通知の位置
-#define ESCAPE_RADIUS				(D3DXVECTOR3(80.0f, 20.0f, 0.0f))			// 脱出通知の半径
-#define ESCAPE_INIT_COL				(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f))			// 脱出通知の初期の色
-#define ESCAPE_COL					(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))			// 脱出通知の色
-#define ESCAPE_ADD_ALPHA			(0.01f)										// 脱出通知の透明度の加算数
-#define ESCAPE_EMPHASIS_TIME		(30)										// 脱出通知が強調状態になる時間
-#define ESCAPE_RADIUS_MOVE			(D3DXVECTOR3(2.0f, 0.5f, 0.0f))				// 脱出通知の半径の拡大率
-#define ESCAPE_EMPHASIS_RADIUS		(D3DXVECTOR3(120.0f, 30.0f, 0.0f))			// 脱出通知の強調時の半径
-#define ESCAPE_EMPHASIS_WAIT_CNT	(20)										// 脱出通知の強調時の待機カウント数
-#define ESCAPE_EMPHASIS_COL			(D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f))			// 脱出通知の強調時の色
-#define ESCAPE_EMPHASIS_ADD_COL		(D3DXCOLOR(0.0f, 0.03f, 0.05f, 0.0f))		// 脱出通知の強調時の色の追加量
 
-#define ESCAPE_TEXTURE		"data/TEXTURE/Escape.png"							// 脱出通知のテクスチャ
+#define ESCAPE_POS				(D3DXVECTOR3(1150.0f, 40.0f, 0.0f))		// 脱出通知の位置
+#define ESCAPE_RADIUS			(D3DXVECTOR3(80.0f, 20.0f, 0.0f))		// 脱出通知の半径
+#define ESCAPE_INIT_COL			(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f))		// 脱出通知の初期の色
+#define ESCAPE_COL				(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// 脱出通知の色
+#define ESCAPE_RADIUS_MOVE		(D3DXVECTOR3(2.0f, 0.5f, 0.0f))			// 脱出通知の半径の拡大率
+#define ESCAPE_EMPHASIS_RADIUS	(D3DXVECTOR3(120.0f, 30.0f, 0.0f))		// 脱出通知の強調時の半径
+#define ESCAPE_EMPHASIS_COL		(D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f))		// 脱出通知の強調時の色
+#define ESCAPE_EMPHASIS_ADD_COL	(D3DXCOLOR(0.0f, 0.03f, 0.05f, 0.0f))	// 脱出通知の強調時の色の追加量
+
+#define ESCAPE_TEXTURE	"data/TEXTURE/Escape.png"	// 脱出通知のテクスチャ
 
 //-----------------------------------------------------
 // プロトタイプ宣言
 //-----------------------------------------------------
-void EscapeEmphasis(void);								// 脱出通知の強調処理
+void EscapeEmphasis(void);	// 脱出通知の強調処理
 
 //-----------------------------------------------------
 //グローバル変数
 //-----------------------------------------------------
-LPDIRECT3DTEXTURE9 g_pTextureEscape = NULL;				// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffEscape = NULL;		// 頂点バッファへのポインタ
-EscapeInfo g_Escape;									// 脱出通知の情報
+LPDIRECT3DTEXTURE9 g_pTextureEscape = NULL;			// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffEscape = NULL;	// 頂点バッファへのポインタ
+
+EscapeInfo g_Escape;	// 脱出通知の情報
 
 //==========================================
 //脱出通知の初期化処理
 //==========================================
 void InitEscape(void)
 {
-	LPDIRECT3DDEVICE9 pDevice;								//各桁の数字を格納
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice;	// デバイスポインタ
 
 	//デバイスの取得
 	pDevice = GetDevice();
@@ -56,17 +59,17 @@ void InitEscape(void)
 		&g_pTextureEscape);
 
 	// 脱出通知の情報の設定
-	g_Escape.pos = ESCAPE_POS;					// 位置
-	g_Escape.length = ESCAPE_RADIUS;			// 長さ
-	g_Escape.col = ESCAPE_INIT_COL;				// 色
-	g_Escape.bUse = false;						// 使用状況
+	g_Escape.pos	= ESCAPE_POS;		// 位置
+	g_Escape.length	= ESCAPE_RADIUS;	// 長さ
+	g_Escape.col	= ESCAPE_INIT_COL;	// 色
+	g_Escape.bUse	= false;			// 使用状況
 
 	// 脱出通知の状態関係の設定
 	g_Escape.stateInfo.nStateCounter = 0;						// 状態カウンター 
 	g_Escape.stateInfo.escapeState	 = ESCAPESTATE_NONE;		// 状態
 	g_Escape.stateInfo.emphaState	 = EMPHASISSTATE_BIGGER;	// 拡大中状態
 
-	//頂点バッファの生成
+	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4,
 		D3DUSAGE_WRITEONLY,
 		FVF_VERTEX_2D,
@@ -76,34 +79,34 @@ void InitEscape(void)
 
 	VERTEX_2D *pVtx;
 
-	//頂点バッファをロック
+	// 頂点バッファをロック
 	g_pVtxBuffEscape->Lock(0, 0, (void**)&pVtx, 0);
 
-	//頂点座標の設定
+	// 頂点座標の設定
 	pVtx[0].pos = D3DXVECTOR3(g_Escape.pos.x - g_Escape.length.x, g_Escape.pos.y - g_Escape.length.y, 0.0f);
 	pVtx[1].pos = D3DXVECTOR3(g_Escape.pos.x + g_Escape.length.x, g_Escape.pos.y - g_Escape.length.y, 0.0f);
 	pVtx[2].pos = D3DXVECTOR3(g_Escape.pos.x - g_Escape.length.x, g_Escape.pos.y + g_Escape.length.y, 0.0f);
 	pVtx[3].pos = D3DXVECTOR3(g_Escape.pos.x + g_Escape.length.x, g_Escape.pos.y + g_Escape.length.y, 0.0f);
 
-	//rhwの設定
+	// rhwの設定
 	pVtx[0].rhw = 1.0f;
 	pVtx[1].rhw = 1.0f;
 	pVtx[2].rhw = 1.0f;
 	pVtx[3].rhw = 1.0f;
 
-	//頂点カラーの設定
+	// 頂点カラーの設定
 	pVtx[0].col = g_Escape.col;
 	pVtx[1].col = g_Escape.col;
 	pVtx[2].col = g_Escape.col;
 	pVtx[3].col = g_Escape.col;
 
-	//テクスチャ座標の設定
+	// テクスチャ座標の設定
 	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-	//頂点バッファをアンロックする
+	// 頂点バッファをアンロックする
 	g_pVtxBuffEscape->Unlock();
 }
 
@@ -112,14 +115,14 @@ void InitEscape(void)
 //========================================
 void UninitEscape(void)
 {
-	//テクスチャの破棄
+	// テクスチャの破棄
 	if (g_pTextureEscape != NULL)
 	{
 		g_pTextureEscape->Release();
 		g_pTextureEscape = NULL;
 	}
 
-	//頂点バッファの破棄
+	// 頂点バッファの破棄
 	if (g_pVtxBuffEscape != NULL)
 	{
 		g_pVtxBuffEscape->Release();

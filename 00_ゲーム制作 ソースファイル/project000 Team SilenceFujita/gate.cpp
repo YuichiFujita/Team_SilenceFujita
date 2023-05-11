@@ -25,31 +25,33 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define GATE_GRAVITY			(1.0f)		// 重力
-#define GATE_OPEN				(2.5f)		// ゲートの開く速度
+#define GATE_GRAVITY	(1.0f)	// 重力
+#define GATE_OPEN		(2.5f)	// ゲートの開く速度
+
 #define GATE_DOOR_PLUSPOS		(285.0f)	// ドアの初期位置の y座標加算量
 #define GATE_EXIT_WIDESIZE_MUL	(0.3f)		// 脱出口の横位置加算量の倍率
 #define GATE_EXIT_FORWARDPLUS	(200.0f)	// 脱出口の前方加算量
 
-#define GATE_PINCH_CNT			(60)		// ゲートのピンチの境界線
-#define GATE_PINCH_COL			(D3DXCOLOR(1.0f, 0.3f, 0.3f, 1.0f))			// 制限時間間近のゲートの色
-#define GATE_ATTEN_CNT			(10)		// ゲートの注意の境界線
-#define GATE_ATTEN_COL_CNT		(30)		// ゲートの色の変わるカウント数
-#define GATE_ATTEN_EMI			(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))
-#define GATE_ATTEN_DIF			(D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f))
-#define GATE_ATTEN_AMB			(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
+#define GATE_PINCH_CNT		(60)	// ゲートのピンチの境界線
+#define GATE_ATTEN_CNT		(10)	// ゲートの注意の境界線
+#define GATE_ATTEN_COL_CNT	(30)	// ゲートの色の変わるカウント数
+
+#define GATE_PINCH_COL	(D3DXCOLOR(1.0f, 0.3f, 0.3f, 1.0f))	// 制限時間間近のゲートの色
+#define GATE_ATTEN_EMI	(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))
+#define GATE_ATTEN_DIF	(D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f))
+#define GATE_ATTEN_AMB	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void GateAttention(Gate *pGate);			// ゲートの注意処理
+void GateAttention(Gate *pGate);	// ゲートの注意処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Gate      g_aGate[MAX_GATE];				// オブジェクトの情報
-Exit      g_exit;							// 脱出の情報
-Collision g_aCollGate[MODEL_GATE_MAX];		// 当たり判定の情報
+Gate      g_aGate[MAX_GATE];			// オブジェクトの情報
+Exit      g_exit;						// 脱出の情報
+Collision g_aCollGate[MODEL_GATE_MAX];	// 当たり判定の情報
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -69,34 +71,38 @@ void InitGate(void)
 		// 基本情報の初期化
 		g_aGate[nCntGate].pos     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
 		g_aGate[nCntGate].rot     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aGate[nCntGate].state   = GATESTATE_FLY;					// 状態
-		g_aGate[nCntGate].nNotaID = NONE_3D_NOTATION;				// 強調表示のインデックス
-		g_aGate[nCntGate].bUse    = false;							// 使用状況
+
+		g_aGate[nCntGate].state   = GATESTATE_FLY;		// 状態
+		g_aGate[nCntGate].nNotaID = NONE_3D_NOTATION;	// 強調表示のインデックス
+		g_aGate[nCntGate].bUse    = false;				// 使用状況
 
 		// モデル情報の初期化
-		g_aGate[nCntGate].modelData.dwNumMat = 0;					// マテリアルの数
-		g_aGate[nCntGate].modelData.pTexture = NULL;				// テクスチャへのポインタ
-		g_aGate[nCntGate].modelData.pMesh    = NULL;				// メッシュ (頂点情報) へのポインタ
-		g_aGate[nCntGate].modelData.pBuffMat = NULL;				// マテリアルへのポインタ
-		g_aGate[nCntGate].modelData.vtxMin   = INIT_VTX_MIN;		// 最小の頂点座標
-		g_aGate[nCntGate].modelData.vtxMax   = INIT_VTX_MAX;		// 最大の頂点座標
-		g_aGate[nCntGate].modelData.size     = INIT_SIZE;			// 大きさ
-		g_aGate[nCntGate].modelData.fRadius  = 0.0f;				// 半径
+		g_aGate[nCntGate].modelData.dwNumMat = 0;				// マテリアルの数
+		g_aGate[nCntGate].modelData.pTexture = NULL;			// テクスチャへのポインタ
+		g_aGate[nCntGate].modelData.pMesh    = NULL;			// メッシュ (頂点情報) へのポインタ
+		g_aGate[nCntGate].modelData.pBuffMat = NULL;			// マテリアルへのポインタ
+		g_aGate[nCntGate].modelData.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
+		g_aGate[nCntGate].modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
+		g_aGate[nCntGate].modelData.size     = INIT_SIZE;		// 大きさ
+		g_aGate[nCntGate].modelData.fRadius  = 0.0f;			// 半径
 
 		// アイコンの情報の初期化
-		g_aGate[nCntGate].icon.nIconID = NONE_ICON;					// アイコンのインデックス
-		g_aGate[nCntGate].icon.state = ICONSTATE_NONE;				// アイコンの状態
+		g_aGate[nCntGate].icon.nIconID = NONE_ICON;			// アイコンのインデックス
+		g_aGate[nCntGate].icon.state   = ICONSTATE_NONE;	// アイコンの状態
 
 		// 当たり判定情報の初期化
 		for (int nCntCollGate = 0; nCntCollGate < MODEL_GATE_MAX; nCntCollGate++)
 		{ // ゲートの種類の総数分繰り返す
 
+			g_aGate[nCntGate].collInfo[nCntCollGate].stateRot = ROTSTATE_0;	// 向き状態
+
 			for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
 			{ // 当たり判定の最大数分繰り返す
 
 				g_aGate[nCntGate].collInfo[nCntCollGate].vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
-				g_aGate[nCntGate].collInfo[nCntCollGate].fWidth[nCntColl] = 0.0f;							// 横幅
-				g_aGate[nCntGate].collInfo[nCntCollGate].fDepth[nCntColl] = 0.0f;							// 奥行
+
+				g_aGate[nCntGate].collInfo[nCntCollGate].fWidth[nCntColl] = 0.0f;	// 横幅
+				g_aGate[nCntGate].collInfo[nCntCollGate].fDepth[nCntColl] = 0.0f;	// 奥行
 			}
 		}
 
@@ -108,19 +114,19 @@ void InitGate(void)
 		g_aGate[nCntGate].doorData.fMove = 0.0f;	// 移動量
 
 		// モデル情報の初期化
-		g_aGate[nCntGate].doorData.modelData.dwNumMat = 0;					// マテリアルの数
-		g_aGate[nCntGate].doorData.modelData.pTexture = NULL;				// テクスチャへのポインタ
-		g_aGate[nCntGate].doorData.modelData.pMesh    = NULL;				// メッシュ (頂点情報) へのポインタ
-		g_aGate[nCntGate].doorData.modelData.pBuffMat = NULL;				// マテリアルへのポインタ
-		g_aGate[nCntGate].doorData.modelData.vtxMin   = INIT_VTX_MIN;		// 最小の頂点座標
-		g_aGate[nCntGate].doorData.modelData.vtxMax   = INIT_VTX_MAX;		// 最大の頂点座標
-		g_aGate[nCntGate].doorData.modelData.size     = INIT_SIZE;			// 大きさ
-		g_aGate[nCntGate].doorData.modelData.fRadius  = 0.0f;				// 半径
+		g_aGate[nCntGate].doorData.modelData.dwNumMat = 0;				// マテリアルの数
+		g_aGate[nCntGate].doorData.modelData.pTexture = NULL;			// テクスチャへのポインタ
+		g_aGate[nCntGate].doorData.modelData.pMesh    = NULL;			// メッシュ (頂点情報) へのポインタ
+		g_aGate[nCntGate].doorData.modelData.pBuffMat = NULL;			// マテリアルへのポインタ
+		g_aGate[nCntGate].doorData.modelData.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
+		g_aGate[nCntGate].doorData.modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
+		g_aGate[nCntGate].doorData.modelData.size     = INIT_SIZE;		// 大きさ
+		g_aGate[nCntGate].doorData.modelData.fRadius  = 0.0f;			// 半径
 
 		// 注意の情報の初期化
-		g_aGate[nCntGate].atten.bUse = false;								// 使用状況
-		g_aGate[nCntGate].atten.nAttenCounter = 0;							// 注意カウント
-		g_aGate[nCntGate].atten.state = ATTENTIONSTATE_NONE;				// 注意の状態
+		g_aGate[nCntGate].atten.nAttenCounter = 0;				// 注意カウント
+		g_aGate[nCntGate].atten.bUse  = false;					// 使用状況
+		g_aGate[nCntGate].atten.state = ATTENTIONSTATE_NONE;	// 注意の状態
 	}
 
 	// 脱出の情報の初期化
@@ -139,8 +145,9 @@ void InitGate(void)
 
 			g_aCollGate[nCntGate].vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
 			g_aCollGate[nCntGate].scale[nCntColl]  = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
-			g_aCollGate[nCntGate].fWidth[nCntColl] = 0.0f;							// 横幅
-			g_aCollGate[nCntGate].fDepth[nCntColl] = 0.0f;							// 奥行
+
+			g_aCollGate[nCntGate].fWidth[nCntColl] = 0.0f;	// 横幅
+			g_aCollGate[nCntGate].fDepth[nCntColl] = 0.0f;	// 奥行
 		}
 	}
 }
