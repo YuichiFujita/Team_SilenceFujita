@@ -13,7 +13,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_PARTICLE	(128)	// パーティクルの最大数
+#define MAX_2DPARTICLE	(128)	// パーティクルの最大数
 
 //**********************************************************************************************************************
 //	構造体定義 (2DParticle)
@@ -37,7 +37,7 @@ void Particle2DStart(Particle2D *pParticle);							// スタート時のエフェクト
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Particle2D g_a2DParticle[MAX_PARTICLE];				// パーティクルの情報
+Particle2D g_a2DParticle[MAX_2DPARTICLE];				// パーティクルの情報
 
 //======================================================================================================================
 //	パーティクルの初期化処理
@@ -45,7 +45,7 @@ Particle2D g_a2DParticle[MAX_PARTICLE];				// パーティクルの情報
 void Init2DParticle(void)
 {
 	// パーティクルの情報の初期化
-	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_PARTICLE; nCnt2DParticle++)
+	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_2DPARTICLE; nCnt2DParticle++)
 	{ // パーティクルの最大表示数分繰り返す
 
 		g_a2DParticle[nCnt2DParticle].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
@@ -69,7 +69,7 @@ void Uninit2DParticle(void)
 //======================================================================================================================
 void Update2DParticle(void)
 {
-	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_PARTICLE; nCnt2DParticle++)
+	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_2DPARTICLE; nCnt2DParticle++)
 	{ // パーティクルの最大表示数分繰り返す
 
 		if (g_a2DParticle[nCnt2DParticle].bUse == true)
@@ -101,7 +101,7 @@ void Draw2DParticle(void)
 //======================================================================================================================
 void Set2DParticle(D3DXVECTOR3 pos, D3DXCOLOR col, PARTICLE2DTYPE type, int nSpawn, int nLife)
 {
-	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_PARTICLE; nCnt2DParticle++)
+	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_2DPARTICLE; nCnt2DParticle++)
 	{ // パーティクルの最大表示数分繰り返す
 
 		if (g_a2DParticle[nCnt2DParticle].bUse == false)
@@ -266,7 +266,7 @@ int GetNum2DParticle(void)
 	// 変数を宣言
 	int nNum2DParticle = 0;	// パーティクルの総数の確認用
 
-	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_PARTICLE; nCnt2DParticle++)
+	for (int nCnt2DParticle = 0; nCnt2DParticle < MAX_2DPARTICLE; nCnt2DParticle++)
 	{ // パーティクルの最大表示数分繰り返す
 
 		if (g_a2DParticle[nCnt2DParticle].bUse == true)

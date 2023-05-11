@@ -1055,7 +1055,7 @@ bool DownBarrier(int nCntBarrier)
 	{ // 警察の最大表示数分繰り返す
 
 		if (pPolice->bUse == true							// 警察が使用されている
-		&&  g_aBarrier[nCntBarrier].pCar != pCar			// 車アドレスが同じではない
+		&&  g_aBarrier[nCntBarrier].pCar != pPolice			// 車アドレスが同じではない
 		&&  GetBarrierState(pPolice) != BARRIERSTATE_SET)	// 警察のバリア状態が完成状態ではない
 		{ // 上記を満たしている場合
 
