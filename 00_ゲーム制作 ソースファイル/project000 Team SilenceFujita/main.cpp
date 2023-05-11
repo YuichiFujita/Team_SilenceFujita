@@ -2120,63 +2120,63 @@ void DrawDebug(void)
 	//--------------------------------------------------------
 	//	デバッグ表示の描画
 	//--------------------------------------------------------
-	//if (g_bDispDebug == true)
-	//{ // デバッグの表示が ON の場合
+	if (g_bDispDebug == true)
+	{ // デバッグの表示が ON の場合
 
-	//	// テキストの描画
-	//	g_pFont->DrawText
-	//	( // 引数
-	//		NULL,
-	//		&aDeb[0],
-	//		-1,
-	//		&rect,
-	//		DT_LEFT,
-	//		D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)
-	//	);
-	//}
+		// テキストの描画
+		g_pFont->DrawText
+		( // 引数
+			NULL,
+			&aDeb[0],
+			-1,
+			&rect,
+			DT_LEFT,
+			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)
+		);
+	}
 
-	////--------------------------------------------------------
-	////	エディット表示の描画
-	////--------------------------------------------------------
-	//if (g_mode == MODE_GAME)
-	//{ // ゲームモードの場合
+	//--------------------------------------------------------
+	//	エディット表示の描画
+	//--------------------------------------------------------
+	if (g_mode == MODE_GAME)
+	{ // ゲームモードの場合
 
-	//	if (GetGameMode() == GAMEMODE_EDIT)
-	//	{ // エディットモードだった場合
+		if (GetGameMode() == GAMEMODE_EDIT)
+		{ // エディットモードだった場合
 
-	//		if (GetStyle() == EDITSTYLE_OBJECT)
-	//		{ // オブジェクトスタイルだった場合
+			if (GetStyle() == EDITSTYLE_OBJECT)
+			{ // オブジェクトスタイルだった場合
 
-	//			if (GetCollisionStyle() == COLLISIONSTYLE_OBJECT)
-	//			{ // オブジェクト操作状態の場合
+				if (GetCollisionStyle() == COLLISIONSTYLE_OBJECT)
+				{ // オブジェクト操作状態の場合
 
-	//				// オブジェクトの操作説明
-	//				DrawDebugControlObject();
+					// オブジェクトの操作説明
+					DrawDebugControlObject();
 
-	//				// エディットモードのデバッグ表示
-	//				DrawDebugEditObject();
-	//			}
-	//			else if (GetCollisionStyle() == COLLISIONSTYLE_COLLISION)
-	//			{ // 当たり判定操作状態の場合
+					// エディットモードのデバッグ表示
+					DrawDebugEditObject();
+				}
+				else if (GetCollisionStyle() == COLLISIONSTYLE_COLLISION)
+				{ // 当たり判定操作状態の場合
 
-	//				// 当たり判定の操作説明
-	//				DrawDebugControlCollision();
+					// 当たり判定の操作説明
+					DrawDebugControlCollision();
 
-	//				// エディットモードのデバッグ表示
-	//				DrawDebugEditCollision();
-	//			}
-	//		}
-	//		else if (GetStyle() == EDITSTYLE_BILLBOARD)
-	//		{ // ビルボードスタイルだった場合
+					// エディットモードのデバッグ表示
+					DrawDebugEditCollision();
+				}
+			}
+			else if (GetStyle() == EDITSTYLE_BILLBOARD)
+			{ // ビルボードスタイルだった場合
 
-	//			// ビルボードの操作説明
-	//			DrawDebugControlBillboard();
+				// ビルボードの操作説明
+				DrawDebugControlBillboard();
 
-	//			// エディットモードのデバッグ表示
-	//			DrawDebugEditBillboard();
-	//		}
-	//	}
-	//}
+				// エディットモードのデバッグ表示
+				DrawDebugEditBillboard();
+			}
+		}
+	}
 }
 
 //==============================================
