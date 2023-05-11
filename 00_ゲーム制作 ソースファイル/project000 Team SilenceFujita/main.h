@@ -17,6 +17,7 @@
 #include <locale.h>							// 音量調節に必要
 #include <tchar.h>							// 音量調節に必要
 #include <time.h>
+#include <assert.h>							// アサート使用に必要
 #include "d3dx9.h"							// 描画処理に必要
 #define  DIRECTINPUT_VERSION	(0x0800)	// ビルド時の警告対処用マクロ
 #include "dinput.h"							// 入力処理に必要
