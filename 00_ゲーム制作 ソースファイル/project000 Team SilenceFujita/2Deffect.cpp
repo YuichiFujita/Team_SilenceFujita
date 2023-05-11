@@ -12,7 +12,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_EFFECT		(4096)		// 使用するポリゴン数 (2Dエフェクトの最大数)
+#define MAX_2DEFFECT		(4096)		// 使用するポリゴン数 (2Dエフェクトの最大数)
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -57,7 +57,7 @@ typedef struct
 LPDIRECT3DTEXTURE9		g_apTexture2DEffect[TEXTURE_2DEFFECT_MAX] = {};	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuff2DEffect = NULL;						// 頂点バッファへのポインタ
 
-Effect2D g_a2DEffect[MAX_EFFECT];		// 2Dエフェクトの情報
+Effect2D g_a2DEffect[MAX_2DEFFECT];		// 2Dエフェクトの情報
 
 //======================================================================================================================
 //	2Dエフェクトの初期化処理
@@ -78,7 +78,7 @@ void Init2DEffect(void)
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
 	( // 引数
-		sizeof(VERTEX_2D) * 4 * MAX_EFFECT,		// 必要頂点数
+		sizeof(VERTEX_2D) * 4 * MAX_2DEFFECT,		// 必要頂点数
 		D3DUSAGE_WRITEONLY,
 		FVF_VERTEX_2D,							// 頂点フォーマット
 		D3DPOOL_MANAGED,
@@ -87,7 +87,7 @@ void Init2DEffect(void)
 	);
 
 	// 2Dエフェクトの情報の初期化
-	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_EFFECT; nCnt2DEffect++)
+	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_2DEFFECT; nCnt2DEffect++)
 	{ // 2Dエフェクトの最大表示数分繰り返す
 
 		g_a2DEffect[nCnt2DEffect].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
@@ -106,7 +106,7 @@ void Init2DEffect(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuff2DEffect->Lock(0, 0, (void**)&pVtx, 0);
 
-	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_EFFECT; nCnt2DEffect++)
+	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_2DEFFECT; nCnt2DEffect++)
 	{ // 2Dエフェクトの最大表示数分繰り返す
 
 		// 頂点座標の設定
@@ -178,7 +178,7 @@ void Update2DEffect(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuff2DEffect->Lock(0, 0, (void**)&pVtx, 0);
 
-	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_EFFECT; nCnt2DEffect++)
+	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_2DEFFECT; nCnt2DEffect++)
 	{ // 2Dエフェクトの最大表示数分繰り返す
 
 		if (g_a2DEffect[nCnt2DEffect].bUse == true)
@@ -261,7 +261,7 @@ void Draw2DEffect(void)
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
-	for (nCntEffect = 0; nCntEffect < MAX_EFFECT; nCntEffect++)
+	for (nCntEffect = 0; nCntEffect < MAX_2DEFFECT; nCntEffect++)
 	{
 		if (g_a2DEffect[nCntEffect].bUse == true)
 		{//エフェクトが使用されている
@@ -293,7 +293,7 @@ void Set2DEffect(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, int nLife, fl
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	g_pVtxBuff2DEffect->Lock(0, 0, (void**)&pVtx, 0);
 
-	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_EFFECT; nCnt2DEffect++)
+	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_2DEFFECT; nCnt2DEffect++)
 	{ // 2Dエフェクトの最大表示数分繰り返す
 
 		if (g_a2DEffect[nCnt2DEffect].bUse == false)
@@ -349,7 +349,7 @@ int GetNum2DEffect(void)
 	// 変数を宣言
 	int nNum2DEffect = 0;	// 2Dエフェクトの総数の確認用
 
-	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_EFFECT; nCnt2DEffect++)
+	for (int nCnt2DEffect = 0; nCnt2DEffect < MAX_2DEFFECT; nCnt2DEffect++)
 	{ // 2Dエフェクトの最大表示数分繰り返す
 
 		if (g_a2DEffect[nCnt2DEffect].bUse == true)
