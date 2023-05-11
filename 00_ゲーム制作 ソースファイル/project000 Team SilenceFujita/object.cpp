@@ -31,24 +31,26 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define OBJ_LIFE				(50)							// オブジェクトの体力
-#define DAMAGE_TIME_OBJ			(20)							// ダメージ状態を保つ時間
-#define UNR_TIME_OBJ			(DAMAGE_TIME_OBJ - 10)			// 無敵状態に変更する時間
-#define JUNK_POS_X				(0.5f)							// がれきが出現する位置の倍率(X軸)
-#define JUNK_POS_Y				(220.0f)						// がれきが出現する位置(Y軸)
-#define JUNK_POS_Z				(0.5f)							// がれきが出現する位置の倍率(Z軸)
-#define SPARK_SPEED				(13.0f)							// 火花が出るスピード
-#define GAME_REBUILD_CNT		(600)							// ゲームモードでのオブジェクトの再建築までのカウント
-#define TUTORIAL_REBUILD_CNT	(600)							// チュートリアルモードでのオブジェクトの再建築までのカウント
+#define OBJ_LIFE		(50)					// オブジェクトの体力
+#define DAMAGE_TIME_OBJ	(20)					// ダメージ状態を保つ時間
+#define UNR_TIME_OBJ	(DAMAGE_TIME_OBJ - 10)	// 無敵状態に変更する時間
 
-#define OBJECT_GRAVITY			(-1.5f)							// オブジェクトの重力
-#define SMASH_WIDTH_MAGNI		(3.0f)							// 吹き飛びの幅の倍率
-#define SMASH_HEIGHT			(20.0f)							// 吹き飛びの高さ
-#define SMASH_DEPTH_MAGNI		(3.0f)							// 吹き飛びの奥行の倍率
-#define SMASH_ANGLE				(0.3f)							// 吹き飛ぶ高さの角度
-#define SMASH_ANGLE_ADD			(0.3f)							// 吹き飛ぶ角度の追加分
-#define SMASH_ADD_ROT			(0.02f)							// 吹き飛びの回転の加算数
-#define SMASH_DEATH_CNT			(40)							// 吹き飛んだ後に消えるまでのカウント
+#define JUNK_POS_X				(0.5f)		// がれきが出現する位置の倍率(X軸)
+#define JUNK_POS_Y				(220.0f)	// がれきが出現する位置(Y軸)
+#define JUNK_POS_Z				(0.5f)		// がれきが出現する位置の倍率(Z軸)
+#define SPARK_SPEED				(13.0f)		// 火花が出るスピード
+#define GAME_REBUILD_CNT		(600)		// ゲームモードでのオブジェクトの再建築までのカウント
+#define TUTORIAL_REBUILD_CNT	(600)		// チュートリアルモードでのオブジェクトの再建築までのカウント
+
+#define OBJECT_GRAVITY		(-1.5f)		// オブジェクトの重力
+#define SMASH_WIDTH_MAGNI	(3.0f)		// 吹き飛びの幅の倍率
+#define SMASH_HEIGHT		(20.0f)		// 吹き飛びの高さ
+#define SMASH_DEPTH_MAGNI	(3.0f)		// 吹き飛びの奥行の倍率
+#define SMASH_ANGLE			(0.3f)		// 吹き飛ぶ高さの角度
+#define SMASH_ANGLE_ADD		(0.3f)		// 吹き飛ぶ角度の追加分
+#define SMASH_ADD_ROT		(0.02f)		// 吹き飛びの回転の加算数
+#define SMASH_DEATH_CNT		(40)		// 吹き飛んだ後に消えるまでのカウント
+
 #define SMASH_ROTMOVE_X			(5)								// 吹き飛ぶ角度の移動量のランダムの範囲(X軸)
 #define SMASH_ROTMOVE_HALF_X	((int)(SMASH_ROTMOVE_X * 0.5f))	// 吹き飛ぶ角度の移動量のランダムの引く数(X軸)
 #define SMASH_ROTMOVE_Y			(9)								// 吹き飛ぶ角度の移動量(Y軸)
@@ -56,20 +58,20 @@
 #define SMASH_ROTMOVE_Z			(5)								// 吹き飛ぶ角度の移動量(Z軸)
 #define SMASH_ROTMOVE_HALF_Z	((int)(SMASH_ROTMOVE_Z * 0.5f))	// 吹き飛ぶ角度の移動量のランダムの引く数(Z軸)
 
-#define APPEAR_ADD_MAGNI		(0.05f)							// 出現時の加算数の倍率
+#define APPEAR_ADD_MAGNI		(0.05f)		// 出現時の加算数の倍率
 
-#define ITEM_OBJECT_COUNT		(3)								// アイテムが落ちるカウント数
-#define JUNK_COUNT				(3)								// がれきのカウント
-#define OBJECT_RADIUS_ARTICLE	(170.0f)						// オブジェクトの小物判定の半径
+#define ITEM_OBJECT_COUNT		(3)			// アイテムが落ちるカウント数
+#define JUNK_COUNT				(3)			// がれきのカウント
+#define OBJECT_RADIUS_ARTICLE	(170.0f)	// オブジェクトの小物判定の半径
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Object    g_aObject[MAX_OBJECT];				// オブジェクトの情報
-Collision g_aCollision[MODEL_OBJ_MAX];			// 当たり判定の情報
-float     g_aShadowRadius[MODEL_OBJ_MAX];		// 影の半径の情報
-bool	  g_aIconSet[MODEL_OBJ_MAX];			// アイコンの設定情報
-int		  g_nObjectItemCount;					// アイテムが落ちるカウント
+Object    g_aObject[MAX_OBJECT];			// オブジェクトの情報
+Collision g_aCollision[MODEL_OBJ_MAX];		// 当たり判定の情報
+float     g_aShadowRadius[MODEL_OBJ_MAX];	// 影の半径の情報
+bool	  g_aIconSet[MODEL_OBJ_MAX];		// アイコンの設定情報
+int		  g_nObjectItemCount;				// アイテムが落ちるカウント
 
 //======================================================================================================================
 //	オブジェクトの初期化処理
@@ -84,67 +86,68 @@ void InitObject(void)
 	{ // オブジェクトの最大表示数分繰り返す
 
 		// 基本情報の初期化
-		g_aObject[nCntObject].pos            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aObject[nCntObject].rot            = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
-		g_aObject[nCntObject].scale          = D3DXVECTOR3(1.0f, 1.0f, 1.0f);		// 拡大率
-		g_aObject[nCntObject].state          = ACTIONSTATE_NONE;					// 状態
-		g_aObject[nCntObject].nLife          = 0;									// 体力
-		g_aObject[nCntObject].nCollisionType = COLLISIONTYPE_NONE;					// 当たり判定の種類
-		g_aObject[nCntObject].nShadowType    = SHADOWTYPE_NONE;						// 影の種類
-		g_aObject[nCntObject].nBreakType     = BREAKTYPE_NONE;						// 壊れ方の種類
-		g_aObject[nCntObject].nType          = 0;									// オブジェクトの種類
-		g_aObject[nCntObject].nCounterState  = 0; 									// 状態管理カウンター
-		g_aObject[nCntObject].nShadowID      = NONE_SHADOW;							// 影のインデックス
-		g_aObject[nCntObject].nNotaID        = NONE_3D_NOTATION;					// 強調表示のインデックス
-		g_aObject[nCntObject].bUse           = false;								// 使用状況
+		g_aObject[nCntObject].pos   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aObject[nCntObject].rot   = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aObject[nCntObject].scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
+
+		g_aObject[nCntObject].state          = ACTIONSTATE_NONE;	// 状態
+		g_aObject[nCntObject].nLife          = 0;					// 体力
+		g_aObject[nCntObject].nCollisionType = COLLISIONTYPE_NONE;	// 当たり判定の種類
+		g_aObject[nCntObject].nShadowType    = SHADOWTYPE_NONE;		// 影の種類
+		g_aObject[nCntObject].nBreakType     = BREAKTYPE_NONE;		// 壊れ方の種類
+		g_aObject[nCntObject].nType          = 0;					// オブジェクトの種類
+		g_aObject[nCntObject].nCounterState  = 0; 					// 状態管理カウンター
+		g_aObject[nCntObject].nShadowID      = NONE_SHADOW;			// 影のインデックス
+		g_aObject[nCntObject].nNotaID        = NONE_3D_NOTATION;	// 強調表示のインデックス
+		g_aObject[nCntObject].bUse           = false;				// 使用状況
 
 		// 当たり判定情報の初期化
+		g_aObject[nCntObject].collInfo.stateRot = ROTSTATE_0;	// 向き状態
+
 		for (int nCntColl = 0; nCntColl < MAX_COLLISION; nCntColl++)
 		{ // 当たり判定の最大数分繰り返す
 
 			g_aObject[nCntObject].collInfo.vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
-			g_aObject[nCntObject].collInfo.fWidth[nCntColl] = 0.0f;								// 横幅
-			g_aObject[nCntObject].collInfo.fDepth[nCntColl] = 0.0f;								// 奥行
+
+			g_aObject[nCntObject].collInfo.fWidth[nCntColl] = 0.0f;	// 横幅
+			g_aObject[nCntObject].collInfo.fDepth[nCntColl] = 0.0f;	// 奥行
 		}
 
 		//吹っ飛び関係の初期化
-		g_aObject[nCntObject].smash.nCounter = 0;									// カウンター
-		g_aObject[nCntObject].smash.State = SMASHSTATE_NONE;						// 状態
-		g_aObject[nCntObject].smash.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
-		g_aObject[nCntObject].smash.bJump = false;									// ジャンプの状態
+		g_aObject[nCntObject].smash.nCounter	= 0;								// カウンター
+		g_aObject[nCntObject].smash.State		= SMASHSTATE_NONE;					// 状態
+		g_aObject[nCntObject].smash.move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aObject[nCntObject].smash.bJump		= false;							// ジャンプの状態
 		g_aObject[nCntObject].smash.nSmashCount = 0;								// カウント
-		g_aObject[nCntObject].smash.rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向きの移動量
+		g_aObject[nCntObject].smash.rotMove		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向きの移動量
 
 		// ジャッジの情報の初期化
-		g_aObject[nCntObject].judge.col = JUDGE_WHITE;								// ピカピカの色
-		g_aObject[nCntObject].judge.state = JUDGESTATE_JUSTICE;						// 善悪
-		g_aObject[nCntObject].judge.ticatica = CHICASTATE_BLACKOUT;					// チカチカ状態
-			
-		// 向き状態を初期化
-		g_aObject[nCntObject].collInfo.stateRot = ROTSTATE_0;
+		g_aObject[nCntObject].judge.col			= JUDGE_WHITE;			// ピカピカの色
+		g_aObject[nCntObject].judge.state		= JUDGESTATE_JUSTICE;	// 善悪
+		g_aObject[nCntObject].judge.ticatica	= CHICASTATE_BLACKOUT;	// チカチカ状態
 
 		// モデル情報の初期化
-		g_aObject[nCntObject].modelData.dwNumMat = 0;								// マテリアルの数
-		g_aObject[nCntObject].modelData.pTexture = NULL;							// テクスチャへのポインタ
-		g_aObject[nCntObject].modelData.pMesh    = NULL;							// メッシュ (頂点情報) へのポインタ
-		g_aObject[nCntObject].modelData.pBuffMat = NULL;							// マテリアルへのポインタ
-		g_aObject[nCntObject].modelData.vtxMin   = INIT_VTX_MIN;					// 最小の頂点座標
-		g_aObject[nCntObject].modelData.vtxMax   = INIT_VTX_MAX;					// 最大の頂点座標
-		g_aObject[nCntObject].modelData.size     = INIT_SIZE;						// 大きさ
-		g_aObject[nCntObject].modelData.fRadius  = 0.0f;							// 半径
+		g_aObject[nCntObject].modelData.dwNumMat = 0;				// マテリアルの数
+		g_aObject[nCntObject].modelData.pTexture = NULL;			// テクスチャへのポインタ
+		g_aObject[nCntObject].modelData.pMesh    = NULL;			// メッシュ (頂点情報) へのポインタ
+		g_aObject[nCntObject].modelData.pBuffMat = NULL;			// マテリアルへのポインタ
+		g_aObject[nCntObject].modelData.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
+		g_aObject[nCntObject].modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
+		g_aObject[nCntObject].modelData.size     = INIT_SIZE;		// 大きさ
+		g_aObject[nCntObject].modelData.fRadius  = 0.0f;			// 半径
 
 		// 構造体の要素をクリア
-		ZeroMemory(&g_aObject[nCntObject].matCopy[0], sizeof(D3DXMATERIAL) * MAX_MATERIAL);
+		ZeroMemory(&g_aObject[nCntObject].matCopy[0], sizeof(g_aObject[nCntObject].matCopy));
 
 		// 出現関係の初期化
-		g_aObject[nCntObject].appear.scaleCopy = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率
-		g_aObject[nCntObject].appear.state = APPEARSTATE_NONE;						// 出現状態
-		g_aObject[nCntObject].appear.scaleAdd = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 拡大率の加算数
-		g_aObject[nCntObject].appear.fAlpha = 0.0f;									// 透明度
+		g_aObject[nCntObject].appear.scaleCopy	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率
+		g_aObject[nCntObject].appear.state		= APPEARSTATE_NONE;					// 出現状態
+		g_aObject[nCntObject].appear.scaleAdd	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 拡大率の加算数
+		g_aObject[nCntObject].appear.fAlpha		= 0.0f;								// 透明度
 
 		// アイコンの情報の初期化
-		g_aObject[nCntObject].icon.state   = ICONSTATE_NONE;						// アイコンの状態
-		g_aObject[nCntObject].icon.nIconID = NONE_ICON;								// アイコンのインデックス
+		g_aObject[nCntObject].icon.state   = ICONSTATE_NONE;	// アイコンの状態
+		g_aObject[nCntObject].icon.nIconID = NONE_ICON;			// アイコンのインデックス
 
 #ifdef _DEBUG	// デバッグ処理
 		// エディット時の状態
@@ -164,8 +167,9 @@ void InitObject(void)
 
 			g_aCollision[nCntObject].vecPos[nCntColl] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置ベクトル
 			g_aCollision[nCntObject].scale[nCntColl]  = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// 拡大率
-			g_aCollision[nCntObject].fWidth[nCntColl] = 0.0f;							// 横幅
-			g_aCollision[nCntObject].fDepth[nCntColl] = 0.0f;							// 奥行
+
+			g_aCollision[nCntObject].fWidth[nCntColl] = 0.0f;	// 横幅
+			g_aCollision[nCntObject].fDepth[nCntColl] = 0.0f;	// 奥行
 		}
 	}
 

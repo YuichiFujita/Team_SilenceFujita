@@ -21,12 +21,12 @@
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3  pos;			// 位置
-	D3DXCOLOR    col;			// 色
-	PARTICLETYPE type;			// 種類
-	int          nSpawn;		// エフェクト数
-	int          nLife;			// 寿命
-	bool         bUse;			// 使用状況
+	D3DXVECTOR3  pos;		// 位置
+	D3DXCOLOR    col;		// 色
+	PARTICLETYPE type;		// 種類
+	int          nSpawn;	// エフェクト数
+	int          nLife;		// 寿命
+	bool         bUse;		// 使用状況
 }Particle;
 
 //**********************************************************************************************************************
@@ -50,7 +50,7 @@ void ParticleShotBarrier(Particle *pParticle);	// バリア発射エフェクト
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-Particle g_aParticle[MAX_PARTICLE];				// パーティクルの情報
+Particle g_aParticle[MAX_PARTICLE];	// パーティクルの情報
 
 //======================================================================================================================
 //	パーティクルの初期化処理
@@ -61,12 +61,13 @@ void InitParticle(void)
 	for (int nCntParticle = 0; nCntParticle < MAX_PARTICLE; nCntParticle++)
 	{ // パーティクルの最大表示数分繰り返す
 
-		g_aParticle[nCntParticle].pos    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aParticle[nCntParticle].col    = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
-		g_aParticle[nCntParticle].type   = PARTICLETYPE_NONE;					// 種類
-		g_aParticle[nCntParticle].nSpawn = 0;									// エフェクト数
-		g_aParticle[nCntParticle].nLife  = 0;									// 寿命
-		g_aParticle[nCntParticle].bUse   = false;								// 使用状況
+		g_aParticle[nCntParticle].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+		g_aParticle[nCntParticle].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
+
+		g_aParticle[nCntParticle].type   = PARTICLETYPE_NONE;	// 種類
+		g_aParticle[nCntParticle].nSpawn = 0;					// エフェクト数
+		g_aParticle[nCntParticle].nLife  = 0;					// 寿命
+		g_aParticle[nCntParticle].bUse   = false;				// 使用状況
 	}
 }
 
