@@ -379,56 +379,62 @@ void InitRanking(void)
 	//------------------------------------------------------------------------------------------------------------------
 	//	ランキング（文字）の初期化
 	//------------------------------------------------------------------------------------------------------------------
-	// 頂点座標を設定
-	pVtx[0].pos = D3DXVECTOR3(g_rank2DChar.pos.x - RANK_CHAR_WIDTH, g_rank2DChar.pos.y - RANK_CHAR_HEIGHT, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(g_rank2DChar.pos.x + RANK_CHAR_WIDTH, g_rank2DChar.pos.y - RANK_CHAR_HEIGHT, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(g_rank2DChar.pos.x - RANK_CHAR_WIDTH, g_rank2DChar.pos.y + RANK_CHAR_HEIGHT, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(g_rank2DChar.pos.x + RANK_CHAR_WIDTH, g_rank2DChar.pos.y + RANK_CHAR_HEIGHT, 0.0f);
+	{
 
-	// rhw の設定
-	pVtx[0].rhw = 1.0f;
-	pVtx[1].rhw = 1.0f;
-	pVtx[2].rhw = 1.0f;
-	pVtx[3].rhw = 1.0f;
+		// 頂点座標を設定
+		pVtx[0].pos = D3DXVECTOR3(g_rank2DChar.pos.x - RANK_CHAR_WIDTH, g_rank2DChar.pos.y - RANK_CHAR_HEIGHT, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(g_rank2DChar.pos.x + RANK_CHAR_WIDTH, g_rank2DChar.pos.y - RANK_CHAR_HEIGHT, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(g_rank2DChar.pos.x - RANK_CHAR_WIDTH, g_rank2DChar.pos.y + RANK_CHAR_HEIGHT, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(g_rank2DChar.pos.x + RANK_CHAR_WIDTH, g_rank2DChar.pos.y + RANK_CHAR_HEIGHT, 0.0f);
 
-	// 頂点カラーの設定
-	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		// rhw の設定
+		pVtx[0].rhw = 1.0f;
+		pVtx[1].rhw = 1.0f;
+		pVtx[2].rhw = 1.0f;
+		pVtx[3].rhw = 1.0f;
 
-	// テクスチャ座標の設定
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+		// 頂点カラーの設定
+		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// テクスチャ座標の設定
+		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	ランキング（ニュースコア背景）の初期化
 	//------------------------------------------------------------------------------------------------------------------
-	// 頂点座標を設定
-	pVtx[4].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x - RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y - RANK_NEW_BG_HEIGHT, 0.0f);
-	pVtx[5].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x + RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y - RANK_NEW_BG_HEIGHT, 0.0f);
-	pVtx[6].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x - RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y + RANK_NEW_BG_HEIGHT, 0.0f);
-	pVtx[7].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x + RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y + RANK_NEW_BG_HEIGHT, 0.0f);
+	{
 
-	// rhw の設定
-	pVtx[4].rhw = 1.0f;
-	pVtx[5].rhw = 1.0f;
-	pVtx[6].rhw = 1.0f;
-	pVtx[7].rhw = 1.0f;
+		// 頂点座標を設定
+		pVtx[4].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x - RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y - RANK_NEW_BG_HEIGHT, 0.0f);
+		pVtx[5].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x + RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y - RANK_NEW_BG_HEIGHT, 0.0f);
+		pVtx[6].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x - RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y + RANK_NEW_BG_HEIGHT, 0.0f);
+		pVtx[7].pos = D3DXVECTOR3(g_rank2DNewBg.pos.x + RANK_NEW_BG_WIDTH, g_rank2DNewBg.pos.y + RANK_NEW_BG_HEIGHT, 0.0f);
 
-	// 頂点カラーの設定
-	pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		// rhw の設定
+		pVtx[4].rhw = 1.0f;
+		pVtx[5].rhw = 1.0f;
+		pVtx[6].rhw = 1.0f;
+		pVtx[7].rhw = 1.0f;
 
-	// テクスチャ座標の設定
-	pVtx[4].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[5].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[6].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
+		// 頂点カラーの設定
+		pVtx[4].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[5].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[6].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[7].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// テクスチャ座標の設定
+		pVtx[4].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[5].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[6].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[7].tex = D3DXVECTOR2(1.0f, 1.0f);
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	ランキング（下線）の初期化
@@ -680,11 +686,11 @@ void DrawRanking(void)
 
 	if (GetTitleState() != TITLESTATE_FADE)
 	{//タイトル遷移中じゃないとき
-	 //ランキングスコアの数値
+		//ランキングスコアの数値
 		for (int nCount = 0; nCount < RANK_SCORE_MAX; nCount++)
 		{ // 順位が更新されている場合
 
-		  //数値を設定
+			//数値を設定
 			SetValue(
 				D3DXVECTOR3(g_aRankScore[nCount].pos.x, g_aRankScore[nCount].pos.y + (nCount * RANK_INTERVAL_Y), 0.0f),
 				g_aRankScore[nCount].nScore,
@@ -720,7 +726,7 @@ void DrawRanking(void)
 		for (int nCount = 0; nCount < RANK_FADE_MAX; nCount++)
 		{ // 順位が更新されている場合
 
-		  //数値を設定
+			//数値を設定
 			SetValue(
 				D3DXVECTOR3(g_aRankScore[nCount].pos.x, g_aRankScore[nCount].pos.y + (nCount * RANK_FADE_INTERVAL_Y), 0.0f),
 				g_aRankScore[nCount].nScore,
@@ -734,9 +740,6 @@ void DrawRanking(void)
 			DrawValue(RANK_FADE_NUM_PLACE, VALUETYPE_NORMAL);
 		}
 	}
-
-
-
 }
 
 //=====================================

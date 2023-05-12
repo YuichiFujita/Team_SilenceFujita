@@ -26,31 +26,31 @@
 //**********************************************************************************************************************
 // マクロ定義
 //**********************************************************************************************************************
-#define RESULT_FINISH_COUNT		(30)			// リザルトが終了するまでのカウント
-#define RESULT_SCORE_WIDTH		(60.0f)			// 値の縦幅
-#define RESULT_SCORE_HEIGHT		(60.0f)			// 値の横幅
-#define RESULT_SCORE_SHIFT		(90.0f)			// 値のずらす幅
+#define RESULT_FINISH_COUNT	(30)	// リザルトが終了するまでのカウント
+#define RESULT_SCORE_WIDTH	(60.0f)	// 値の縦幅
+#define RESULT_SCORE_HEIGHT	(60.0f)	// 値の横幅
+#define RESULT_SCORE_SHIFT	(90.0f)	// 値のずらす幅
+#define RANK_CHANGE_CNT		(450)	// 自動遷移のカウント
+#define RANK_AFTERGLOW_CNT	(60)	// スコア完成後の余韻のカウント
+
 #define RESULT_SCORE_POS		(D3DXVECTOR3(1000.0f, 560.0f, 0.0f))
 #define RESULT_SCORE_BACK_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 550.0f, 0.0f))
 #define RESULT_SCORE_BACK_SIZE	(D3DXVECTOR3(540.0f, 120.0f, 0.0f))
 
-#define RESULT_WORD_RADIUS		(D3DXVECTOR3(540.0f, 75.0f, 0.0f))						// 言葉の半径
-#define RESULT_WORD_BACK_RADIUS	(D3DXVECTOR3(640.0f, 160.0f, 0.0f))						// 言葉の背景の半径
-#define RESULT_WORD_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 180.0f, 0.0f))		// 言葉の位置
-
-#define RANK_CHANGE_CNT			(450)			// 自動遷移のカウント
-#define RANK_AFTERGLOW_CNT		(60)			// スコア完成後の余韻のカウント
+#define RESULT_WORD_RADIUS		(D3DXVECTOR3(540.0f, 75.0f, 0.0f))					// 言葉の半径
+#define RESULT_WORD_BACK_RADIUS	(D3DXVECTOR3(640.0f, 160.0f, 0.0f))					// 言葉の背景の半径
+#define RESULT_WORD_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 180.0f, 0.0f))	// 言葉の位置
 
 //**********************************************************************************************************************
 // リザルト画面のテクスチャ
 //**********************************************************************************************************************
 typedef enum
 {
-	RSL_TEX_GAMECLEAR = 0,		// ゲームクリア
-	RSL_TEX_GAMEOVER,			// ゲームオーバー
-	RSL_TEX_WORD_BACK,			// 言葉の背景
-	RSL_TEX_SCORE_BACK,			// スコアの背景
-	RSL_TEX_MAX					// この列挙型の総数
+	RSL_TEX_GAMECLEAR = 0,	// ゲームクリア
+	RSL_TEX_GAMEOVER,		// ゲームオーバー
+	RSL_TEX_WORD_BACK,		// 言葉の背景
+	RSL_TEX_SCORE_BACK,		// スコアの背景
+	RSL_TEX_MAX				// この列挙型の総数
 }RSLTEXTURE;
 
 //**********************************************************************************************************************
@@ -74,38 +74,34 @@ typedef struct
 }RSLWORD;
 
 //**********************************************************************************************************************
-//	プロトタイプ宣言
-//**********************************************************************************************************************
-
-//**********************************************************************************************************************
 // グローバル変数宣言
 //**********************************************************************************************************************
 LPDIRECT3DTEXTURE9 g_apTextureResult[RSL_TEX_MAX] = {};		// テクスチャ(2枚分)へのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultWord = NULL;		// 画面の頂点バッファへのポインタ(リザルト表示関係)
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffResultNumBack = NULL;		// 画面の頂点バッファへのポインタ(数値の背景)
 
-int g_nFadeTitleCounter;									// タイトル遷移カウンター
-int g_nResultCounter;										// リザルトカウンター
+int g_nFadeTitleCounter;	// タイトル遷移カウンター
+int g_nResultCounter;		// リザルトカウンター
 
-int g_nResultScore;											// リザルト画面のスコア
-int g_nDispRslScore;										// 表示用のスコア
-int g_nAddDispScore;										// 表示用のスコアの加算倍率
+int g_nResultScore;			// リザルト画面のスコア
+int g_nDispRslScore;		// 表示用のスコア
+int g_nAddDispScore;		// 表示用のスコアの加算倍率
 
-bool g_bRslFade;											// リザルトから遷移するかどうか
+bool g_bRslFade;			// リザルトから遷移するかどうか
 
-D3DLIGHT9 g_RslLight;										// リザルトのライト
-RESULTSTATE g_ResultState;									// ゲーム終了時の状態
-RSLWORD g_RslWord;											// 文字の情報
+D3DLIGHT9 g_RslLight;		// リザルトのライト
+RESULTSTATE g_ResultState;	// ゲーム終了時の状態
+RSLWORD g_RslWord;			// 文字の情報
 
 //**********************************************************************************************************************
 // テクスチャファイル名
 //**********************************************************************************************************************
 const char *c_apFilenameResult[RSL_TEX_MAX] =
 {
-	"data/TEXTURE/GAMECLEAR.tga",							// ゲームクリア
-	"data/TEXTURE/GAMEOVER.tga",							// ゲームオーバー
-	"data/TEXTURE/ui008.tga",								// 言葉の背景
-	"data/TEXTURE/ui009.tga",								// スコアの背景
+	"data/TEXTURE/GAMECLEAR.tga",	// ゲームクリア
+	"data/TEXTURE/GAMEOVER.tga",	// ゲームオーバー
+	"data/TEXTURE/ui008.tga",		// 言葉の背景
+	"data/TEXTURE/ui009.tga",		// スコアの背景
 };
 
 //===============================
@@ -113,8 +109,8 @@ const char *c_apFilenameResult[RSL_TEX_MAX] =
 //===============================
 void InitResult(void)
 {
-	LPDIRECT3DDEVICE9 pDevice;								//デバイスへのポインタ
-	VERTEX_2D * pVtx;										//頂点情報へのポインタ
+	LPDIRECT3DDEVICE9 pDevice;	//デバイスへのポインタ
+	VERTEX_2D * pVtx;			//頂点情報へのポインタ
 
 	//デバイスの取得
 	pDevice = GetDevice();
