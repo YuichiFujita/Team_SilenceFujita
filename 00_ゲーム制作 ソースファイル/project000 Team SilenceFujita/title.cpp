@@ -28,18 +28,18 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_TITLE			(3)			// 使用するポリゴン数
+#define MAX_TITLE	(3)	// 使用するポリゴン数
 
-#define TITLE_POS_X			(640.0f)	// タイトルの停止時の絶対座標 (x)
-#define TITLE_POS_Y			(225.0f)	// タイトルの停止時の絶対座標 (y)
-#define TITLE_WIDTH			(390.0f)	// タイトルの横幅 / 2
-#define TITLE_HEIGHT		(140.0f)	// タイトルの縦幅 / 2
+#define TITLE_POS_X		(640.0f)	// タイトルの停止時の絶対座標 (x)
+#define TITLE_POS_Y		(225.0f)	// タイトルの停止時の絶対座標 (y)
+#define TITLE_WIDTH		(390.0f)	// タイトルの横幅 / 2
+#define TITLE_HEIGHT	(140.0f)	// タイトルの縦幅 / 2
 
-#define TITLE_SELECT_POS_X			(SCREEN_WIDTH * 0.5f)			//タイトル選択肢の開始位置（X)
-#define TITLE_SELECT_POS_Y			(SCREEN_HEIGHT * 0.825f)		//タイトル選択肢の開始位置（Y）	
-#define TITLE_SELECT_SIZE_X			(220.0f)						//タイトル選択肢の大きさ（X）
-#define TITLE_SELECT_SIZE_Y			(60.0f)							//タイトル選択肢の大きさ（Y）
-#define TITLE_SELECT_INTERVAL_X		(225.0f)						//タイトル選択肢の間隔（X）
+#define TITLE_SELECT_POS_X		(SCREEN_WIDTH * 0.5f)		//タイトル選択肢の開始位置（X)
+#define TITLE_SELECT_POS_Y		(SCREEN_HEIGHT * 0.825f)	//タイトル選択肢の開始位置（Y）	
+#define TITLE_SELECT_SIZE_X		(220.0f)					//タイトル選択肢の大きさ（X）
+#define TITLE_SELECT_SIZE_Y		(60.0f)						//タイトル選択肢の大きさ（Y）
+#define TITLE_SELECT_INTERVAL_X	(225.0f)					//タイトル選択肢の間隔（X）
 
 #define TITLE_MOVE			(2.0f)		// タイトルの移動量
 #define TIT_FIRST_ALPHA		(0.65f)		// 背景の初期の透明度
@@ -47,16 +47,16 @@
 #define TIT_ALPHA_HIGH		(0.5f)		// 不透明度の最大値
 #define TIT_ALPHA_LOW		(0.5f)		// 透明度の最大値
 
-#define TRANS_CNT			(900)		// 自動遷移するまでのカウント
+#define TRANS_CNT	(900)	// 自動遷移するまでのカウント
 
 //**********************************************************************************************************************
 //	コンスト定義
 //**********************************************************************************************************************
 const char *apTextureTitle[] =			// テクスチャの相対パス
 {
-	"data\\TEXTURE\\title000.tga",				// タイトルのテクスチャ相対パス
-	"data\\TEXTURE\\TitleStart.tga",			// タイトル選択（スタート）
-	"data\\TEXTURE\\TitleTutorial.tga",			// タイトル選択（チュートリアル）
+	"data\\TEXTURE\\title000.tga",		// タイトルのテクスチャ相対パス
+	"data\\TEXTURE\\TitleStart.tga",	// タイトル選択（スタート）
+	"data\\TEXTURE\\TitleTutorial.tga",	// タイトル選択（チュートリアル）
 };
 
 //**********************************************************************************************************************
@@ -64,10 +64,10 @@ const char *apTextureTitle[] =			// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_TITLE_TITLE = 0,			// タイトル
-	TEXTURE_TITLE_SELECT_START,			// タイトル選択（スタート）
-	TEXTURE_TITLE_SELECT_TUTORIAL,		// タイトル選択（チュートリアル）
-	TEXTURE_TITLE_MAX,					// この列挙型の総数
+	TEXTURE_TITLE_TITLE = 0,		// タイトル
+	TEXTURE_TITLE_SELECT_START,		// タイトル選択（スタート）
+	TEXTURE_TITLE_SELECT_TUTORIAL,	// タイトル選択（チュートリアル）
+	TEXTURE_TITLE_MAX,				// この列挙型の総数
 } TEXTURE_TITLE;
 
 //**********************************************************************************************************************
@@ -75,9 +75,9 @@ typedef enum
 //**********************************************************************************************************************
 typedef enum
 {
-	TRANSITION_TITLE_LOGO = 0,			// ロゴ画面
-	TRANSITION_TITLE_RANKING,			// ランキング
-	TRANSITION_TITLE_MAX,				// この列挙型の総数
+	TRANSITION_TITLE_LOGO = 0,	// ロゴ画面
+	TRANSITION_TITLE_RANKING,	// ランキング
+	TRANSITION_TITLE_MAX,		// この列挙型の総数
 } TRANSITION_TITLE;
 
 //**********************************************************************************************************************
@@ -95,8 +95,8 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 pos;			//位置
-	D3DXCOLOR col;				//色
+	D3DXVECTOR3 pos;	//位置
+	D3DXCOLOR col;		//色
 }TitleSelect;
 
 //**********************************************************************************************************************

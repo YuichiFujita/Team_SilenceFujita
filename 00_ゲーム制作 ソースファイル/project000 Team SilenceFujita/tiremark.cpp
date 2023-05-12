@@ -24,6 +24,7 @@ void InitTireMark(void)
 	//”š”­‚Ìî•ñ‚Ì‰Šú‰»
 	for (int nCntTireMark = 0; nCntTireMark < MAX_TIREMARK; nCntTireMark++)
 	{
+
 		// ˆÊ’u‚ğ‰Šú‰»‚·‚é
 		g_aTireMark[nCntTireMark].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 

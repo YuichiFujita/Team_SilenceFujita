@@ -19,15 +19,15 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_TIMER		(1)			// 使用するポリゴン数
-#define MAX_VAL_TIMER	(2)			// タイマーの数値表示の最大数
-#define MAX_MIN			(60)		// タイム (分) の最大値
-#define MAX_SEC			(60)		// タイム (秒) の最大値
-#define NUM_RED_TIMER	(10)		// タイマーが赤くなり始める時間
+#define MAX_TIMER		(1)		// 使用するポリゴン数
+#define MAX_VAL_TIMER	(2)		// タイマーの数値表示の最大数
+#define MAX_MIN			(60)	// タイム (分) の最大値
+#define MAX_SEC			(60)	// タイム (秒) の最大値
+#define NUM_RED_TIMER	(10)	// タイマーが赤くなり始める時間
 
-#define VAL_TIME_WIDTH	(28.0f)		// タイマーの数値の横幅 / 2
-#define VAL_TIME_HEIGHT	(28.0f)		// タイマーの数値の縦幅 / 2
-#define VAL_TIME_SPACE	(38.0f)		// タイマーの数値間の幅 (x)
+#define VAL_TIME_WIDTH	(28.0f)	// タイマーの数値の横幅 / 2
+#define VAL_TIME_HEIGHT	(28.0f)	// タイマーの数値の縦幅 / 2
+#define VAL_TIME_SPACE	(38.0f)	// タイマーの数値間の幅 (x)
 
 #define TIMER_POS_MIN_X	(1085.0f)	// タイマー (分) の絶対座標 (x)
 #define TIMER_POS_SEC_X	(1185.0f)	// タイマー (秒) の絶対座標 (x)
@@ -50,9 +50,9 @@ const char *apTextureTimer[] =		// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_TIMER_NORMAL = 0,		// タイマーコロン(：) (通常)
-	TEXTURE_TIMER_RED,				// タイマーコロン(：) (赤)
-	TEXTURE_TIMER_MAX,				// この列挙型の総数
+	TEXTURE_TIMER_NORMAL = 0,	// タイマーコロン(：) (通常)
+	TEXTURE_TIMER_RED,			// タイマーコロン(：) (赤)
+	TEXTURE_TIMER_MAX,			// この列挙型の総数
 } TEXTURE_TIMER;
 
 //**********************************************************************************************************************
@@ -61,8 +61,8 @@ typedef enum
 LPDIRECT3DTEXTURE9      g_apTextureTimer[TEXTURE_TIMER_MAX] = {};	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffTimer = NULL;						// 頂点バッファへのポインタ
 
-TIMERSTATE g_timerState;			// タイマーの状態
-int        g_nTime;					// 現在のタイム
+TIMERSTATE g_timerState;	// タイマーの状態
+int        g_nTime;			// 現在のタイム
 
 //======================================================================================================================
 //	タイマーの初期化処理
@@ -83,9 +83,9 @@ void InitTimer(void)
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
 	( // 引数
-		sizeof(VERTEX_2D) * 4 * MAX_TIMER,		// 必要頂点数
+		sizeof(VERTEX_2D) * 4 * MAX_TIMER,	// 必要頂点数
 		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_2D,							// 頂点フォーマット
+		FVF_VERTEX_2D,						// 頂点フォーマット
 		D3DPOOL_MANAGED,
 		&g_pVtxBuffTimer,
 		NULL

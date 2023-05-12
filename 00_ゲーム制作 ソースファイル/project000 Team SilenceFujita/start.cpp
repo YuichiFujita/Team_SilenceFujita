@@ -17,38 +17,40 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define NONE_START_TEXTURE				(-1)																// テクスチャがいらない番号
+#define NONE_START_TEXTURE	(-1)	// テクスチャがいらない番号
 
-#define START_PREFACE_FIRST_RADIUS		(D3DXVECTOR3(300.0f, 88.0f, 0.0f))									// 前置き(前半)の半径
-#define START_PREFACE_SECOND_RADIUS		(D3DXVECTOR3(300.0f, 88.0f, 0.0f))									// 前置き(後半)の半径
-#define START_SIGLIGHT_INIT_RADIUS		(D3DXVECTOR3(0.0f, 60.0f, 0.0f))									// シグナルの光源の全長
-#define START_SIGNAL_RADIUS				(D3DXVECTOR3(250.0f, 80.0f, 0.0f))									// シグナルの半径
-#define START_GO_RADIUS					(D3DXVECTOR3(200.0f, 100.0f, 0.0f))									// Goの半径
+#define START_PREFACE_FIRST_RADIUS	(D3DXVECTOR3(300.0f, 88.0f, 0.0f))	// 前置き(前半)の半径
+#define START_PREFACE_SECOND_RADIUS	(D3DXVECTOR3(300.0f, 88.0f, 0.0f))	// 前置き(後半)の半径
+#define START_SIGLIGHT_INIT_RADIUS	(D3DXVECTOR3(0.0f, 60.0f, 0.0f))	// シグナルの光源の全長
+#define START_SIGNAL_RADIUS			(D3DXVECTOR3(250.0f, 80.0f, 0.0f))	// シグナルの半径
+#define START_GO_RADIUS				(D3DXVECTOR3(200.0f, 100.0f, 0.0f))	// Goの半径
 
-#define START_PREFACE_FIRST_INIT_POS	(D3DXVECTOR3(-300.0f, 250.0f, 0.0f))													// 前置き(前半)の初期位置
-#define START_PREFACE_SECOND_INIT_POS	(D3DXVECTOR3(SCREEN_WIDTH + 300.0f, 430.0f, 0.0f))										// 前置き(後半)の初期位置
-#define START_SIGLIGHT_INIT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - START_SIGNAL_RADIUS.x + 5.0f, -80.0f, 0.0f))			// シグナルの光源の初期位置
-#define START_SIGNAL_INIT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, -80.0f, 0.0f))										// シグナルの初期位置
-#define START_GO_INIT_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))							// Goの初期位置
+#define START_PREFACE_FIRST_INIT_POS	(D3DXVECTOR3(-300.0f, 250.0f, 0.0f))											// 前置き(前半)の初期位置
+#define START_PREFACE_SECOND_INIT_POS	(D3DXVECTOR3(SCREEN_WIDTH + 300.0f, 430.0f, 0.0f))								// 前置き(後半)の初期位置
+#define START_SIGLIGHT_INIT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - START_SIGNAL_RADIUS.x + 5.0f, -80.0f, 0.0f))	// シグナルの光源の初期位置
+#define START_SIGNAL_INIT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, -80.0f, 0.0f))								// シグナルの初期位置
+#define START_GO_INIT_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))					// Goの初期位置
 
-#define START_PREFACE_FIRST_POS			(D3DXVECTOR3(450.0f, SCREEN_HEIGHT * 0.5f - START_PREFACE_FIRST_RADIUS.y, 0.0f))		// 前置き(前半)の移動した後の位置
-#define START_PREFACE_SECOND_POS		(D3DXVECTOR3(850.0f, SCREEN_HEIGHT * 0.5f + START_PREFACE_SECOND_RADIUS.y, 0.0f))		// 前置き(後半)の移動した後の位置
-#define START_SIGLIGHT_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - START_SIGNAL_RADIUS.x, SCREEN_HEIGHT * 0.5f, 0.0f))	// シグナルの光源の移動した後の位置
-#define START_SIGNAL_POS				(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))							// シグナルの移動した後の位置
-#define START_SIGLIGHT_RADIUS			(D3DXVECTOR3(490.0f, 60.0f, 0.0f))									// シグナルの光源の処理後の半径
+#define START_PREFACE_FIRST_POS		(D3DXVECTOR3(450.0f, SCREEN_HEIGHT * 0.5f - START_PREFACE_FIRST_RADIUS.y, 0.0f))		// 前置き(前半)の移動した後の位置
+#define START_PREFACE_SECOND_POS	(D3DXVECTOR3(850.0f, SCREEN_HEIGHT * 0.5f + START_PREFACE_SECOND_RADIUS.y, 0.0f))		// 前置き(後半)の移動した後の位置
+#define START_SIGLIGHT_POS			(D3DXVECTOR3(SCREEN_WIDTH * 0.5f - START_SIGNAL_RADIUS.x, SCREEN_HEIGHT * 0.5f, 0.0f))	// シグナルの光源の移動した後の位置
 
-#define START_PREFACE_MOVE				(5.5f)			// 前置きの移動量
-#define START_PREFACE_ALPHA_MOVE		(0.04f)			// 透明度の移動量
-#define START_PREFACE_WAIT_COUNT		(90)			// 前置きの待機カウント数
-#define START_PREFACE_WAIT_COUNT		(90)			// 前置きの待機カウント数
-#define START_SIGNAL_MOVE				(4.0f)			// シグナルの移動量
-#define START_SIGNAL_COUNT				(40)			// シグナルのカウント
-#define START_SIGNAL_LIGHT_MAX			(3)				// シグナルが光る回数
-#define START_SIGNAL_NORMAL_COL			(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))									// 通常のシグナルの色
-#define START_SIGNAL_START_COL			(D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f))									// スタート時のシグナルの色
-#define START_GO_ALPHA_MOVE				(0.01f)			// GO!!の透明度の移動量
-#define START_GO_RADIUS_ADD				(2.0f)			// GO!!の半径の追加量
-#define START_SIGNAL_PARTICLE_COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))									// パーティクルの色
+#define START_SIGNAL_POS		(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f))	// シグナルの移動した後の位置
+#define START_SIGLIGHT_RADIUS	(D3DXVECTOR3(490.0f, 60.0f, 0.0f))								// シグナルの光源の処理後の半径
+
+#define START_PREFACE_MOVE			(5.5f)	// 前置きの移動量
+#define START_PREFACE_ALPHA_MOVE	(0.04f)	// 透明度の移動量
+#define START_PREFACE_WAIT_COUNT	(90)	// 前置きの待機カウント数
+#define START_PREFACE_WAIT_COUNT	(90)	// 前置きの待機カウント数
+#define START_SIGNAL_MOVE			(4.0f)	// シグナルの移動量
+#define START_SIGNAL_COUNT			(40)	// シグナルのカウント
+#define START_SIGNAL_LIGHT_MAX		(3)		// シグナルが光る回数
+#define START_GO_ALPHA_MOVE			(0.01f)	// GO!!の透明度の移動量
+#define START_GO_RADIUS_ADD			(2.0f)	// GO!!の半径の追加量
+
+#define START_SIGNAL_NORMAL_COL		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))	// 通常のシグナルの色
+#define START_SIGNAL_START_COL		(D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f))	// スタート時のシグナルの色
+#define START_SIGNAL_PARTICLE_COL	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// パーティクルの色
 
 //**********************************************************************************************************************
 //	コンスト定義
@@ -91,23 +93,23 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 pos;						// 位置
-	D3DXVECTOR3 move;						// 移動量
-	D3DXVECTOR3 radius;						// 半径
-	D3DXCOLOR	col;						// 色
-	int			nNumTex;					// テクスチャの番号
-	bool		bUse;						// 使用状況
+	D3DXVECTOR3 pos;		// 位置
+	D3DXVECTOR3 move;		// 移動量
+	D3DXVECTOR3 radius;		// 半径
+	D3DXCOLOR	col;		// 色
+	int			nNumTex;	// テクスチャの番号
+	bool		bUse;		// 使用状況
 }Start;
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void StartPrefaceFirst(void);				// 前置き(前半)の処理
-void StartPrefaceSecond(void);				// 前置き(後半)の処理
-void StartPrefaceThird(void);				// 前置き(画面からはける)の処理
-void StartSignalMove(void);					// シグナルの移動処理
-void StartSignal(void);						// シグナルの処理
-void StartGo(void);							// GO!!表示処理
+void StartPrefaceFirst(void);	// 前置き(前半)の処理
+void StartPrefaceSecond(void);	// 前置き(後半)の処理
+void StartPrefaceThird(void);	// 前置き(画面からはける)の処理
+void StartSignalMove(void);		// シグナルの移動処理
+void StartSignal(void);			// シグナルの処理
+void StartGo(void);				// GO!!表示処理
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -115,10 +117,10 @@ void StartGo(void);							// GO!!表示処理
 LPDIRECT3DTEXTURE9      g_apTextureStart[TEXTURE_START_MAX] = {};	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffStart = NULL;						// 頂点バッファへのポインタ
 
-Start	   g_aStart[START_POLIGON_MAX];								// それぞれの演出の位置
-STARTSTATE g_StartState;											// スタートの状態
-int		   g_nActionCount;											// 行動のカウント
-int		   g_nSignalCount;											// シグナルの変わった回数
+Start	   g_aStart[START_POLIGON_MAX];	// それぞれの演出の位置
+STARTSTATE g_StartState;				// スタートの状態
+int		   g_nActionCount;				// 行動のカウント
+int		   g_nSignalCount;				// シグナルの変わった回数
 
 //======================================================================================================================
 //	スタートの初期化処理

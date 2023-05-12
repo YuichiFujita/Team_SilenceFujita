@@ -27,15 +27,15 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_WIND			(1024)			// 風の最大数
-#define HUMAN_FLY_POS_Y		(50.0f)			// 吹き飛ぶ判定が入る高さ
-#define WIND_WIDTH			(1000.0f)		// 風の範囲(X軸)
-#define WIND_DEPTH			(300.0f)		// 風の範囲(Z軸)
-#define FLYAWAY_WIDTH		(100.0f)		// 吹き飛ぶ幅
-#define FLYAWAY_HEIGHT		(25.0f)			// 吹き飛ぶ高さ
-#define FLYAWAY_DEPTH		(100.0f)		// 吹き飛ぶ奥行
+#define MAX_WIND			(1024)		// 風の最大数
+#define HUMAN_FLY_POS_Y		(50.0f)		// 吹き飛ぶ判定が入る高さ
+#define WIND_WIDTH			(1000.0f)	// 風の範囲(X軸)
+#define WIND_DEPTH			(300.0f)	// 風の範囲(Z軸)
+#define FLYAWAY_WIDTH		(100.0f)	// 吹き飛ぶ幅
+#define FLYAWAY_HEIGHT		(25.0f)		// 吹き飛ぶ高さ
+#define FLYAWAY_DEPTH		(100.0f)	// 吹き飛ぶ奥行
 
-#define ITEM_WIND_COUNT		(5)								// アイテムが落ちるカウント数
+#define ITEM_WIND_COUNT		(5)			// アイテムが落ちるカウント数
 
 //**********************************************************************************************************************
 //	構造体定義 (Bomb)
@@ -55,17 +55,17 @@ typedef struct
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
-void FlyAwayHuman(Human *pHuman, Player player);					// 人間が吹き飛ばされる処理
+void FlyAwayHuman(Human *pHuman, Player player);	// 人間が吹き飛ばされる処理
 
 //**********************************************************************************************************************
 //	グローバル変数
 //**********************************************************************************************************************
-LPDIRECT3DTEXTURE9		g_pTextureWind = NULL;		// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWind = NULL;		// 頂点バッファへのポインタ
-Wind g_aWind[MAX_WIND];								// 風の構造体
-WindInfo g_WindInfo;								// 風の情報の構造体
+LPDIRECT3DTEXTURE9		g_pTextureWind = NULL;	// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWind = NULL;	// 頂点バッファへのポインタ
+Wind g_aWind[MAX_WIND];							// 風の構造体
+WindInfo g_WindInfo;							// 風の情報の構造体
 
-int		  g_nHumanItemCount;					// アイテムが落ちるカウント
+int g_nHumanItemCount;	// アイテムが落ちるカウント
 
 //======================================================================================================================
 //	送風機の初期化処理
@@ -78,19 +78,21 @@ void InitWind(void)
 
 	for (int nCnt = 0; nCnt < MAX_WIND; nCnt++)
 	{ // 情報の処理
-		g_aWind[nCnt].pos	  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-		g_aWind[nCnt].move	  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
-		g_aWind[nCnt].col	  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
-		g_aWind[nCnt].fAlpha  = 0.0f;								// 透明度
-		g_aWind[nCnt].fRadius = 0.0f;								// 半径
-		g_aWind[nCnt].nLife	  = 0;									// 寿命
-		g_aWind[nCnt].bUse	  = false;								// 使用状況
+
+		g_aWind[nCnt].pos	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+		g_aWind[nCnt].move	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
+		g_aWind[nCnt].col	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色
+
+		g_aWind[nCnt].fAlpha	= 0.0f;		// 透明度
+		g_aWind[nCnt].fRadius	= 0.0f;		// 半径
+		g_aWind[nCnt].nLife		= 0;		// 寿命
+		g_aWind[nCnt].bUse		= false;	// 使用状況
 	}
 
 	// 風の情報の初期化
-	g_WindInfo.nUseCounter = 0;										// 風のカウンターを初期化する
-	g_WindInfo.nOverHeatCounter = 0;								// オーバーヒートカウンターを初期化する
-	g_WindInfo.state = WIND_USABLE;									// 使用可能状態
+	g_WindInfo.nUseCounter		= 0;			// 風のカウンターを初期化する
+	g_WindInfo.nOverHeatCounter	= 0;			// オーバーヒートカウンターを初期化する
+	g_WindInfo.state			= WIND_USABLE;	// 使用可能状態
 
 	// アイテムが落ちるカウントを初期化する
 	g_nHumanItemCount = 0;
@@ -119,6 +121,7 @@ void InitWind(void)
 
 	for (int nCntWind = 0; nCntWind < MAX_WIND; nCntWind++)
 	{ // エフェクトの最大表示数分繰り返す
+
 		// 頂点座標の設定
 		pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		pVtx[1].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);

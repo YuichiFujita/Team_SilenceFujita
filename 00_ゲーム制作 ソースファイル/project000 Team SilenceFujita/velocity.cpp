@@ -53,10 +53,10 @@ const char *apTextureVelocity[] =	// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_VELO_NORMAL = 0,		// ライフの背景
-	TEXTURE_VELO_NULL_00,			// NULL
-	TEXTURE_VELO_NULL_01,			// NULL
-	TEXTURE_VELO_MAX,				// この列挙型の総数
+	TEXTURE_VELO_NORMAL = 0,	// ライフの背景
+	TEXTURE_VELO_NULL_00,		// NULL
+	TEXTURE_VELO_NULL_01,		// NULL
+	TEXTURE_VELO_MAX,			// この列挙型の総数
 } TEXTURE_VELO;
 
 //**********************************************************************************************************************
