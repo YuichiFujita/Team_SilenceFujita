@@ -25,15 +25,15 @@
 //**********************************************************************************************************************
 const char *apTextureMeshField[] =		// テクスチャの相対パス
 {
-	"data\\TEXTURE\\road000.png",			// 直線のテクスチャの相対パス
-	"data\\TEXTURE\\road001.png",			// 曲がり角度のテクスチャの相対パス
-	"data\\TEXTURE\\road002.png",			// 交差点のテクスチャの相対パス
-	"data\\TEXTURE\\road003.png",			// 丁字路のテクスチャの相対パス
-	"data\\TEXTURE\\sidewalk000.png",		// 地面のテクスチャの相対パス
-	"data\\TEXTURE\\Tile.jpg",				// タイルのテクスチャの相対パス
-	"data\\TEXTURE\\ShopStreet.jpg",		// 商店街の道のテクスチャの相対パス
-	"data\\TEXTURE\\red_sidewalk.jpg",		// 歩道のテクスチャの相対パス
-	"data\\TEXTURE\\sidewalk002.png",		// 地面のテクスチャの相対パス
+	"data\\TEXTURE\\road000.png",		// 直線のテクスチャの相対パス
+	"data\\TEXTURE\\road001.png",		// 曲がり角度のテクスチャの相対パス
+	"data\\TEXTURE\\road002.png",		// 交差点のテクスチャの相対パス
+	"data\\TEXTURE\\road003.png",		// 丁字路のテクスチャの相対パス
+	"data\\TEXTURE\\sidewalk000.png",	// 地面のテクスチャの相対パス
+	"data\\TEXTURE\\Tile.jpg",			// タイルのテクスチャの相対パス
+	"data\\TEXTURE\\ShopStreet.jpg",	// 商店街の道のテクスチャの相対パス
+	"data\\TEXTURE\\red_sidewalk.jpg",	// 歩道のテクスチャの相対パス
+	"data\\TEXTURE\\sidewalk002.png",	// 地面のテクスチャの相対パス
 };
 
 const D3DXCOLOR aColorMeshField[] =		// マップの地面カラー
@@ -89,7 +89,7 @@ int       g_nNeedIdxField;						// 必要インデックス数
 void InitMeshField(void)
 {
 	// 変数を宣言
-	int nNumVtx = 0;							// 頂点数の計測用
+	int nNumVtx = 0;	// 頂点数の計測用
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -97,23 +97,24 @@ void InitMeshField(void)
 	WORD      *pIdx;							// インデックス情報へのポインタ
 
 	// グローバル変数の初期化
-	g_nNeedVtxField = 0;						// 必要頂点の総数
-	g_nNeedIdxField = 0;						// 必要インデックスの総数
+	g_nNeedVtxField = 0;	// 必要頂点の総数
+	g_nNeedIdxField = 0;	// 必要インデックスの総数
 
 	// メッシュフィールドの情報の初期化
 	for (int nCntMeshField = 0; nCntMeshField < MAX_MESHFIELD; nCntMeshField++)
 	{ // メッシュフィールドの最大表示数分繰り返す
 
-		g_aMeshField[nCntMeshField].pos         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aMeshField[nCntMeshField].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aMeshField[nCntMeshField].fWidth      = 0.0f;								// 横幅
-		g_aMeshField[nCntMeshField].fHeight     = 0.0f;								// 縦幅
-		g_aMeshField[nCntMeshField].nPartWidth  = 0;								// 横の分割数
-		g_aMeshField[nCntMeshField].nPartHeight = 0;								// 縦の分割数
-		g_aMeshField[nCntMeshField].nNumVtx     = 0;								// 必要頂点数
-		g_aMeshField[nCntMeshField].nNumIdx     = 0;								// 必要インデックス数
-		g_aMeshField[nCntMeshField].nType       = 0;								// 種類
-		g_aMeshField[nCntMeshField].bUse        = false;							// 使用状況
+		g_aMeshField[nCntMeshField].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aMeshField[nCntMeshField].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+
+		g_aMeshField[nCntMeshField].fWidth      = 0.0f;		// 横幅
+		g_aMeshField[nCntMeshField].fHeight     = 0.0f;		// 縦幅
+		g_aMeshField[nCntMeshField].nPartWidth  = 0;		// 横の分割数
+		g_aMeshField[nCntMeshField].nPartHeight = 0;		// 縦の分割数
+		g_aMeshField[nCntMeshField].nNumVtx     = 0;		// 必要頂点数
+		g_aMeshField[nCntMeshField].nNumIdx     = 0;		// 必要インデックス数
+		g_aMeshField[nCntMeshField].nType       = 0;		// 種類
+		g_aMeshField[nCntMeshField].bUse        = false;	// 使用状況
 	}
 
 	// テクスチャの読み込み

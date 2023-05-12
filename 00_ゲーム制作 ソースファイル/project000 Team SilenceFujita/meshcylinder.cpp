@@ -43,17 +43,17 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 pos;					// 位置
-	D3DXVECTOR3 rot;					// 向き
-	D3DXMATRIX  mtxWorld;				// ワールドマトリックス
-	float       fRadius;				// 半径
-	float       fHeight;				// 縦幅
-	int         nPartWidth;				// 横の分割数
-	int         nPartHeight;			// 縦の分割数
-	int         nNumVtx;				// 必要頂点数
-	int         nNumIdx;				// 必要インデックス数
-	int         nType;					// 種類
-	bool        bUse;					// 使用状況
+	D3DXVECTOR3 pos;			// 位置
+	D3DXVECTOR3 rot;			// 向き
+	D3DXMATRIX  mtxWorld;		// ワールドマトリックス
+	float       fRadius;		// 半径
+	float       fHeight;		// 縦幅
+	int         nPartWidth;		// 横の分割数
+	int         nPartHeight;	// 縦の分割数
+	int         nNumVtx;		// 必要頂点数
+	int         nNumIdx;		// 必要インデックス数
+	int         nType;			// 種類
+	bool        bUse;			// 使用状況
 } MeshCylinder;
 
 //**********************************************************************************************************************
@@ -79,10 +79,10 @@ int          g_nNeedIdxCylinder;				// 必要インデックス数
 void InitMeshCylinder(void)
 {
 	// 変数を宣言
-	D3DXVECTOR3 vecPos;							// 頂点位置の計算用
-	D3DXVECTOR3 vecNor;							// 法線ベクトルの計算用
-	int         nNumVtx = 0;					// 頂点数の計測用
-	WEATHERTYPE weather = GetWeather();			// 天気
+	D3DXVECTOR3 vecPos;					// 頂点位置の計算用
+	D3DXVECTOR3 vecNor;					// 法線ベクトルの計算用
+	int         nNumVtx = 0;			// 頂点数の計測用
+	WEATHERTYPE weather = GetWeather();	// 天気
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -90,23 +90,24 @@ void InitMeshCylinder(void)
 	WORD      *pIdx;							// インデックス情報へのポインタ
 	
 	// グローバル変数の初期化
-	g_nNeedVtxCylinder = 0;						// 必要頂点の総数
-	g_nNeedIdxCylinder = 0;						// 必要インデックスの総数
+	g_nNeedVtxCylinder = 0;	// 必要頂点の総数
+	g_nNeedIdxCylinder = 0;	// 必要インデックスの総数
 
 	// メッシュシリンダーの情報の初期化
 	for (int nCntMeshCylinder = 0; nCntMeshCylinder < MAX_MESHCYLINDER; nCntMeshCylinder++)
 	{ // メッシュシリンダーの最大表示数分繰り返す
 
-		g_aMeshCylinder[nCntMeshCylinder].pos         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aMeshCylinder[nCntMeshCylinder].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aMeshCylinder[nCntMeshCylinder].fRadius     = 0.0f;							// 半径
-		g_aMeshCylinder[nCntMeshCylinder].fHeight     = 0.0f;							// 縦幅
-		g_aMeshCylinder[nCntMeshCylinder].nPartWidth  = 0;								// 横の分割数
-		g_aMeshCylinder[nCntMeshCylinder].nPartHeight = 0;								// 縦の分割数
-		g_aMeshCylinder[nCntMeshCylinder].nNumVtx     = 0;								// 必要頂点数
-		g_aMeshCylinder[nCntMeshCylinder].nNumIdx     = 0;								// 必要インデックス数
-		g_aMeshCylinder[nCntMeshCylinder].nType       = 0;								// 種類
-		g_aMeshCylinder[nCntMeshCylinder].bUse        = false;							// 使用状況
+		g_aMeshCylinder[nCntMeshCylinder].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aMeshCylinder[nCntMeshCylinder].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+
+		g_aMeshCylinder[nCntMeshCylinder].fRadius     = 0.0f;	// 半径
+		g_aMeshCylinder[nCntMeshCylinder].fHeight     = 0.0f;	// 縦幅
+		g_aMeshCylinder[nCntMeshCylinder].nPartWidth  = 0;		// 横の分割数
+		g_aMeshCylinder[nCntMeshCylinder].nPartHeight = 0;		// 縦の分割数
+		g_aMeshCylinder[nCntMeshCylinder].nNumVtx     = 0;		// 必要頂点数
+		g_aMeshCylinder[nCntMeshCylinder].nNumIdx     = 0;		// 必要インデックス数
+		g_aMeshCylinder[nCntMeshCylinder].nType       = 0;		// 種類
+		g_aMeshCylinder[nCntMeshCylinder].bUse        = false;	// 使用状況
 	}
 
 	// テクスチャの読み込み
@@ -180,34 +181,38 @@ void InitMeshCylinder(void)
 					pVtx[0].nor = vecNor;
 
 					switch (weather)
-					{
+					{ // 天気ごとの処理
 					case WEATHERTYPE_SUNNY:		// 晴れ
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
 
 					case WEATHERTYPE_RAIN:		// 雨
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
 
 					case WEATHERTYPE_SNOW:		// 雪
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
 
 					case WEATHERTYPE_THUNDER:	// 雷雨
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
+
+					default:	// 例外処理
+						assert(false);
+						break;
 					}
 
 					// テクスチャ座標の設定

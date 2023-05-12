@@ -19,7 +19,7 @@
 //**********************************************************************************************************************
 //	マクロ定義
 //**********************************************************************************************************************
-#define MAX_PAUSE		(4)			// 使用するポリゴン数
+#define MAX_PAUSE	(4)	// 使用するポリゴン数
 
 #define PAUSE_POS_X		(640.0f)	// セレクトメニューの絶対座標 (x)
 #define PAUSE_POS_Y		(210.0f)	// セレクトメニューの絶対座標 (y)
@@ -44,11 +44,11 @@ const char *apTexturePause[] =		// テクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_PAUSE_NULL_00 = 0,		// NULL
-	TEXTURE_PAUSE_RESUME,			// RESUME
-	TEXTURE_PAUSE_RETRY,			// RETRY
-	TEXTURE_PAUSE_EXIT,				// EXIT
-	TEXTURE_PAUSE_MAX,				// この列挙型の総数
+	TEXTURE_PAUSE_NULL_00 = 0,	// NULL
+	TEXTURE_PAUSE_RESUME,		// RESUME
+	TEXTURE_PAUSE_RETRY,		// RETRY
+	TEXTURE_PAUSE_EXIT,			// EXIT
+	TEXTURE_PAUSE_MAX,			// この列挙型の総数
 } TEXTURE_PAUSE;
 
 //**********************************************************************************************************************
@@ -57,9 +57,9 @@ typedef enum
 LPDIRECT3DTEXTURE9		g_apTexturePause[TEXTURE_PAUSE_MAX] = {};	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffPause = NULL;						// 頂点バッファへのポインタ
 
-int  g_nSelectPause;				// 現在の選択中メニュー
-int  g_nOldSelectPause;				// 前回の選択中メニュー
-bool g_bPauseEnd;					// ポーズ終了確認用
+int  g_nSelectPause;	// 現在の選択中メニュー
+int  g_nOldSelectPause;	// 前回の選択中メニュー
+bool g_bPauseEnd;		// ポーズ終了確認用
 
 //======================================================================================================================
 //	ポーズ画面の初期化処理
@@ -67,8 +67,8 @@ bool g_bPauseEnd;					// ポーズ終了確認用
 void InitPause(void)
 {
 	// ポインタを宣言
-	LPDIRECT3DDEVICE9 pDevice;		// デバイスへのポインタ (ポインタの宣言だが * はいらない)
-	VERTEX_2D *pVtx;				// 頂点情報へのポインタ
+	LPDIRECT3DDEVICE9 pDevice;	// デバイスへのポインタ (ポインタの宣言だが * はいらない)
+	VERTEX_2D *pVtx;			// 頂点情報へのポインタ
 
 	// デバイスの取得
 	pDevice = GetDevice();
@@ -83,17 +83,18 @@ void InitPause(void)
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer
 	( // 引数
-		sizeof(VERTEX_2D) * 4 * MAX_PAUSE,		// 必要頂点数
+		sizeof(VERTEX_2D) * 4 * MAX_PAUSE,	// 必要頂点数
 		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_2D,							// 頂点フォーマット
+		FVF_VERTEX_2D,						// 頂点フォーマット
 		D3DPOOL_MANAGED,
 		&g_pVtxBuffPause,
 		NULL
 	);
 
 	// 変数の値を初期化
-	g_nSelectPause    = PAUSESELECT_RESUME;		// 現在の選択中メニューを初期化
-	g_nOldSelectPause = PAUSESELECT_RESUME;		// 前回の選択中メニューを初期化
+	g_nSelectPause    = PAUSESELECT_RESUME;	// 現在の選択中メニュー
+	g_nOldSelectPause = PAUSESELECT_RESUME;	// 前回の選択中メニュー
+	g_bPauseEnd       = false;				// ポーズ終了確認用
 
 	//------------------------------------------------------------------------------------------------------------------
 	//	頂点情報の初期化

@@ -38,15 +38,15 @@ typedef enum
 //**********************************************************************************************************************
 typedef struct
 {
-	D3DXVECTOR3 pos;				// 位置
-	D3DXVECTOR3 rot;				// 向き
-	D3DXMATRIX  mtxWorld;			// ワールドマトリックス
-	float       fRadius;			// 半径
-	int         nPartWidth;			// 横の分割数
-	int         nPartHeight;		// 縦の分割数
-	int         nNumVtx;			// 必要頂点数
-	int         nNumIdx;			// 必要インデックス数
-	bool        bUse;				// 使用状況
+	D3DXVECTOR3 pos;			// 位置
+	D3DXVECTOR3 rot;			// 向き
+	D3DXMATRIX  mtxWorld;		// ワールドマトリックス
+	float       fRadius;		// 半径
+	int         nPartWidth;		// 横の分割数
+	int         nPartHeight;	// 縦の分割数
+	int         nNumVtx;		// 必要頂点数
+	int         nNumIdx;		// 必要インデックス数
+	bool        bUse;			// 使用状況
 } MeshDome;
 
 //**********************************************************************************************************************
@@ -72,11 +72,11 @@ int      g_nNeedIdxDome;			// 必要インデックス数
 void InitMeshDome(void)
 {
 	// 変数を宣言
-	D3DXVECTOR3 vecPos;							// 頂点位置の計算用
-	D3DXVECTOR3 vecNor;							// 法線ベクトルの計算用
-	float       fRotWidth, fRotHeight;			// 頂点位置の方向の計算用
-	int         nNumVtx = 0;					// 頂点数の計測用
-	WEATHERTYPE weather = GetWeather();			// 天気
+	D3DXVECTOR3 vecPos;					// 頂点位置の計算用
+	D3DXVECTOR3 vecNor;					// 法線ベクトルの計算用
+	float       fRotWidth, fRotHeight;	// 頂点位置の方向の計算用
+	int         nNumVtx = 0;			// 頂点数の計測用
+	WEATHERTYPE weather = GetWeather();	// 天気
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
@@ -84,21 +84,22 @@ void InitMeshDome(void)
 	WORD      *pIdx;							// インデックス情報へのポインタ
 	
 	// グローバル変数の初期化
-	g_nNeedVtxDome = 0;							// 必要頂点の総数
-	g_nNeedIdxDome = 0;							// 必要インデックスの総数
+	g_nNeedVtxDome = 0;	// 必要頂点の総数
+	g_nNeedIdxDome = 0;	// 必要インデックスの総数
 
 	// メッシュドームの情報の初期化
 	for (int nCntMeshDome = 0; nCntMeshDome < MAX_MESHDOME; nCntMeshDome++)
 	{ // メッシュドームの最大表示数分繰り返す
 
-		g_aMeshDome[nCntMeshDome].pos         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aMeshDome[nCntMeshDome].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aMeshDome[nCntMeshDome].fRadius     = 0.0f;							// 半径
-		g_aMeshDome[nCntMeshDome].nPartWidth  = 0;								// 横の分割数
-		g_aMeshDome[nCntMeshDome].nPartHeight = 0;								// 縦の分割数
-		g_aMeshDome[nCntMeshDome].nNumVtx     = 0;								// 必要頂点数
-		g_aMeshDome[nCntMeshDome].nNumIdx     = 0;								// 必要インデックス数
-		g_aMeshDome[nCntMeshDome].bUse        = false;							// 使用状況
+		g_aMeshDome[nCntMeshDome].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aMeshDome[nCntMeshDome].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+
+		g_aMeshDome[nCntMeshDome].fRadius     = 0.0f;	// 半径
+		g_aMeshDome[nCntMeshDome].nPartWidth  = 0;		// 横の分割数
+		g_aMeshDome[nCntMeshDome].nPartHeight = 0;		// 縦の分割数
+		g_aMeshDome[nCntMeshDome].nNumVtx     = 0;		// 必要頂点数
+		g_aMeshDome[nCntMeshDome].nNumIdx     = 0;		// 必要インデックス数
+		g_aMeshDome[nCntMeshDome].bUse        = false;	// 使用状況
 	}
 
 	// テクスチャの読み込み
@@ -176,34 +177,38 @@ void InitMeshDome(void)
 					pVtx[0].nor = vecNor;
 
 					switch (weather)
-					{
+					{ // 天気ごとの処理
 					case WEATHERTYPE_SUNNY:		// 晴れ
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
 
 					case WEATHERTYPE_RAIN:		// 雨
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
 
 					case WEATHERTYPE_SNOW:		// 雪
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
 
 					case WEATHERTYPE_THUNDER:	// 雷雨
 
 						// 頂点カラーの設定
 						pVtx[0].col = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 
-						break;					// 抜け出す
+						break;	// 抜け出す
+
+					default:	// 例外処理
+						assert(false);
+						break;
 					}
 
 					// テクスチャ座標の設定

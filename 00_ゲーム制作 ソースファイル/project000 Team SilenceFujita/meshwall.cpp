@@ -24,9 +24,9 @@ const char *apTextureMeshWall[] =		// ƒeƒNƒXƒ`ƒƒ‚Ì‘Š‘ÎƒpƒX
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_MESHWALL_SIDEWALK = 0,		// •à“¹
-	TEXTURE_MESHWALL_BUILDING,			// ƒrƒ‹ŠX
-	TEXTURE_MESHWALL_MAX,				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
+	TEXTURE_MESHWALL_SIDEWALK = 0,	// •à“¹
+	TEXTURE_MESHWALL_BUILDING,		// ƒrƒ‹ŠX
+	TEXTURE_MESHWALL_MAX,			// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 } TEXTURE_MESHWALL;
 
 //**********************************************************************************************************************
@@ -42,9 +42,9 @@ LPDIRECT3DTEXTURE9      g_apTextureMeshWall[TEXTURE_MESHWALL_MAX] = {};	// ƒeƒNƒ
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffMeshWall = NULL;						// ’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
 LPDIRECT3DINDEXBUFFER9  g_pIdxBuffMeshWall = NULL;						// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
-MeshWall g_aMeshWall[MAX_MESHWALL];		// ƒƒbƒVƒ…ƒEƒH[ƒ‹‚Ìî•ñ
-int      g_nNeedVtxWall;				// •K—v’¸“_”
-int      g_nNeedIdxWall;				// •K—vƒCƒ“ƒfƒbƒNƒX”
+MeshWall g_aMeshWall[MAX_MESHWALL];	// ƒƒbƒVƒ…ƒEƒH[ƒ‹‚Ìî•ñ
+int      g_nNeedVtxWall;			// •K—v’¸“_”
+int      g_nNeedIdxWall;			// •K—vƒCƒ“ƒfƒbƒNƒX”
 
 //======================================================================================================================
 //	ƒƒbƒVƒ…ƒEƒH[ƒ‹‚Ì‰Šú‰»ˆ—
@@ -52,7 +52,7 @@ int      g_nNeedIdxWall;				// •K—vƒCƒ“ƒfƒbƒNƒX”
 void InitMeshWall(void)
 {
 	// •Ï”‚ðéŒ¾
-	int nNumVtx = 0;							// ’¸“_”‚ÌŒv‘ª—p
+	int nNumVtx = 0;	// ’¸“_”‚ÌŒv‘ª—p
 
 	// ƒ|ƒCƒ“ƒ^‚ðéŒ¾
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
@@ -60,23 +60,24 @@ void InitMeshWall(void)
 	WORD      *pIdx;							// ƒCƒ“ƒfƒbƒNƒXî•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
 	// ƒOƒ[ƒoƒ‹•Ï”‚Ì‰Šú‰»
-	g_nNeedVtxWall = 0;							// •K—v’¸“_‚Ì‘”
-	g_nNeedIdxWall = 0;							// •K—vƒCƒ“ƒfƒbƒNƒX‚Ì‘”
+	g_nNeedVtxWall = 0;	// •K—v’¸“_‚Ì‘”
+	g_nNeedIdxWall = 0;	// •K—vƒCƒ“ƒfƒbƒNƒX‚Ì‘”
 
 	// ƒƒbƒVƒ…ƒEƒH[ƒ‹‚Ìî•ñ‚Ì‰Šú‰»
 	for (int nCntMeshWall = 0; nCntMeshWall < MAX_MESHWALL; nCntMeshWall++)
 	{ // ƒƒbƒVƒ…ƒEƒH[ƒ‹‚ÌÅ‘å•\Ž¦”•ªŒJ‚è•Ô‚·
 
-		g_aMeshWall[nCntMeshWall].pos         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ˆÊ’u
-		g_aMeshWall[nCntMeshWall].rot         = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// Œü‚«
-		g_aMeshWall[nCntMeshWall].fWidth      = 0.0f;							// ‰¡•
-		g_aMeshWall[nCntMeshWall].fHeight     = 0.0f;							// c•
-		g_aMeshWall[nCntMeshWall].nPartWidth  = 0;								// ‰¡‚Ì•ªŠ„”
-		g_aMeshWall[nCntMeshWall].nPartHeight = 0;								// c‚Ì•ªŠ„”
-		g_aMeshWall[nCntMeshWall].nNumVtx     = 0;								// •K—v’¸“_”
-		g_aMeshWall[nCntMeshWall].nNumIdx     = 0;								// •K—vƒCƒ“ƒfƒbƒNƒX”
-		g_aMeshWall[nCntMeshWall].nType       = 0;								// Ží—Þ
-		g_aMeshWall[nCntMeshWall].bUse        = false;							// Žg—pó‹µ
+		g_aMeshWall[nCntMeshWall].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ˆÊ’u
+		g_aMeshWall[nCntMeshWall].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// Œü‚«
+
+		g_aMeshWall[nCntMeshWall].fWidth      = 0.0f;	// ‰¡•
+		g_aMeshWall[nCntMeshWall].fHeight     = 0.0f;	// c•
+		g_aMeshWall[nCntMeshWall].nPartWidth  = 0;		// ‰¡‚Ì•ªŠ„”
+		g_aMeshWall[nCntMeshWall].nPartHeight = 0;		// c‚Ì•ªŠ„”
+		g_aMeshWall[nCntMeshWall].nNumVtx     = 0;		// •K—v’¸“_”
+		g_aMeshWall[nCntMeshWall].nNumIdx     = 0;		// •K—vƒCƒ“ƒfƒbƒNƒX”
+		g_aMeshWall[nCntMeshWall].nType       = 0;		// Ží—Þ
+		g_aMeshWall[nCntMeshWall].bUse        = false;	// Žg—pó‹µ
 	}
 
 	// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚Ýž‚Ý
