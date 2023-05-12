@@ -12,44 +12,40 @@
 //===========================================
 //マクロ定義
 //===========================================
-#define MAX_PRAISE			(30)									// 褒めの最大数
+#define MAX_PRAISE			(30)	// 褒めの最大数
+#define PRAISE_LAPSE_CNT	(90)	// 褒めを表示しておくカウント
 
 #define PRAISE_INIT_POS		(D3DXVECTOR3(	0.0f,	0.0f, 0.0f))	// 褒めの初期位置
 #define PRAISE_POS			(D3DXVECTOR3(1100.0f, 500.0f, 0.0f))	// 褒めの位置
 #define PRAISE_INIT_SIZE	(D3DXVECTOR3( 810.0f, 150.0f, 0.0f))	// 褒めの初期サイズ
 #define PRAISE_SUB_SIZE		(D3DXVECTOR3(  81.0f,  15.0f, 0.0f))	// 褒めのサイズの減算量
 #define PRAISE_SIZE			(D3DXVECTOR3( 162.0f,  30.0f, 0.0f))	// 褒めのサイズ
-#define PRAISE_LAPSE_CNT	(90)									// 褒めを表示しておくカウント
 
 //===========================================
 //列挙型定義(PRAISE_TEXTURE)
 //===========================================
 typedef enum
 {
-	PRAISE_TEXTURE_NICE = 0,			// ナイスコンボテクスチャ
-	PRAISE_TEXTURE_GREAT,				// グレートコンボテクスチャ
-	PRAISE_TEXTURE_GOOD,				// グッドコンボテクスチャ
-	PRAISE_TEXTURE_MAX					// この列挙型の総数
+	PRAISE_TEXTURE_NICE = 0,	// ナイスコンボテクスチャ
+	PRAISE_TEXTURE_GREAT,		// グレートコンボテクスチャ
+	PRAISE_TEXTURE_GOOD,		// グッドコンボテクスチャ
+	PRAISE_TEXTURE_MAX			// この列挙型の総数
 }PRAISE_TEXTURE;
-
-//===========================================
-//プロトタイプ宣言
-//===========================================
 
 //===========================================
 //グローバル変数宣言
 //===========================================
-LPDIRECT3DTEXTURE9      g_apTexturePraise[PRAISE_TEXTURE_MAX] = {};		// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffPraise = NULL;	// 頂点バッファへのポインタ
+LPDIRECT3DTEXTURE9      g_apTexturePraise[PRAISE_TEXTURE_MAX] = {};	// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffPraise = NULL;					// 頂点バッファへのポインタ
 
-Praise g_aPraise[MAX_PRAISE];						// 褒めの情報
+Praise g_aPraise[MAX_PRAISE];	// 褒めの情報
 
 // コンスト定義
 const char *c_apPraiseTextureName[PRAISE_TEXTURE_MAX] = 
 {
-	"data/TEXTURE/praise000.png",		// ナイスコンボテクスチャ
-	"data/TEXTURE/praise001.png",		// グレートコンボテクスチャ
-	"data/TEXTURE/praise002.png",		// グッドコンボテクスチャ
+	"data/TEXTURE/praise000.png",	// ナイスコンボテクスチャ
+	"data/TEXTURE/praise001.png",	// グレートコンボテクスチャ
+	"data/TEXTURE/praise002.png",	// グッドコンボテクスチャ
 };
 
 //===========================================
@@ -64,15 +60,21 @@ void InitPraise(void)
 	for (int nCntPra = 0; nCntPra < MAX_PRAISE; nCntPra++)
 	{
 		// 情報の初期化
-		g_aPraise[nCntPra].pos		= PRAISE_INIT_POS;					// 位置
-		g_aPraise[nCntPra].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aPraise[nCntPra].size		= PRAISE_INIT_SIZE;					// サイズ
-		g_aPraise[nCntPra].state	= PRAISESTATE_APPEAR;				// 状態
-		g_aPraise[nCntPra].nCount	= 0;								// 消滅カウント
-		g_aPraise[nCntPra].nNumTex	= 0;								// テクスチャの番号
-		g_aPraise[nCntPra].fAngle	= atan2f((g_aPraise[nCntPra].size.x * 2), (g_aPraise[nCntPra].size.y * 2));		// 方向
-		g_aPraise[nCntPra].fLength	= sqrtf((g_aPraise[nCntPra].size.x * 2) * (g_aPraise[nCntPra].size.x * 2) + (g_aPraise[nCntPra].size.y * 2) * (g_aPraise[nCntPra].size.y * 2)) * 0.5f;		// 長さ
-		g_aPraise[nCntPra].bUse		= false;							// 使用状況
+		g_aPraise[nCntPra].pos	= PRAISE_INIT_POS;					// 位置
+		g_aPraise[nCntPra].rot	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aPraise[nCntPra].size	= PRAISE_INIT_SIZE;					// サイズ
+
+		g_aPraise[nCntPra].state	= PRAISESTATE_APPEAR;	// 状態
+		g_aPraise[nCntPra].nCount	= 0;					// 消滅カウント
+		g_aPraise[nCntPra].nNumTex	= 0;					// テクスチャの番号
+		g_aPraise[nCntPra].bUse		= false;				// 使用状況
+
+		// 方向の初期化
+		g_aPraise[nCntPra].fAngle	= atan2f((g_aPraise[nCntPra].size.x * 2), (g_aPraise[nCntPra].size.y * 2));
+
+		// 長さの初期化
+		g_aPraise[nCntPra].fLength	= sqrtf((g_aPraise[nCntPra].size.x * 2) * (g_aPraise[nCntPra].size.x * 2)
+									+ (g_aPraise[nCntPra].size.y * 2) * (g_aPraise[nCntPra].size.y * 2)) * 0.5f;
 	}
 
 	for (int nCntTex = 0; nCntTex < PRAISE_TEXTURE_MAX; nCntTex++)
@@ -111,19 +113,19 @@ void InitPraise(void)
 		pVtx[3].pos.y = g_aPraise[nCntPra].pos.y + cosf(g_aPraise[nCntPra].rot.z + g_aPraise[nCntPra].fAngle) * g_aPraise[nCntPra].fLength;
 		pVtx[3].pos.z = 0.0f;
 
-		//rhwの設定
+		// rhwの設定
 		pVtx[0].rhw = 1.0f;
 		pVtx[1].rhw = 1.0f;
 		pVtx[2].rhw = 1.0f;
 		pVtx[3].rhw = 1.0f;
 
-		//頂点カラーの設定
+		// 頂点カラーの設定
 		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-		//テクスチャ座標の設定
+		// テクスチャ座標の設定
 		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
 		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
@@ -132,7 +134,7 @@ void InitPraise(void)
 		pVtx += 4;			// 頂点データを4つ分進める
 	}
 
-	//頂点バッファをアンロックする
+	// 頂点バッファをアンロックする
 	g_pVtxBuffPraise->Unlock();
 }
 

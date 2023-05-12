@@ -130,7 +130,7 @@
 //**********************************************************************************************************************
 //	ランキングのコンスト定義
 //**********************************************************************************************************************
-const char *apTextureRank[] =		// ランキングのテクスチャの相対パス
+const char *apTextureRank[] =	// ランキングのテクスチャの相対パス
 {
 	"data\\TEXTURE\\ranking000.tga",	// ランキング文字
 	"data\\TEXTURE\\ui001.tga",			// ニュースコア背景
@@ -147,20 +147,16 @@ const char *apTextureRank[] =		// ランキングのテクスチャの相対パス
 //**********************************************************************************************************************
 typedef enum
 {
-	TEXTURE_RANK_CHAR = 0,		// ランキング文字
-	TEXTURE_RANK_UI_004,		// ニュースコア背景
-	TEXTURE_RANK_LINE,			// ランキングの下線
-	TEXTURE_RANK_1ST,			// スコアの順位（一位）
-	TEXTURE_RANK_2ND,			// スコアの順位（二位）
-	TEXTURE_RANK_3RD,			// スコアの順位（三位）
-	TEXTURE_RANK_4TH,			// スコアの順位（四位）
-	TEXTURE_RANK_5TH,			// スコアの順位（五位）
-	TEXTURE_RANK_MAX,			// この列挙型の総数
+	TEXTURE_RANK_CHAR = 0,	// ランキング文字
+	TEXTURE_RANK_UI_004,	// ニュースコア背景
+	TEXTURE_RANK_LINE,		// ランキングの下線
+	TEXTURE_RANK_1ST,		// スコアの順位（一位）
+	TEXTURE_RANK_2ND,		// スコアの順位（二位）
+	TEXTURE_RANK_3RD,		// スコアの順位（三位）
+	TEXTURE_RANK_4TH,		// スコアの順位（四位）
+	TEXTURE_RANK_5TH,		// スコアの順位（五位）
+	TEXTURE_RANK_MAX,		// この列挙型の総数
 } TEXTURE_RANKING;
-
-//**********************************************
-//* 列挙型
-//**********************************************
 
 //**********************************************
 //* 構造体
@@ -201,9 +197,9 @@ Ranking2D g_rank2DRank[RANK_SCORE_MAX];		//ランキング順位の2Dポリゴン
 RankingScore g_aRankScore[RANK_SCORE_MAX];	//ランキングのスコアの情報
 RankingScore g_aRankNewScore;				//ランキングのニュースコアの情報
 
-FileMode g_fileMode;						//ファイルの入出力の種類
-bool g_bRankTrance;							//遷移の有無
-int g_nNewScoreNumber = -1;					//ニュースコアの番号
+FileMode g_fileMode;		//ファイルの入出力の種類
+bool g_bRankTrance;			//遷移の有無
+int g_nNewScoreNumber = -1;	//ニュースコアの番号
 
 //====================================
 //= ランキングの初期化処理
@@ -217,7 +213,7 @@ void InitRanking(void)
 	for (int nCount = 0; nCount < TEXTURE_RANK_MAX; nCount++)
 	{ // 使用するテクスチャ数分繰り返す
 
-	  // テクスチャの読み込み
+		// テクスチャの読み込み
 		D3DXCreateTextureFromFile(pDevice, apTextureRank[nCount], &g_apTextureRank[nCount]);
 	}
 
@@ -368,11 +364,10 @@ void InitRanking(void)
 	);
 
 	if (GetTitleState() != TITLESTATE_FADE)
-	{//タイトル遷移中じゃないとき
+	{ // タイトル遷移中じゃないとき
 		
-		//スコアのソート
+		// スコアのソート
 		SortRankingScore();
-
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -440,7 +435,8 @@ void InitRanking(void)
 	//------------------------------------------------------------------------------------------------------------------
 	for (int nCount = 0; nCount < RANK_SCORE_MAX; nCount++)
 	{ // スコア分回す
-	  // 頂点座標を設定
+
+		// 頂点座標を設定
 		pVtx[8  + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine[nCount].pos.x - RANK_WIDTH) - ((RANK_NUM_PLACE * RANK_INTERVAL_X) + RANK_LINE_WIDTH), (g_rank2DLine[nCount].pos.y - RANK_HEIGHT), 0.0f);
 		pVtx[9  + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine[nCount].pos.x + RANK_WIDTH + RANK_LINE_OVER_X),										  (g_rank2DLine[nCount].pos.y - RANK_HEIGHT), 0.0f);
 		pVtx[10 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DLine[nCount].pos.x - RANK_WIDTH) - ((RANK_NUM_PLACE * RANK_INTERVAL_X) + RANK_LINE_WIDTH), (g_rank2DLine[nCount].pos.y + RANK_HEIGHT), 0.0f);
@@ -470,7 +466,8 @@ void InitRanking(void)
 	//------------------------------------------------------------------------------------------------------------------
 	for (int nCount = 0; nCount < RANK_SCORE_MAX; nCount++)
 	{ // スコア分回す
-	  // 頂点座標を設定
+
+		// 頂点座標を設定
 		pVtx[28 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DRank[nCount].pos.x - RANK_RANK_WIDTH), (g_rank2DRank[nCount].pos.y - RANK_RANK_HEIGHT), 0.0f);
 		pVtx[29 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DRank[nCount].pos.x + RANK_RANK_WIDTH), (g_rank2DRank[nCount].pos.y - RANK_RANK_HEIGHT), 0.0f);
 		pVtx[30 + (nCount * 4)].pos = D3DXVECTOR3((g_rank2DRank[nCount].pos.x - RANK_RANK_WIDTH), (g_rank2DRank[nCount].pos.y + RANK_RANK_HEIGHT), 0.0f);
@@ -494,7 +491,6 @@ void InitRanking(void)
 		pVtx[30 + (nCount * 4)].tex = D3DXVECTOR2(0.0f, 1.0f);
 		pVtx[31 + (nCount * 4)].tex = D3DXVECTOR2(1.0f, 1.0f);
 	}
-
 
 	// 頂点バッファをアンロックする
 	g_pVtxBuffRank->Unlock();
@@ -528,21 +524,21 @@ void UninitRanking(void)
 		g_pVtxBuffRank = NULL;
 	}
 
-	//ニュースコアの番号
+	// ニュースコアの番号
 	g_nNewScoreNumber = -1;
 
-	//ランキングの値をファイルに書き出し
+	// ランキングの値をファイルに書き出し
 	SaveRanking();
 
 	// 万能終了の全体処理（3Dマップ）
 	UninitAllAroundChunk();
 
 	if (GetTitleState() != TITLESTATE_FADE)
-	{//タイトル遷移中じゃないとき
-		//サウンドの停止（リザルトからのBGM）
+	{ // タイトル遷移中じゃないとき
+
+		// サウンドの停止（リザルトからのBGM）
 		StopSound();
 	}
-
 }
 
 //=====================================

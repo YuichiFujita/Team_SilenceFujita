@@ -55,9 +55,8 @@
 #define POLICAR_TACKLE_RANGE	(1000.0f)	// タックル状態になる範囲
 #define POLICAR_SPAWN_RANGE		(3000.0f)	// スポーンしないゲートからの範囲
 
-#define ADDPOLICE_COUNT			(4)			// 警察が増えるカウント
-
-#define NONE_NEAREST			(-1)		// 最寄りの初期値
+#define ADDPOLICE_COUNT	(4)		// 警察が増えるカウント
+#define NONE_NEAREST	(-1)	// 最寄りの初期値
 
 //**********************************************************************************************************************
 //	タックル関係のマクロ定義
@@ -67,7 +66,7 @@
 #define FINISH_POLICAR_TACKLE	(80)		// タックル終了するまでの時間
 #define STOP_POLICAR_CNT		(25)		// 止まっている間のカウント数
 #define STOP_POLICAR_ROT		(0.05f)		// 車が止まっている間の向きの増加係数
-#define BOOST_POLICAR_ROT		(0.035f)		// ブースト中の向きの増加係数
+#define BOOST_POLICAR_ROT		(0.035f)	// ブースト中の向きの増加係数
 #define POLICAR_ATTEN_STOP		(0.1f)		// 追加移動量の減衰係数
 
 //**********************************************************************************************************************
@@ -79,30 +78,31 @@
 //**********************************************************************************************************************
 //	チュートリアルでのマクロ定義
 //**********************************************************************************************************************
-#define POLICE_TUTORIAL_DEST		(D3DXVECTOR3(-2000.0f, 0.0f, 3000.0f))	// 警察のチュートリアルでの目的地
-#define POLICE_TUTORIAL_MOVE		(0.1f)									// 警察のチュートリアルでの移動量
-#define POLICE_TUTORIAL_ALPHA_MOVE	(0.01f)									// 警察のチュートリアルでの透明度の移動量
+#define POLICE_TUTORIAL_DEST	(D3DXVECTOR3(-2000.0f, 0.0f, 3000.0f))	// 警察のチュートリアルでの目的地
+
+#define POLICE_TUTORIAL_MOVE		(0.1f)	// 警察のチュートリアルでの移動量
+#define POLICE_TUTORIAL_ALPHA_MOVE	(0.01f)	// 警察のチュートリアルでの透明度の移動量
 
 //**********************************************************************************************************************
 //	プロトタイプ宣言
 //**********************************************************************************************************************
 void PosPolice(D3DXVECTOR3 *move, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bMove);	// プレイヤーの位置の更新処理
 void RevPolice(D3DXVECTOR3 *rot, D3DXVECTOR3 *pos,D3DXVECTOR3 *move);				// プレイヤーの補正の更新処理
-void PatrolPoliceAct(Police *pPolice);					// 警察のパトロール行動処理
-void ChasePoliceAct(Police *pPolice);					// 警察の追跡処理
-void PatrolBackAct(Police *pPolice);					// パトロールに戻る処理
-void CurvePolice(Police *pPolice);						// 警察のカーブ処理
-void DashPoliceAction(Police *pPolice);					// 警察の走行処理
-void SetPolicePosRot(Police *pPolice);					// 警察の位置と向きの設定処理
-void PolicePosRotCorrect(Police *pPolice);				// 警察の位置の補正処理
-void PoliceTackle(Police *pPolice);						// 警察のタックル処理
-void PoliceTrafficImprove(Police *pPolice);				// 警察の渋滞改善処理
-void PoliceGatePos(Police *pPolice);					// 警察の出現ゲート決定処理
-void PoliceSpawn(Police *pPolice);						// 警察の出現処理
-void PoliceCurveCheck(Police *pPolice);					// 警察の曲がり角チェック処理
-void PoliceWaitCheck(Police *pPolice);					// 警察の待機状態チェック処理
 
-void PoliceSoundVolume(D3DXVECTOR3 *pPos);				// プレイヤーとの距離で音量を調整
+void PatrolPoliceAct(Police *pPolice);		// 警察のパトロール行動処理
+void ChasePoliceAct(Police *pPolice);		// 警察の追跡処理
+void PatrolBackAct(Police *pPolice);		// パトロールに戻る処理
+void CurvePolice(Police *pPolice);			// 警察のカーブ処理
+void DashPoliceAction(Police *pPolice);		// 警察の走行処理
+void SetPolicePosRot(Police *pPolice);		// 警察の位置と向きの設定処理
+void PolicePosRotCorrect(Police *pPolice);	// 警察の位置の補正処理
+void PoliceTackle(Police *pPolice);			// 警察のタックル処理
+void PoliceTrafficImprove(Police *pPolice);	// 警察の渋滞改善処理
+void PoliceGatePos(Police *pPolice);		// 警察の出現ゲート決定処理
+void PoliceSpawn(Police *pPolice);			// 警察の出現処理
+void PoliceCurveCheck(Police *pPolice);		// 警察の曲がり角チェック処理
+void PoliceWaitCheck(Police *pPolice);		// 警察の待機状態チェック処理
+void PoliceSoundVolume(D3DXVECTOR3 *pPos);	// プレイヤーとの距離で音量を調整
 
 //**********************************************************************************************************************
 //	グローバル変数
@@ -111,7 +111,7 @@ Police g_aPolice[MAX_POLICE];	// オブジェクトの情報
 Reinforce g_AddPolice;			// 警察の増援の情報
 
 // チュートリアル用
-TutorialPolice g_TutorialPolice;	// 警察(チュートリアル版)
+TutorialPolice g_TutorialPolice;	// 警察 (チュートリアル版)
 
 //======================================================================================================================
 //	警察の初期化処理
@@ -121,65 +121,70 @@ void InitPolice(void)
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
-	// オブジェクトの情報の初期化
+	// 警察の情報の初期化
 	for (int nCntPolice = 0; nCntPolice < MAX_POLICE; nCntPolice++)
-	{ // オブジェクトの最大表示数分繰り返す
+	{ // 警察の最大表示数分繰り返す
 
 		// 基本情報を初期化
-		g_aPolice[nCntPolice].pos		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
-		g_aPolice[nCntPolice].posOld	  = g_aPolice[nCntPolice].pos;		// 前回の位置
-		g_aPolice[nCntPolice].move		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
-		g_aPolice[nCntPolice].rot		  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
-		g_aPolice[nCntPolice].rotDest	  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
-		g_aPolice[nCntPolice].state		  = POLICESTATE_PATROL;				// 警察の状態
-		g_aPolice[nCntPolice].bombState   = BOMBSTATE_NONE;					// ボムの状態
-		g_aPolice[nCntPolice].nLife		  = 0;								// 体力
-		g_aPolice[nCntPolice].nShadowID   = NONE_SHADOW;					// 影のインデックス
-		g_aPolice[nCntPolice].bJump		  = false;							// ジャンプしていない
-		g_aPolice[nCntPolice].nTrafficCnt = 0;								// 渋滞カウント
-		g_aPolice[nCntPolice].fAlpha	  = 1.0f;							// 透明度
-		g_aPolice[nCntPolice].nNumSpawnGate = NONE_NEAREST;					// 出てくるゲートの番号
-		g_aPolice[nCntPolice].bUse		  = false;							// 使用状況
+		g_aPolice[nCntPolice].pos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置
+		g_aPolice[nCntPolice].posOld	= g_aPolice[nCntPolice].pos;		// 前回の位置
+		g_aPolice[nCntPolice].move		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+		g_aPolice[nCntPolice].rot		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+		g_aPolice[nCntPolice].rotDest	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 目標の向き
+
+		g_aPolice[nCntPolice].state			= POLICESTATE_PATROL;	// 警察の状態
+		g_aPolice[nCntPolice].bombState		= BOMBSTATE_NONE;		// ボムの状態
+		g_aPolice[nCntPolice].nLife			= 0;					// 体力
+		g_aPolice[nCntPolice].nShadowID		= NONE_SHADOW;			// 影のインデックス
+		g_aPolice[nCntPolice].bJump			= false;				// ジャンプしていない
+		g_aPolice[nCntPolice].bMove			= false;				// 移動しているかどうか
+		g_aPolice[nCntPolice].nTrafficCnt	= 0;					// 渋滞カウント
+		g_aPolice[nCntPolice].fAlpha		= 1.0f;					// 透明度
+		g_aPolice[nCntPolice].nNumSpawnGate	= NONE_NEAREST;			// 出てくるゲートの番号
+		g_aPolice[nCntPolice].bUse			= false;				// 使用状況
 
 		// 曲がり角関係を初期化
 		g_aPolice[nCntPolice].policeCurve.curveInfo.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 曲がり角の位置
-		g_aPolice[nCntPolice].policeCurve.curveInfo.nCurveNumber = -1;						// 番号
-		g_aPolice[nCntPolice].policeCurve.curveInfo.curveAngle = CURVE_RIGHT;				// 右に曲がる
-		g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle = DASH_RIGHT;					// 右に進む
-		g_aPolice[nCntPolice].policeCurve.curveInfo.bDeadEnd = false;						// 行き止まりかどうか
-		g_aPolice[nCntPolice].policeCurve.actionState = CARACT_DASH;						// 状態
-		g_aPolice[nCntPolice].policeCurve.nSKipCnt = 0;										// スキップする回数
-		g_aPolice[nCntPolice].policeCurve.rotDest = g_aPolice[nCntPolice].rot;				// 目標の向き
+		g_aPolice[nCntPolice].policeCurve.curveInfo.nCurveNumber	= -1;					// 番号
+		g_aPolice[nCntPolice].policeCurve.curveInfo.curveAngle		= CURVE_RIGHT;			// 右に曲がる
+		g_aPolice[nCntPolice].policeCurve.curveInfo.dashAngle		= DASH_RIGHT;			// 右に進む
+		g_aPolice[nCntPolice].policeCurve.curveInfo.bDeadEnd		= false;				// 行き止まりかどうか
 
-		g_aPolice[nCntPolice].policeCurveCopy = g_aPolice[nCntPolice].policeCurve;			// 曲がり角の情報を代入
+		g_aPolice[nCntPolice].policeCurve.actionState	= CARACT_DASH;							// 状態
+		g_aPolice[nCntPolice].policeCurve.nSKipCnt		= 0;									// スキップする回数
+		g_aPolice[nCntPolice].policeCurve.rotDest		= g_aPolice[nCntPolice].rot;			// 目標の向き
+		g_aPolice[nCntPolice].policeCurveCopy			= g_aPolice[nCntPolice].policeCurve;	// 曲がり角の情報を代入
 
 		// モデル情報の初期化
-		g_aPolice[nCntPolice].modelData.dwNumMat = 0;						// マテリアルの数
-		g_aPolice[nCntPolice].modelData.pTexture = NULL;					// テクスチャへのポインタ
-		g_aPolice[nCntPolice].modelData.pMesh    = NULL;					// メッシュ (頂点情報) へのポインタ
-		g_aPolice[nCntPolice].modelData.pBuffMat = NULL;					// マテリアルへのポインタ
-		g_aPolice[nCntPolice].modelData.dwNumMat = 0;						// マテリアルの数
-		g_aPolice[nCntPolice].modelData.vtxMin   = INIT_VTX_MIN;			// 最小の頂点座標
-		g_aPolice[nCntPolice].modelData.vtxMax   = INIT_VTX_MAX;			// 最大の頂点座標
-		g_aPolice[nCntPolice].modelData.size     = INIT_SIZE;				// 大きさ
-		g_aPolice[nCntPolice].modelData.fRadius  = 0.0f;					// 半径
+		g_aPolice[nCntPolice].modelData.dwNumMat = 0;				// マテリアルの数
+		g_aPolice[nCntPolice].modelData.pTexture = NULL;			// テクスチャへのポインタ
+		g_aPolice[nCntPolice].modelData.pMesh    = NULL;			// メッシュ (頂点情報) へのポインタ
+		g_aPolice[nCntPolice].modelData.pBuffMat = NULL;			// マテリアルへのポインタ
+		g_aPolice[nCntPolice].modelData.dwNumMat = 0;				// マテリアルの数
+		g_aPolice[nCntPolice].modelData.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
+		g_aPolice[nCntPolice].modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
+		g_aPolice[nCntPolice].modelData.size     = INIT_SIZE;		// 大きさ
+		g_aPolice[nCntPolice].modelData.fRadius  = 0.0f;			// 半径
+
+		// マテリアルのコピー情報を初期化
+		ZeroMemory(&g_aPolice[nCntPolice].MatCopy[0], sizeof(g_aPolice[nCntPolice].MatCopy));
 
 		// タックル関係の情報の初期化
-		g_aPolice[nCntPolice].tackle.nTackleCnt = 0;						// タックルのカウント
-		g_aPolice[nCntPolice].tackle.tacklemove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
-		g_aPolice[nCntPolice].tackle.tackleState = TACKLESTATE_CHARGE;		// タックルの状態
+		g_aPolice[nCntPolice].tackle.nTackleCnt		= 0;								// タックルのカウント
+		g_aPolice[nCntPolice].tackle.tacklemove		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// タックル時の追加移動量
+		g_aPolice[nCntPolice].tackle.tackleState	= TACKLESTATE_CHARGE;				// タックルの状態
 
 		// アイコンの情報の初期化
-		g_aPolice[nCntPolice].icon.nIconID = NONE_ICON;						// アイコンのインデックス
-		g_aPolice[nCntPolice].icon.state = ICONSTATE_NONE;					// アイコンの状態
-
-		// チュートリアルの警察
-		g_TutorialPolice.state = POLITUTOSTATE_DRIVE;						// 状態
-		g_TutorialPolice.fAlpha = 1.0f;									// 透明度
+		g_aPolice[nCntPolice].icon.nIconID	= NONE_ICON;		// アイコンのインデックス
+		g_aPolice[nCntPolice].icon.state	= ICONSTATE_NONE;	// アイコンの状態
 	}
 
 	// 援軍情報の初期化
-	g_AddPolice.nBonus = 0;													// 得点が入った回数
+	g_AddPolice.nBonus = 0;	// 得点が入った回数
+
+	// チュートリアルの警察の情報を初期化
+	g_TutorialPolice.state	= POLITUTOSTATE_DRIVE;	// 状態
+	g_TutorialPolice.fAlpha	= 1.0f;					// 透明度
 }
 
 //======================================================================================================================

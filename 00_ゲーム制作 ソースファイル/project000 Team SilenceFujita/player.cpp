@@ -52,14 +52,14 @@
 #define UNRIVALED_CNT			(10)		// 無敵時にチカチカさせるカウント
 #define STATE_MOVE				(1.5f)		// 停止・旋回時の判定範囲
 #define PLAYER_BROKEN			(50)		// 黒煙が出る体力の境界
-#define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))	// ボロボロになっている車の色の追加量
-#define PLAYER_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))				// 黒煙の色
 #define PLAYER_BACK				(125.0f)	// プレイヤーの後ろ
 #define PLAYER_SHIFT_EXHAUST	(30.0f)		// プレイヤーの排気ガスのずらす幅
-
 #define PLAY_CLEAR_MOVE			(4.0f)		// クリア成功時のプレイヤーの自動移動量
 #define REV_PLAY_CLEAR_MOVE		(0.1f)		// クリア成功時のプレイヤーの減速係数
 #define REV_PLAY_OVER_MOVE		(0.02f)		// クリア失敗時のプレイヤーの減速係数
+
+#define PLAYER_BREAK_ADD_COL	(D3DXCOLOR(0.0035f, 0.0030f, 0.0005f, 0.0f))	// ボロボロになっている車の色の追加量
+#define PLAYER_SMOKE_COL		(D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f))				// 黒煙の色
 
 //------------------------------------------------------------
 //	破滅疾走 (スラム・ブースト) マクロ定義
@@ -96,12 +96,12 @@
 //************************************************************
 typedef enum
 {
-	PLAYMOVESTATE_NONE = 0,			// 何もしない状態
-	PLAYMOVESTATE_ACCEL,			// 前進状態
-	PLAYMOVESTATE_BACK,				// 後退状態
-	PLAYMOVESTATE_ROTATE,			// 旋回状態
-	PLAYMOVESTATE_BRAKE,			// 停止状態
-	PLAYMOVESTATE_MAX				// この列挙型の総数
+	PLAYMOVESTATE_NONE = 0,	// 何もしない状態
+	PLAYMOVESTATE_ACCEL,	// 前進状態
+	PLAYMOVESTATE_BACK,		// 後退状態
+	PLAYMOVESTATE_ROTATE,	// 旋回状態
+	PLAYMOVESTATE_BRAKE,	// 停止状態
+	PLAYMOVESTATE_MAX		// この列挙型の総数
 }PLAYMOVESTATE;
 
 //************************************************************
@@ -109,9 +109,9 @@ typedef enum
 //************************************************************
 typedef struct
 {
-	int  nCounterHeal;				// ボムの回復管理カウンター
-	bool bForward;					// 前向きカメラの状況
-	bool bFirst;					// 一人称カメラの状況
+	int  nCounterHeal;	// ボムの回復管理カウンター
+	bool bForward;		// 前向きカメラの状況
+	bool bFirst;		// 一人称カメラの状況
 }TutorialInfo;
 
 //************************************************************
@@ -120,28 +120,29 @@ typedef struct
 void UpdateGameStartPlayer(void);	// ゲームスタート時のプレイヤー更新処理
 void UpdateGameNorPlayer(void);		// ゲーム通常時のプレイヤー更新処理
 void UpdateTutorialNorPlayer(void);	// チュートリアル通常時のプレイヤー更新処理
-void UpdateClearPlayer(void);		// クリア成功時のプレイヤー更新処理
-void UpdateOverPlayer(void);		// クリア失敗時のプレイヤー更新処理
 
-PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake);		// プレイヤーの移動量の更新処理
+void UpdateClearPlayer(void);	// クリア成功時のプレイヤー更新処理
+void UpdateOverPlayer(void);	// クリア失敗時のプレイヤー更新処理
 
-void PosPlayer(void);				// プレイヤーの位置の更新処理
-void RotPlayer(void);				// プレイヤーの向きの更新処理
-void RevPlayer(void);				// プレイヤーの補正の更新処理
+PLAYMOVESTATE MovePlayer(bool bMove, bool bRotate, bool bBrake);	// プレイヤーの移動量の更新処理
 
-void CameraChangePlayer(void);		// プレイヤーのカメラの状態変化処理
-void SlumBoostPlayer(void);			// プレイヤーの加速処理
-void FlyAwayPlayer(void);			// プレイヤーの送風処理
-void SilenceWorldPlayer(void);		// プレイヤーの爆弾処理
+void PosPlayer(void);	// プレイヤーの位置の更新処理
+void RotPlayer(void);	// プレイヤーの向きの更新処理
+void RevPlayer(void);	// プレイヤーの補正の更新処理
 
-void UpdateSlumBoost(void);			// 加速の更新処理
-void SetSlumBoost(void);			// 加速の設定処理
-void UpdateFlyAway(void);			// 送風の更新処理
-void UpdateSilenceWorld(void);		// 爆弾の更新処理
+void CameraChangePlayer(void);	// プレイヤーのカメラの状態変化処理
+void SlumBoostPlayer(void);		// プレイヤーの加速処理
+void FlyAwayPlayer(void);		// プレイヤーの送風処理
+void SilenceWorldPlayer(void);	// プレイヤーの爆弾処理
 
-void AbiHealPlayer(void);			// 能力ゲージの回復処理
-void CameraChange(void);			// カメラを変えたときの処理
-void ExhaustGas(void);				// 排気ガス排出処理
+void UpdateSlumBoost(void);		// 加速の更新処理
+void SetSlumBoost(void);		// 加速の設定処理
+void UpdateFlyAway(void);		// 送風の更新処理
+void UpdateSilenceWorld(void);	// 爆弾の更新処理
+
+void AbiHealPlayer(void);	// 能力ゲージの回復処理
+void CameraChange(void);	// カメラを変えたときの処理
+void ExhaustGas(void);		// 排気ガス排出処理
 
 //************************************************************
 //	グローバル変数
@@ -159,44 +160,47 @@ void InitPlayer(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// デバイスへのポインタ
 
 	// プレイヤーの本体情報の初期化
-	g_player.pos           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 現在の位置
-	g_player.oldPos        = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 前回の位置
-	g_player.move          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
-	g_player.rot           = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
-	g_player.moveRot       = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き変更量
-	g_player.state         = ACTIONSTATE_NORMAL;				// プレイヤーの状態
-	g_player.nLife         = PLAY_LIFE;							// 体力
-	g_player.nCounterState = 0;									// 状態管理カウンター
-	g_player.nShadowID     = NONE_SHADOW;						// 影のインデックス
-	g_player.nBrokenCnt	   = 0;									// 黒煙の出る間隔
-	g_player.bMove         = false;								// 移動状況
-	g_player.bJump         = false;								// ジャンプ状況
-	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;				// カメラの状態
-	g_player.bCameraFirst  = false;								// 一人称カメラの状況
-	g_player.bUnrivaled	   = false;								// 透明状況
-	g_player.bUse          = false;								// 使用状況
+	g_player.pos     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 現在の位置
+	g_player.oldPos  = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 前回の位置
+	g_player.move    = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+	g_player.rot     = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
+	g_player.moveRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き変更量
+
+	g_player.state         = ACTIONSTATE_NORMAL;	// プレイヤーの状態
+	g_player.nLife         = PLAY_LIFE;				// 体力
+	g_player.nCounterState = 0;						// 状態管理カウンター
+	g_player.nShadowID     = NONE_SHADOW;			// 影のインデックス
+	g_player.nBrokenCnt	   = 0;						// 黒煙の出る間隔
+	g_player.bMove         = false;					// 移動状況
+	g_player.bJump         = false;					// ジャンプ状況
+	g_player.nCameraState  = PLAYCAMESTATE_NORMAL;	// カメラの状態
+	g_player.bCameraFirst  = false;					// 一人称カメラの状況
+	g_player.bUnrivaled	   = false;					// 透明状況
+	g_player.bUse          = false;					// 使用状況
+	g_player.nNumEnterGate = 0;						// 出てくるゲート
 
 	// モデル情報の初期化
-	g_player.modelData.dwNumMat = 0;				// マテリアルの数
-	g_player.modelData.pTexture = NULL;				// テクスチャへのポインタ
-	g_player.modelData.pMesh    = NULL;				// メッシュ (頂点情報) へのポインタ
-	g_player.modelData.pBuffMat = NULL;				// マテリアルへのポインタ
-	g_player.modelData.dwNumMat = 0;				// マテリアルの数
-	g_player.modelData.vtxMin   = INIT_VTX_MIN;		// 最小の頂点座標
-	g_player.modelData.vtxMax   = INIT_VTX_MAX;		// 最大の頂点座標
-	g_player.modelData.size     = INIT_SIZE;		// 大きさ
-	g_player.modelData.fRadius  = 0.0f;				// 半径
+	g_player.modelData.dwNumMat = 0;			// マテリアルの数
+	g_player.modelData.pTexture = NULL;			// テクスチャへのポインタ
+	g_player.modelData.pMesh    = NULL;			// メッシュ (頂点情報) へのポインタ
+	g_player.modelData.pBuffMat = NULL;			// マテリアルへのポインタ
+	g_player.modelData.dwNumMat = 0;			// マテリアルの数
+	g_player.modelData.vtxMin   = INIT_VTX_MIN;	// 最小の頂点座標
+	g_player.modelData.vtxMax   = INIT_VTX_MAX;	// 最大の頂点座標
+	g_player.modelData.size     = INIT_SIZE;	// 大きさ
+	g_player.modelData.fRadius  = 0.0f;			// 半径
 
 	// ブーストの情報の初期化
 	g_player.boost.plusMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 追加移動量
-	g_player.boost.state    = BOOSTSTATE_NONE;					// 加速状態
-	g_player.boost.nCounter = 0;								// 加速管理カウンター
+	g_player.boost.state    = BOOSTSTATE_NONE;	// 加速状態
+	g_player.boost.nCounter = 0;				// 加速管理カウンター
 
 	// 風の情報の初期化
-	g_player.wind.bUseWind     = false;							// 風の使用状況
-	g_player.wind.nCircleCount = 0;								// どこに出すか
-	g_player.wind.nCount       = 0;								// 風を出すカウント
-	g_player.wind.rot          = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
+	g_player.wind.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す位置
+	g_player.wind.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 風を出す方向
+	g_player.wind.bUseWind     = false;	// 風の使用状況
+	g_player.wind.nCircleCount = 0;		// どこに出すか
+	g_player.wind.nCount       = 0;		// 風を出すカウント
 
 	// 爆弾の情報の初期化
 	g_player.bomb.state           = ATTACKSTATE_NONE;	// 攻撃状態
@@ -206,16 +210,19 @@ void InitPlayer(void)
 	g_player.bomb.bShot           = false;				// 発射待機状況
 
 	// アイコンの情報の初期化
-	g_player.icon.nIconID = NONE_ICON;			// アイコンのインデックス
-	g_player.icon.state   = ICONSTATE_NONE;		// アイコンの状態
+	g_player.icon.nIconID = NONE_ICON;		// アイコンのインデックス
+	g_player.icon.state   = ICONSTATE_NONE;	// アイコンの状態
+
+	// マテリアルのコピー情報の初期化
+	ZeroMemory(&g_player.MatCopy[0], sizeof(g_player.MatCopy));
 
 	// チュートリアルの情報の初期化
-	g_tutoInfo.nCounterHeal = 0;				// ボムの回復管理カウンター
-	g_tutoInfo.bForward     = false;			// 前向きカメラの状況
-	g_tutoInfo.bFirst       = false;			// 一人称カメラの状況
+	g_tutoInfo.nCounterHeal = 0;		// ボムの回復管理カウンター
+	g_tutoInfo.bForward     = false;	// 前向きカメラの状況
+	g_tutoInfo.bFirst       = false;	// 一人称カメラの状況
 
-	//プレイヤーの音
-	g_bWindSound = false;		//送風機
+	// プレイヤーの音
+	g_bWindSound = false;	// 送風機
 }
 
 //============================================================

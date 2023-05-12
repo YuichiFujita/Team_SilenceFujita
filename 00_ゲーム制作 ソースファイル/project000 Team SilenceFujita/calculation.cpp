@@ -357,6 +357,9 @@ void InitAllAroundChunk(void)
 	// 強調表示の初期化
 	Init3DNotation();
 
+	// プレイヤーの初期化
+	InitPlayer();
+
 	// 警察の初期化
 	InitPolice();
 
@@ -416,6 +419,9 @@ void UninitAllAroundChunk(void)
 
 	// 強調表示の終了
 	Uninit3DNotation();
+
+	// プレイヤーの終了
+	UninitPlayer();
 
 	// 警察の終了
 	UninitPolice();
@@ -525,9 +531,6 @@ void InitResultChunk(void)
 	// 万能初期化の全体処理
 	InitAllAroundChunk();
 
-	// アイコンの初期化
-	InitIcon();
-
 	// フラッシュの初期化
 	InitFlash();
 }
@@ -539,9 +542,6 @@ void UninitResultChunk(void)
 {
 	// 万能終了の全体処理
 	UninitAllAroundChunk();
-
-	// アイコンの終了
-	UninitIcon();
 
 	// フラッシュの終了
 	UninitFlash();

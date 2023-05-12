@@ -1324,7 +1324,7 @@ void TxtSetAI(void)
 	int			type;			// 種類
 
 	// 変数配列を宣言
-	char         aString[MAX_STRING];	// テキストの文字列の代入用
+	char aString[MAX_STRING];	// テキストの文字列の代入用
 
 	// ポインタを宣言
 	FILE *pFile;				// ファイルポインタ
