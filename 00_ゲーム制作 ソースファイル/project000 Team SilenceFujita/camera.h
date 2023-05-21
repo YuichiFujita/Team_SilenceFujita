@@ -81,8 +81,5 @@ D3DXVECTOR3 GetCameraPosV(void);	// 視点座標の取得処理
 D3DXVECTOR3 GetCameraPosR(void);	// 注視点座標の取得処理
 D3DXVECTOR3 GetCameraRot(void);		// 向きの取得処理
 float GetCameraDis(void);			// 距離の取得処理
-void  ResetCamera(void);			// カメラの再設定処理
-
-CAMERASTATE *GetCameraState(void);	// カメラの状態の取得処理
 
 #endif
